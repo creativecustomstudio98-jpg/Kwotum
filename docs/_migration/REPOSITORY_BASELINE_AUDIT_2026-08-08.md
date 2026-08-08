@@ -88,6 +88,15 @@ regresję wysokości hero `/branze` w macierzy 320–1536 px bez obniżania CSP.
    Gitleaks na tym samym SHA.
 5. Dopiero po 12ZD przejść do otwartych gate'ów 12ZE–13D i checklisty pilota.
 
+## Clean checkout
+
+Pierwszy przebieg z detached worktree dokładnego SHA ujawnił wyścig między
+`next typegen` i `next build`: oba procesy równolegle modyfikowały
+`.next/types/routes.d.ts`, a Turbo zwróciło kod 0 mimo zalogowanego `ENOENT`.
+Graf zadań został zaostrzony tak, aby każdy `build` czekał na własny
+`typecheck`. Odbiór wymaga ponownego, pozbawionego tego komunikatu przebiegu z
+nowego SHA; sam pozornie zielony kod wyjścia nie jest uznawany za dowód.
+
 ## Kryterium odbioru
 
 Ten raport dokumentuje lokalny postęp, ale nie zamyka Etapu 12ZD. Jedynym

@@ -6,6 +6,10 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Build każdego workspace'u czeka teraz na jego własny typecheck. Usuwa to
+  wyścig czystego checkoutu, w którym równoległe `next typegen` i `next build`
+  modyfikowały `.next/types` oraz mogły zalogować `ENOENT` mimo kodu wyjścia 0
+  z całego przebiegu Turbo.
 - Drugi pass Etapu 12ZD usuwa dziewięć znanych podatności zależności przez
   bezpieczne wymuszenie wersji `undici`, `brace-expansion`, `js-yaml`, `nanoid`
   i `postcss`; finalny audyt raportuje zero znanych podatności. Lokalny katalog
