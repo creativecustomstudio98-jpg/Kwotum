@@ -2247,8 +2247,9 @@ odpowiadającymi zmianami. Usunięto dziewięć znanych podatności zależności
 177/177, pełne RLS i WordPress PASS, a produkcyjny standalone E2E przechodzi
 257 testów przy 17 jawnych skipach. Gate pozostaje OPEN: trzeba podzielić
 worktree na logiczne commity, uruchomić 16 scenariuszy panelu z tymczasowym
-kontem, odtworzyć clean checkout i uzyskać zielone CI/CodeQL/Gitleaks na tym
-samym SHA. Raport:
+kontem i uzyskać zielone CI/CodeQL/Gitleaks na tym samym SHA. Clean checkout
+został odtworzony na `517d80a`: frozen install, Turbo 32/32, pełne RLS,
+WordPress i audyt zależności PASS. Raport:
 `docs/_migration/REPOSITORY_BASELINE_AUDIT_2026-08-08.md`. R7.1 pozostaje
 nieodebrane; naprawa regresji E2E nie zatwierdza tego etapu produktu.
 

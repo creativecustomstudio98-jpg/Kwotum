@@ -94,8 +94,12 @@ Pierwszy przebieg z detached worktree dokładnego SHA ujawnił wyścig między
 `next typegen` i `next build`: oba procesy równolegle modyfikowały
 `.next/types/routes.d.ts`, a Turbo zwróciło kod 0 mimo zalogowanego `ENOENT`.
 Graf zadań został zaostrzony tak, aby każdy `build` czekał na własny
-`typecheck`. Odbiór wymaga ponownego, pozbawionego tego komunikatu przebiegu z
-nowego SHA; sam pozornie zielony kod wyjścia nie jest uznawany za dowód.
+`typecheck`. Ponowny zimny przebieg z detached checkoutu SHA `517d80a`
+przeszedł bez `ENOENT`: frozen install, 32/32 zadań Turbo, build 40 tras,
+177 testów jednostkowych, pełne RLS na świeżej tymczasowej bazie, WordPress,
+SAST, secret scan i dependency audit. Tymczasowa baza została usunięta po
+teście. Sam pozornie zielony kod wyjścia nie jest uznawany za dowód; log został
+sprawdzony pod kątem poprawnej kolejności typegen → build.
 
 ## Kryterium odbioru
 
