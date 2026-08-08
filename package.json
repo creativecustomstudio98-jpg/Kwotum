@@ -28,6 +28,7 @@
     "security:sast": "bash scripts/security/static-scan.sh",
     "security:secrets": "bash scripts/security/secret-scan.sh",
     "security:scan": "pnpm security:sast && pnpm security:secrets",
+    "smoke:runtime": "node scripts/smoke-runtime.mjs",
     "start": "turbo run start",
     "test": "pnpm test:unit && pnpm test:rls && pnpm test:wordpress",
     "test:rls": "bash scripts/test-rls.sh",

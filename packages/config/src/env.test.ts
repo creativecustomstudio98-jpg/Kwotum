@@ -62,7 +62,7 @@ describe("environment validation", () => {
     ).toThrow();
   });
 
-  it("rejects localhost and insecure APP_URL for a production deployment", () => {
+  it("rejects localhost and insecure APP_URL for staging and production", () => {
     expect(() =>
       parseDeploymentEnv({
         APP_URL: "http://localhost:3000",
@@ -75,6 +75,18 @@ describe("environment validation", () => {
         DEPLOYMENT_ENV: "production",
       }),
     ).toThrow();
+    expect(() =>
+      parseDeploymentEnv({
+        APP_URL: "http://localhost:3000",
+        DEPLOYMENT_ENV: "staging",
+      }),
+    ).toThrow();
+    expect(() =>
+      parseDeploymentEnv({
+        APP_URL: "http://staging.kwotum.example",
+        DEPLOYMENT_ENV: "staging",
+      }),
+    ).toThrow();
     expect(
       parseDeploymentEnv({
         APP_URL: "https://app.lorum.example",
@@ -83,6 +95,15 @@ describe("environment validation", () => {
     ).toEqual({
       APP_URL: "https://app.lorum.example",
       DEPLOYMENT_ENV: "production",
+    });
+    expect(
+      parseDeploymentEnv({
+        APP_URL: "https://staging.kwotum.example",
+        DEPLOYMENT_ENV: "staging",
+      }),
+    ).toEqual({
+      APP_URL: "https://staging.kwotum.example",
+      DEPLOYMENT_ENV: "staging",
     });
     expect(
       parseDeploymentEnv({

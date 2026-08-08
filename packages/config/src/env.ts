@@ -45,7 +45,7 @@ export const deploymentEnvSchema = z
   })
   .strict()
   .superRefine((env, context) => {
-    if (env.DEPLOYMENT_ENV !== "production") return;
+    if (env.DEPLOYMENT_ENV !== "staging" && env.DEPLOYMENT_ENV !== "production") return;
     const appUrl = new URL(env.APP_URL);
     const isLoopback =
       appUrl.hostname === "localhost" ||
@@ -54,7 +54,7 @@ export const deploymentEnvSchema = z
     if (appUrl.protocol !== "https:" || isLoopback) {
       context.addIssue({
         code: "custom",
-        message: "Production APP_URL must use HTTPS and a non-loopback hostname.",
+        message: "Staging and production APP_URL must use HTTPS and a non-loopback hostname.",
         path: ["APP_URL"],
       });
     }

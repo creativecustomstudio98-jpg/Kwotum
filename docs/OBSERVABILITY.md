@@ -8,6 +8,17 @@
 - tracing dla submit → lead → notification;
 - health/liveness i osobna readiness zależności krytycznych.
 
+## Kontrakt runtime
+
+`GET /health` jest kontrolą liveness procesu i nie odpytuje zależności.
+`GET /ready` sprawdza ograniczonym czasowo wywołaniem ścieżkę Supabase REST →
+PostgreSQL. Odpowiedź publiczna zawiera wyłącznie `ready` albo `unavailable`;
+nie zawiera hosta, wersji, latencji, klucza ani komunikatu błędu. Monitoring
+może zapisywać status i czas zewnętrznego pomiaru, ale nie body błędu providera.
+
+Lokalny smoke test nie zastępuje uptime checku ani alertu stagingowego.
+Docelowy alert readiness wymaga progu, właściciela i runbooka wybranego w 13A.
+
 ## Alerty
 
 Krytyczne: trwała niemożność submitu, podejrzenie tenant leakage, kolejka bez postępu, utrata bazy. Wysokie: skok 5xx, e-mail/webhook failure rate, błędy widgetu. Każdy alert ma właściciela, runbook i próg oparty na wpływie.
