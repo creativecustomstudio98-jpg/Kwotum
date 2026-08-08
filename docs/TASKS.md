@@ -770,6 +770,54 @@ Visual QA sidebara uzyskało 18/20. Prettier zmienionych plików, lint, typechec
 również przeszedł podczas kontroli. Pełny panelowy Playwright zatrzymują
 wyłącznie wyżej opisane, istniejące błędy CSP.
 
+### Korekta 12M-X — premium sidebar Kwotum
+
+- [x] Zachować jeden wspólny komponent, capability-gated linki, persystencję,
+      klawiaturę i dolną nawigację mobilną.
+- [x] Zwiększyć wyłącznie rozwinięty wariant z 208 do 240 px; rail zwinięty
+      pozostawić na 78 px.
+- [x] Pokazać aktualną markę Kwotum bez płytki, tła i obramowania, zachowując
+      oryginalny `Logoicon.svg`.
+- [x] Dodać osobny, code-native zestaw ikon nawigacji bez zależności, kafelków
+      pod ikonami i bez zmiany ikon formularzy lub akcji biznesowych.
+- [x] Utrzymać reduced motion, forced colors, focus i brak overflow mobile.
+- [x] Zastąpić skokową podmianę strzałki uchwytem krawędziowym, obrotem
+      jednego SVG i wspólnym easingiem szerokości oraz etykiet.
+- [x] Zaktualizować kontrakt geometrii buildera i test E2E sidebara.
+
+**Status 2026-08-03:** korekta jest zamknięta. Sidebar ma 240/78 px,
+warstwowe tło, czysty znak marki oraz autorskie ikony dla dashboardu, leadów,
+procesów, szablonów, analityki, integracji, ustawień i skrótów. Ikony oraz znak
+nie mają własnych kafelków, a uchwyt animuje wspólnie rail i treść. Live QA
+potwierdziło 240 px, 78 px, ukrycie raila i dolną nawigację przy 425 px oraz
+0 px overflow. Lint, typecheck, 85/85 testów web i build przechodzą. Izolowany
+Playwright pozostaje poprawnie pominięty bez sekretów `PANEL_E2E_*`; nie
+uruchomiono alternatywnego logowania ani atrap danych. Raport:
+`docs/PANEL_SIDEBAR_GLASS_2026-08-03.md`.
+
+### Korekta 12M-Y — referencyjny wybór organizacji Kwotum
+
+- [x] Zablokować załącznik 2872 × 1608 px i odtworzyć jego desktopową
+      geometrię na viewportcie kontrolnym 2048 × 1152.
+- [x] Zbudować header około 102 px, kontener 1260 px, kartę około 232 px,
+      avatar 78 px i akcje 60 px bez zmiany ich hrefów.
+- [x] Dodać trzy prawdziwe metadane: opublikowane procesy, leady `new` oraz
+      `in_progress` i ostatnią aktywność z leada albo procesu.
+- [x] Zachować RLS, role i wariant akcji Procesy/Leady bez wpisywania danych
+      referencyjnych na sztywno.
+- [x] Dodać polską odmianę liczników i względny opis aktywności z testami.
+- [x] Zachować pusty stan, wiele organizacji, klawiaturę i transformację mobile
+      bez poziomego overflow.
+- [x] Dodać kontrakt E2E 2048 × 1152 i 390 × 844 z axe oraz screenshotami.
+
+**Status 2026-08-03:** implementacja i live QA są zamknięte. Aktualny tenant
+pokazuje realnie 1 aktywny proces, 37 leadów do obsługi i aktywność dzisiaj.
+Mobile przy aktywnym viewportcie 510 px ma 0 px overflow, trzy metadane oraz
+dwa równe przyciski. Lint, typecheck, 88/88 testów web i produkcyjny build 39
+tras przechodzą. Izolowany E2E pozostaje warunkowy na `PANEL_E2E_*`; raport i artefakty:
+`docs/PANEL_ORGANIZATION_PICKER_REFERENCE_2026-08-03.md` oraz
+`artifacts/visual-qa/12m-panel-shell/organization-picker-kwotum/`.
+
 ## Etap 12N — referencyjna lista Procesy / Formularze
 
 - [x] Wyciąć dokładny crop ekranu procesów z
@@ -1615,6 +1663,562 @@ Odczyt GitHub potwierdził, że remote nadal wskazuje `3193262`, aktualnego
 CodeQL nie ma na zdalnej gałęzi, a ostatnie joby CI kończyły się bez wykonania
 jakiegokolwiek kroku; nie są zaliczane jako dowód gate'u.
 
+**Status kontraktu desktopowego i D0 2026-08-01:** właściciel dostarczył osiem
+nowych referencji V7: siedem kadrów 1672 × 941 oraz overview 941 × 1672.
+Oryginały zablokowano rozmiarem i SHA-256 w
+`docs/ui/landing-desktop-v7/reference/`. Audyt i pomiary ustalają dziewięć
+regionów desktopu, jawne override'y wobec V6, luki referencyjne oraz
+klasyfikację `KEEP/REWRITE/REMOVE/ARCHIVE`. Baseline obecnego `/` ma
+1672 × 6298 px, a produkcyjny zestaw marketingowy przechodzi 21/21.
+
+D0 nie zmienił TSX/CSS, nie zaktualizował snapshotów i nie usunął runtime.
+Niepotwierdzone ceny, trial, logotypy klientów, CRM/Sheets, statystyki, SLA,
+telefon i e-mail z obrazów nie rozszerzają scope; implementacja ma zachować ich
+rolę kompozycyjną za pomocą prawdziwych funkcji i uczciwego copy. Kandydaci
+legacy pozostają na dysku do bezpiecznego cleanupu po podmianie aktywnego
+landingu. `artifacts/promo/lorum-launch-v1/` pozostał nietknięty. Następny
+dozwolony fragment to D1 — home-only header, hero i pasek dowodu, po czym visual
+QA 1672 × 941 i STOP. Program D1–D5 nie zastępuje otwartego gate'u 12ZD.
+
+**Status D1 2026-08-02:** home-only header, hero i neutralny pasek zastosowań
+odtworzono według V7-01. Krytyczne osie 64/1608 px, hero 96–807 px, dashboard
+około 880–1608 × 126–731 px i formularz około 697–927 × 258–753 px przechodzą
+overlay. Cała scena produktu jest code-native; nie skopiowano fikcyjnych
+klientów, KPI ani nieistniejącego terminarza. Dodano nazwane tokeny marketingowe
+z testem kontrastu. Lint, typecheck, build oraz marketingowe 21/21 Playwright
+przechodzą, łącznie z axe, klawiaturą, no-JS, forced colors i overflow. Raport i
+artefakty są w `docs/ui/landing-desktop-v7/D1_HERO_REPORT.md` oraz
+`artifacts/visual-qa/landing-desktop-v7/d1/`. Etap zatrzymano przed D2.
+
+**Status D2 2026-08-02:** sekcję `guided-flow` przebudowano do trzech kart
+według V7-02. Karty trafiają w osie referencji z odchyleniem około 0–2 px,
+łączniki mają 64 px, oprawy ikon 80 px, a dolna powierzchnia kończy się przy
+y≈827. Znormalizowany RMSE wynosi 0,107663, a ocena visual QA 19/20; brak
+osobnej referencji mobile ogranicza wynik transformacji do 3/4. Sekcja jest
+semantyczną listą, SVG są code-native, a copy nie sugeruje tworzenia brakujących
+danych. Lint, typecheck, build i marketingowe 21/21 Playwright przechodzą.
+Raport: `docs/ui/landing-desktop-v7/D2_PROCESS_REPORT.md`. Etap zatrzymano przed
+D3.
+
+**Status D3 2026-08-02:** sekcję `client-demo` przebudowano do czterech kart
+kluczowych danych według V7-03. Nagłówek, opis i siatka trafiają odpowiednio w
+y≈197, y≈369 i y≈480; osie kart obejmują x≈109–1554 przy szerokościach
+324/320/345/355 px. Znormalizowany RMSE spadł z 0,146148 do 0,137486, a ocena
+visual QA wynosi 19/20. Wartości i score są jawnie demonstracyjne, UI jest
+code-native z dwoma istniejącymi lokalnymi zdjęciami, a CTA prowadzi do
+rzeczywistego przykładu leada. Format, lint, typecheck, unit, build i
+marketingowe 21/21 Playwright przechodzą. Raport:
+`docs/ui/landing-desktop-v7/D3_KEY_INFORMATION_REPORT.md`. Etap zatrzymano przed
+następną sekcją desktopu; legacy demo pozostaje do audytowanego cleanupu D5.
+
+**Status D4 lead 2026-08-02:** sekcję `decision-document` przebudowano według
+fragmentu V7-08 do pełnego demonstracyjnego leada. Przy szerokości 1672 px
+sekcja ma 576 px, karta x≈126–1546 i y≈123–520, galeria zaczyna się przy x≈481,
+a separator wyniku przy x≈1093. Trzy rastry zawierają wyłącznie fotografie
+wycięte z zaakceptowanej referencji; dane, ikony, score i CTA są code-native.
+Nie dodano fikcyjnego przypisania handlowca. Pierwszy axe wykrył niepoprawne
+opakowanie `dt/dd`; semantykę poprawiono i finalny zestaw Playwright przechodzi
+21/21. Format, lint, typecheck, unit i build również przechodzą. Raport:
+`docs/ui/landing-desktop-v7/D4_LEAD_EXAMPLE_REPORT.md`. Następna dozwolona
+sekcja to wyłącznie integracje V7-04.
+
+**Status integracji V7-04 2026-08-02:** aktywną sekcję
+`industry-and-publishing` przebudowano do układu pięciu powierzchni według
+natywnej referencji 1672 × 941. Finalna geometria trafia w kicker y≈58, H2
+y≈139, stage x=139/y≈334 i rail x=139/y≈766; normalized RMSE wynosi 0,149777.
+Niepotwierdzone CRM i Google Sheets zastąpiono istniejącymi kanałami WordPress
+i hosted link, zachowując e-mail oraz warunkowo opisany webhook. UI jest
+code-native, nie zawiera atrap kontrolek ani prawdziwych danych osobowych.
+Etykietę 11,2 px wykrytą przez gate podniesiono do 12 px. Format, lint,
+typecheck, unit, build i marketingowe Playwright 21/21 przechodzą. Raport:
+`docs/ui/landing-desktop-v7/INTEGRATIONS_REPORT.md`. Następna dozwolona sekcja
+to wyłącznie pricing V7-05 z uczciwym modelem pilotażowym; cleanup legacy nadal
+czeka na osobny gate.
+
+**Status pricingu V7-05 2026-08-02:** sekcję `pilot` przebudowano do dwóch
+wariantów rozpoczęcia współpracy w natywnej geometrii 1672 × 941. Karty trafiają
+w osie x≈314/831, y≈281, mają szerokości 494/504 px i wysokość 541 px; H2
+zaczyna się przy x≈382/y≈122, a dolny pasek przy y≈852. Normalized RMSE wynosi
+0,155654. Kwoty 249/549 zł, limity, trial, karta płatnicza i claim rezygnacji
+zostały zastąpione rzeczywistym pilotażem, indywidualną wyceną i decyzją o
+dalszym rozwoju. Oba CTA prowadzą do kanonicznego `/cennik`; test blokuje kwoty
+w złotych, trial i kartę na home. Format plików etapu, lint, typecheck, unit,
+build i marketingowe Playwright 21/21 przechodzą. Root `format:check` ma jeden
+niezależny wyjątek w nietkniętym, nieśledzonym
+`artifacts/promo/lorum-launch-v2/STORYBOARD.md`. Raport:
+`docs/ui/landing-desktop-v7/PRICING_REPORT.md`. Następny dozwolony fragment to
+wyłącznie FAQ/pomoc V7-06; cleanup legacy pozostaje osobnym gate'em.
+
+**Status FAQ V7-06 2026-08-02:** dodano nową sekcję `faq` pomiędzy pricingiem a
+footerem w natywnej geometrii 1672 × 941. Lewa oś trafia w x≈87, dwuliniowy H2
+zaczyna się przy y≈158, pięć wierszy po 82,9 px przy y≈417, a panel pomocy ma
+`x≈1079, y≈145, 506 × 716 px`. Normalized RMSE wynosi 0,146369. Natywny
+`details/summary` działa klawiaturą i bez JavaScriptu. Fikcyjny telefon, e-mail,
+chat, 98% satysfakcji i SLA zastąpiono istniejącymi trasami `/jak-dziala`,
+`/produkt`, `/wordpress`, `/cennik` oraz prawdziwymi zasadami RLS/MVP. Pierwszy
+gate wykrył mobilny kicker 11,52 px; po korekcie do 12 px marketingowe
+Playwright przechodzi 22/22. Format plików etapu, lint, typecheck, unit i build
+przechodzą. Root `format:check` ma dwa niezależne wyjątki w nietkniętych,
+nieśledzonych `artifacts/promo/lorum-launch-v2/STORYBOARD.md` oraz
+`artifacts/promo/lorum-launch-v3/STORYBOARD.md`. Raport:
+`docs/ui/landing-desktop-v7/FAQ_REPORT.md`. Następny dozwolony fragment to
+wyłącznie finalne CTA V7-07; cleanup legacy pozostaje osobnym gate'em.
+
+**Status finalnego CTA V7-07 2026-08-02:** dodano nową sekcję `final-cta`
+pomiędzy FAQ a istniejącym footerem. Panel trafia w
+`x=64, y≈80, 1544 × 777 px`, proof w `x≈867, y≈188, 674 × 566 px`, opis w
+`y≈509`, CTA w `y≈642`, a dolne fakty w `y≈771`. Normalized RMSE wynosi
+0,146519. Liczby 128/+20%, 72/+15% i procenty 85/72/68/61 zastąpiono pięcioma
+grupami danych przykładowego briefu, czterema istniejącymi kanałami oraz jawnie
+demonstracyjnym score 87/100. CTA prowadzą do `#przykladowy-lead` i `/produkt`;
+nie dodano formularza ani atrap akcji. Format plików etapu, lint, typecheck,
+unit, build i marketingowe Playwright 23/23 przechodzą. Root `format:check` ma
+niezależne wyjątki w nietkniętych storyboardach
+`artifacts/promo/lorum-launch-v2/STORYBOARD.md` i
+`artifacts/promo/lorum-launch-v3/STORYBOARD.md`. Raport:
+`docs/ui/landing-desktop-v7/FINAL_CTA_REPORT.md`. Następny dozwolony mikroetap
+to wyłącznie integracja footera i kompozycyjny audyt V7-08, bez cleanupu legacy.
+
+**Status footera i overview V7-08 2026-08-02:** istniejącą stopkę przebudowano
+do wspólnej osi `x=64–1608` z finalnym CTA. Pełny znak Lorum, status produktu,
+trzy semantyczne nawigacje, linki prawne i dolny rail zastępują stary,
+szablonowy układ; wszystkie 14 linków ma działające cele. Pełny render
+1672 × 7603 px zachowuje kolejność hero, procesu, kluczowych danych,
+przykładowego leada, integracji, pilotażu, FAQ, finalnego CTA i footera.
+V7-08 ma inną skalę, dlatego zgodnie z kontraktem wykonano side-by-side i ocenę
+kompozycyjną bez fikcyjnego RMSE. Marketingowe Playwright przechodzi 24/24,
+w tym układy 1440/1024/768/390/320 px, no-JS, forced colors i brak overflow.
+Raport: `docs/ui/landing-desktop-v7/FOOTER_OVERVIEW_REPORT.md`. D4 i budowa
+sekcji desktopu są zamknięte. Następny dozwolony etap to wyłącznie D5 — pełna
+kontrola integralności, konsolidacja i bezpieczny cleanup, bez nowej sekcji i
+bez rozpoczęcia redesignu mobile.
+
+**Status mobile M0/M1 2026-08-02:** po zaakceptowaniu desktopu właściciel
+polecił rozpocząć osobny program mobile sekcja po sekcji. Kontrakt zapisano w
+`docs/ui/landing-mobile-v1/MOBILE_MASTER_PROMPT.md`; treść pozostaje z V7, a
+pełny V6 mobile służy wyłącznie do oceny transformacji. Audit wykrył realne,
+maskowane przez `overflow: hidden` przekroczenie H1 i CTA: przy 390 px elementy
+miały 397,1 px szerokości, a przy 320 px 346,7 px. M1 przebudował wyłącznie
+header i hero. Finalne osie to `x=16–374` przy 390 px oraz `x=12–308` przy
+320 px; CTA mają 56 px, menu 44 px, scena zaczyna się około y=670, a hero jest
+krótszy o około 220 px. Test mierzy rzeczywiste bounding boxy na
+320/375/390/430 px zamiast polegać na `scrollWidth`. Marketingowe Playwright
+przechodzi 25/25, a desktop 1440 pozostaje bez zmiany. Raport:
+`docs/ui/landing-mobile-v1/M1_HERO_REPORT.md`. Następny dozwolony etap to
+wyłącznie M2 — trzy kroki procesu. D5 cleanup pozostaje odłożony i nie został
+rozpoczęty.
+
+**Status marki Kwotum i korekty finalnego CTA 2026-08-02:** właściciel
+zatrzymał M2 i zatwierdził osobny, zamknięty mikroetap marki. ADR-033 zmienia
+widoczną nazwę Lorum na Kwotum oraz wprowadza skalowalny znak Q, pozostawiając
+`@wyceno/*`, widget, eventy, nagłówki i zapisane prefiksy preferencji bez
+migracji. Baseline wykazał, że przy viewportcie 320 px dzieci panelu CTA miały
+około 326,8 px szerokości wewnątrz panelu 288 px; korekta usuwa clipping,
+zmniejsza zagnieżdżony inset i porządkuje rytm pionowy. Dowody znajdują się w
+`docs/ui/kwotum-brand-v1/` i `artifacts/visual-qa/kwotum-brand-v1/`. Po
+zamknięciu gate'u dozwolony następny etap wraca do M2. Gate lokalny jest
+zamknięty: lint i typecheck 8/8, pełne unit/RLS/WordPress, build 8/8 oraz
+marketingowe Playwright 25/25 przechodzą. Root `format:check` zgłasza wyłącznie
+siedem istniejących, nietkniętych plików równoległego `artifacts/promo/`.
+Nowsza mikro-korekta usuwa różne kolumny `9/14.5/max-content` z raila warunków
+oraz sztywną szerokość 12 rem pierwszej akcji przykładowego leada. Rail jest
+zwarty na desktopie i jednokolumnowy na mobile, a obie akcje mają tę samą
+szerokość na każdym breakpointcie. Korekta właścicielska z 2026-08-03 zastępuje
+wcześniejszy zielony łuk nowym znakiem Q z formularzem i potwierdzeniem;
+dokładny artwork właściciela został wyjęty z maski eksportera bez przerysowania
+i jest współdzielony przez faviconę, marketing, auth i panel. Lista leadów używa
+od teraz jednej białej powierzchni całej prawej części, bez kremowego tła pod
+osobną kartą, oraz wykorzystuje wysokość desktopu przez 18 rekordów na stronę.
+Szczegół leada jest tym samym pojedynczym białym canvasem: wynik, zakładki i
+kolumny nie tworzą drugiej warstwy tła ani zewnętrznej karty. Zaokrąglenie
+zachowuje funkcjonalny blok wyniku oraz kontrolki notatki, statusu i głównej
+akcji. Widok Odpowiedzi korzysta z numerowanych wierszy pytanie–wartość, a Pliki
+mają płaską listę z typem, rozmiarem i osobną małą powierzchnią podglądu po
+prawej; mobile układa podgląd pod listą. Notatki są renderowane od najnowszej z
+tenantowo odczytaną nazwą autora i datą zapisu, a formularz resetuje textarea
+wyłącznie po udanej akcji serwerowej. Ta sama korekta obejmuje listę Procesów i
+bibliotekę Szablonów, aby trzy główne widoki operacyjne miały jeden wspólny
+shell powierzchni. Ustawienia, Prywatność i Powiadomienia również używają
+białego tła całej prawej części. Integracje WordPress zostały spłaszczone do
+sekcji i list rozdzielonych linią; nie mają sztucznych minimalnych wysokości ani
+okrągłych kafelków ikon, a mały promień pozostaje wyłącznie na kontrolkach i
+statusach.
+
+**Status mobile M2 2026-08-02:** trzy wysokie, mobilne karty procesu zostały
+przekształcone w jedną zwartą sekwencję bez zmiany desktopu. Przy 390 px sekcja
+ma 1146,4 px zamiast około 1618,3 px, karty po 243,8 px zamiast 377,3 px, a
+łączniki 48 × 48 px zamiast 64 × 64 px. Przy 320 px bezpieczna oś wynosi
+`x=12–308`, wysokość sekcji 1178,8 px, a całe copy zachowuje minimum 16 px.
+Dedykowane testy mierzą 320/375/390/430 px: równe szerokości kart, maksymalną
+wysokość, centralne łączniki, boczne marginesy i brak overflow. Snapshoty 768
+i 1440 px pozostają bez zmiany. Raport i artefakty:
+`docs/ui/landing-mobile-v1/M2_PROCESS_REPORT.md` oraz
+`artifacts/visual-qa/landing-mobile-v1/m2/`. Następny dozwolony etap to
+wyłącznie M3 — cztery karty kluczowych danych; M3 nie został rozpoczęty. Gate
+M2: marketingowy Playwright 29/29, lint i typecheck po 8/8, pełne unit,
+RLS/WordPress, build 8/8 i `git diff --check` przechodzą. Scope'owany format M2
+przechodzi; root `format:check` zgłasza wyłącznie dziesięć nietkniętych plików
+równoległego `artifacts/promo/`.
+
+**Status mobile M3 2026-08-02:** cztery grupy kluczowych danych zostały
+przekształcone z pionowej listy kart 335 px w porównywalną siatkę 2 × 2. Przy
+320 px sekcja ma 1046,1 px zamiast 2034,1 px, a karty 142 × 279,4 px; przy
+390/430 px sekcja ma około 965 px, a karty odpowiednio 173/193 × 260,7 px.
+Budżet, termin, galeria 2 × 2 i score 87 pozostają kompletne, tytuły mają 16 px,
+a bezpieczna oś wynosi 12 px przy 320 oraz 16 px powyżej. Przy odpowiedniku
+zoomu 200% siatka przechodzi do jednej kolumny bez clippingu. Dedykowany gate
+M3 i regresja przechodzą 10/10, pełny marketing 34/34, lint i typecheck po 8/8, pełne
+unit/RLS/WordPress oraz build 8/8. Raport i artefakty:
+`docs/ui/landing-mobile-v1/M3_KEY_INFORMATION_REPORT.md` i
+`artifacts/visual-qa/landing-mobile-v1/m3/`. Scope'owany format i
+`git diff --check` przechodzą; root `format:check` zgłasza wyłącznie dwanaście
+nietkniętych plików równoległego `artifacts/promo/`. Następny dozwolony etap
+to wyłącznie M4 — przykładowy lead; M4 nie został rozpoczęty.
+
+## Etap 12ZB-P — rebranding publicznych podstron Kwotum V1
+
+- [x] R0: zinwentaryzować wszystkie publiczne podstrony poza `/`.
+- [x] R0: wykonać baseline desktop 1440 × 1000 i mobile 390 × 844 dla każdej
+      trasy oraz zapisać metryki, screenshoty i błędy runtime.
+- [x] R0: rozbić każdą stronę na sekcje i przypisać jeden z dziesięciu
+      archetypów implementacyjnych bez łączenia odbioru osobnych tras.
+- [x] R0: zapisać wspólną architekturę wizualną zgodną z home V7/M1–M3.
+- [x] R0: zapisać master plan R1–R12 z osobnym gate'em każdej sekcji.
+- [x] R1: zbudować wspólny shell podstron bez zmiany treści i kolejności
+      sekcji.
+- [x] R2.1: przebudować hero `/produkt` z własnym proofem procesu i jawną
+      granicą MVP.
+- [x] R2.2: przebudować mapę produktu wokół jednego rekordu leada.
+- [x] R2.3: przebudować granice produktu jako kontrakt odpowiedzialności.
+- [x] R2.4: przebudować finalne CTA i overview produktu.
+- [x] R3.1: przebudować hero `/jak-dziala` z jawną mapą zaufania.
+- [x] R3.2: przebudować kroki 1–3 `/jak-dziala` jako jawny kontrakt procesu.
+- [x] R3.3: przebudować kroki 4–6 `/jak-dziala` jako jawny outcome flow.
+- [x] R3.4: przebudować bezpieczeństwo `/jak-dziala` jako model warstw ochrony.
+- [x] R3.5: przebudować finalne CTA i overview `/jak-dziala`.
+- [x] R3.C: skrócić przekrojowo rytm `/jak-dziala` bez utraty informacji.
+- [x] R4.1: przebudować hero `/cennik` jako mapę kwalifikacji pilotażu.
+- [x] R4.2: przebudować dwie ścieżki współpracy `/cennik`.
+- [x] R4.3: przebudować model self-service jako jawny rejestr walidacji.
+- [x] R4.4: przebudować kryteria zakresu i finalne CTA `/cennik`.
+- [x] Pricing recovery: uprościć cały `/cennik` do dwóch kart zgodnych z
+      zaakceptowanym landingiem i referencją planów.
+- [x] R4.I.1: utworzyć shell, metadata, breadcrumbs i hero `/integracje` oraz
+      poprawić cel wspólnej nawigacji.
+- [ ] R4.I.2–R4.I.4: domknąć mapę realnych kanałów, status WordPressa, granice,
+      CTA, sitemap i visual QA `/integracje` bez fikcyjnych konektorów.
+- [x] R5.1: przebudować hero `/dla-agencji` jako czytelną relację agencja →
+      organizacja klienta → widget → lead pozostający w organizacji firmy.
+- [x] R5.2: przebudować metodę wdrożenia `/dla-agencji` jako jeden spójny plan
+      procesu zgodny wizualnie ze stroną główną i panelem.
+- [x] R5.3: przebudować granice tenantów i własność leadów `/dla-agencji` na
+      podstawie rzeczywistej macierzy Owner/Admin/Sales.
+- [~] R5.4: przebudować izolację widgetu od CSS strony hosta jako mały,
+  code-native proof zgodny z rzeczywistym Shadow DOM; implementacja i gate
+  są zamknięte, etap oczekuje na odbiór właściciela.
+- [ ] R5.5–R11: przebudowywać jedną trasę i jedną sekcję naraz zgodnie z
+      `docs/ui/marketing-subpages-v1/MASTER_REBRAND_PLAN.md`.
+- [ ] R12: wykonać globalną kontrolę SEO, linków, dostępności, responsive,
+      prawdziwości copy, wydajności i bezpieczny cleanup legacy.
+
+**Status R0 2026-08-02:** audyt objął 19 tras i 38 renderów. Wszystkie zwracają
+HTTP 200, nie zgłaszają błędów konsoli/pageerror i nie mają poziomego overflow.
+Baseline ujawnił dwa niespójne języki wizualne: zaakceptowany home V7 oraz
+starszy, płaski system podstron. Najdłuższe strony branżowe mają około
+5,5 tys. px na desktopie i 7,2 tys. px na mobile. Nie zmieniono runtime stron.
+Kontrakt, audyt i plan znajdują się w `docs/ui/marketing-subpages-v1/`, a
+artefakty w `artifacts/visual-qa/marketing-subpages-v1/audit/`. Następny
+dozwolony etap to wyłącznie R1. M4 strony głównej pozostaje wstrzymany, nie
+anulowany.
+
+**Status R1 2026-08-02:** wszystkie podstrony otrzymały pełny znak Kwotum,
+sześciopozycyjną nawigację, aktywną trasę `aria-current`, osie V7, bezpieczne
+marginesy 16/12 px na mobile, równą geometrię CTA, poprawione breadcrumbs i
+spokojny legal shell. Nie zmieniono treści ani kolejności sekcji. Dedykowany
+gate przechodzi 8/8, wszystkie 19 podstron dziedziczy shell bez overflow przy
+1536/390 px, a cztery archetypy przechodzą 1440/1024/768/390/320 px. Axe
+wykrył i wymusił poprawę kontrastu etykiety breadcrumbs z 4,28:1; finalnie nie
+ma naruszeń. Pełny marketing przeszedł 42/42, lint, typecheck i build 39 tras
+są zielone. Raport i visual QA:
+`docs/ui/marketing-subpages-v1/R1_SHARED_SHELL_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r1/`. Następny dozwolony etap to
+wyłącznie R2.1 — hero `/produkt`.
+
+**Status R2.1 2026-08-02:** hero `/produkt` pokazuje teraz code-native przepływ
+konfiguracja → publikacja → gotowy lead oraz jawny podział odpowiedzialności
+przeglądarka → serwer → firma. Copy zachowuje realny zakres MVP i nie dodaje
+cen, KPI, klientów, integracji ani pełnego CRM. Desktop ma dwukolumnową
+kompozycję, a mobile osobny, zwarty rail procesu; przy 320–1440 px nie ma
+overflow, CTA są równe, a najmniejszy tekst ma 12 px. Dedykowany gate przechodzi
+8/8, pełny marketing 50/50, lint, typecheck, pełne unit/RLS/WordPress i build
+39 tras są zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R2_1_PRODUCT_HERO_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r2-1/`. Następny dozwolony etap to
+wyłącznie R2.2 — mapa produktu.
+
+**Status R2.2 2026-08-02:** płaską siatkę sześciu modułów zastąpiła code-native
+mapa zależności builder → widget → pricing/scoring → jeden rekord leada →
+powiadomienia i analityka. Rekord zachowuje pełny kontekst, wynik z powodami i
+następny krok, a kontrakt decyzji nie przypisuje systemowi roli handlowca.
+Sekcja jest krótsza o 198 px na desktopie i 287 px przy 390 px, nie ma overflow
+na 320–1440 px, a najmniejszy tekst ma 12 px. Axe wymusił przyciemnienie małych
+etykiet z kontrastu 3,47–4,43:1 do poziomu WCAG AA. Dedykowany gate przechodzi
+16/16, pełny marketing 58/58, lint i typecheck po 8/8, pełne
+unit/RLS/WordPress oraz build 39 tras są zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R2_2_PRODUCT_MAP_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r2-2/`. Następny dozwolony etap to
+wyłącznie R2.3 — granice produktu; R2.3 nie został rozpoczęty.
+
+**Status R2.3 2026-08-02:** tekstową listę granic zastąpił ciemny, code-native
+kontrakt odpowiedzialności. Trzy karty pokazują wynik orientacyjny,
+uporządkowany lead oraz jawne reguły, a każda rozdziela rolę Kwotum i firmy.
+Finalny rail przypomina, że niewiążący wynik zawsze wymaga weryfikacji firmy.
+Sekcja ma 894,4 px na desktopie i 1254,5 px przy 390 px, nie ma overflow na
+320–1440 px, a najmniejszy tekst ma 12 px. Axe wykrył nadpisanie ciemnego tła i
+kolorów przez późniejszą kaskadę oraz wymusił właściwy scope także w forced
+colors. Dedykowany gate przechodzi 16/16, pełny marketing 66/66, lint i
+typecheck po 8/8, pełne unit/RLS/WordPress oraz build 39 tras są zielone.
+Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R2_3_PRODUCT_BOUNDARIES_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r2-3/`. Następny dozwolony etap to
+wyłącznie R2.4 — finalne CTA i overview; R2.4 nie został rozpoczęty.
+
+**Status R2.4 2026-08-02:** wspólny band zastąpił lokalny finał decyzji
+`/produkt` z dwoma działającymi CTA, trzema regułami produktu oraz code-native
+overview „Kwotum w jednym widoku”. Desktop zachowuje dwukolumnową kompozycję,
+a przy 1088 px przechodzi w jedną kolumnę; CTA mają identyczne wymiary na
+320–1440 px i nie ma poziomego overflow. Axe wykrył kontrast 4,32:1 małych
+etykiet, a test geometrii nierówne wysokości CTA przy 1024 px; oba problemy są
+zamknięte. Dedykowany gate R2.3 + R2.4 przechodzi 16/16, pełny marketing 74/74,
+pełne testy, lint, typecheck i build 39 tras są zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R2_4_PRODUCT_FINAL_CTA_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r2-4/`. Trasa `/produkt` ma
+ukończone R2.1–R2.4. Następny dozwolony etap to wyłącznie R3.1 — hero i mapa
+zaufania `/jak-dziala`; R3.1 nie został rozpoczęty.
+
+**Status R3.1 2026-08-02:** tekstowy hero `/jak-dziala` zastąpiła code-native
+mapa przeglądarka → serwer → panel. Centralna karta wskazuje serwer jako źródło
+potwierdzonego wyniku i kontroli dostępu, przeglądarka wyłącznie prowadzi
+klienta, a decyzja pozostaje po stronie firmy. Desktop zachowuje dwie kolumny,
+mobile zwartą oś pionową, oba CTA są równe i działają, a późniejsze sześć
+kroków pozostało bez redesignu. Axe wykrył kontrast 1,59:1 i 1,56:1 na karcie
+serwera oraz scope forced colors; test geometrii ujawnił różnicę wysokości CTA
+19,44 px przy 1024 px. Wszystkie problemy są zamknięte. Dedykowany gate
+przechodzi 8/8, pełny marketing 82/82, pełne testy, lint, typecheck i build 39
+tras są zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R3_1_HOW_HERO_TRUST_MAP_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r3-1/`. Następny dozwolony etap to
+wyłącznie R3.2 — kroki 1–3; R3.2 nie został rozpoczęty.
+
+**Status R3.2 2026-08-02:** pierwsze trzy wiersze procesu zastąpiła
+code-native sekwencja konfiguracja → walidacja i publikacja → sesja klienta.
+Każda karta pokazuje właściciela, działanie, jawnie demonstracyjny artefakt i
+rezultat, a granica zaufania przypomina, że przeglądarka nie otrzymuje
+prywatnego pricingu ani scoringu. Desktop używa trzech równych kart, mobile
+czytelnej osi pionowej; 320–1440 px zachowuje tekst minimum 12 px i zero
+overflow. Kroki 4–6 pozostały bez redesignu w osobnej sekcji. Dedykowany gate
+R3.1 + R3.2 przechodzi 16/16, pełny marketing 90/90, pełne testy, lint,
+typecheck i build 39 tras są zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R3_2_HOW_STEPS_1_3_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r3-2/`. Następny dozwolony etap to
+wyłącznie R3.3 — kroki 4–6; R3.3 nie został rozpoczęty.
+
+**Status R3.3 2026-08-02:** kroki 4–6 tworzą teraz nazwany, code-native outcome
+flow: potwierdzenie wyniku → świadome przekazanie kontaktu → decyzja firmy.
+Ciemny panel oddziela rezultat od przygotowania procesu, a trzy równe rekordy
+pokazują właściciela, mechanizm, demonstracyjny artefakt i rezultat. Wynik jest
+jawnie orientacyjny, prywatny score pozostaje w panelu, a ostatnia decyzja po
+stronie firmy. Desktop ma 963,3 px wobec 949,7 px baseline'u; mobile zachowuje
+pełne dane bez overflow i tekstu poniżej 12 px. Dedykowany gate R3.1–R3.3
+przechodzi 27/27, pełny marketing 101/101, pełne testy, lint, typecheck i build
+39 tras są zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R3_3_HOW_STEPS_4_6_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r3-3/`. Następny dozwolony etap to
+wyłącznie R3.4 — bezpieczeństwo procesu; R3.4 nie został rozpoczęty.
+
+**Status R3.4 2026-08-02:** płaską listę bezpieczeństwa `/jak-dziala`
+zastąpił nazwany model trzech barier: autoryzacja i tenant scope po stronie
+serwera → wymuszone RLS w PostgreSQL → walidacja pliku i prywatny storage.
+Każda warstwa pokazuje mechanizm oraz rezultat, a osobna publiczna granica
+wyjaśnia allowlistę manifestu bez dodawania certyfikatów i gwarancji. Desktop
+używa dwóch kolumn, mobile jednej kolejności DOM; dziewięć viewportów zachowuje
+tekst minimum 12 px i zero overflow. Axe wykrył kontrast 4,41:1 dwóch małych
+etykiet, który został podniesiony do WCAG AA. Dedykowany gate R3.1–R3.4
+przechodzi 38/38, pełny marketing 112/112, pełne testy, lint, typecheck i build
+39 tras są zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R3_4_HOW_SECURITY_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r3-4/`. Następny dozwolony etap to
+wyłącznie R3.5 — finalne CTA i overview; R3.5 nie został rozpoczęty.
+
+**Status R3.5 2026-08-02:** historyczny wspólny band z self-linkiem zastąpił
+lokalny finał `/jak-dziala`. Główne CTA prowadzi do `/branze`, drugie do
+`/logowanie`, a code-native overview rozdziela stały sześciostopniowy mechanizm
+od pytań, zakresu, materiałów i kolejnego kroku zależnych od usługi. Oba CTA są
+równe na 320–1536 px, semantyka ma nazwany region i complementary, a capture
+nie wykrywa błędów ani overflow. Dedykowany gate R3.1–R3.5 przechodzi 49/49,
+pełny marketing 123/123, pełne testy, lint, typecheck i build 39 tras są
+zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R3_5_HOW_FINAL_CTA_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r3-5/`. Cała trasa ma jednak 8704 px
+przy 390 px wobec 5698 px w audycie R0, dlatego ilościowy gate R3 pozostaje
+otwarty. Następny dozwolony etap to wyłącznie R3.C — redukcja rytmu
+R3.1–R3.4 bez utraty informacji; R4.1 nie został rozpoczęty.
+
+**Status R3.C 2026-08-02:** cała trasa `/jak-dziala` otrzymała zwarty kontrakt
+mobile oparty na progressive disclosure. Rezultat każdego etapu jest zawsze
+widoczny, a pełne opisy i demonstracyjne artefakty otwierają się natywnym
+`details`; desktop oraz tryb bez JavaScriptu renderują całą treść jako otwartą.
+Przy 390 px dokument skrócił się z 8704 do 5573 px (−36,0%) i jest o 125 px
+krótszy od R0, a przy 320 px z 9350 do 5883 px (−37,1%). Dziewięć viewportów
+zachowuje tekst minimum 12 px, poprawną kolejność DOM i zero overflow.
+Dedykowany gate R3.1–R3.C przechodzi 60/60, pełny marketing 134/134, kontrolny
+pakiet regresji 22/22, pełne testy, lint, typecheck i build 39 tras są zielone.
+Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R3_C_HOW_ROUTE_COMPACTION_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r3-c/`. Etap R3 jest zamknięty.
+Następny dozwolony etap to wyłącznie R4.1 — hero `/cennik`; nie został
+rozpoczęty.
+
+**Status R4.1 2026-08-03:** tekstowe hero `/cennik` zastąpiła code-native mapa
+kwalifikacji wdrożenia. Trzy rekordy oddzielają proces, sposób publikacji i
+kryteria walidacji, a rezultat pokazuje ustalony zakres pilotażu przed
+indywidualną wyceną. Status self-service nadal jawnie informuje o braku
+zatwierdzonych kwot, limitów i rozliczeń. Oba CTA działają i są równe na
+320–1536 px; 1024 px zachowuje układ poziomy, a 768 px przechodzi w jedną oś.
+Pierwszy pass ujawnił realny overflow 69–308 px i nierówne CTA przy 1024 px;
+oba problemy zamknięto bez maskowania. Dedykowany gate przechodzi 11/11, pełny
+marketing 145/145, pełne testy, lint, typecheck i build 39 tras są zielone.
+Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R4_1_PRICING_HERO_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r4-1/`. Następny dozwolony etap to
+wyłącznie R4.2 — dwie ścieżki współpracy; R4.2 nie został rozpoczęty.
+
+**Status R4.2 2026-08-03:** dwie generyczne kolumny `/cennik` zastąpił nazwany
+region aktywnego programu pilotażowego i przyszłego self-service. Statusy
+„Dostępne teraz” oraz „W walidacji”, neutralna geometria drugiej karty i brak
+kontrolki zakupu nie pozwalają pomylić walidacji z gotowym planem. Każda
+ścieżka rozdziela opis, model, cztery fakty i rezultat; dolna nota, CTA oraz
+finalny `CtaBand` pozostały bez redesignu. Wszystkie 9 viewportów mają HTTP
+200, minimum 12 px tekstu, 0 błędów runtime i 0 px overflow. Dedykowany gate
+R4.1–R4.2 przechodzi 22/22, pełny marketing 156/156, pełne testy, lint,
+typecheck i build 39 tras są zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R4_2_PRICING_PATHS_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r4-2/`. Następny dozwolony etap to
+wyłącznie R4.3 — model w walidacji; R4.3 nie został rozpoczęty.
+
+**Status R4.3 2026-08-03:** cztery ogólne braki w karcie self-service zastąpił
+semantyczny rejestr `<dl>`. Kwota, limity, płatności i dalszy model mają jawny
+status i krótkie uzasadnienie, ale nie tworzą planu cenowego ani roadmapy.
+Karta pilotażu, dolna nota, przyciski i finalny `CtaBand` pozostały bez zmian.
+Macierz 320–1536 px ma HTTP 200, minimum 12 px tekstu, 0 błędów runtime i 0 px
+overflow. Dedykowany gate R4.1–R4.3 przechodzi 33/33, pełny marketing 167/167,
+pełne testy, lint, typecheck i build 39 tras są zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R4_3_PRICING_VALIDATION_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r4-3/`. Następny dozwolony etap to
+wyłącznie R4.4 — kryteria zakresu i CTA; R4.4 nie został rozpoczęty.
+
+**Status R4.4 2026-08-03:** ogólną dolną notę `/cennik` zastąpił nazwany
+region trzech kryteriów indywidualnego zakresu: procesu, publikacji i
+walidacji. Sekcja pokazuje rezultat przed i po pilotażu, a finalny blok prowadzi
+dwiema równymi, działającymi akcjami do `/jak-dziala#proces` oraz `/logowanie`.
+Nie dodano ceny, limitu, triala, karty, formularza ani obietnicy self-service.
+Macierz 320–1536 px ma HTTP 200, minimum 12 px tekstu, 0 błędów runtime i 0 px
+overflow. Dedykowany gate R4.1–R4.4 przechodzi 44/44, pełny marketing 178/178,
+pełne testy, lint, typecheck i build 39 tras są zielone. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R4_4_PRICING_SCOPE_CTA_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r4-4/`. Etap R4 jest zamknięty.
+
+**Status pricing recovery 2026-08-03:** wielowarstwową konstrukcję R4.1–R4.4
+zastąpiły dwie spokojne karty zgodne z zaakceptowaną stroną główną: dostępny
+program pilotażowy oraz jawnie niegotowy self-service. Przy 1440 px dokument
+ma 2592 px zamiast 3580 px, a przy 390 px 4107 px zamiast 6206 px. Obie karty
+i CTA zachowują równe szerokości; macierz 320–1536 px ma minimum 12 px tekstu,
+0 błędów runtime i 0 px overflow. Dedykowany gate przechodzi 44/44, pełny
+marketing na buildzie produkcyjnym 178/178, testy jednostkowe 155/155, lint i
+typecheck po 8/8, a build 8/8 generuje 39 tras. Raport i artefakty:
+`docs/ui/marketing-subpages-v1/PRICING_RECOVERY_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/pricing-recovery/`.
+
+**Status R4.I.1 2026-08-03:** utworzono kanoniczną trasę `/integracje` z
+metadata, breadcrumbs i hero zgodnym z dostarczoną referencją: centralny
+demonstracyjny rekord leada, cztery realne kanały, przerywane połączenia i
+dolny rail. Header prowadzi do `/integracje`, a `/wordpress` pozostaje trasą
+szczegółową. Nie dodano fikcyjnych CRM, webhooków ani arkuszy. Macierz
+320–1536 px ma HTTP 200, minimum 12 px tekstu, 0 błędów runtime i 0 px
+overflow. Dedykowany gate przechodzi 11/11, pełny marketing 189/189, testy
+jednostkowe 155/155, lint i typecheck po 8/8, a build 8/8 generuje 40 stron.
+Raport i artefakty:
+`docs/ui/marketing-subpages-v1/R4_I_1_INTEGRATIONS_HERO_REPORT.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r4-i-1/`.
+
+**Zmiana priorytetu 2026-08-03:** właściciel produktu wstrzymał R4.I.2–R4.I.4
+i uruchomił R5.1 po audycie niespójności `/dla-agencji`, `/branze` i pięciu
+tras branżowych względem zaakceptowanego home V7. Jednostką pracy pozostaje
+jedna sekcja jednej trasy. Aktywny etap to wyłącznie R5.1 — hero i relacja
+tenantów `/dla-agencji`; R5.2, R7 i R8 pozostają zamrożone do zamknięcia jego
+visual QA i gate'u.
+
+**Status R5.1 po trzeciej korekcie 2026-08-03 — COMPLETE:** właściciel
+odrzucił zarówno beżowy diagram, jak i drugą marketingową makietę z pływającym
+telefonem oraz skróconym dokumentem leada. Aktualny proof jest jednym pełnym
+ekranem listy leadów, wyprowadzonym z `panel-navigation.tsx`, właściwej trasy
+`/leady`, `styles.css` i wspólnych ikon panelu. Desktop pokazuje pełny sidebar,
+filtry, siedem kolumn, statusy i paginację; mobile przechodzi na listę oraz
+dolną nawigację aplikacji. Dziewięć viewportów 320–1536 px ma 0 px overflow,
+minimum 12 px tekstu i zero błędów runtime. R5.1 przechodzi 11/11, regresja
+R5.1 + shell + home 53/53, unit 177/177, a lint/typecheck/build po 8/8. Wynik
+wykonawczy visual QA wynosi 19/20. Właściciel zaakceptował finalny render
+odpowiedzią „super dalej”. Aktywny jest wyłącznie R5.2; R5.3–R5.5 i R7
+pozostają zamrożone. Raport:
+`docs/ui/marketing-subpages-v1/R5_1_AGENCY_HERO_REPORT.md`.
+
+**Status R5.2 2026-08-04 — COMPLETE:** legacy’ową listę czterech
+kolumn zastąpił jeden semantyczny plan wdrożenia z etapami Warsztat,
+Konfiguracja, Osadzenie i Przekazanie. Każdy etap wskazuje właściciela,
+działanie oraz rezultat, używa ikon rzeczywistego panelu i kończy się rejestrem
+wspólnej architektury, indywidualnej treści oraz danych w organizacji klienta.
+Mobile przechodzi na pionową oś procesu, a nie stos kart. Produkcyjna macierz
+320–1536 px ma HTTP 200, minimum 12 px tekstu, 0 px overflow i zero błędów
+runtime. Dedykowany gate przechodzi 11/11; wszystkie 22 przypadki R5.1 + R5.2
+są zielone. W szerokiej regresji dwa crawle shellu przekroczyły 30 s przy
+równoległym obciążeniu 64 testami, po czym przeszły 2/2 w izolowanym rerunie
+bez zmiany timeoutu. Unit 177/177, lint/typecheck/build po 8/8. R5.3–R5.5 i R7
+pozostawały zamrożone do decyzji właściciela. Właściciel zaakceptował etap
+poleceniem „kontynuuj”, wydanym bezpośrednio po pytaniu o przejście do R5.3.
+Aktywny jest wyłącznie R5.3; R5.4–R5.5 i R7 pozostają zamrożone. Raport:
+`docs/ui/marketing-subpages-v1/R5_2_AGENCY_METHOD_REPORT.md`.
+
+**Status R5.3 2026-08-04 — COMPLETE:** legacy’owy artykuł o
+własności danych zastąpiła oddzielna sekcja oparta na rzeczywistym modelu
+autoryzacji. Pokazuje aktywną organizację klienta, macierz Owner/Admin/Sales,
+domyślny brak dostępu agencji oraz trzy warstwy egzekwowania granicy:
+organizację z adresu panelu, serwerowy `TenantContext` i RLS. Opis Shadow DOM
+został strukturalnie oddzielony, ale nieprzebudowany, ponieważ należy do R5.4.
+Macierz 320–1536 px ma HTTP 200, minimum 12 px tekstu, 0 px overflow i zero
+błędów runtime. Dedykowany gate przechodzi 11/11, finalna regresja R5.1–R5.3 +
+shell + home 75/75, unit 177/177, RLS i WordPress PASS, a
+lint/typecheck/build po 8/8. R5.4–R5.5 i R7 pozostają zamrożone do decyzji
+właściciela. Raport:
+`docs/ui/marketing-subpages-v1/R5_3_AGENCY_OWNERSHIP_REPORT.md`.
+
+**Decyzja właściciela R5.3 2026-08-04 — COMPLETE:** właściciel zaakceptował
+finalny render poleceniem „dalej”. R5.1–R5.3 zostają zamrożone. Aktywny jest
+wyłącznie R5.4 — izolacja widgetu od CSS strony hosta; R5.5 i R7 pozostają
+zamrożone.
+
+**Status R5.4 2026-08-04 — READY FOR OWNER REVIEW:** legacy’owy nagłówek i
+akapit o Shadow DOM zastąpiła osobna, ciemnozielona powierzchnia techniczna.
+Code-native proof zestawia agresywny CSS strony klienta z pełnym interfejsem
+widgetu wewnątrz shadow root oraz pokazuje rzeczywisty `<wyceno-widget>`, mały
+loader, własny arkusz i wąski kontrakt zdarzeń. Copy jawnie ogranicza Shadow
+DOM do izolacji CSS, bez sugerowania granicy bezpieczeństwa JavaScriptu.
+Macierz 320–1536 px ma HTTP 200, minimum 12 px tekstu, 0 px overflow i zero
+błędów runtime. Dedykowany gate przechodzi 11/11, finalna regresja R5.1–R5.4 +
+shell + home 86/86, rzeczywisty test agresywnego CSS widgetu 1/1, unit 177/177,
+RLS i WordPress PASS, a lint/typecheck/build po 8/8. R5.5 i R7 pozostają
+zamrożone do jawnej decyzji właściciela. Raport:
+`docs/ui/marketing-subpages-v1/R5_4_AGENCY_ISOLATION_REPORT.md`.
+
 - [ ] Wskazać immutable commit SHA i wyniki jako bazę Etapu 12ZE.
 
 **Gate:** `git status` jest czysty, checkout od zera odtwarza build i pełne
@@ -1633,6 +2237,20 @@ zostały zastąpione aktualnymi opisami, a 12F/12K jawnie zamknięto przez
 późniejszych następców. Gate etapu pozostaje OPEN do czasu drugiego passu
 retencji artefaktów, pełnego testu na Node 24.18.0, czystego checkoutu
 i zdalnego CI na jednym SHA.
+
+**Status drugiego passu 2026-08-08 — LOCAL GATES PASS, GATE OPEN:** zastany
+kandydat został ponownie zinwentaryzowany i sklasyfikowany. Lokalne źródła i
+rendery promocyjne (`artifacts/promo/`) pozostają na dysku, ale są wyłączone z
+repozytorium; dowody product visual QA pozostają kandydatem do wersjonowania z
+odpowiadającymi zmianami. Usunięto dziewięć znanych podatności zależności,
+`pnpm audit` raportuje zero znanych podatności, Turbo przechodzi 32/32, unit
+177/177, pełne RLS i WordPress PASS, a produkcyjny standalone E2E przechodzi
+257 testów przy 17 jawnych skipach. Gate pozostaje OPEN: trzeba podzielić
+worktree na logiczne commity, uruchomić 16 scenariuszy panelu z tymczasowym
+kontem, odtworzyć clean checkout i uzyskać zielone CI/CodeQL/Gitleaks na tym
+samym SHA. Raport:
+`docs/_migration/REPOSITORY_BASELINE_AUDIT_2026-08-08.md`. R7.1 pozostaje
+nieodebrane; naprawa regresji E2E nie zatwierdza tego etapu produktu.
 
 ## Etap 12ZE — self-service pricing, scoring i wynik
 
@@ -1657,7 +2275,7 @@ publikuje.
 
 ## Etap 12ZF — webhook v1 albo formalna redukcja MVP
 
-- [ ] Zapisać ADR-033 utrzymujący webhook w MVP albo usuwający go spójnie
+- [ ] Zapisać ADR-034 utrzymujący webhook w MVP albo usuwający go spójnie
       z wymagań, scope, API, QA, marketingu i release.
 - [ ] Przy utrzymaniu: wdrożyć tenantowe endpointy, sekret, HMAC-SHA256,
       wersjonowany envelope i minimalny event `lead.created`.
@@ -1690,6 +2308,76 @@ usunięty ze wszystkich kontraktów w tym samym etapie.
 **Gate:** każda firma ma osobny, zatwierdzony arkusz reguł, przypadki
 regresyjne, UAT i protokół go/no-go. Żadne ceny fixture'ów ani reguły innego
 tenanta nie stają się niejawnie rekomendacją produkcyjną.
+
+## Etap 12ZH — bezpieczny podgląd i wysłanie procesu
+
+- [x] Zapisać prompt wykonawczy i ADR-035 oddzielający bezstanowy preview od
+      publicznej sesji oraz zaproszenie od powiadomień leada.
+- [x] Użyć prawdziwego runtime widgetu z pamięciowym API i storage bez requestów,
+      sesji, analityki, uploadu, leada i powiadomienia.
+- [x] Zmienić Instalację w ekran Podgląd i udostępnianie z desktop/mobile,
+      resetem, hosted linkiem, zachowanymi trybami embed, WordPressem i
+      diagnostyką.
+- [x] Dodać capability `flow:share`, tenantowy outbox, idempotencję, retry,
+      historię prób, RLS i audit log bez PII.
+- [x] Dodać formularz wysyłki, historię z odbiorcą/autorem/datą/wersją/statusami
+      oraz wersjonowany e-mail HTML + text bez trackingu.
+- [x] Dodać testy jednostkowe widgetu, szablonu, workera i ról oraz testy
+      PostgreSQL/RLS, drugiego tenanta, Sales, idempotencji i dostawy.
+
+**Gate zamknięty 2026-08-03:** widget 17/17, e-mail 9/9, database 3/3 i web
+90/90 przechodzą; lint i typecheck są zielone, `pnpm test:rls` przechodzi na
+świeżej bazie z testem `flow_invitations.sql`, a build 8/8 generuje 40 tras.
+Produkcja pozostaje zablokowana przez realnego providera, DPA, domenę nadawcy,
+SPF/DKIM/DMARC, scheduler, alerty oraz ręczny UAT dostawy.
+
+## Etap 12ZI — operacyjna obsługa leada
+
+- [x] Zapisać prompt wykonawczy i ADR-036 oddzielający immutable brief klienta
+      od tenantowego stanu obsługi.
+- [x] Dodać `lead_operations`, `lead_tasks`, append-only activity, złożone FK,
+      idempotencję, eksport DSAR, retencję i cascade usunięcia.
+- [x] Dodać `lead:assign` i `lead:operate`, wąskie RPC, forced RLS oraz zakres
+      zamykania zadań Owner/Admin/Sales.
+- [x] Przebudować prawą kolumnę bez warstwowania: status, właściciel,
+      priorytet, następny krok, kontakt, aktywność, notatki i otwarte zadania.
+- [x] Podłączyć działające rozpoczęcie obsługi, planowanie kontaktu, tworzenie,
+      wykonanie i anulowanie zadania oraz pełną historię.
+- [x] Dodać unit projekcji i PostgreSQL/RLS dla ról, drugiego tenanta,
+      zawieszonego konta, idempotencji, grantów i redakcji audytu.
+- [x] Zastosować migrację do lokalnej bazy po naprawieniu rozbieżnej historii
+      już zastosowanego Etapu 12ZH, wykonać desktop/mobile visual QA i axe.
+
+**Gate zamknięty 2026-08-03:** historia lokalnych migracji została uzgodniona
+bez resetu danych, a migracja `20260803000200_stage12zi_lead_operations.sql`
+jest zastosowana. Unit web 92/92, database 3/3, `pnpm test:rls`, lint,
+typecheck i build są zielone. Produkcyjny E2E Chromium przechodzi razem z
+axe, trwałością statusu/właściciela/priorytetu, notatką z autorem i datą,
+utworzeniem oraz zamknięciem zadania, historią i kontrolą reflow bez overflow
+dla 1536 × 1024 oraz 390 × 844. Dowody znajdują się w
+`artifacts/visual-qa/12zi-lead-operations/`.
+
+## Podetap 12ZJ — lokalny kontrakt runtime readiness
+
+- [x] Zapisać ADR-037 rozdzielający bezstanowy liveness od readiness
+      krytycznej zależności danych.
+- [x] Dodać ograniczony czasowo `GET /ready` przez anonimowy Supabase REST i
+      wąski probe PostgreSQL bez dostępu do danych tenantów.
+- [x] Dodać generyczne 503, `no-store`, `noindex`, testy timeoutu, błędu,
+      payloadu i grantów anon/auth.
+- [x] Wymusić HTTPS i host nie-loopback dla staging/production oraz ukryć
+      `/design-system` przez 404 poza local/preview.
+- [x] Dodać runtime smoke dla health, readiness, CSP, CORS, cookies, robots i
+      środowiskowej dostępności showcase.
+- [x] Zastosować migrację lokalnie bez resetu danych i wykonać pełny gate.
+
+**Gate zamknięty lokalnie 2026-08-03:** migracja
+`20260803000300_stage13a_runtime_readiness.sql` jest zastosowana. Unit w ośmiu
+pakietach, w tym web 106/106, PostgreSQL/RLS, lint 8/8, typecheck 8/8 i build
+8/8 przechodzą. Smoke profilu local i production przechodzi dla `health`,
+`ready`, nagłówków, CORS, robots i środowiskowego 404. Podetap nie oznacza
+utworzenia stagingu ani nie zamyka żadnej zewnętrznej pozycji 13A; wejście do
+13A nadal wymaga ukończenia 12ZE–12ZG oraz decyzji infrastrukturalnych.
 
 ## Etap 13 — Produkcja
 

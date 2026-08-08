@@ -1,4 +1,4 @@
-# Visual QA Lorum
+# Visual QA Kwotum
 
 **Status:** kanoniczny  
 **Ostatni przegląd:** 2026-07-29
@@ -108,10 +108,10 @@ jawnie oznaczone i nie są zapisywane ani wysyłane.
 - ikony mają liniowy zielony znak w jasnej, okrągłej oprawie.
 
 Załącznik H nie ma lokalnego oryginału, dlatego wynik nie podaje pozornego RMSE.
-Zachowane odchylenie tekstowe to aktywna marka Lorum zamiast historycznego
+Zachowane odchylenie tekstowe to aktywna marka Kwotum zamiast historycznego
 Wyceno widocznego w źródle.
 
-## Etap 12K — auth Lorum, status QA
+## Etap 12K — auth Kwotum, status QA
 
 - lokalna referencja: `apps/web/public/ekranylogowania.png`, 1536 × 1024;
 - nowsze rozstrzygnięcie: każdy ekran auth wypełnia pierwszy viewport z
@@ -226,10 +226,31 @@ bezpieczeństwa zapisu i dostępności kontrolek.
 - mobile skraca etykietę publikacji, a prawdziwe Cofnij/Ponów pozostają
   dostępne klawiaturą w menu publikacji.
 
+Korekta shellu Kwotum z 2026-08-03 zastępuje wyłącznie rozwiniętą szerokość
+sidebara: 240 px zamiast historycznych 208 px. Rail zwinięty pozostaje 78 px,
+a minimalny kontrakt szerokości preview buildera przy 1448 px wynosi 527 px.
+Artefakty i raport korekty znajdują się w
+`artifacts/visual-qa/12m-panel-shell/sidebar-kwotum-glass/` oraz
+`PANEL_SIDEBAR_GLASS_2026-08-03.md`.
+
+## Korekta 12M-Y — wybór organizacji Kwotum
+
+- zakres: `/panel` po uwierzytelnieniu;
+- referencja: zaakceptowany załącznik 2872 × 1608 px, SHA-256
+  `783b30ceadefada2a5841af73c1b5334cb672f10723e555a53309d929975f133`;
+- kontrolny desktop: 2048 × 1152, header 101–104 px, kontener 1258–1262 px,
+  karta 230–236 px, avatar 76–80 px i akcje minimum 59 px wysokości;
+- mobile: 390 × 844, jedna kolejność DOM, trzy metadane, dwie widoczne akcje
+  i maksymalnie 1 px tolerancji overflow;
+- dane: wyłącznie rzeczywiste count/head oraz ostatnie timestampy dostępne
+  przez aktywne członkostwo i RLS; liczby z obrazu nie są kopiowane;
+- artefakty:
+  `artifacts/visual-qa/12m-panel-shell/organization-picker-kwotum/`.
+
 Playwright sprawdza 320/375/390/430/724/768/1024/1280/1448/1536 px, długie
 polskie treści, reflow odpowiadający 200% zoom, brak kolizji topbara, cele
 dotykowe, keyboard i axe. Overlay potwierdza wspólne osie głównych paneli;
-różnice treści wynikają z realnego procesu i nowszej decyzji o marce Lorum.
+różnice treści wynikają z realnego procesu i nowszej decyzji o marce Kwotum.
 Oddzielnej referencji mobile nie dostarczono, dlatego nie przyznano pełnych
 4 punktów za pixel fidelity transformacji mobilnej.
 

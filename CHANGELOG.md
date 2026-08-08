@@ -6,6 +6,341 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Drugi pass Etapu 12ZD usuwa dziewięć znanych podatności zależności przez
+  bezpieczne wymuszenie wersji `undici`, `brace-expansion`, `js-yaml`, `nanoid`
+  i `postcss`; finalny audyt raportuje zero znanych podatności. Lokalny katalog
+  źródeł i renderów promocyjnych pozostaje poza Git bez kasowania danych.
+  Produkcyjna regresja standalone przechodzi 257 testów przy 17 jawnych
+  skipach; pełny gate pozostaje otwarty do clean SHA, testów panelu i zdalnego
+  CI/CodeQL/Gitleaks.
+- R5.4 zastępuje pusty legacy’owy akapit o Shadow DOM na `/dla-agencji`
+  osobnym, ciemnozielonym proofem technicznym. Widok zestawia agresywny CSS
+  strony hosta z pełnym interfejsem widgetu wewnątrz rzeczywistej granicy
+  shadow root, pokazuje `<wyceno-widget>`, mały loader, własny arkusz i wąski
+  kontrakt zdarzeń. Copy nie przedstawia Shadow DOM jako zabezpieczenia przed
+  JavaScriptem, a proof nie zawiera atrap kontrolek. Produkcyjna macierz
+  320–1536 px ma minimum 12 px tekstu, zero overflow i błędów runtime;
+  dedykowany gate przechodzi 11/11, finalna regresja 86/86, realny test
+  agresywnego CSS widgetu 1/1, unit 177/177, RLS i WordPress PASS, a
+  lint/typecheck/build po 8/8. Etap oczekuje na odbiór właściciela; R5.5
+  pozostaje zamrożone.
+- R5.3 przebudowuje granicę danych na `/dla-agencji` w oddzielną powierzchnię
+  zgodną z panelem. Sekcja pokazuje aktywną organizację klienta, rzeczywistą
+  macierz Owner/Admin/Sales, domyślny brak dostępu agencji oraz trzy warstwy
+  izolacji: organizację z adresu panelu, serwerowy `TenantContext` i RLS.
+  Legacy’owy opis Shadow DOM został odłączony strukturalnie i pozostawiony do
+  R5.4. Produkcyjna macierz 320–1536 px ma minimum 12 px tekstu, zero overflow
+  i błędów runtime; R5.3 przechodzi 11/11, pełna regresja 75/75, unit 177/177,
+  RLS i WordPress PASS, a lint/typecheck/build po 8/8. Właściciel zaakceptował
+  etap poleceniem „dalej”; aktywny jest wyłącznie R5.4.
+- R5.2 przebudowuje `#model-wdrozenia` na `/dla-agencji` z czterech luźnych
+  kolumn w jeden produktowy plan wdrożenia. Każdy z czterech etapów ma ikonę
+  panelu, właściciela, działanie i rezultat, a dolny rejestr rozdziela wspólną
+  architekturę, indywidualną treść i logikę oraz dane w organizacji klienta.
+  Mobile używa pionowej osi procesu; sekcja nie zawiera atrap kontrolek ani
+  nowych obietnic produktu. Produkcyjna macierz 320–1536 px ma minimum 12 px
+  tekstu, zero overflow i błędów runtime. R5.2 przechodzi 11/11, unit 177/177,
+  a lint/typecheck/build po 8/8. Właściciel zaakceptował etap poleceniem
+  „kontynuuj”, dlatego R5.2 jest COMPLETE i może rozpocząć się R5.3.
+- Podetap 12ZJ rozdziela liveness `/health` od prawdziwego `/ready`, który z
+  limitem czasu sprawdza ścieżkę anonimowy Supabase REST → PostgreSQL bez
+  odczytu danych tenantów. Błędy są zamknięte do generycznego 503, odpowiedzi
+  mają `no-store` i `noindex`, staging/production wymagają HTTPS i ukrywają
+  `/design-system` przez 404. Nowy runtime smoke przechodzi dla profilu local
+  i production, a pełny gate obejmuje web 106/106, RLS oraz lint/typecheck/build
+  po 8/8. Nie deklaruje to aktywnego stagingu ani wybranych providerów.
+- Trzecia korekta R5.1 zastępuje dwa odrzucone proofy hero `/dla-agencji`
+  jednym pełnym ekranem listy leadów, wyprowadzonym bezpośrednio z panelu
+  Kwotum. Usunięto diagram, pływający telefon, kartę roli agencji, rail i
+  `CompactLeadDocument`. Desktop odtwarza sidebar, nawigację, konto, filtry,
+  siedem kolumn, statusy i paginację; mobile przechodzi na listę oraz dolną
+  nawigację panelu. Właściciel zaakceptował finalny render odpowiedzią „super
+  dalej”, dlatego etap jest COMPLETE. Macierz 320–1536 px
+  ma minimum 12 px tekstu, zero overflow i błędów runtime; R5.1 przechodzi
+  11/11, regresja R5.1 + shell + home 53/53, unit 177/177, a
+  lint/typecheck/build po 8/8.
+- Szczegół leada otrzymał produkcyjny panel „Obsługa leada”: status,
+  tenantowego właściciela, priorytet, deterministyczny następny krok,
+  zaplanowany kontakt, ostatnią aktywność, notatki z autorem i datą oraz
+  otwarte zadania. Kontakty i zadania mają prawdziwy zapis serwerowy,
+  idempotencję, wykonanie/anulowanie i pełną historię. Nowe `lead:assign` oraz
+  `lead:operate`, wąskie RPC, forced RLS i złożone FK egzekwują tenant scope;
+  Sales nie przypisuje leada ani nie zamyka cudzego zadania. Eksport DSAR,
+  retencja, legal hold i usunięcie obejmują nowy agregat, a audit nie kopiuje
+  treści ani danych kontaktowych. Potwierdzone akcje aktualizują panel bez
+  wyścigu z odświeżeniem RSC, a końcowy Chromium E2E z axe przechodzi na
+  desktopie 1536 × 1024 i mobile 390 × 844 bez overflow.
+- Ekran instalacji opublikowanego procesu stał się kompletnym miejscem
+  „Podgląd i udostępnianie”. Pełny formularz działa na wspólnym runtime widgetu,
+  ale używa pamięciowego API bez requestów, sesji, analityki, plików i leadów.
+  Owner/Admin mogą wysłać klientowi aktualny hosted link przez osobny tenantowy
+  outbox z idempotencją, retry, historią prób i statusem; wiadomość HTML/text nie
+  zawiera PII w URL ani trackingu. Dodano `flow:share`, RLS, negatywne testy
+  Sales/drugiego tenanta oraz worker współdzielący chroniony endpoint kolejek.
+- R4.I.1 tworzy kanoniczną trasę `/integracje` i naprawia cel pozycji
+  „Integracje” we wspólnym headerze, pozostawiając `/wordpress` jako stronę
+  szczegółową. Hero odtwarza geometrię dostarczonej referencji: centralny
+  demonstracyjny rekord leada, cztery realne kanały, przerywane połączenia i
+  dolny rail. Fikcyjne CRM, webhooki oraz arkusze zastąpiono widgetem, hosted
+  linkiem, WordPressem i powiadomieniem e-mail. Macierz 320–1536 px ma minimum
+  12 px tekstu, zero błędów i zero overflow; dedykowany gate przechodzi 11/11,
+  pełny marketing 189/189, testy jednostkowe 155/155, lint i typecheck 8/8,
+  a build 8/8 generuje 40 stron.
+- Wspólny znak Kwotum używa dokładnego artworku z dostarczonej ikony Q z
+  formularzem i zielonym potwierdzeniem, bez przerysowania symbolu. Eksport
+  został przycięty i znormalizowany do lekkiego zasobu ekranowego; ten sam plik
+  zasila header, sidebar, auth i faviconę.
+- Listy Leadów, Procesów i Szablonów nie używają już kremowego tła pod osobną
+  białą kartą. Cała prawa część tych ekranów jest jedną białą powierzchnią bez
+  zewnętrznego paddingu, obramowania, promienia i cienia. Lista pokazuje do 18
+  leadów na stronę, aby wykorzystać wysokość desktopu. Szczegół leada również
+  jest jednym białym canvasem bez drugiej warstwy tła; zaokrąglenia zachowuje
+  funkcjonalny blok wyniku oraz kontrolki, a zakładki i kolumny rozdzielają
+  hairline'y. Odpowiedzi mają numerowany układ pytanie–wartość, natomiast Pliki
+  łączą płaską listę metadanych z małym podglądem pierwszego materiału po
+  prawej. Zapisana notatka pojawia się pod formularzem w historii z nazwą
+  autora i datą dodania; formularz czyści treść po poprawnym zapisie. Ten sam
+  biały shell obejmuje Ustawienia, Prywatność i Powiadomienia. Integracje
+  WordPress mają płaskie sekcje bez sztucznych minimalnych wysokości, a promień
+  zachowują tylko kontrolki i statusy.
+- Trasa `/panel` odtwarza zaakceptowany wybór organizacji Kwotum: header około
+  102 px, oś treści 1260 px, duży nagłówek oraz pozioma karta z avatarem,
+  nazwą, slugiem i dwiema działającymi akcjami. Trzy metadane korzystają z
+  prawdziwych opublikowanych procesów, leadów wymagających obsługi i ostatniej
+  aktywności pod ochroną istniejącego RLS. Mobile składa kartę do jednej
+  kolumny bez overflow; polska odmiana i daty mają testy jednostkowe.
+- Wspólny sidebar panelu Kwotum ma teraz 240 px w stanie rozwiniętym i
+  zachowuje 78 px po zwinięciu. Logo jest czyste, bez płytki i obramowania,
+  tło sidebara ma warstwowe światło, a nawigacja osobny code-native zestaw ikon bez teł i
+  obramowań; capability gates, persystencja, breakpoint 56 rem i mobilny pasek
+  nie zmieniły zachowania. Okrągły przełącznik zastąpił smukły uchwyt z
+  płynnym obrotem strzałki i wspólnym easingiem raila oraz etykiet. Lint,
+  typecheck, 85/85 testów web i build przechodzą.
+- Pricing recovery upraszcza cały `/cennik` do dwóch dużych, spokojnych kart
+  zgodnych z zaakceptowanym landingiem: dostępnego programu pilotażowego i
+  jawnie niegotowego self-service. Usunięto wizualny nadmiar R4.1–R4.4 bez
+  dodawania ceny, triala, limitu, karty ani zakupu. Dokument skrócił się z
+  3580 do 2592 px przy 1440 px oraz z 6206 do 4107 px przy 390 px; dziewięć
+  viewportów zachowuje równe karty i CTA, minimum 12 px tekstu, zero błędów i
+  zero overflow. Gate pricing przechodzi 44/44, pełny marketing 178/178,
+  testy jednostkowe 155/155, lint i typecheck 8/8 oraz build 8/8 z 39 trasami.
+  Audyt ujawnił także brak publicznej trasy `/integracje`; otrzymała osobny
+  następny etap R4.I, ponieważ etykieta headera prowadzi obecnie błędnie do
+  `/wordpress`.
+- R4.4 domyka `/cennik`: dolna nota stała się kontraktem trzech kryteriów
+  indywidualnego zakresu i dwóch rezultatów pilotażu, a finalny blok ma dwie
+  równe, realne ścieżki do procesu i logowania. Nie dodano ceny, limitu,
+  triala, karty, formularza ani obietnicy self-service. Macierz 320–1536 px ma
+  minimum 12 px tekstu i zero overflow; dedykowany gate R4.1–R4.4 przechodzi
+  44/44, pełny marketing 178/178, pełne testy, lint, typecheck i build 39 tras
+  są zielone.
+- R4.3 zastępuje listę braków self-service na `/cennik` semantycznym rejestrem
+  decyzji. Kwota, limity, płatności i dalszy model mają jawny status i
+  uzasadnienie, bez kwot, terminu, planu zakupu ani obietnicy wdrożenia.
+  Desktop używa zwartego układu, mobile pionowych rekordów; macierz 320–1536 px
+  ma tekst minimum 12 px i zero overflow. Dedykowany gate R4.1–R4.3 przechodzi
+  33/33, pełny marketing 167/167, pełne testy, lint, typecheck i build są
+  zielone.
+- R4.2 przebudowuje dwie ścieżki `/cennik`: aktywny program pilotażowy i
+  przyszły self-service mają osobne statusy, opis, model, cztery fakty oraz
+  rezultat. Neutralna karta walidacji nie wygląda jak gotowy plan i nie ma
+  kontrolki zakupu. Desktop utrzymuje dwie równe karty, mobile jedną oś, a
+  pełna macierz 320–1536 px ma tekst minimum 12 px i zero overflow. Dedykowany
+  gate R4.1–R4.2 przechodzi 22/22, pełny marketing 156/156, pełne testy, lint,
+  typecheck i build 39 tras są zielone.
+- Zamknięto R0 programu rebrandingu 19 publicznych podstron Kwotum poza `/`.
+  Powtarzalny audyt Playwright zapisał 38 renderów desktop/mobile, metryki
+  wysokości, sekcji, overflow i błędów; wszystkie trasy zwracają HTTP 200 bez
+  błędów runtime i poziomego overflow. Audyt wykazał, że stabilny, lecz starszy
+  i płaski system podstron wymaga osobnej architektury zgodnej z home V7.
+  `docs/ui/marketing-subpages-v1/` zawiera plan każdej trasy i sekcji,
+  współdzielony kontrakt projektowy oraz etapy R1–R12. Runtime stron nie został
+  zmieniony, a M4 strony głównej pozostaje wstrzymany.
+- R1 ujednolica wspólny shell wszystkich podstron z home V7: pełny znak
+  Kwotum, sześć tras nawigacji, `aria-current`, szerokie osie desktopu,
+  marginesy 16/12 px na mobile, równe CTA, poprawione breadcrumbs oraz legal
+  shell. Dedykowany axe wykrył kontrast 4,28:1 bieżącej etykiety; przyciemnienie
+  koloru zamyka naruszenie. Wszystkie 19 podstron przechodzi kontrolę shellu i
+  overflow na desktop/mobile, bez zmiany treści i kolejności sekcji.
+- R2.1 przebudowuje wyłącznie hero `/produkt`: teza prowadzi od konfiguracji
+  przez niezmienną publikację do gotowego leada, a trzy code-native karty i
+  rail odpowiedzialności zastępują generyczny tekstowy intro. Desktop ma
+  dwukolumnowy proof, mobile osobną zwartą oś procesu, oba CTA są równe, tekst
+  nie schodzi poniżej 12 px, a zakres MVP jawnie wyklucza płatności i pełny
+  CRM. Dedykowany gate przechodzi 8/8, pełny marketing 50/50, pełne testy,
+  lint, typecheck i build 39 tras są zielone. Regresja ujawniła i usunęła także
+  blokujące ładowanie leniwej miniatury w trybie bez JavaScriptu.
+- R2.2 zastępuje płaską listę modułów `/produkt` jedną mapą zależności:
+  builder, publikacja i server-confirmed pricing/scoring prowadzą do pełnego
+  rekordu leada, a powiadomienia i analityka są działaniami następczymi.
+  Desktop używa poziomego przepływu, mobile zwartej sekwencji pionowej, a
+  sekcja jest krótsza od baseline'u bez utraty danych. Axe wykrył i wymusił
+  poprawę kontrastu małych etykiet rekordu do WCAG AA. Dedykowany gate
+  przechodzi 16/16, pełny marketing 58/58, pełne testy, lint, typecheck oraz
+  build 39 tras są zielone.
+- R2.3 przebudowuje granice `/produkt` w kontrastowy kontrakt odpowiedzialności.
+  Trzy code-native karty rozdzielają role Kwotum i firmy dla orientacyjnego
+  wyniku, uporządkowanego leada oraz jawnych reguł, a końcowy rail przypomina o
+  obowiązkowej weryfikacji niewiążącego wyniku. Desktop używa trzech równych
+  kolumn, mobile zwartej sekwencji. Axe wykrył i wymusił poprawny scope ciemnego
+  tła, małych etykiet oraz forced colors. Dedykowany gate przechodzi 16/16,
+  pełny marketing 66/66, pełne testy, lint, typecheck i build 39 tras są zielone.
+- R2.4 domyka `/produkt` lokalnym finałem decyzji i overview „Kwotum w jednym
+  widoku”. Dwa działające CTA mają równą geometrię na 320–1440 px, a trzy
+  reguły i trzy etapy podsumowania nie rozszerzają zakresu MVP. Axe wykrył i
+  zamknął kontrast 4,32:1 małych etykiet, a test geometrii wymusił wcześniejsze
+  przejście do jednej kolumny przy 1024 px. Dedykowany gate R2.3 + R2.4
+  przechodzi 16/16, pełny marketing 74/74, pełne testy, lint, typecheck i build
+  39 tras są zielone.
+- R3.1 zastępuje tekstowy hero `/jak-dziala` code-native mapą zaufania
+  przeglądarka → serwer → panel. Serwer jest jednoznacznie źródłem
+  potwierdzonego wyniku i kontroli dostępu, przeglądarka tylko prowadzi klienta,
+  a decyzja pozostaje po stronie firmy. Desktop używa dwóch kolumn, mobile
+  zwartej osi pionowej, CTA są równe i działają. Axe wymusił poprawę kontrastu
+  centralnej karty i scope forced colors, a test 1024 px usunął zawijanie
+  pierwszej akcji. Dedykowany gate przechodzi 8/8, pełny marketing 82/82, pełne
+  testy, lint, typecheck i build 39 tras są zielone.
+- R3.2 zastępuje pierwsze trzy płaskie wiersze `/jak-dziala` code-native
+  sekwencją konfiguracja → walidacja i publikacja → sesja klienta. Każda karta
+  pokazuje właściciela, działanie, demonstracyjny artefakt i rezultat, a dolna
+  granica zaufania wyklucza prywatny pricing i scoring z przeglądarki. Desktop
+  używa trzech równych kolumn, mobile osi pionowej bez overflow na 320–430 px.
+  Kroki 4–6 pozostają bez redesignu do R3.3. Dedykowany gate R3.1 + R3.2
+  przechodzi 16/16, pełny marketing 90/90, pełne testy, lint, typecheck i build
+  39 tras są zielone.
+- R3.3 zamienia kroki 4–6 `/jak-dziala` w ciemny outcome flow: potwierdzony
+  wynik → świadome przekazanie kontaktu → decyzja firmy. Jeden nazwany region
+  i trzy H3 zastępują anonimową listę trzech H2, a code-native artefakty
+  pokazują bezpieczny wynik, zapis leada oraz dalszą obsługę bez wymyślonych
+  KPI. Wynik pozostaje orientacyjny, prywatny score jest w panelu, a wszystkie
+  dane przykładowe są oznaczone. Dziewięć viewportów zachowuje tekst minimum
+  12 px i zero overflow. Dedykowany gate R3.1–R3.3 przechodzi 27/27, pełny
+  marketing 101/101, pełne testy, lint, typecheck i build 39 tras są zielone.
+- R3.4 zastępuje płaską listę bezpieczeństwa `/jak-dziala` modelem trzech
+  niezależnych barier: serwerowej autoryzacji z tenant scope, wymuszonego RLS
+  w PostgreSQL oraz walidacji pliku przed prywatnym storage. Każda warstwa
+  pokazuje mechanizm i rezultat, a publiczna granica wyjaśnia bezpieczny
+  manifest bez obietnic certyfikatów lub absolutnego bezpieczeństwa. Axe
+  wykrył kontrast 4,41:1 dwóch etykiet i wymusił korektę do WCAG AA. Gate
+  R3.1–R3.4 przechodzi 38/38, pełny marketing 112/112, pełne testy, lint,
+  typecheck i build 39 tras są zielone.
+- R3.5 zastępuje wspólny finalny band `/jak-dziala` lokalnym CTA bez self-linku
+  i overview rozdzielającym stały mechanizm od branżowego kontekstu. Akcje
+  prowadzą do istniejących `/branze` i `/logowanie`, zachowują równą geometrię
+  na 320–1536 px, a nazwany region i complementary przechodzą axe oraz forced
+  colors. Gate R3.1–R3.5 przechodzi 49/49, pełny marketing 123/123, pełne testy,
+  lint, typecheck i build 39 tras są zielone. Historyczny warunek krótszej
+  trasy mobile pozostaje otwarty: 8704 px przy 390 px wobec 5698 px w R0, więc
+  przed R4.1 wymagany jest osobny pass redukcji rytmu R3.1–R3.4.
+- R3.C zamyka ilościowy gate `/jak-dziala`: mobile wykorzystuje natywne
+  progressive disclosure z zawsze widocznym rezultatem każdego etapu, podczas
+  gdy desktop i tryb bez JavaScriptu zachowują pełną, otwartą treść. Dokument
+  przy 390 px skrócił się z 8704 do 5573 px (−36,0%), a przy 320 px z 9350 do
+  5883 px (−37,1%), bez usunięcia copy, zmiany kolejności procesu lub poziomego
+  overflow. Gate R3.1–R3.C przechodzi 60/60, pełny marketing 134/134, pełne
+  testy, lint, typecheck i build 39 tras są zielone. Następny etap to wyłącznie
+  R4.1 — hero `/cennik`.
+- R4.1 zastępuje płaski hero `/cennik` code-native mapą kwalifikacji
+  wdrożenia: proces → publikacja → walidacja → ustalony zakres pilotażu.
+  Status self-service zachowuje jawny brak zatwierdzonych kwot, limitów i
+  rozliczeń, a dwa równe CTA prowadzą do istniejącego modelu współpracy oraz
+  procesu Kwotum. Dziewięć viewportów ma tekst minimum 12 px i zero overflow;
+  dedykowany gate przechodzi 11/11, pełny marketing 145/145, pełne testy, lint,
+  typecheck i build 39 tras są zielone. Następny etap to wyłącznie R4.2.
+- Widoczna marka produktu zmienia się z Lorum na **Kwotum** bez naruszania
+  stabilnych identyfikatorów `@wyceno/*`, widgetu, eventów, nagłówków i storage.
+  Nowy code-native znak Q ma wspólny SVG dla favicony, auth i panelu oraz
+  równoważną wersję inline w marketingu. Finalne CTA na mobile otrzymuje
+  poprawne insets i szerokości dzieci: usunięto realne przekroczenie 326,8 px
+  wewnątrz panelu 288 px przy viewportcie 320 px oraz skrócono nadmierny rytm
+  między blokami. Decyzję, referencje i visual QA zapisują ADR-033 oraz
+  `docs/ui/kwotum-brand-v1/`. Dalsza korekta zastępuje trzy arbitralne kolumny
+  warunków zwartym railem i usuwa sztywną, krótszą szerokość pierwszego CTA
+  przykładowego leada; oba przyciski są teraz równe na desktopie i mobile.
+- Rozpoczęto sekcyjną rekonstrukcję desktopowego landingu V7. Etap D1 zamyka
+  home-only header, hero i pasek zastosowań według kadru 1672 × 941: wspólne
+  osie 64/1608 px, trzywierszowy headline oraz nakładające się code-native
+  formularz i dashboard leada. Dodano osobne role kolorystyczne marketingu z
+  testem WCAG; fałszywe logo klientów, KPI i nieistniejący terminarz zastąpiono
+  działającymi trasami, realnymi kanałami i jawnym fixture'em demonstracyjnym.
+  Visual QA zawiera trzy passy, overlay i difference, a marketingowy Playwright
+  przechodzi 21/21 na desktopie, reflow i breakpointach smoke.
+- Etap D2 przebudowuje sekcję procesu do trzech dużych kart według natywnej
+  referencji 1672 × 941. Numery, liniowe SVG i 64-pikselowe łączniki są
+  code-native, a karty i dolna powierzchnia trafiają w osie wzorca z różnicą
+  około 0–2 px. Tekst kwalifikacji opisuje sprawdzanie kompletności zamiast
+  tworzenia brakujących danych. Overlay daje normalized RMSE 0,107663, visual
+  QA 19/20, a zestaw marketingowy przechodzi 21/21 wraz z no-JS, reflow,
+  forced colors i breakpointami smoke.
+- Etap D3 odtwarza cztery kluczowe grupy informacji według V7-03: budżet,
+  termin, pliki i zdjęcia oraz demonstracyjny wynik kwalifikacji. Siatka
+  1672 × 941 pokrywa osie referencji przy RMSE 0,137486; ikony, plan i score są
+  code-native, a fotografie pochodzą z istniejących assetów runtime. CTA demo
+  prowadzi do rzeczywistego przykładu leada. Format, lint, typecheck, unit,
+  build i marketingowy Playwright 21/21 przechodzą.
+- Mikroetap D4 przebudowuje przykład kompletnego leada według fragmentu V7-08:
+  pięć parametrów, galeria 2+1, wynik 87/100, następny krok i dwa działające
+  CTA. UI jest code-native, a trzy nowe rastry zawierają wyłącznie fotografie
+  z zaakceptowanej planszy. Kompozycja 1672 px trafia w osie karty, galerii i
+  wyniku z odchyleniem około 0–3 px po skalowaniu overview. Axe wymusił poprawną
+  strukturę `dl/dt/dd`; finalnie format, lint, typecheck, unit, build i
+  Playwright 21/21 przechodzą.
+- Sekcja integracji odtwarza natywną kompozycję V7-04 w 1672 × 941: cztery
+  kanały otaczają centralny rekord leada, prowadzą do niego łamane połączenia,
+  a dolny rail zachowuje trzy kolumny dowodu. Niepotwierdzone CRM i Google
+  Sheets zastąpiono realnymi WordPress i hosted link; e-mail oraz webhook są
+  opisane bez fikcyjnych gwarancji. Finalne osie odbiegają od referencji o
+  około 0–1 px, normalized RMSE wynosi 0,149777, a gate marketingowy przechodzi
+  21/21 po podniesieniu najmniejszej etykiety z 11,2 do 12 px.
+- Sekcja pricingu zachowuje dwukolumnową geometrię V7-05 bez kopiowania
+  niezatwierdzonych kwot 249/549 zł, limitów, trialu i płatności. Karty opisują
+  prawdziwy pilotaż oraz decyzję o dalszym rozwoju, a oba CTA prowadzą do
+  kanonicznego `/cennik`. Finalne osie kart `x≈314/831, y≈281` odbiegają od
+  referencji o około 0–2 px; normalized RMSE wynosi 0,155654. Test marketingowy
+  blokuje kwoty, „14 dni” i kartę płatniczą na home, a pełny zestaw przechodzi
+  21/21.
+- Sekcja FAQ odtwarza dwukolumnową kompozycję V7-06 w 1672 × 941: pięć
+  natywnych pytań `details/summary` po lewej i panel źródeł pomocy po prawej.
+  Fikcyjny telefon, e-mail, chat, 98% satysfakcji i SLA zastąpiono działającymi
+  trasami produktu oraz prawdziwymi zasadami RLS/MVP. Panel trafia w
+  `x≈1079, y≈145, 506 × 716`, a pierwszy wiersz FAQ w `y≈417`; normalized RMSE
+  wynosi 0,146369. Akordeon działa klawiaturą i bez JavaScriptu, a pełny zestaw
+  marketingowy przechodzi 22/22 po podniesieniu mobilnego kickera do 12 px.
+- Finalne CTA odtwarza duży panel V7-07 w 1672 × 941. Panel ma pozycję
+  `x=64, y≈80` i rozmiar `1544 × 777`; copy znajduje się po lewej, a trzy
+  powierzchnie proof po prawej. Fikcyjne
+  128/+20%, 72/+15% i procenty skuteczności zastąpiono pięcioma grupami danych,
+  czterema istniejącymi kanałami i demonstracyjnym score 87/100. Działające CTA
+  prowadzą do przykładu leada i `/produkt`; normalized RMSE wynosi 0,146519, a
+  marketingowy Playwright przechodzi 23/23.
+- Stopka kończy sekcyjną budowę desktopu V7 na wspólnej osi `x=64–1608` z
+  finalnym CTA. Pełny znak Lorum, status walidacji, trzy semantyczne nawigacje,
+  działające linki prawne i dolny rail zastępują stary układ szablonowy.
+  Kompozycyjny side-by-side V7-08 potwierdza kolejność całej strony bez
+  niewłaściwego RMSE obrazów o innych skalach. Pięć breakpointów zachowuje
+  układ 4/2/1 kolumny bez overflow, a marketingowy Playwright przechodzi 24/24.
+- Program mobile V1 zaczyna od osobnej transformacji headera i hero zamiast
+  skalowania desktopu. M1 usuwa maskowane rozszerzenie min-content: H1 i CTA
+  mieszczą się teraz w osiach `16–374 px` przy 390 px oraz `12–308 px` przy
+  320 px. CTA mają 56 px, menu 44 px z poprawnym focusem i znakiem zamknięcia,
+  fakty tworzą zwartą siatkę, a scena produktu zaczyna się około 124 px wyżej.
+  Nowy test sprawdza bounding boxy 320/375/390/430 px, ponieważ samo
+  `scrollWidth` nie wykrywało clippingu. Marketingowy Playwright przechodzi
+  25/25 bez zmiany desktopowego snapshotu 1440 px.
+- M2 mobile przekształca trzy kroki procesu w jedną zwartą, pionową sekwencję.
+  Numer i ikona współdzielą górny wiersz, karty mają wysokość wynikającą z
+  treści, a centralne łączniki 48 × 48 px zachowują kierunek i dostępny rozmiar.
+  Sekcja ma 1146–1179 px zamiast około 1618 px, tekst pozostaje co najmniej
+  16 px, a osie `12–308` i `16–374` eliminują clipping na 320–430 px. Nowe
+  testy mierzą wysokość, równość kart, marginesy i overflow; tablet 768 px oraz
+  desktop 1440 px pozostają bez zmiany.
+- M3 mobile zmienia cztery kluczowe grupy danych z czterech wysokich ekranów w
+  porównywalną siatkę 2 × 2. Sekcja ma teraz 965–1046 px zamiast 1910–2034 px,
+  karty zachowują równe wymiary, tytuły 16 px, pełny budżet i termin, galerię
+  2 × 2 oraz code-native score 87. Dedykowane testy blokują zmianę osi,
+  wysokości, kolejności i overflow na 320/375/390/430 px. Przy odpowiedniku
+  zoomu 200% siatka przechodzi do jednej kolumny; 768 i 1440 px pozostają bez
+  zmiany.
 - Audyt gotowości dla pierwszych pięciu klientów dodał trzy wykonawcze źródła:
   raport `NO-GO`, checklistę bezpieczeństwa/danych oraz plan sprzedaży i
   onboardingu oferty 599/999 zł. ADR-002 ponownie zatwierdza Supabase z

@@ -855,3 +855,149 @@ pricingu, scoringu, RLS, tenant scope ani kontraktu widgetu. Mobile używa tej
 samej sceny ze skorygowaną perspektywą i kolejnością warstw; nie zastępuje jej
 osobnym uproszczonym obrazem. Reduced motion zachowuje statyczną kompozycję,
 forced colors usuwa efekty szkła, a tekst 12 px spełnia WCAG 2.2 AA.
+
+## ADR-033: Kwotum jako widoczna marka przy zachowaniu kontraktów technicznych
+
+**Status:** accepted na podstawie decyzji właściciela z 2026-08-02; zastępuje
+ADR-024 wyłącznie w zakresie widocznej nazwy i znaku. Profesjonalny clearance
+nazwy, domen i znaku nadal blokuje publiczny launch.
+
+**Decyzja:** warstwa widoczna dla użytkownika używa nazwy **Kwotum** w
+marketingu, panelu, auth, hosted flow, wiadomościach i interfejsie konektora
+WordPress. Wordmark jest zapisywany małymi literami jako `kwotum`, a zwykłe
+zdania używają formy `Kwotum`.
+
+Znak jest code-native SVG: litera Q ma jeden ciągły, ciemnozielony obwód i ogon
+wychodzący ze światła znaku. Limonkowy akcent jest częścią prawego górnego łuku,
+nie doklejoną kropką. Paleta znaku to `#06753A` i `#9AD672`, wordmark używa
+istniejącego koloru tekstu `#0B1530`. Ten sam plik SVG zasila faviconę, auth i
+panel, a marketingowy nagłówek używa równoważnej wersji inline.
+
+Stabilne kontrakty techniczne pozostają bez zmian: pakiety `@wyceno/*`,
+`<wyceno-widget>`, eventy `wyceno:*`, nagłówek `X-Wyceno-Session`, techniczne
+prefiksy storage, shortcode, text-domain i namespace konektora WordPress oraz
+istniejące identyfikatory `lorum:*` używane przez zapisane preferencje UI.
+
+**Dlaczego:** nowa nazwa lepiej komunikuje przejście „od zakresu do konkretnej
+kwoty”, a znak Q pozostaje czytelny w małej skali i pasuje do istniejącego
+języka wizualnego. Rozdzielenie marki prezentacyjnej od kontraktów zapobiega
+zerwaniu sesji, osadzeń, lokalnych preferencji i integracji.
+
+**Konsekwencje:** nowe copy i testy muszą oczekiwać Kwotum. Historyczne raporty,
+ścieżki plików i nazwy migracji mogą zachować Lorum jako zapis wcześniejszej
+decyzji. Nie wolno przedstawiać dostępności domeny ani ochrony znaku jako
+potwierdzonej bez profesjonalnego badania.
+
+## ADR-035: pamięciowy preview runtime i osobny outbox zaproszeń procesu
+
+**Status:** accepted dla Etapu 12ZH na podstawie decyzji właściciela produktu z
+2026-08-03
+
+**Decyzja:** pełny podgląd opublikowanego procesu korzysta z tego samego
+`WycenoWidgetElement`, `WidgetSessionController`, parsera manifestu, walidacji
+odpowiedzi i nawigacji co publiczny widget, ale podstawia jawny, pamięciowy
+adapter `PreviewWidgetApi` oraz `MemoryWidgetStorage`. Adapter nie wykonuje
+requestów sieciowych, nie zapisuje sesji, analityki ani plików i kończy submit
+syntetycznym potwierdzeniem oznaczonym jako podgląd. Manifest jest pobierany po
+stronie serwera z immutable opublikowanej wersji, bez prywatnych reguł
+buildera. Preview draftu pozostaje poza tym etapem, ponieważ wymaga osobnego,
+wersjonowanego snapshotu roboczego.
+
+Wysyłka hosted linku przed powstaniem leada jest osobnym agregatem
+`flow_invitations`, a nie nullable rozszerzeniem istniejącego powiadomienia
+leada. Rekord wskazuje tenant, flow i immutable wersję, przechowuje snapshot
+odbiorcy, opcjonalną wiadomość, autora, idempotency key oraz stan outboxu.
+Osobna tabela prób używa tego samego adaptera dostawy i tej samej polityki
+retry co powiadomienia leadów. Worker przetwarza oba outboxy w jednym
+chronionym uruchomieniu, ale ich kontrakty, retencja i historia pozostają
+rozdzielone.
+
+Adres w wiadomości jest zwykłym publicznym `/f/{publicId}`. Nie dodajemy PII,
+identyfikatora zaproszenia ani tokenu śledzącego do URL, nie używamy tracking
+pixela i nie deklarujemy informacji o otwarciu. Owner i Admin otrzymują jawne
+capability `flow:share`; Sales nie widzi draftów ani zaproszeń procesu.
+
+**Dlaczego:** obecne „Otwórz test” tworzy prawdziwą sesję publiczną i może
+zakończyć się produkcyjnym leadem. Sam iframe albo ukrycie submitu nie usuwa
+skutków ubocznych. Z kolei obecny outbox ma nieusuwalny związek z istniejącym
+leadem i dwa zamknięte typy wiadomości, więc zaproszenie wymaga własnego cyklu
+życia, historii i kontroli dostępu.
+
+**Konsekwencje:** preview opublikowanej wersji jest bezstanowy względem bazy i
+nie zanieczyszcza analityki. Nie służy do testowania serwerowej dostawy ani
+produkcyjnego wyliczenia; te pozostają częścią UAT hosted flow. Migracja
+zaproszeń jest forward-only. Rollback aplikacji pozostawia nieprzetworzone
+rekordy bezpiecznie w tabeli; worker starszej wersji ich nie claimuje.
+Produkcja nadal wymaga zatwierdzonego providera, domeny nadawcy, schedulera,
+alertów kolejki, DPA i testu realnej dostawy.
+
+## ADR-036: osobny agregat Lead Operations zamiast rozszerzania leada o pola UI
+
+**Status:** accepted dla Etapu 12ZI na podstawie decyzji właściciela produktu z
+2026-08-03
+
+**Decyzja:** przypisanie i priorytet są przechowywane w jednej tenantowej
+relacji `lead_operations`, a zadania i planowane kontakty w `lead_tasks`.
+Immutable dane przesłane przez klienta pozostają w istniejącym agregacie
+`leads`; nie dokładamy do niego pól wynikających wyłącznie z pracy zespołu.
+Zmiany przypisania, priorytetu i cyklu zadania zapisuje append-only
+`lead_activity_events`, który zawiera techniczne referencje i enumy, ale nie
+kopiuje treści zadania, notatki ani danych kontaktowych.
+
+„Następny krok” i „Zaplanowany kontakt” są projekcjami najbliższych otwartych
+zadań, a „Ostatnia aktywność” jest maksimum czasów z istniejących statusów i
+notatek oraz nowych zdarzeń operacyjnych. Nie powstają ręcznie synchronizowane
+kolumny zduplikowane względem źródeł. Rozpoczęcie obsługi atomowo ustawia status
+`in_progress` i przypisuje aktora tylko wtedy, gdy lead pozostawał
+nieprzypisany.
+
+Owner/Admin otrzymują `lead:assign`, wszystkie aktywne role otrzymują
+`lead:operate`. Tabele są bezpośrednio tylko do odczytu przez wymuszone RLS;
+zapis wykonują wąskie RPC ponownie sprawdzające tenant, rolę, aktywne
+członkostwo, stan zadania i idempotency key. Zadania podlegają temu samemu
+eksportowi, retencji, legal hold i usunięciu co lead.
+
+**Dlaczego:** pola właściciela, priorytetu i daty dodane bezpośrednio do
+`leads` mieszałyby immutable brief klienta z operacyjnym stanem zespołu.
+Osobny agregat pozwala rozwijać obsługę bez zmiany kontraktu submitu, a
+projekcje eliminują niespójność pomiędzy CTA, zadaniem i ręcznie wpisanym
+„następnym krokiem”.
+
+**Konsekwencje:** migracja jest forward-only i tworzy stan domyślny dla
+istniejących leadów oraz trigger dla nowych. Rollback UI pozostawia dane
+operacyjne bezpiecznie w tabelach; starsza aplikacja ich nie modyfikuje.
+Zewnętrzne kalendarze, przypomnienia i automatyczne SLA wymagają osobnych
+decyzji oraz workerów i nie są deklarowane w tym etapie.
+
+## ADR-037: rozdzielenie liveness i readiness runtime
+
+**Status:** accepted dla lokalnego podetapu 12ZJ na podstawie polecenia
+kontynuacji właściciela produktu z 2026-08-03
+
+**Decyzja:** `GET /health` pozostaje tanią kontrolą liveness procesu i nie
+wykonuje połączeń zewnętrznych. Nowy `GET /ready` wykonuje ograniczony czasowo,
+anonimowy probe przez skonfigurowany Supabase REST do wąskiej funkcji
+`runtime_readiness_probe()`. Funkcja nie czyta danych tenantów, nie przyjmuje
+argumentów i zwraca wyłącznie `true`; jej obecność potwierdza jednocześnie
+dostępność HTTP, PostgREST, PostgreSQL oraz zastosowanie migracji zawierającej
+kontrakt readiness.
+
+Endpoint nie zwraca URL-i, kluczy, czasu zapytania, wersji bazy ani komunikatu
+błędu zależności. Sukces ma status 200 i `ready`, a brak konfiguracji, timeout,
+błąd sieci, nieoczekiwany payload lub status zależności zwraca generyczne 503
+i `unavailable`. Obie odpowiedzi są `no-store` i `noindex`.
+
+Showcase `/design-system` pozostaje dostępny w local/preview, ale staging i
+production zwracają 404. Staging i production wymagają HTTPS oraz hosta
+niebędącego loopbackiem już na etapie walidacji konfiguracji.
+
+**Dlaczego:** liveness nie może zależeć od bazy, bo awaria zależności
+powodowałaby niepotrzebne restarty zdrowego procesu. Readiness musi natomiast
+zatrzymać kierowanie ruchu do instancji, która nie może korzystać z krytycznej
+ścieżki danych. Wąski probe ogranicza uprawnienia i nie tworzy publicznego
+mechanizmu diagnostycznego ujawniającego infrastrukturę.
+
+**Konsekwencje:** migracja jest forward-only. Starsza aplikacja ignoruje nową
+funkcję, a rollback aplikacji nie wymaga cofania schematu. Readiness nie
+potwierdza działania e-maila, ClamAV, schedulerów, backupu ani monitoringu;
+pozostają osobnymi bramkami Etapów 13A–13C.

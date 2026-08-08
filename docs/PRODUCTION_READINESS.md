@@ -1,7 +1,8 @@
-# Gotowość produkcyjna Lorum
+# Gotowość produkcyjna Kwotum
 
 **Status:** kanoniczny raport wykonawczy  
-**Ostatni przegląd:** 2026-07-31  
+**Ostatni przegląd:** 2026-08-08
+
 **Decyzja:** **NO-GO** dla prawdziwych danych i pierwszego płacącego klienta
 
 Ten dokument jest krótką warstwą wykonawczą. Szczegółową kolejność etapów
@@ -23,39 +24,39 @@ Na Node 24.18.0 i pnpm 11.17.0 przeszły:
 
 - frozen/offline install;
 - format, lint, typecheck, SAST i working-tree secret scan;
-- 147 testów jednostkowych;
+- 177 testów jednostkowych;
 - pełny zestaw PostgreSQL/RLS dla dwóch tenantów;
 - WordPress 6.9.2 i 7.0.2 na PHP 8.5;
-- build 39 tras i widget 17 269 B gzip;
-- Playwright 34/34 dostępnych scenariuszy, w tym auth, axe, klawiatura,
+- build 40 tras i widget 18 912 B gzip;
+- Playwright 257 dostępnych scenariuszy, w tym auth, axe, klawiatura,
   responsive, SEO, CSP i widget.
 
-Piętnaście scenariuszy panelu było warunkowo pominiętych bez `PANEL_E2E_*`.
-Aktualny audyt npm nie znalazł znanych podatności high/critical.
+Siedemnaście scenariuszy było warunkowo pominiętych, w tym szesnaście panelu
+bez `PANEL_E2E_*`. Aktualny audyt zależności nie znalazł znanych podatności.
 
 ## Ustalenia blokujące
 
-| ID    | Priorytet | Ryzyko i wpływ biznesowy                                                                                                                                                                   | Dowód                                                                                              | Naprawa / kryterium akceptacji                                                                                                  |
-| ----- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| PR-01 | P0        | Publiczny widget nie ma rozproszonego limitu per IP/origin ani adaptacyjnego Turnstile. Spammer może zużyć zasoby i zablokować prawdziwe leady.                                            | `docs/SECURITY.md`, sekcja ryzyka Etapu 5; brak adaptera w `apps/web/app/api/v1/public/`           | Etap 13B: wspólny store limitów, limity IP/origin/flow/session/org, Turnstile przy podwyższonym ryzyku i testy retry/bypass.    |
-| PR-02 | P0        | Produkcyjny ClamAV, backup DB/Storage, restore drill, monitoring i schedulery nie są aktywne. Utrata danych lub przyjęcie złośliwego pliku nie ma operacyjnej bariery.                     | `apps/web/lib/security/malware-scanner.ts`, `docs/BACKUP_AND_RECOVERY.md`, `docs/OBSERVABILITY.md` | Etapy 13A–13C: prywatny ClamAV fail-closed, backup poza głównym dostawcą, restore staging, alerty i podpisany protokół RPO/RTO. |
-| PR-03 | P0        | Nie ma zielonego CI, CodeQL i pełnohistorycznego Gitleaks na jednym aktualnym SHA. Lokalny skan nie wyklucza sekretu w historii.                                                           | `.github/workflows/ci.yml`, `.github/workflows/codeql.yml`, `docs/TASKS.md` 12ZD                   | Wypchnąć branch, uzyskać zielone wszystkie joby i wskazać dokładny SHA. Każdy znaleziony sekret wymaga rotacji u dostawcy.      |
-| PR-04 | P1        | Testy signed URL nie zawierają osobnego negatywnego przypadku bezpośredniej próby podpisania ścieżki drugiego tenanta. RLS Storage jest testowane, ale ten kontrakt wymaga jawnego dowodu. | `apps/web/lib/leads/service.ts`, `supabase/tests/tenant_isolation.sql`                             | Dodać integracyjny test A/B: verified, pending scan, foreign tenant i expiry 60 s.                                              |
-| PR-05 | P1        | Upload buforuje multipart i plik w pamięci requestu, a produkcyjna kwarantanna nie jest wdrożona jako osobny stan Storage. Przy równoległych plikach rośnie ryzyko pamięci i awarii.       | `apps/web/app/api/v1/public/sessions/current/files/route.ts`                                       | Etap 13B: kontrolowana sesja, prywatna kwarantanna, streaming/skan, finalizacja i testy limitów oraz awarii.                    |
-| PR-06 | P1        | MFA Ownerów, SMTP Auth, limity logowania, SSL enforcement i network restrictions wymagają konfiguracji i dowodu z Supabase Dashboard.                                                      | `docs/SECURITY.md`, `docs/RELEASE_CHECKLIST.md`                                                    | Wykonać checklistę z `SECURITY_AND_DATA.md`, zapisać screenshot/eksport ustawień bez sekretów i test konta administracyjnego.   |
-| PR-07 | P1        | Provider e-mail, domena nadawcy, alerty kolejki i realny test dostawy nie są zatwierdzone. Submit może działać, ale firma nie dostać leada.                                                | `apps/web/lib/notifications/worker.ts`, `docs/NOTIFICATIONS.md`                                    | Wybrać provider, DPA, SPF/DKIM/DMARC, scheduler, alert wieku kolejki i test HTML/text w realnych klientach.                     |
-| PR-08 | P1        | Webhook jest wymaganiem MVP, ale nie ma implementacji. Marketing lub onboarding nie mogą go obiecywać.                                                                                     | `docs/PRODUCT_REQUIREMENTS.md`, `docs/TASKS.md` 12ZF                                               | ADR-033: bezpieczny webhook v1 albo spójne usunięcie z MVP przed ofertą.                                                        |
-| PR-09 | P1        | Nowa oferta pierwszych pięciu klientów (599/999 zł, miesiąc gratis) nie jest jeszcze wdrożona w landingu, CTA ani formularzu Founding Client.                                              | `apps/web/app/(marketing)`, `tests/e2e/marketing.spec.ts`                                          | Osobny etap P1 po 12ZD: działające CTA, kwalifikacja, dostawa zgłoszenia i analityka bez PII.                                   |
-| PR-10 | P1        | Brak aktywnego error trackingu, uptime i alertów submit/upload/integracji.                                                                                                                 | `docs/OBSERVABILITY.md`; brak zatwierdzonego adaptera runtime                                      | Etap 13A: provider, redakcja PII, request ID, syntetyczny submit i przetestowane alerty.                                        |
-| PR-11 | P2        | `/design-system` jest noindex, ale nadal publicznie osiągalny w buildzie.                                                                                                                  | `apps/web/app/(marketing)/design-system/` i test sitemap/noindex                                   | Wyłączyć trasę w produkcji albo zabezpieczyć środowiskowo i zachować dostęp w local/preview.                                    |
-| PR-12 | P2        | Brak ręcznego VoiceOver/NVDA oraz terenowych Core Web Vitals.                                                                                                                              | `docs/RELEASE_CHECKLIST.md`                                                                        | Test na docelowym hostingu, urządzeniach i wspieranych przeglądarkach przed publicznym startem.                                 |
+| ID    | Priorytet          | Ryzyko i wpływ biznesowy                                                                                                                                                                   | Dowód                                                                                              | Naprawa / kryterium akceptacji                                                                                                  |
+| ----- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| PR-01 | P0                 | Publiczny widget nie ma rozproszonego limitu per IP/origin ani adaptacyjnego Turnstile. Spammer może zużyć zasoby i zablokować prawdziwe leady.                                            | `docs/SECURITY.md`, sekcja ryzyka Etapu 5; brak adaptera w `apps/web/app/api/v1/public/`           | Etap 13B: wspólny store limitów, limity IP/origin/flow/session/org, Turnstile przy podwyższonym ryzyku i testy retry/bypass.    |
+| PR-02 | P0                 | Produkcyjny ClamAV, backup DB/Storage, restore drill, monitoring i schedulery nie są aktywne. Utrata danych lub przyjęcie złośliwego pliku nie ma operacyjnej bariery.                     | `apps/web/lib/security/malware-scanner.ts`, `docs/BACKUP_AND_RECOVERY.md`, `docs/OBSERVABILITY.md` | Etapy 13A–13C: prywatny ClamAV fail-closed, backup poza głównym dostawcą, restore staging, alerty i podpisany protokół RPO/RTO. |
+| PR-03 | P0                 | Nie ma zielonego CI, CodeQL i pełnohistorycznego Gitleaks na jednym aktualnym SHA. Lokalny skan nie wyklucza sekretu w historii.                                                           | `.github/workflows/ci.yml`, `.github/workflows/codeql.yml`, `docs/TASKS.md` 12ZD                   | Wypchnąć branch, uzyskać zielone wszystkie joby i wskazać dokładny SHA. Każdy znaleziony sekret wymaga rotacji u dostawcy.      |
+| PR-04 | P1                 | Testy signed URL nie zawierają osobnego negatywnego przypadku bezpośredniej próby podpisania ścieżki drugiego tenanta. RLS Storage jest testowane, ale ten kontrakt wymaga jawnego dowodu. | `apps/web/lib/leads/service.ts`, `supabase/tests/tenant_isolation.sql`                             | Dodać integracyjny test A/B: verified, pending scan, foreign tenant i expiry 60 s.                                              |
+| PR-05 | P1                 | Upload buforuje multipart i plik w pamięci requestu, a produkcyjna kwarantanna nie jest wdrożona jako osobny stan Storage. Przy równoległych plikach rośnie ryzyko pamięci i awarii.       | `apps/web/app/api/v1/public/sessions/current/files/route.ts`                                       | Etap 13B: kontrolowana sesja, prywatna kwarantanna, streaming/skan, finalizacja i testy limitów oraz awarii.                    |
+| PR-06 | P1                 | MFA Ownerów, SMTP Auth, limity logowania, SSL enforcement i network restrictions wymagają konfiguracji i dowodu z Supabase Dashboard.                                                      | `docs/SECURITY.md`, `docs/RELEASE_CHECKLIST.md`                                                    | Wykonać checklistę z `SECURITY_AND_DATA.md`, zapisać screenshot/eksport ustawień bez sekretów i test konta administracyjnego.   |
+| PR-07 | P1                 | Provider e-mail, domena nadawcy, alerty kolejki i realny test dostawy nie są zatwierdzone. Submit może działać, ale firma nie dostać leada.                                                | `apps/web/lib/notifications/worker.ts`, `docs/NOTIFICATIONS.md`                                    | Wybrać provider, DPA, SPF/DKIM/DMARC, scheduler, alert wieku kolejki i test HTML/text w realnych klientach.                     |
+| PR-08 | P1                 | Webhook jest wymaganiem MVP, ale nie ma implementacji. Marketing lub onboarding nie mogą go obiecywać.                                                                                     | `docs/PRODUCT_REQUIREMENTS.md`, `docs/TASKS.md` 12ZF                                               | ADR-033: bezpieczny webhook v1 albo spójne usunięcie z MVP przed ofertą.                                                        |
+| PR-09 | P1                 | Nowa oferta pierwszych pięciu klientów (599/999 zł, miesiąc gratis) nie jest jeszcze wdrożona w landingu, CTA ani formularzu Founding Client.                                              | `apps/web/app/(marketing)`, `tests/e2e/marketing.spec.ts`                                          | Osobny etap P1 po 12ZD: działające CTA, kwalifikacja, dostawa zgłoszenia i analityka bez PII.                                   |
+| PR-10 | P1                 | Brak aktywnego error trackingu, uptime i alertów submit/upload/integracji.                                                                                                                 | `docs/OBSERVABILITY.md`; brak zatwierdzonego adaptera runtime                                      | Etap 13A: provider, redakcja PII, request ID, syntetyczny submit i przetestowane alerty.                                        |
+| PR-11 | zamknięte lokalnie | `/design-system` ma runtime 404 w staging/production i pozostaje dostępny wyłącznie w local/preview; docelowy hosting nadal wymaga powtórzenia smoke.                                      | `apps/web/app/design-system/availability.ts`, `scripts/smoke-runtime.mjs`                          | Powtórzyć profil production na stagingu i przypiąć wynik do immutable SHA.                                                      |
+| PR-12 | P2                 | Brak ręcznego VoiceOver/NVDA oraz terenowych Core Web Vitals.                                                                                                                              | `docs/RELEASE_CHECKLIST.md`                                                                        | Test na docelowym hostingu, urządzeniach i wspieranych przeglądarkach przed publicznym startem.                                 |
 
 Odczyt GitHub z 2026-07-31: `origin/main` nadal wskazuje
 `3193262fef6f9e0a003497072abf67852fa1745a`; aktualnego workflow CodeQL nie ma
 na zdalnej gałęzi. Najnowsze joby CI z 2026-07-27 zakończyły się po około dwóch
 sekundach z pustą listą kroków. Nie stanowią dowodu wykonania testów.
 
-## Naprawione w audycie 2026-07-31
+## Naprawione lokalnie
 
 1. Standalone start bezpiecznie wczytuje opcjonalny, ignorowany
    `apps/web/.env.local`. Naprawia to powtarzalny błąd ekranów auth w E2E bez
@@ -65,6 +66,12 @@ sekundach z pustą listą kroków. Nie stanowią dowodu wykonania testów.
 3. `DEPLOYMENT_ENV=production` blokuje build dla brakującego HTTPS lub
    loopbackowego `APP_URL`.
 4. Aktualny dependency audit npm zakończył się bez znanych podatności.
+5. Podetap 12ZJ rozdziela `/health` i `/ready`, dodaje ograniczony czasowo
+   probe Supabase REST → PostgreSQL oraz generyczne 503 bez ujawniania
+   infrastruktury.
+6. Staging i production wymagają HTTPS i hosta nie-loopback, a wewnętrzny
+   `/design-system` zwraca tam 404. Smoke profilu local i production sprawdza
+   readiness, nagłówki, CORS, cache, cookies i robots.
 
 Ryzyko regresji tych zmian jest niskie: istniejące zmienne procesu mają
 pierwszeństwo nad `.env.local`, a walidacja produkcyjna nie zmienia local,
@@ -77,22 +84,22 @@ pełny E2E auth.
 | --------------------- | ------------------------- | --------------------------------------------------------------------- |
 | Reprodukowalność      | lokalnie PASS             | clean checkout i zdalne CI na SHA nadal wymagane                      |
 | Sekrety/env           | lokalnie PASS             | pełnohistoryczny Gitleaks i ewentualna rotacja                        |
-| RLS/tenant scope      | PASS lokalny              | 25/25 tabel publicznych ma ENABLE + FORCE RLS; potrzebny staging      |
+| RLS/tenant scope      | PASS lokalny              | 30/30 tabel publicznych ma ENABLE + FORCE RLS; potrzebny staging      |
 | Service role          | ograniczony               | trzy serwerowe przepływy: upload, notifications, retention            |
 | Auth/sesje            | kod PASS                  | MFA, SMTP i provider rate limits ręcznie                              |
 | Public API/widget     | częściowo                 | brak rozproszonego rate limit/Turnstile                               |
 | Upload/Storage        | częściowo                 | prywatny bucket i walidacja PASS; ClamAV/kwarantanna produkcyjna OPEN |
-| Nagłówki/SEO          | lokalnie PASS             | test na docelowej domenie i wyłączenie design systemu                 |
+| Nagłówki/SEO          | lokalnie PASS             | test na docelowej domenie; design system ma runtime 404 poza local    |
 | Migracje/integralność | lokalnie PASS             | rehearsal, backup point i rollback na stagingu                        |
 | Backup/DR             | projekt istnieje          | brak aktywnego backupu i restore drill                                |
-| Logi/observability    | projekt istnieje          | brak zatwierdzonego runtime i alertów                                 |
+| Logi/observability    | health/readiness lokalnie | brak providera, uptime i alertów                                      |
 | CI/CD                 | konfiguracja istnieje     | brak zielonego zdalnego przebiegu na aktualnym SHA                    |
 | Konwersja/sprzedaż    | niezgodna z nowym briefem | osobny etap Founding Client                                           |
 | Dostępność/wydajność  | automaty lokalnie PASS    | ręczny AT i field CWV OPEN                                            |
 
 ## Decyzja
 
-Lorum nie jest obecnie gotowe do przyjęcia prawdziwych danych pierwszego
+Kwotum nie jest obecnie gotowe do przyjęcia prawdziwych danych pierwszego
 klienta. Po zamknięciu PR-01–PR-03, uruchomieniu infrastruktury z PR-02 i
 udokumentowanym smoke teście można rozważyć kontrolowany pilot jednej
 organizacji. Brak jawnego, podpisanego GO oznacza NO-GO.

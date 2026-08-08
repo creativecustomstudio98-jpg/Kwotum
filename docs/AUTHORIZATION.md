@@ -7,8 +7,11 @@
 | Organizacja, członkowie, usunięcie |   tak |               nie |         nie |
 | Płatności                          |   tak |               nie |         nie |
 | Flow, pricing, publikacja          |   tak |               tak |         nie |
+| Podgląd i wysłanie procesu         |   tak |               tak |         nie |
 | Integracje                         |   tak | tak bez płatności |         nie |
 | Leady, statusy, notatki            |   tak |               tak |         tak |
+| Priorytet, kontakt i zadania leada |   tak |               tak |         tak |
+| Przypisanie właściciela leada      |   tak |               tak |         nie |
 | Eksport                            |   tak |    konfigurowalne |         nie |
 | Analityka                          |   tak |               tak | ograniczona |
 
@@ -32,6 +35,14 @@ Sales nie otrzymuje dostępu do draftów, reguł ani opublikowanych snapshotów.
 Kolejne uprawnienia domenowe powstają razem z odpowiednią domeną, nigdy
 wcześniej.
 
+Etap 12ZH dodaje Ownerowi i Adminowi `flow:share`. Capability pozwala
+wyświetlić bezstanowy podgląd aktualnie opublikowanej wersji, utworzyć
+tenantowe zaproszenie i odczytać historię jego dostawy. Sales nie otrzymuje
+tego capability. RPC `create_flow_invitation` ponownie sprawdza rolę,
+organizację, aktywną publikację oraz przypięcie wersji niezależnie od warstwy
+aplikacji, a RLS ogranicza odczyt zaproszeń do aktywnego Ownera/Admina tego
+samego tenanta.
+
 Etap 7 dodaje aktywnym rolom Owner/Admin/Sales capabilities `lead:read`,
 `lead:note` i `lead:status`. Panel zawsze buduje `TenantContext` z URL
 organizacji i zweryfikowanego członkostwa. RLS ogranicza odczyt leadów,
@@ -40,6 +51,16 @@ odpowiedzi, potwierdzeń, plików, historii i notatek. Notatka musi mieć autora
 które ponownie sprawdza aktywną rolę i oba UUID; zwykły klient nie ma grantu
 `UPDATE` na `leads`. Etap 12 udostępnia eksport wyłącznie aktywnemu Ownerowi;
 Admin i Sales nie mają tego capability ani bezpośredniego dostępu do eksportu.
+
+Etap 12ZI dodaje Ownerowi i Adminowi `lead:assign`, a wszystkim aktywnym rolom
+`lead:operate`. Pierwsze pozwala przypisać leada wyłącznie aktywnemu członkowi
+tej samej organizacji. Drugie obejmuje priorytet, planowanie kontaktu, tworzenie
+zadań i ich zamykanie. Sales może zamknąć tylko zadanie utworzone przez siebie
+albo przypisane do siebie; Owner/Admin mogą zamknąć każde zadanie własnego
+tenanta. Rozpoczęcie obsługi przez istniejący RPC statusu przypisuje aktora
+tylko wtedy, gdy lead nie ma właściciela. Bezpośredni zapis
+`lead_operations`, `lead_tasks` i `lead_activity_events` nie jest przyznany
+klientowi; wąskie RPC ponownie sprawdzają rolę, tenant i aktywne członkostwo.
 
 Etap 9 dodaje `analytics:summary` wszystkim aktywnym rolom. Owner/Admin mają
 dodatkowo `analytics:read` i przez RLS mogą odczytać surowe eventy oraz rekordy
@@ -65,3 +86,9 @@ Przypadki leadów i zmiany statusu rozszerza
 zawieszonym.
 Analitykę rozszerza `supabase/tests/analytics.sql`: raw access Owner/Sales,
 agregat Sales, drugi tenant, consent withdrawal, retencja i próg małej próby.
+Zaproszenia rozszerza `supabase/tests/flow_invitations.sql`: idempotencja,
+aktualna publikacja, odmowa dla Sales i drugiego tenanta, minimalne granty,
+claim, sent, retry oraz redakcja PII z audit logu.
+Operacje leada rozszerza `supabase/tests/lead_operations.sql`: aktywny i
+zawieszony członek, drugi tenant, idempotencja zadania, minimalne granty,
+samoprzypisanie, zakres Sales i eksport bez PII w audit logu.

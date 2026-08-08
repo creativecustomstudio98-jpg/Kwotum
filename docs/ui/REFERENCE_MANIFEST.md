@@ -58,28 +58,32 @@ semantycznego React/Next.js i wspólnych tokenów `packages/ui`.
 
 ## Załączniki nowsze niż pakiet
 
-| ID    | Zakres                              | Decyzja                                                                                                     |
-| ----- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| A i B | identyczny builder desktop          | wąski rail, sekcje/pytania, centralny preview, prawy inspector; nadpisuje starszy builder                   |
-| C     | lead operacyjny desktop             | bogaty dokument i stały panel sprzedażowy; nadpisuje prostszy lead detail                                   |
-| D     | plansza produktu Wyceno             | źródło gęstości i regionów, ale nie nazwy marki ani grafu node-based                                        |
-| E     | landing desktop/mobile Wyceno       | źródło geometrii pierwszego folda                                                                           |
-| F     | zaakceptowany master board Wyceno   | starszy poprzednik planszy Lorum                                                                            |
-| G     | starsza sekcja pod hero             | cztery poziome kroki i pięć kafli; zastąpiona dla tego regionu przez załącznik H                            |
-| H     | ikony i sekcje poniżej hero         | okrągłe zielone ikony, osobne szablony oraz porównanie + pionowy proces + dokument leada                    |
-| I     | plansza auth 1536 × 1024            | osobne desktopowe ekrany logowania i rejestracji; lokalny oryginał blokuje anatomię                         |
-| J     | pełnoekranowe logowanie 2048 × 1157 | auth wypełnia pierwszy viewport; bez zewnętrznej ramy, cechy dopiero poniżej                                |
-| K     | korekta gęstości auth 2048 × 1202   | mniejsze kontrolki, ikony, typografia i ilustracje; więcej oddechu między grupami                           |
-| L     | lista leadów 816 × 592              | jeden lekki kontener, search + CTA, pięć filtrów, siedem kolumn i zwarta paginacja                          |
-| M     | szczegóły leada 794 × 578           | profil, score + 3 powody, 4 zakładki i podsumowanie z prawym panelem obsługi                                |
-| N     | biblioteka szablonów, pełna trasa   | pięć mniejszych kart w jednym rzędzie, zwarty nagłówek; nadpisuje kolumny wąskiego cropa                    |
-| O     | cały landing `/`, kierunek tekstowy | autorskie telefony 3D, profesjonalny minimalizm i jeden język wizualny całej strony                         |
-| P     | analityka, kierunek tekstowy        | styl dashboardu; dolne dane jako etapy, bąble, kafelki, karty i pierścienie zamiast pasków                  |
-| Q     | pozostałe ekrany produktu           | Lorum, jeden zwijany sidebar, pełny workspace i wdrożenie wszystkich powierzchni z realnym modelem danych   |
-| R     | pełny dashboard operacyjny          | sześć KPI, trzy rzędy danych, szybkie akcje i realne statusy; nadpisuje wcześniejszy ubogi dashboard        |
-| S     | landing `/`, korekta tekstowa       | trzy faktyczne ekrany Lorum jako szklane panele 3D; nadpisuje telefony i dekoracyjny render                 |
-| T     | rozbudowana biblioteka szablonów    | toolbar, KPI, pięć bogatych kart i detal wyboru; nadpisuje pustą kompozycję N, ale nie dodaje atrap funkcji |
-| U     | hero `/`, render telefonu           | fizyczny telefon bez prostokątnego tła, UI wychodzące z ekranu, sześć ikon; nadpisuje S tylko w hero        |
+| ID    | Zakres                              | Decyzja                                                                                                                |
+| ----- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| A i B | identyczny builder desktop          | wąski rail, sekcje/pytania, centralny preview, prawy inspector; nadpisuje starszy builder                              |
+| C     | lead operacyjny desktop             | bogaty dokument i stały panel sprzedażowy; nadpisuje prostszy lead detail                                              |
+| D     | plansza produktu Wyceno             | źródło gęstości i regionów, ale nie nazwy marki ani grafu node-based                                                   |
+| E     | landing desktop/mobile Wyceno       | źródło geometrii pierwszego folda                                                                                      |
+| F     | zaakceptowany master board Wyceno   | starszy poprzednik planszy Lorum                                                                                       |
+| G     | starsza sekcja pod hero             | cztery poziome kroki i pięć kafli; zastąpiona dla tego regionu przez załącznik H                                       |
+| H     | ikony i sekcje poniżej hero         | okrągłe zielone ikony, osobne szablony oraz porównanie + pionowy proces + dokument leada                               |
+| I     | plansza auth 1536 × 1024            | osobne desktopowe ekrany logowania i rejestracji; lokalny oryginał blokuje anatomię                                    |
+| J     | pełnoekranowe logowanie 2048 × 1157 | auth wypełnia pierwszy viewport; bez zewnętrznej ramy, cechy dopiero poniżej                                           |
+| K     | korekta gęstości auth 2048 × 1202   | mniejsze kontrolki, ikony, typografia i ilustracje; więcej oddechu między grupami                                      |
+| L     | lista leadów 816 × 592              | jeden lekki kontener, search + CTA, pięć filtrów, siedem kolumn i zwarta paginacja                                     |
+| M     | szczegóły leada 794 × 578           | profil, score + 3 powody, 4 zakładki i podsumowanie z prawym panelem obsługi                                           |
+| N     | biblioteka szablonów, pełna trasa   | pięć mniejszych kart w jednym rzędzie, zwarty nagłówek; nadpisuje kolumny wąskiego cropa                               |
+| O     | cały landing `/`, kierunek tekstowy | autorskie telefony 3D, profesjonalny minimalizm i jeden język wizualny całej strony                                    |
+| P     | analityka, kierunek tekstowy        | styl dashboardu; dolne dane jako etapy, bąble, kafelki, karty i pierścienie zamiast pasków                             |
+| Q     | pozostałe ekrany produktu           | Lorum, jeden zwijany sidebar, pełny workspace i wdrożenie wszystkich powierzchni z realnym modelem danych              |
+| R     | pełny dashboard operacyjny          | sześć KPI, trzy rzędy danych, szybkie akcje i realne statusy; nadpisuje wcześniejszy ubogi dashboard                   |
+| S     | landing `/`, korekta tekstowa       | trzy faktyczne ekrany Lorum jako szklane panele 3D; nadpisuje telefony i dekoracyjny render                            |
+| T     | rozbudowana biblioteka szablonów    | toolbar, KPI, pięć bogatych kart i detal wyboru; nadpisuje pustą kompozycję N, ale nie dodaje atrap funkcji            |
+| U     | hero `/`, render telefonu           | fizyczny telefon bez prostokątnego tła, UI wychodzące z ekranu, sześć ikon; nadpisuje S tylko w hero                   |
+| V     | pełny landing desktop V7            | osiem obrazów 2026-08-01; nadpisuje desktopową geometrię `/`, ale nie zatwierdza cen, klientów, CRM, statystyk ani SLA |
+| X     | sidebar panelu Kwotum               | znak bez płytki, ikony bez kafelków i szerokość 240 px; funkcje, rail 78 px i mobile bez zmiany                        |
+| Y     | wybór organizacji Kwotum            | szeroki header, oś 1260 px i pozioma karta z realnym podsumowaniem; mobile zachowuje jedną kolumnę                     |
+| Z     | operacyjna obsługa leada            | zwarta prawa kolumna: status, właściciel, priorytet, kontakt, notatki i zadania; wyłącznie z prawdziwym zapisem        |
 
 Oryginały panelowe A/C/F są dostępne w `apps/web/public/panel/`, a D w
 `references/product-app-board.png`; zostały zablokowane 2026-07-27:
@@ -120,6 +124,15 @@ oryginału nie przypisujemy mu sztucznego SHA-256 ani wyniku pixel diff.
 Załącznik M jest dostępny wyłącznie w rozmowie i nadpisuje wcześniejszy ekran
 szczegółów tylko na trasie `/panel/[organizationId]/leady/[leadId]`. Zachowuje
 realne odpowiedzi, pliki, historię, notatki, status i uprawnienia tenantowe.
+
+Decyzja Z pochodzi z zaakceptowanego załącznika właściciela z 2026-08-03 i
+precyzuje wyłącznie prawą kolumnę tego szczegółu. Referencja definiuje zwarty
+układ obsługi, notatki z autorem i czasem oraz akcje kontaktu i zadania, ale nie
+zatwierdza atrap CRM. Implementacja używa tenantowego stanu, RPC, forced RLS i
+append-only activity. Oryginał 770 × 1104 px ma SHA-256
+`ab5fb8075ef249b146778ccd7d2aa2ef8ae340b952ab52f94ac925ef9efc4afa` i jest
+zapisany jako
+`artifacts/visual-qa/12zi-lead-operations/reference-lead-operations-770x1104.png`.
 
 Decyzja N jest tekstową korektą właściciela do regionu szablonów z planszy D.
 Na pełnej trasie `/panel/[organizationId]/szablony` pięć kart ma pozostać
@@ -201,6 +214,79 @@ sześcioczęściowa struktura landingu pozostaje bez zmian.
 | ------------------------------------------------------------------------------ | ----------- | ------------------------------------------------------------------ |
 | `apps/web/public/images/redesign/lorum-hero-phone-desktop-transparent-v4.webp` | 1536 × 1024 | `1781845b7dcebedb086200d409e0807c368706a45bdf2a0794b782c7e9a7c0eb` |
 | `apps/web/public/images/redesign/lorum-hero-phone-mobile-transparent-v4.webp`  | 864 × 1821  | `bef2d7c2f74702d0bc47cf146c4a922fc4ba75dccc53d4db951c44a38c490537` |
+
+Decyzja V pochodzi z ośmiu obrazów dostarczonych przez właściciela
+2026-08-01. Zastępuje wcześniejsze decyzje O, S i U oraz starszy pełny landing
+V6 wyłącznie dla geometrii desktopowego `/`. Siedem kadrów ma natywny rozmiar
+1672 × 941 px; ósmy, 941 × 1672 px, jest planszą kolejności i nie może być
+traktowany jako pełnostronicowy pixel-perfect screenshot.
+
+Nowa sekwencja desktopu to: header/hero → pasek dowodu → trzy kroki → cztery
+grupy danych → przykładowy lead → integracje → dwa warianty rozpoczęcia →
+FAQ/pomoc → final CTA → footer. V7-04 (integracje) jest wstawiany po przykładzie
+leada, mimo że nie występuje na pomniejszonym overview.
+
+Obrazy V7 nie zatwierdzają widocznych na nich niepotwierdzonych logotypów
+klientów, cen 249/549 zł, trialu, płatności, limitów planów, natywnych CRM/Google
+Sheets, danych kontaktowych, 98% satysfakcji, SLA `< 2h`, wzrostów `+20%/+15%`
+ani liczby 128 leadów. Produkcja zachowuje ich rolę kompozycyjną wyłącznie za
+pomocą prawdziwych funkcji i uczciwego copy zgodnego z `SCOPE.md` oraz
+`NON_GOALS.md`.
+
+| Plik                                                          |    Rozmiar | SHA-256                                                            |
+| ------------------------------------------------------------- | ---------: | ------------------------------------------------------------------ |
+| `docs/ui/landing-desktop-v7/reference/01-hero.png`            | 1672 × 941 | `7113a8acc45f48e7488bb39fe1f9f4bd2933137c845e429ed4bdb7664adf41df` |
+| `docs/ui/landing-desktop-v7/reference/02-process.png`         | 1672 × 941 | `e7ce0ef29bd71eb4246aa68e3efec06f0f82a47acdfc28a6f57387206962d025` |
+| `docs/ui/landing-desktop-v7/reference/03-key-information.png` | 1672 × 941 | `f659ff69af90114cab05774f95dd1a8f7432c4cb4d75cddabbd4b7e3b776ff27` |
+| `docs/ui/landing-desktop-v7/reference/04-integrations.png`    | 1672 × 941 | `8c89d943581eac353cd699ebf5d2a7b1388ec3b8f7bbbf42c4d70226460301ed` |
+| `docs/ui/landing-desktop-v7/reference/05-pricing.png`         | 1672 × 941 | `9b0d2e08274cee4622d2dbbbbe26cf1da781f331e00431ba22355f82b709c1fc` |
+| `docs/ui/landing-desktop-v7/reference/06-faq.png`             | 1672 × 941 | `ba3ecf0284c557b21363270658f4ecb2f6bd780be20cf2ed62549ae10918abc0` |
+| `docs/ui/landing-desktop-v7/reference/07-final-cta.png`       | 1672 × 941 | `da0587ba1ecc2694186ad84ef9f5aaf52f5101f944f273cf5cfadf5afcc95282` |
+| `docs/ui/landing-desktop-v7/reference/08-full-overview.png`   | 941 × 1672 | `8ddaca5adef25e9205910c93816fc7501668b397f14e34411bb94f3780edace6` |
+
+Decyzja W pochodzi z czterech obrazów zaakceptowanych przez właściciela
+2026-08-02. Pierwszy nadpisuje wcześniejszy znak i widoczną nazwę Lorum na
+**Kwotum** zgodnie z ADR-033. Drugi wskazuje problem rytmu finalnego CTA na
+mobile. Trzeci wskazuje nierówny rail warunków finalnego CTA, a czwarty różne
+szerokości dwóch akcji przykładowego leada. Nie są wzorcem nowej treści ani
+powrotem do starego układu proof. Korekta obejmuje wyłącznie bezpieczne insets,
+szerokości dzieci, rytm i znak marki. Desktopowa geometria V7 pozostaje bez
+zmian poza pokazanymi dwoma mikroregionami.
+
+| Plik                                                                | Rozmiar    | SHA-256                                                            |
+| ------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------ |
+| `docs/ui/kwotum-brand-v1/reference/01-kwotum-logo-direction.png`    | 1600 × 900 | `0ae9103735a3b0bf0d48653cdc38ba311776c7d175efe45b48a26ba9a1083a97` |
+| `docs/ui/kwotum-brand-v1/reference/02-mobile-final-cta-padding.png` | 780 × 1688 | `97ac5c1ba02547248da3006173c8a146f906e483f4e88ba1fd473981d3c87fb7` |
+| `docs/ui/kwotum-brand-v1/reference/03-final-cta-facts-spacing.png`  | 1460 × 158 | `2fa98bbf8b746e189373210250a779a4c48f721e37180f633a29ca0a1fb6e683` |
+| `docs/ui/kwotum-brand-v1/reference/04-lead-actions-width.png`       | 564 × 262  | `b048c0a8cdb6e15c0f59f8048c0397e53fab3576c7cc5078dc04228d9896e72d` |
+
+Decyzja X jest tekstową dyspozycją właściciela z 2026-08-03 i nadpisuje
+Etap 12M tylko w warstwie wizualnej wspólnego sidebara panelu. Rozwinięty
+wariant ma 240 px, znak Kwotum nie ma osobnego tła ani obramowania, a główne
+narzędzia otrzymują osobny, code-native zestaw ikon bez teł i obramowań.
+Zwinięty rail pozostaje
+78 px, breakpoint 56 rem i dolna nawigacja mobilna nie zmieniają struktury,
+capability-gated linków ani zachowania. Dyspozycja nie dodaje nowych funkcji,
+tras ani zależności. Ponieważ nie dostarczono obrazu źródłowego, nie przypisuje
+się jej sztucznego SHA-256; dowody runtime znajdują się w
+`artifacts/visual-qa/12m-panel-shell/sidebar-kwotum-glass/`.
+
+Decyzja Y pochodzi z obrazu zaakceptowanego przez właściciela 2026-08-03 i
+nadpisuje wyłącznie trasę wyboru organizacji `/panel`. Desktop używa headera
+około 102 px, osi treści 1260 px, dużego nagłówka i poziomej karty organizacji
+z avatarem, nazwą, slugiem, trzema metadanymi oraz dwiema działającymi akcjami.
+Liczby widoczne na obrazie nie są fixture'em produkcyjnym: aplikacja pobiera
+liczbę opublikowanych procesów, leadów `new`/`in_progress` oraz ostatnią
+aktywność przez uwierzytelniony klient i istniejące RLS. Mobile zachowuje
+kolejność DOM, składa kartę do jednej kolumny i nie przewija się poziomo.
+
+| Plik                                                                                     | Rozmiar     | SHA-256                                                            |
+| ---------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------ |
+| `artifacts/visual-qa/12m-panel-shell/organization-picker-kwotum/reference-2872x1608.png` | 2872 × 1608 | `783b30ceadefada2a5841af73c1b5334cb672f10723e555a53309d929975f133` |
+
+Pełny audyt, pomiary, luki i klasyfikację cleanupu zawierają
+`landing-desktop-v7/REFERENCE_AUDIT.md` oraz `MEASUREMENTS.md`. W D0 nie
+zmieniono aplikacji ani nie usunięto poprzednich plików runtime.
 
 Wygenerowane ilustracje produktowe Etapu 12K:
 

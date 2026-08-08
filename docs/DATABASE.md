@@ -87,10 +87,19 @@ przypięty do tej samej wersji. Szczegóły: `docs/ESTIMATION_ENGINE.md`.
 - `analytics_consent_records` — wersjonowana historia decyzji sesji;
 - `leads` — organizacja, wersja, status, score, przedział, kontakt;
 - `lead_answers`, `lead_files`, `lead_status_history`, `lead_notes`;
+- `lead_operations` — jeden stan właściciela i priorytetu na lead;
+- `lead_tasks` — planowane kontakty i zadania z terminem, odpowiedzialnym,
+  idempotencją i cyklem otwarte/wykonane/anulowane;
+- `lead_activity_events` — techniczna historia operacji bez kopiowania treści
+  zadania, notatki i kontaktu;
 - `consent_records` — typ, treść/hash wersji, timestamp i źródło;
 - `notifications` — tenantowy outbox ze snapshotem odbiorcy, wersją szablonu,
   statusem, blokadą i terminem retry;
 - `notification_delivery_attempts` — historia prób bez treści wiadomości;
+- `flow_invitations` — tenantowy outbox wysłania aktualnego hosted flow,
+  przypięty do immutable wersji, autora i idempotency key;
+- `flow_invitation_delivery_attempts` — historia prób zaproszenia bez treści
+  wiadomości i bez PII w audit logu;
 - `webhook_endpoints` i `webhook_deliveries` powstaną w kolejnych etapach.
 
 ## Kluczowe więzy
@@ -130,6 +139,38 @@ tenanta, ale nie ma bezpośredniego zapisu. Rola workera może wywołać tylko
 funkcje claim/complete/fail; claim stosuje `SKIP LOCKED`, lock token i odzyskuje
 próby zawieszone dłużej niż 15 minut. Każda próba trafia do osobnego rekordu.
 Szczegóły: `docs/NOTIFICATIONS.md`.
+
+### Stan wdrożenia Etapu 12ZH
+
+Migracja `20260803000100_stage12zh_flow_invitations.sql` dodaje osobny outbox
+zaproszeń procesu, ponieważ istniejące powiadomienia są nieusuwalnie przypięte
+do leada. Złożone FK wymuszają zgodność organizacji, flow, immutable wersji i
+aktywnego publicznego aliasu. Unikalność `(organization_id, request_id)` daje
+idempotencję, a constraint stanu pilnuje locka, daty wysłania, providera i
+wyniku próby.
+
+Owner/Admin tworzą zaproszenie wyłącznie przez wąskie RPC; bezpośredni zapis
+tabel nie jest przyznany klientowi. Worker claimuje rekordy przez
+`FOR UPDATE SKIP LOCKED`, odzyskuje zawieszone próby i zapisuje outcome w
+osobnej tabeli. Migracja jest forward-only: rollback aplikacji pozostawia
+nieprzetworzone rekordy bezpiecznie w kolejce, której starszy worker nie zna.
+
+### Stan wdrożenia Etapu 12ZI
+
+Migracja `20260803000200_stage12zi_lead_operations.sql` dodaje osobny agregat
+operacyjny, nie zmieniając immutable briefu klienta w `leads`. Trigger tworzy
+domyślny `lead_operations` dla nowych leadów, a migracja uzupełnia istniejące.
+Najbliższe otwarte zadanie jest źródłem „następnego kroku”, najbliższy otwarty
+kontakt źródłem „zaplanowanego kontaktu”, a ostatnia aktywność jest projekcją
+submitu, statusów, notatek i zdarzeń operacyjnych.
+
+Owner/Admin przypisują właściciela przez `set_lead_assignee`; wszystkie aktywne
+role zmieniają priorytet i pracują na zadaniach przez kontrolowane RPC. Sales
+zamyka tylko własne/przypisane zadania. Klient ma wyłącznie SELECT przez forced
+RLS, a audit zapisuje identyfikatory, enumy i terminy bez tytułu, opisu,
+notatki lub e-maila. Złożone tenantowe FK oraz `ON DELETE CASCADE` włączają
+zadania do legal hold, retencji i usunięcia wraz z leadem; eksport DSAR zawiera
+treść zadań. Migracja jest forward-only, a rollback UI nie usuwa danych.
 
 ### Stan wdrożenia Etapu 9
 

@@ -21,7 +21,7 @@ i produkcji opisuje `PRODUCTION_READINESS_PLAN.md`.
 | Webhook                   | wymagany w MVP, brak implementacji        | ADR-033 i implementacja albo redukcja scope     |
 | Security/compliance       | lokalny audyt bez znanych critical/high   | zdalne skany, prawo, rate limit, WAF i operacje |
 | Marketing i UI            | lokalnie ukończone                        | tylko regresje blokujące ścieżkę lub dostępność |
-| Staging i produkcja       | nierozpoczęte                             | Etap 13A po zakończeniu 12ZD–12ZG               |
+| Staging i produkcja       | lokalny kontrakt readiness gotowy         | Etap 13A po zakończeniu 12ZD–12ZG               |
 
 ## Najbliższa kolejność
 
@@ -32,6 +32,7 @@ i produkcji opisuje `PRODUCTION_READINESS_PLAN.md`.
 | 12ZE | nierozpoczęty | self-service pricing, scoring i wynik w builderze  | konfiguracja → publikacja → widget → lead                   |
 | 12ZF | nierozpoczęty | webhook v1 albo formalna redukcja MVP              | brak konfliktu wymagania–kod                                |
 | 12ZG | nierozpoczęty | reguły i UAT 1–3 firm pilotażowych                 | osobne zatwierdzone przypadki i go/no-go                    |
+| 12ZJ | ukończony     | lokalny liveness/readiness i runtime smoke         | RLS, build oraz smoke local/production                      |
 | 13A  | nierozpoczęty | staging i produkcyjna infrastruktura               | odseparowane środowiska, schedulery, health/readiness       |
 | 13B  | nierozpoczęty | bezpieczeństwo, prawo i gotowość operacyjna        | DPA, rate limit, monitoring, runbooki, manual accessibility |
 | 13C  | nierozpoczęty | przećwiczony release candidate                     | restore, rollback i pełna release checklist                 |
