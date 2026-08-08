@@ -14,6 +14,10 @@ test-results/
 apps/web/public/widget/
 artifacts/redesign/
 
+# Local promotional source media and renders are not release artifacts.
+# Keep them outside Git; product visual-QA evidence remains versioned separately.
+artifacts/promo/
+
 # Environment files: only the documented example is versioned
 .env
 .env.*
