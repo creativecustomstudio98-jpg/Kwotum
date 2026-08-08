@@ -1,0 +1,242 @@
+[
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/produkt",
+    "phase": "before",
+    "viewport": "1440",
+    "breadcrumbs": {
+      "height": 26.59375,
+      "left": 60,
+      "right": 1380,
+      "top": 93,
+      "width": 1320
+    },
+    "documentHeight": 3602,
+    "footer": {
+      "height": 333.8125,
+      "left": 64,
+      "right": 1376,
+      "top": 3236.328125,
+      "width": 1312
+    },
+    "header": {
+      "height": 68,
+      "left": 60,
+      "right": 1380,
+      "top": 0,
+      "width": 1320
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/cennik",
+    "phase": "before",
+    "viewport": "1440",
+    "breadcrumbs": {
+      "height": 26.59375,
+      "left": 60,
+      "right": 1380,
+      "top": 93,
+      "width": 1320
+    },
+    "documentHeight": 2702,
+    "footer": {
+      "height": 333.8125,
+      "left": 64,
+      "right": 1376,
+      "top": 2335.6875,
+      "width": 1312
+    },
+    "header": {
+      "height": 68,
+      "left": 60,
+      "right": 1380,
+      "top": 0,
+      "width": 1320
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/meble-na-wymiar",
+    "phase": "before",
+    "viewport": "1440",
+    "breadcrumbs": {
+      "height": 26.59375,
+      "left": 60,
+      "right": 1380,
+      "top": 93,
+      "width": 1320
+    },
+    "documentHeight": 5513,
+    "footer": {
+      "height": 333.8125,
+      "left": 64,
+      "right": 1376,
+      "top": 5146.984375,
+      "width": 1312
+    },
+    "header": {
+      "height": 68,
+      "left": 60,
+      "right": 1380,
+      "top": 0,
+      "width": 1320
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/polityka-prywatnosci",
+    "phase": "before",
+    "viewport": "1440",
+    "breadcrumbs": {
+      "height": 26.59375,
+      "left": 60,
+      "right": 1380,
+      "top": 165,
+      "width": 1320
+    },
+    "documentHeight": 1727,
+    "footer": {
+      "height": 333.8125,
+      "left": 64,
+      "right": 1376,
+      "top": 1361.53125,
+      "width": 1312
+    },
+    "header": {
+      "height": 68,
+      "left": 60,
+      "right": 1380,
+      "top": 0,
+      "width": 1320
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/produkt",
+    "phase": "before",
+    "viewport": "390",
+    "breadcrumbs": {
+      "height": 26.59375,
+      "left": 20,
+      "right": 370,
+      "top": 93,
+      "width": 350
+    },
+    "documentHeight": 5662,
+    "footer": {
+      "height": 1055.53125,
+      "left": 16,
+      "right": 374,
+      "top": 4582.3125,
+      "width": 358
+    },
+    "header": {
+      "height": 68,
+      "left": 20,
+      "right": 370,
+      "top": 0,
+      "width": 350
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/cennik",
+    "phase": "before",
+    "viewport": "390",
+    "breadcrumbs": {
+      "height": 26.59375,
+      "left": 20,
+      "right": 370,
+      "top": 93,
+      "width": 350
+    },
+    "documentHeight": 4089,
+    "footer": {
+      "height": 1055.53125,
+      "left": 16,
+      "right": 374,
+      "top": 3009.4375,
+      "width": 358
+    },
+    "header": {
+      "height": 68,
+      "left": 20,
+      "right": 370,
+      "top": 0,
+      "width": 350
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/meble-na-wymiar",
+    "phase": "before",
+    "viewport": "390",
+    "breadcrumbs": {
+      "height": 26.59375,
+      "left": 20,
+      "right": 370,
+      "top": 93,
+      "width": 350
+    },
+    "documentHeight": 7208,
+    "footer": {
+      "height": 1055.53125,
+      "left": 16,
+      "right": 374,
+      "top": 6128.25,
+      "width": 358
+    },
+    "header": {
+      "height": 68,
+      "left": 20,
+      "right": 370,
+      "top": 0,
+      "width": 350
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/polityka-prywatnosci",
+    "phase": "before",
+    "viewport": "390",
+    "breadcrumbs": {
+      "height": 26.59375,
+      "left": 20,
+      "right": 370,
+      "top": 117,
+      "width": 350
+    },
+    "documentHeight": 2565,
+    "footer": {
+      "height": 1055.53125,
+      "left": 16,
+      "right": 374,
+      "top": 1485.796875,
+      "width": 358
+    },
+    "header": {
+      "height": 68,
+      "left": 20,
+      "right": 370,
+      "top": 0,
+      "width": 350
+    },
+    "horizontalOverflow": 0
+  }
+]

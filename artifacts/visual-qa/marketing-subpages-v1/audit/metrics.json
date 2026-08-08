@@ -1,0 +1,1964 @@
+[
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/produkt",
+    "slug": "produkt",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 3602,
+    "h1": ["Jeden proces od konfiguracji do obsługi leada."],
+    "h2": [
+      "Jeden system prowadzi od opublikowanych pytań do decyzji handlowca.",
+      "Formularz kwalifikuje. Nie udaje systemu do wszystkiego.",
+      "Zacznij od realnego zapytania swojej branży."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "product-workspace__brief",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 29,
+    "title": "System kwalifikacji zapytań dla firm usługowych · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "marketing-button",
+        "href": "/jak-dziala",
+        "text": "Przejdź przez proces →"
+      },
+      {
+        "className": "marketing-button marketing-button--secondary",
+        "href": "/funkcje",
+        "text": "Zobacz funkcje"
+      },
+      {
+        "className": "",
+        "href": "/jak-dziala",
+        "text": "Zobacz proces →"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/jak-dziala",
+    "slug": "jak-dziala",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 4082,
+    "h1": ["Klient odpowiada. Serwer potwierdza. Firma dostaje kontekst."],
+    "h2": [
+      "Konfiguracja",
+      "Walidacja i publikacja",
+      "Sesja klienta",
+      "Wynik",
+      "Kontakt i lead",
+      "Obsługa i pomiar",
+      "Dane organizacji mają kilka niezależnych warstw ochrony.",
+      "Mechanizm jest wspólny. Pytania pozostają branżowe."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 3,
+    "smallTextCount": 15,
+    "title": "Jak Kwotum porządkuje i kwalifikuje zapytania · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/cennik",
+    "slug": "cennik",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 2702,
+    "h1": ["Najpierw pilotaż. Model self-service po walidacji."],
+    "h2": [
+      "Wdrożenie z ustalonym zakresem",
+      "Model w trakcie walidacji",
+      "Zakres przed ceną — tak samo jak w dobrym formularzu."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 2,
+    "smallTextCount": 10,
+    "title": "Cennik — program pilotażowy Kwotum · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "marketing-button",
+        "href": "/jak-dziala",
+        "text": "Oceń zakres procesu"
+      },
+      {
+        "className": "marketing-button marketing-button--secondary",
+        "href": "/produkt",
+        "text": "Poznaj produkt"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/dla-agencji",
+    "slug": "dla-agencji",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 2900,
+    "h1": ["Dodaj do wdrożenia proces sprzedażowy, nie kolejny zwykły formularz."],
+    "h2": [
+      "Powtarzalna metoda, treść dopasowana do klienta.",
+      "Leady pozostają w organizacji firmy.",
+      "Widget nie dziedziczy stylów motywu.",
+      "Zbuduj usługę wdrożeniową wokół jakości briefu."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 3,
+    "smallTextCount": 15,
+    "title": "Formularze wyceny dla agencji WordPress i web · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/wordpress",
+    "slug": "wordpress",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 3268,
+    "h1": ["Kalkulator na stronie. Dane leadów poza WordPressem."],
+    "h2": [
+      "Wąskie połączenie zamiast drugiej bazy leadów.",
+      "Mała powierzchnia, jawne kontrole bezpieczeństwa.",
+      "Bezpieczny konektor bez przenoszenia danych do CMS."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 3,
+    "smallTextCount": 13,
+    "title": "Kwalifikacja zapytań w WordPress — bez danych leadów w CMS · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "marketing-button",
+        "href": "/funkcje/widget-na-strone",
+        "text": "Poznaj widget"
+      },
+      {
+        "className": "marketing-button marketing-button--secondary",
+        "href": "/dla-agencji",
+        "text": "Zobacz model dla agencji"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze",
+    "slug": "branze",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 2894,
+    "h1": ["Wspólny mechanizm, pytania wynikające z usługi."],
+    "h2": [
+      "Kalkulator wyceny mebli na wymiar, który zaczyna od zakresu",
+      "Kalkulator ogrodzenia z pytaniami o teren, bramę i montaż",
+      "Kalkulator ceny strony internetowej bez zgadywania zakresu",
+      "Formularz wyceny klimatyzacji przed wizją lokalną",
+      "Formularz wyceny remontu, który rozdziela zakres od niewiadomych",
+      "Pięć dopracowanych zastosowań zamiast katalogu bez treści."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 2,
+    "smallTextCount": 18,
+    "title": "Formularze wyceny dla pięciu branż usługowych · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze/meble-na-wymiar",
+        "text": "01Meble na wymiarKalkulator wyceny mebli na wymiar, który zaczyna od zakresuFormularz wyceny mebli na wymiar, który porządkuje rodzaj zabudowy, wymiary, materiały, wyposażenie i termin przed rozmową.→"
+      },
+      {
+        "className": "",
+        "href": "/branze/ogrodzenia",
+        "text": "02OgrodzeniaKalkulator ogrodzenia z pytaniami o teren, bramę i montażInteraktywny formularz dla firm ogrodzeniowych: długość, system, bramy, teren, montaż i termin w jednym uporządkowanym zapytaniu.→"
+      },
+      {
+        "className": "",
+        "href": "/branze/strony-internetowe",
+        "text": "03Strony internetoweKalkulator ceny strony internetowej bez zgadywania zakresuFormularz wyceny strony internetowej zbierający typ serwisu, treści, funkcje, integracje, termin i poziom gotowości materiałów.→"
+      },
+      {
+        "className": "",
+        "href": "/branze/klimatyzacja",
+        "text": "04KlimatyzacjaFormularz wyceny klimatyzacji przed wizją lokalnąFormularz dla instalatora klimatyzacji porządkujący pomieszczenia, metraż, typ budynku, montaż i dostępność techniczną.→"
+      },
+      {
+        "className": "",
+        "href": "/branze/remonty",
+        "text": "05RemontyFormularz wyceny remontu, który rozdziela zakres od niewiadomychFormularz wyceny remontu zbierający pomieszczenia, metraż, stan, instalacje, standard, materiały i logistykę.→"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/meble-na-wymiar",
+    "slug": "branze-meble-na-wymiar",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 5513,
+    "h1": ["Kalkulator wyceny mebli na wymiar, który zaczyna od zakresu"],
+    "h2": [
+      "Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?",
+      "Zobacz, jak pytanie staje się częścią briefu.",
+      "Pięć obszarów do uporządkowania przed kontaktem.",
+      "Co firma może zobaczyć po ukończeniu procesu.",
+      "Od syntetycznego szablonu do procesu firmy.",
+      "Pytania o zakres i wynik.",
+      "Uporządkuj pierwsze zapytanie: meble na wymiar."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-demo",
+      "marketing-section marketing-section--dark",
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 8,
+    "smallTextCount": 30,
+    "title": "Kalkulator wyceny mebli na wymiar, który zaczyna od zakresu · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze",
+        "text": "Branże"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/ogrodzenia",
+    "slug": "branze-ogrodzenia",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 5461,
+    "h1": ["Kalkulator ogrodzenia z pytaniami o teren, bramę i montaż"],
+    "h2": [
+      "Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?",
+      "Zobacz, jak pytanie staje się częścią briefu.",
+      "Pięć obszarów do uporządkowania przed kontaktem.",
+      "Co firma może zobaczyć po ukończeniu procesu.",
+      "Od syntetycznego szablonu do procesu firmy.",
+      "Pytania o zakres i wynik.",
+      "Uporządkuj pierwsze zapytanie: ogrodzenia."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-demo",
+      "marketing-section marketing-section--dark",
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 8,
+    "smallTextCount": 30,
+    "title": "Kalkulator ogrodzenia z pytaniami o teren, bramę i montaż · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze",
+        "text": "Branże"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/strony-internetowe",
+    "slug": "branze-strony-internetowe",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 5513,
+    "h1": ["Kalkulator ceny strony internetowej bez zgadywania zakresu"],
+    "h2": [
+      "Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?",
+      "Zobacz, jak pytanie staje się częścią briefu.",
+      "Pięć obszarów do uporządkowania przed kontaktem.",
+      "Co firma może zobaczyć po ukończeniu procesu.",
+      "Od syntetycznego szablonu do procesu firmy.",
+      "Pytania o zakres i wynik.",
+      "Uporządkuj pierwsze zapytanie: strony internetowe."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-demo",
+      "marketing-section marketing-section--dark",
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 8,
+    "smallTextCount": 30,
+    "title": "Kalkulator ceny strony internetowej bez zgadywania zakresu · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze",
+        "text": "Branże"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/klimatyzacja",
+    "slug": "branze-klimatyzacja",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 5461,
+    "h1": ["Formularz wyceny klimatyzacji przed wizją lokalną"],
+    "h2": [
+      "Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?",
+      "Zobacz, jak pytanie staje się częścią briefu.",
+      "Pięć obszarów do uporządkowania przed kontaktem.",
+      "Co firma może zobaczyć po ukończeniu procesu.",
+      "Od syntetycznego szablonu do procesu firmy.",
+      "Pytania o zakres i wynik.",
+      "Uporządkuj pierwsze zapytanie: klimatyzacja."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-demo",
+      "marketing-section marketing-section--dark",
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 8,
+    "smallTextCount": 30,
+    "title": "Formularz wyceny klimatyzacji przed wizją lokalną · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze",
+        "text": "Branże"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/remonty",
+    "slug": "branze-remonty",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 5513,
+    "h1": ["Formularz wyceny remontu, który rozdziela zakres od niewiadomych"],
+    "h2": [
+      "Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?",
+      "Zobacz, jak pytanie staje się częścią briefu.",
+      "Pięć obszarów do uporządkowania przed kontaktem.",
+      "Co firma może zobaczyć po ukończeniu procesu.",
+      "Od syntetycznego szablonu do procesu firmy.",
+      "Pytania o zakres i wynik.",
+      "Uporządkuj pierwsze zapytanie: remonty."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-demo",
+      "marketing-section marketing-section--dark",
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 8,
+    "smallTextCount": 30,
+    "title": "Formularz wyceny remontu, który rozdziela zakres od niewiadomych · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze",
+        "text": "Branże"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje",
+    "slug": "funkcje",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 2776,
+    "h1": ["Funkcje podporządkowane jakości następnego kroku."],
+    "h2": [
+      "Kalkulator wyceny na stronę z serwerową kontrolą wyniku",
+      "Formularz wieloetapowy zamiast ściany pól",
+      "Kwalifikacja leadów bez zamiany formularza w przesłuchanie",
+      "Wyjaśnialny lead scoring zamiast czarnej skrzynki",
+      "Widget formularza wyceny odporny na CSS strony",
+      "Funkcje działają razem, nie jako osobne obietnice."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 2,
+    "smallTextCount": 18,
+    "title": "Funkcje formularza wyceny i kwalifikacji · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje/kalkulator-wyceny",
+        "text": "01PricingKalkulator wyceny na stronę z serwerową kontrolą wynikuKalkulator wyceny na stronę oparty na ograniczonych regułach, wersjach procesu i serwerowym potwierdzeniu wyniku.→"
+      },
+      {
+        "className": "",
+        "href": "/funkcje/formularz-wieloetapowy",
+        "text": "02Prowadzony procesFormularz wieloetapowy zamiast ściany pólFormularz wieloetapowy prowadzący klienta od zakresu do kompletnego briefu, z walidacją i zapisem odpowiedzi.→"
+      },
+      {
+        "className": "",
+        "href": "/funkcje/kwalifikacja-leadow",
+        "text": "03KwalifikacjaKwalifikacja leadów bez zamiany formularza w przesłuchanieFormularz kwalifikacji klienta, który zbiera dane potrzebne do decyzji o kolejnym kroku i zapisuje uporządkowany lead.→"
+      },
+      {
+        "className": "",
+        "href": "/funkcje/lead-scoring",
+        "text": "04ScoringWyjaśnialny lead scoring zamiast czarnej skrzynkiLead scoring oparty na jawnych, ograniczonych regułach firmy — bez AI jako źródła decyzji i bez ujawniania wyniku klientowi.→"
+      },
+      {
+        "className": "",
+        "href": "/funkcje/widget-na-strone",
+        "text": "05OsadzenieWidget formularza wyceny odporny na CSS stronyWidget na stronę, który korzysta z tego samego opublikowanego procesu i nie ujawnia prywatnych reguł pricingu ani scoringu.→"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje/kalkulator-wyceny",
+    "slug": "funkcje-kalkulator-wyceny",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 3558,
+    "h1": ["Kalkulator wyceny na stronę z serwerową kontrolą wyniku"],
+    "h2": [
+      "Co ta funkcja zmienia w obsłudze zapytania.",
+      "Trzy kroki bez ukrytej automatyzacji.",
+      "Kontrola jest częścią funkcji, nie dopiskiem.",
+      "Zobacz funkcję w kontekście całej ścieżki."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 16,
+    "title": "Kalkulator wyceny na stronę z serwerową kontrolą wyniku · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje",
+        "text": "Funkcje"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje/formularz-wieloetapowy",
+    "slug": "funkcje-formularz-wieloetapowy",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 3558,
+    "h1": ["Formularz wieloetapowy zamiast ściany pól"],
+    "h2": [
+      "Co ta funkcja zmienia w obsłudze zapytania.",
+      "Trzy kroki bez ukrytej automatyzacji.",
+      "Kontrola jest częścią funkcji, nie dopiskiem.",
+      "Zobacz funkcję w kontekście całej ścieżki."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 16,
+    "title": "Formularz wieloetapowy zamiast ściany pól · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje",
+        "text": "Funkcje"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje/kwalifikacja-leadow",
+    "slug": "funkcje-kwalifikacja-leadow",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 3610,
+    "h1": ["Kwalifikacja leadów bez zamiany formularza w przesłuchanie"],
+    "h2": [
+      "Co ta funkcja zmienia w obsłudze zapytania.",
+      "Trzy kroki bez ukrytej automatyzacji.",
+      "Kontrola jest częścią funkcji, nie dopiskiem.",
+      "Zobacz funkcję w kontekście całej ścieżki."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 16,
+    "title": "Kwalifikacja leadów bez zamiany formularza w przesłuchanie · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje",
+        "text": "Funkcje"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje/lead-scoring",
+    "slug": "funkcje-lead-scoring",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 3558,
+    "h1": ["Wyjaśnialny lead scoring zamiast czarnej skrzynki"],
+    "h2": [
+      "Co ta funkcja zmienia w obsłudze zapytania.",
+      "Trzy kroki bez ukrytej automatyzacji.",
+      "Kontrola jest częścią funkcji, nie dopiskiem.",
+      "Zobacz funkcję w kontekście całej ścieżki."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 16,
+    "title": "Wyjaśnialny lead scoring zamiast czarnej skrzynki · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje",
+        "text": "Funkcje"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje/widget-na-strone",
+    "slug": "funkcje-widget-na-strone",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 3558,
+    "h1": ["Widget formularza wyceny odporny na CSS strony"],
+    "h2": [
+      "Co ta funkcja zmienia w obsłudze zapytania.",
+      "Trzy kroki bez ukrytej automatyzacji.",
+      "Kontrola jest częścią funkcji, nie dopiskiem.",
+      "Zobacz funkcję w kontekście całej ścieżki."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 16,
+    "title": "Widget formularza wyceny odporny na CSS strony · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje",
+        "text": "Funkcje"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/polityka-prywatnosci",
+    "slug": "polityka-prywatnosci",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 1727,
+    "h1": ["Informacja prywatności dla konta Kwotum"],
+    "h2": ["Dane konta", "Cel i dostęp", "Google", "Prawa i retencja"],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": ["(none)", "(none)", "(none)", "(none)"],
+    "sectionCount": 4,
+    "smallTextCount": 7,
+    "title": "Informacja prywatności · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/regulamin",
+    "slug": "regulamin",
+    "viewport": "desktop",
+    "viewportHeight": 1000,
+    "viewportWidth": 1440,
+    "documentHeight": 1678,
+    "h1": ["Warunki korzystania z wersji pilotażowej Kwotum"],
+    "h2": ["Charakter usługi", "Konto i bezpieczeństwo", "Dozwolone użycie", "Wersja pilotażowa"],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": ["(none)", "(none)", "(none)", "(none)"],
+    "sectionCount": 4,
+    "smallTextCount": 7,
+    "title": "Warunki korzystania · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/produkt",
+    "slug": "produkt",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 5662,
+    "h1": ["Jeden proces od konfiguracji do obsługi leada."],
+    "h2": [
+      "Jeden system prowadzi od opublikowanych pytań do decyzji handlowca.",
+      "Formularz kwalifikuje. Nie udaje systemu do wszystkiego.",
+      "Zacznij od realnego zapytania swojej branży."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "product-workspace__brief",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 29,
+    "title": "System kwalifikacji zapytań dla firm usługowych · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "marketing-button",
+        "href": "/jak-dziala",
+        "text": "Przejdź przez proces →"
+      },
+      {
+        "className": "marketing-button marketing-button--secondary",
+        "href": "/funkcje",
+        "text": "Zobacz funkcje"
+      },
+      {
+        "className": "",
+        "href": "/jak-dziala",
+        "text": "Zobacz proces →"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/jak-dziala",
+    "slug": "jak-dziala",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 5698,
+    "h1": ["Klient odpowiada. Serwer potwierdza. Firma dostaje kontekst."],
+    "h2": [
+      "Konfiguracja",
+      "Walidacja i publikacja",
+      "Sesja klienta",
+      "Wynik",
+      "Kontakt i lead",
+      "Obsługa i pomiar",
+      "Dane organizacji mają kilka niezależnych warstw ochrony.",
+      "Mechanizm jest wspólny. Pytania pozostają branżowe."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 3,
+    "smallTextCount": 15,
+    "title": "Jak Kwotum porządkuje i kwalifikuje zapytania · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/cennik",
+    "slug": "cennik",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 4089,
+    "h1": ["Najpierw pilotaż. Model self-service po walidacji."],
+    "h2": [
+      "Wdrożenie z ustalonym zakresem",
+      "Model w trakcie walidacji",
+      "Zakres przed ceną — tak samo jak w dobrym formularzu."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 2,
+    "smallTextCount": 10,
+    "title": "Cennik — program pilotażowy Kwotum · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "marketing-button",
+        "href": "/jak-dziala",
+        "text": "Oceń zakres procesu"
+      },
+      {
+        "className": "marketing-button marketing-button--secondary",
+        "href": "/produkt",
+        "text": "Poznaj produkt"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/dla-agencji",
+    "slug": "dla-agencji",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 4418,
+    "h1": ["Dodaj do wdrożenia proces sprzedażowy, nie kolejny zwykły formularz."],
+    "h2": [
+      "Powtarzalna metoda, treść dopasowana do klienta.",
+      "Leady pozostają w organizacji firmy.",
+      "Widget nie dziedziczy stylów motywu.",
+      "Zbuduj usługę wdrożeniową wokół jakości briefu."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 3,
+    "smallTextCount": 15,
+    "title": "Formularze wyceny dla agencji WordPress i web · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/wordpress",
+    "slug": "wordpress",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 4459,
+    "h1": ["Kalkulator na stronie. Dane leadów poza WordPressem."],
+    "h2": [
+      "Wąskie połączenie zamiast drugiej bazy leadów.",
+      "Mała powierzchnia, jawne kontrole bezpieczeństwa.",
+      "Bezpieczny konektor bez przenoszenia danych do CMS."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 3,
+    "smallTextCount": 13,
+    "title": "Kwalifikacja zapytań w WordPress — bez danych leadów w CMS · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "marketing-button",
+        "href": "/funkcje/widget-na-strone",
+        "text": "Poznaj widget"
+      },
+      {
+        "className": "marketing-button marketing-button--secondary",
+        "href": "/dla-agencji",
+        "text": "Zobacz model dla agencji"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze",
+    "slug": "branze",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 4062,
+    "h1": ["Wspólny mechanizm, pytania wynikające z usługi."],
+    "h2": [
+      "Kalkulator wyceny mebli na wymiar, który zaczyna od zakresu",
+      "Kalkulator ogrodzenia z pytaniami o teren, bramę i montaż",
+      "Kalkulator ceny strony internetowej bez zgadywania zakresu",
+      "Formularz wyceny klimatyzacji przed wizją lokalną",
+      "Formularz wyceny remontu, który rozdziela zakres od niewiadomych",
+      "Pięć dopracowanych zastosowań zamiast katalogu bez treści."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 2,
+    "smallTextCount": 18,
+    "title": "Formularze wyceny dla pięciu branż usługowych · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze/meble-na-wymiar",
+        "text": "01Meble na wymiarKalkulator wyceny mebli na wymiar, który zaczyna od zakresuFormularz wyceny mebli na wymiar, który porządkuje rodzaj zabudowy, wymiary, materiały, wyposażenie i termin przed rozmową.→"
+      },
+      {
+        "className": "",
+        "href": "/branze/ogrodzenia",
+        "text": "02OgrodzeniaKalkulator ogrodzenia z pytaniami o teren, bramę i montażInteraktywny formularz dla firm ogrodzeniowych: długość, system, bramy, teren, montaż i termin w jednym uporządkowanym zapytaniu.→"
+      },
+      {
+        "className": "",
+        "href": "/branze/strony-internetowe",
+        "text": "03Strony internetoweKalkulator ceny strony internetowej bez zgadywania zakresuFormularz wyceny strony internetowej zbierający typ serwisu, treści, funkcje, integracje, termin i poziom gotowości materiałów.→"
+      },
+      {
+        "className": "",
+        "href": "/branze/klimatyzacja",
+        "text": "04KlimatyzacjaFormularz wyceny klimatyzacji przed wizją lokalnąFormularz dla instalatora klimatyzacji porządkujący pomieszczenia, metraż, typ budynku, montaż i dostępność techniczną.→"
+      },
+      {
+        "className": "",
+        "href": "/branze/remonty",
+        "text": "05RemontyFormularz wyceny remontu, który rozdziela zakres od niewiadomychFormularz wyceny remontu zbierający pomieszczenia, metraż, stan, instalacje, standard, materiały i logistykę.→"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/meble-na-wymiar",
+    "slug": "branze-meble-na-wymiar",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 7208,
+    "h1": ["Kalkulator wyceny mebli na wymiar, który zaczyna od zakresu"],
+    "h2": [
+      "Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?",
+      "Zobacz, jak pytanie staje się częścią briefu.",
+      "Pięć obszarów do uporządkowania przed kontaktem.",
+      "Co firma może zobaczyć po ukończeniu procesu.",
+      "Od syntetycznego szablonu do procesu firmy.",
+      "Pytania o zakres i wynik.",
+      "Uporządkuj pierwsze zapytanie: meble na wymiar."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-demo",
+      "marketing-section marketing-section--dark",
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 8,
+    "smallTextCount": 30,
+    "title": "Kalkulator wyceny mebli na wymiar, który zaczyna od zakresu · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze",
+        "text": "Branże"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/ogrodzenia",
+    "slug": "branze-ogrodzenia",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 7108,
+    "h1": ["Kalkulator ogrodzenia z pytaniami o teren, bramę i montaż"],
+    "h2": [
+      "Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?",
+      "Zobacz, jak pytanie staje się częścią briefu.",
+      "Pięć obszarów do uporządkowania przed kontaktem.",
+      "Co firma może zobaczyć po ukończeniu procesu.",
+      "Od syntetycznego szablonu do procesu firmy.",
+      "Pytania o zakres i wynik.",
+      "Uporządkuj pierwsze zapytanie: ogrodzenia."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-demo",
+      "marketing-section marketing-section--dark",
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 8,
+    "smallTextCount": 30,
+    "title": "Kalkulator ogrodzenia z pytaniami o teren, bramę i montaż · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze",
+        "text": "Branże"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/strony-internetowe",
+    "slug": "branze-strony-internetowe",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 7157,
+    "h1": ["Kalkulator ceny strony internetowej bez zgadywania zakresu"],
+    "h2": [
+      "Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?",
+      "Zobacz, jak pytanie staje się częścią briefu.",
+      "Pięć obszarów do uporządkowania przed kontaktem.",
+      "Co firma może zobaczyć po ukończeniu procesu.",
+      "Od syntetycznego szablonu do procesu firmy.",
+      "Pytania o zakres i wynik.",
+      "Uporządkuj pierwsze zapytanie: strony internetowe."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-demo",
+      "marketing-section marketing-section--dark",
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 8,
+    "smallTextCount": 30,
+    "title": "Kalkulator ceny strony internetowej bez zgadywania zakresu · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze",
+        "text": "Branże"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/klimatyzacja",
+    "slug": "branze-klimatyzacja",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 7117,
+    "h1": ["Formularz wyceny klimatyzacji przed wizją lokalną"],
+    "h2": [
+      "Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?",
+      "Zobacz, jak pytanie staje się częścią briefu.",
+      "Pięć obszarów do uporządkowania przed kontaktem.",
+      "Co firma może zobaczyć po ukończeniu procesu.",
+      "Od syntetycznego szablonu do procesu firmy.",
+      "Pytania o zakres i wynik.",
+      "Uporządkuj pierwsze zapytanie: klimatyzacja."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-demo",
+      "marketing-section marketing-section--dark",
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 8,
+    "smallTextCount": 30,
+    "title": "Formularz wyceny klimatyzacji przed wizją lokalną · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze",
+        "text": "Branże"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/remonty",
+    "slug": "branze-remonty",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 7148,
+    "h1": ["Formularz wyceny remontu, który rozdziela zakres od niewiadomych"],
+    "h2": [
+      "Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?",
+      "Zobacz, jak pytanie staje się częścią briefu.",
+      "Pięć obszarów do uporządkowania przed kontaktem.",
+      "Co firma może zobaczyć po ukończeniu procesu.",
+      "Od syntetycznego szablonu do procesu firmy.",
+      "Pytania o zakres i wynik.",
+      "Uporządkuj pierwsze zapytanie: remonty."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-demo",
+      "marketing-section marketing-section--dark",
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 8,
+    "smallTextCount": 30,
+    "title": "Formularz wyceny remontu, który rozdziela zakres od niewiadomych · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/branze",
+        "text": "Branże"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje",
+    "slug": "funkcje",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 3803,
+    "h1": ["Funkcje podporządkowane jakości następnego kroku."],
+    "h2": [
+      "Kalkulator wyceny na stronę z serwerową kontrolą wyniku",
+      "Formularz wieloetapowy zamiast ściany pól",
+      "Kwalifikacja leadów bez zamiany formularza w przesłuchanie",
+      "Wyjaśnialny lead scoring zamiast czarnej skrzynki",
+      "Widget formularza wyceny odporny na CSS strony",
+      "Funkcje działają razem, nie jako osobne obietnice."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 2,
+    "smallTextCount": 18,
+    "title": "Funkcje formularza wyceny i kwalifikacji · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje/kalkulator-wyceny",
+        "text": "01PricingKalkulator wyceny na stronę z serwerową kontrolą wynikuKalkulator wyceny na stronę oparty na ograniczonych regułach, wersjach procesu i serwerowym potwierdzeniu wyniku.→"
+      },
+      {
+        "className": "",
+        "href": "/funkcje/formularz-wieloetapowy",
+        "text": "02Prowadzony procesFormularz wieloetapowy zamiast ściany pólFormularz wieloetapowy prowadzący klienta od zakresu do kompletnego briefu, z walidacją i zapisem odpowiedzi.→"
+      },
+      {
+        "className": "",
+        "href": "/funkcje/kwalifikacja-leadow",
+        "text": "03KwalifikacjaKwalifikacja leadów bez zamiany formularza w przesłuchanieFormularz kwalifikacji klienta, który zbiera dane potrzebne do decyzji o kolejnym kroku i zapisuje uporządkowany lead.→"
+      },
+      {
+        "className": "",
+        "href": "/funkcje/lead-scoring",
+        "text": "04ScoringWyjaśnialny lead scoring zamiast czarnej skrzynkiLead scoring oparty na jawnych, ograniczonych regułach firmy — bez AI jako źródła decyzji i bez ujawniania wyniku klientowi.→"
+      },
+      {
+        "className": "",
+        "href": "/funkcje/widget-na-strone",
+        "text": "05OsadzenieWidget formularza wyceny odporny na CSS stronyWidget na stronę, który korzysta z tego samego opublikowanego procesu i nie ujawnia prywatnych reguł pricingu ani scoringu.→"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje/kalkulator-wyceny",
+    "slug": "funkcje-kalkulator-wyceny",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 4622,
+    "h1": ["Kalkulator wyceny na stronę z serwerową kontrolą wyniku"],
+    "h2": [
+      "Co ta funkcja zmienia w obsłudze zapytania.",
+      "Trzy kroki bez ukrytej automatyzacji.",
+      "Kontrola jest częścią funkcji, nie dopiskiem.",
+      "Zobacz funkcję w kontekście całej ścieżki."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 16,
+    "title": "Kalkulator wyceny na stronę z serwerową kontrolą wyniku · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje",
+        "text": "Funkcje"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje/formularz-wieloetapowy",
+    "slug": "funkcje-formularz-wieloetapowy",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 4575,
+    "h1": ["Formularz wieloetapowy zamiast ściany pól"],
+    "h2": [
+      "Co ta funkcja zmienia w obsłudze zapytania.",
+      "Trzy kroki bez ukrytej automatyzacji.",
+      "Kontrola jest częścią funkcji, nie dopiskiem.",
+      "Zobacz funkcję w kontekście całej ścieżki."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 16,
+    "title": "Formularz wieloetapowy zamiast ściany pól · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje",
+        "text": "Funkcje"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje/kwalifikacja-leadow",
+    "slug": "funkcje-kwalifikacja-leadow",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 4661,
+    "h1": ["Kwalifikacja leadów bez zamiany formularza w przesłuchanie"],
+    "h2": [
+      "Co ta funkcja zmienia w obsłudze zapytania.",
+      "Trzy kroki bez ukrytej automatyzacji.",
+      "Kontrola jest częścią funkcji, nie dopiskiem.",
+      "Zobacz funkcję w kontekście całej ścieżki."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 16,
+    "title": "Kwalifikacja leadów bez zamiany formularza w przesłuchanie · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje",
+        "text": "Funkcje"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje/lead-scoring",
+    "slug": "funkcje-lead-scoring",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 4652,
+    "h1": ["Wyjaśnialny lead scoring zamiast czarnej skrzynki"],
+    "h2": [
+      "Co ta funkcja zmienia w obsłudze zapytania.",
+      "Trzy kroki bez ukrytej automatyzacji.",
+      "Kontrola jest częścią funkcji, nie dopiskiem.",
+      "Zobacz funkcję w kontekście całej ścieżki."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 16,
+    "title": "Wyjaśnialny lead scoring zamiast czarnej skrzynki · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje",
+        "text": "Funkcje"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/funkcje/widget-na-strone",
+    "slug": "funkcje-widget-na-strone",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 4628,
+    "h1": ["Widget formularza wyceny odporny na CSS strony"],
+    "h2": [
+      "Co ta funkcja zmienia w obsłudze zapytania.",
+      "Trzy kroki bez ukrytej automatyzacji.",
+      "Kontrola jest częścią funkcji, nie dopiskiem.",
+      "Zobacz funkcję w kontekście całej ścieżki."
+    ],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": [
+      "marketing-section marketing-section--surface",
+      "marketing-section",
+      "marketing-section marketing-section--dark",
+      "marketing-container marketing-cta-band"
+    ],
+    "sectionCount": 4,
+    "smallTextCount": 16,
+    "title": "Widget formularza wyceny odporny na CSS strony · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      },
+      {
+        "className": "",
+        "href": "/funkcje",
+        "text": "Funkcje"
+      },
+      {
+        "className": "marketing-button marketing-button--light",
+        "href": "/jak-dziala",
+        "text": "Zobacz, jak działa"
+      },
+      {
+        "className": "marketing-button marketing-button--outline-light",
+        "href": "/logowanie",
+        "text": "Przejdź do panelu"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/polityka-prywatnosci",
+    "slug": "polityka-prywatnosci",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 2565,
+    "h1": ["Informacja prywatności dla konta Kwotum"],
+    "h2": ["Dane konta", "Cel i dostęp", "Google", "Prawa i retencja"],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": ["(none)", "(none)", "(none)", "(none)"],
+    "sectionCount": 4,
+    "smallTextCount": 7,
+    "title": "Informacja prywatności · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      }
+    ]
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/regulamin",
+    "slug": "regulamin",
+    "viewport": "mobile",
+    "viewportHeight": 844,
+    "viewportWidth": 390,
+    "documentHeight": 2533,
+    "h1": ["Warunki korzystania z wersji pilotażowej Kwotum"],
+    "h2": ["Charakter usługi", "Konto i bezpieczeństwo", "Dozwolone użycie", "Wersja pilotażowa"],
+    "horizontalOverflow": 0,
+    "mainClassName": "",
+    "sectionClassNames": ["(none)", "(none)", "(none)", "(none)"],
+    "sectionCount": 4,
+    "smallTextCount": 7,
+    "title": "Warunki korzystania · Kwotum",
+    "visibleLinks": [
+      {
+        "className": "",
+        "href": "/",
+        "text": "Start"
+      }
+    ]
+  }
+]

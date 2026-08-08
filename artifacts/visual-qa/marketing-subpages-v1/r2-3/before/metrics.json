@@ -1,0 +1,114 @@
+[
+  {
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "section": {
+      "cards": [],
+      "heading": {
+        "height": 153.515625,
+        "left": 55.15625,
+        "right": 595.90625,
+        "top": 2200.5,
+        "width": 540.75
+      },
+      "height": 480.328125,
+      "left": 0,
+      "list": {
+        "height": 262.328125,
+        "left": 723.90625,
+        "right": 1384.84375,
+        "top": 2168.90625,
+        "width": 660.9375
+      },
+      "right": 1440,
+      "top": 2059.90625
+    },
+    "viewport": "1440"
+  },
+  {
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "section": {
+      "cards": [],
+      "heading": {
+        "height": 101.296875,
+        "left": 16,
+        "right": 414,
+        "top": 3972.03125,
+        "width": 398
+      },
+      "height": 719.609375,
+      "left": 0,
+      "list": {
+        "height": 360.71875,
+        "left": 16,
+        "right": 414,
+        "top": 4137.328125,
+        "width": 398
+      },
+      "right": 430,
+      "top": 3859.4375
+    },
+    "viewport": "430"
+  },
+  {
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "section": {
+      "cards": [],
+      "heading": {
+        "height": 101.296875,
+        "left": 16,
+        "right": 374,
+        "top": 3991.40625,
+        "width": 358
+      },
+      "height": 744.40625,
+      "left": 0,
+      "list": {
+        "height": 385.515625,
+        "left": 16,
+        "right": 374,
+        "top": 4156.703125,
+        "width": 358
+      },
+      "right": 390,
+      "top": 3878.8125
+    },
+    "viewport": "390"
+  },
+  {
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "section": {
+      "cards": [],
+      "heading": {
+        "height": 101.296875,
+        "left": 12,
+        "right": 308,
+        "top": 4190.296875,
+        "width": 296
+      },
+      "height": 744.40625,
+      "left": 0,
+      "list": {
+        "height": 385.515625,
+        "left": 12,
+        "right": 308,
+        "top": 4355.59375,
+        "width": 296
+      },
+      "right": 320,
+      "top": 4077.703125
+    },
+    "viewport": "320"
+  }
+]

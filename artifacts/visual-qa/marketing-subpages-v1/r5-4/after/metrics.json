@@ -1,0 +1,668 @@
+[
+  {
+    "documentHeight": 6334,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "comparison": {
+        "bottom": 5004.328125,
+        "height": 648.84375,
+        "left": 59.828125,
+        "right": 1476.15625,
+        "top": 4355.484375,
+        "width": 1416.328125
+      },
+      "contract": {
+        "bottom": 5120.515625,
+        "height": 116.1875,
+        "left": 59.828125,
+        "right": 1476.15625,
+        "top": 5004.328125,
+        "width": 1416.328125
+      },
+      "heading": {
+        "bottom": 4194.5,
+        "height": 332.59375,
+        "left": 58.828125,
+        "right": 1477.15625,
+        "top": 3861.90625,
+        "width": 1418.328125
+      },
+      "host": {
+        "bottom": 4964.40625,
+        "height": 569,
+        "left": 99.75,
+        "right": 556.6875,
+        "top": 4395.40625,
+        "width": 456.9375
+      },
+      "proof": {
+        "bottom": 5121.515625,
+        "height": 850.21875,
+        "left": 58.828125,
+        "right": 1477.15625,
+        "top": 4271.296875,
+        "width": 1418.328125
+      },
+      "section": {
+        "bottom": 5245.390625,
+        "height": 1506.359375,
+        "left": 0,
+        "right": 1536,
+        "top": 3739.03125,
+        "width": 1536
+      },
+      "shadow": {
+        "bottom": 4964.40625,
+        "height": 569,
+        "left": 623.875,
+        "right": 1436.234375,
+        "top": 4395.40625,
+        "width": 812.359375
+      },
+      "smallestText": 12,
+      "widget": {
+        "bottom": 4951.40625,
+        "height": 479.96875,
+        "left": 636.875,
+        "right": 1423.234375,
+        "top": 4471.4375,
+        "width": 786.359375
+      }
+    },
+    "viewport": "1536"
+  },
+  {
+    "documentHeight": 6195,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "comparison": {
+        "bottom": 4883.84375,
+        "height": 639.1875,
+        "left": 56.15625,
+        "right": 1383.84375,
+        "top": 4244.65625,
+        "width": 1327.6875
+      },
+      "contract": {
+        "bottom": 5000.03125,
+        "height": 116.1875,
+        "left": 56.15625,
+        "right": 1383.84375,
+        "top": 4883.84375,
+        "width": 1327.6875
+      },
+      "heading": {
+        "bottom": 4088.46875,
+        "height": 313.78125,
+        "left": 55.15625,
+        "right": 1384.84375,
+        "top": 3774.6875,
+        "width": 1329.6875
+      },
+      "host": {
+        "bottom": 4846.40625,
+        "height": 564.3125,
+        "left": 93.59375,
+        "right": 520.40625,
+        "top": 4282.09375,
+        "width": 426.8125
+      },
+      "proof": {
+        "bottom": 5001.03125,
+        "height": 840.5625,
+        "left": 55.15625,
+        "right": 1384.84375,
+        "top": 4160.46875,
+        "width": 1329.6875
+      },
+      "section": {
+        "bottom": 5117.21875,
+        "height": 1457.71875,
+        "left": 0,
+        "right": 1440,
+        "top": 3659.5,
+        "width": 1440
+      },
+      "shadow": {
+        "bottom": 4846.40625,
+        "height": 564.3125,
+        "left": 587.59375,
+        "right": 1346.40625,
+        "top": 4282.09375,
+        "width": 758.8125
+      },
+      "smallestText": 12,
+      "widget": {
+        "bottom": 4833.40625,
+        "height": 475.28125,
+        "left": 600.59375,
+        "right": 1333.40625,
+        "top": 4358.125,
+        "width": 732.8125
+      }
+    },
+    "viewport": "1440"
+  },
+  {
+    "documentHeight": 5928,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "comparison": {
+        "bottom": 4678.421875,
+        "height": 619.78125,
+        "left": 50.03125,
+        "right": 1229.96875,
+        "top": 4058.640625,
+        "width": 1179.9375
+      },
+      "contract": {
+        "bottom": 4794.609375,
+        "height": 116.1875,
+        "left": 50.03125,
+        "right": 1229.96875,
+        "top": 4678.421875,
+        "width": 1179.9375
+      },
+      "heading": {
+        "bottom": 3910.453125,
+        "height": 282.46875,
+        "left": 49.03125,
+        "right": 1230.96875,
+        "top": 3627.984375,
+        "width": 1181.9375
+      },
+      "host": {
+        "bottom": 4645.15625,
+        "height": 553.25,
+        "left": 83.296875,
+        "right": 459.921875,
+        "top": 4091.90625,
+        "width": 376.625
+      },
+      "proof": {
+        "bottom": 4795.609375,
+        "height": 821.15625,
+        "left": 49.03125,
+        "right": 1230.96875,
+        "top": 3974.453125,
+        "width": 1181.9375
+      },
+      "section": {
+        "bottom": 4899,
+        "height": 1373.40625,
+        "left": 0,
+        "right": 1280,
+        "top": 3525.59375,
+        "width": 1280
+      },
+      "shadow": {
+        "bottom": 4645.15625,
+        "height": 553.25,
+        "left": 527.109375,
+        "right": 1196.703125,
+        "top": 4091.90625,
+        "width": 669.59375
+      },
+      "smallestText": 12,
+      "widget": {
+        "bottom": 4632.15625,
+        "height": 464.21875,
+        "left": 540.109375,
+        "right": 1183.703125,
+        "top": 4167.9375,
+        "width": 643.59375
+      }
+    },
+    "viewport": "1280"
+  },
+  {
+    "documentHeight": 7370,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "comparison": {
+        "bottom": 5738.359375,
+        "height": 1047.765625,
+        "left": 40.21875,
+        "right": 983.765625,
+        "top": 4690.59375,
+        "width": 943.546875
+      },
+      "contract": {
+        "bottom": 5854.546875,
+        "height": 116.1875,
+        "left": 40.21875,
+        "right": 983.765625,
+        "top": 5738.359375,
+        "width": 943.546875
+      },
+      "heading": {
+        "bottom": 4555.21875,
+        "height": 232.28125,
+        "left": 39.21875,
+        "right": 984.765625,
+        "top": 4322.9375,
+        "width": 945.546875
+      },
+      "host": {
+        "bottom": 5115.46875,
+        "height": 398.265625,
+        "left": 66.828125,
+        "right": 957.15625,
+        "top": 4717.203125,
+        "width": 890.328125
+      },
+      "proof": {
+        "bottom": 5855.546875,
+        "height": 1249.140625,
+        "left": 39.21875,
+        "right": 984.765625,
+        "top": 4606.40625,
+        "width": 945.546875
+      },
+      "section": {
+        "bottom": 5944.546875,
+        "height": 1709.609375,
+        "left": 0,
+        "right": 1024,
+        "top": 4234.9375,
+        "width": 1024
+      },
+      "shadow": {
+        "bottom": 5711.75,
+        "height": 529.09375,
+        "left": 66.828125,
+        "right": 957.15625,
+        "top": 5182.65625,
+        "width": 890.328125
+      },
+      "smallestText": 12,
+      "widget": {
+        "bottom": 5698.75,
+        "height": 440.0625,
+        "left": 79.828125,
+        "right": 944.15625,
+        "top": 5258.6875,
+        "width": 864.328125
+      }
+    },
+    "viewport": "1024"
+  },
+  {
+    "documentHeight": 8171,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "comparison": {
+        "bottom": 6348.34375,
+        "height": 1005.734375,
+        "left": 17,
+        "right": 751,
+        "top": 5342.609375,
+        "width": 734
+      },
+      "contract": {
+        "bottom": 6616.421875,
+        "height": 268.078125,
+        "left": 17,
+        "right": 751,
+        "top": 6348.34375,
+        "width": 734
+      },
+      "heading": {
+        "bottom": 5164.625,
+        "height": 391.15625,
+        "left": 16,
+        "right": 752,
+        "top": 4773.46875,
+        "width": 736
+      },
+      "host": {
+        "bottom": 5745.5,
+        "height": 382.890625,
+        "left": 37,
+        "right": 731,
+        "top": 5362.609375,
+        "width": 694
+      },
+      "proof": {
+        "bottom": 6617.421875,
+        "height": 1404.796875,
+        "left": 16,
+        "right": 752,
+        "top": 5212.625,
+        "width": 736
+      },
+      "section": {
+        "bottom": 6706.421875,
+        "height": 2020.953125,
+        "left": 0,
+        "right": 768,
+        "top": 4685.46875,
+        "width": 768
+      },
+      "shadow": {
+        "bottom": 6328.34375,
+        "height": 515.65625,
+        "left": 37,
+        "right": 731,
+        "top": 5812.6875,
+        "width": 694
+      },
+      "smallestText": 12,
+      "widget": {
+        "bottom": 6315.34375,
+        "height": 426.625,
+        "left": 50,
+        "right": 718,
+        "top": 5888.71875,
+        "width": 668
+      }
+    },
+    "viewport": "768"
+  },
+  {
+    "documentHeight": 9817,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "comparison": {
+        "bottom": 7667.375,
+        "height": 1284.21875,
+        "left": 17,
+        "right": 413,
+        "top": 6383.15625,
+        "width": 396
+      },
+      "contract": {
+        "bottom": 7989.453125,
+        "height": 322.078125,
+        "left": 17,
+        "right": 413,
+        "top": 7667.375,
+        "width": 396
+      },
+      "heading": {
+        "bottom": 6209.171875,
+        "height": 425.71875,
+        "left": 16,
+        "right": 414,
+        "top": 5783.453125,
+        "width": 398
+      },
+      "host": {
+        "bottom": 6860.15625,
+        "height": 463.40625,
+        "left": 30.59375,
+        "right": 399.40625,
+        "top": 6396.75,
+        "width": 368.8125
+      },
+      "proof": {
+        "bottom": 7990.453125,
+        "height": 1737.28125,
+        "left": 16,
+        "right": 414,
+        "top": 6253.171875,
+        "width": 398
+      },
+      "section": {
+        "bottom": 8063.453125,
+        "height": 2352,
+        "left": 0,
+        "right": 430,
+        "top": 5711.453125,
+        "width": 430
+      },
+      "shadow": {
+        "bottom": 7653.78125,
+        "height": 726.4375,
+        "left": 30.59375,
+        "right": 399.40625,
+        "top": 6927.34375,
+        "width": 368.8125
+      },
+      "smallestText": 12,
+      "widget": {
+        "bottom": 7643.984375,
+        "height": 614.828125,
+        "left": 40.390625,
+        "right": 389.609375,
+        "top": 7029.15625,
+        "width": 349.21875
+      }
+    },
+    "viewport": "430"
+  },
+  {
+    "documentHeight": 9984,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "comparison": {
+        "bottom": 7808.71875,
+        "height": 1284.21875,
+        "left": 17,
+        "right": 373,
+        "top": 6524.5,
+        "width": 356
+      },
+      "contract": {
+        "bottom": 8130.796875,
+        "height": 322.078125,
+        "left": 17,
+        "right": 373,
+        "top": 7808.71875,
+        "width": 356
+      },
+      "heading": {
+        "bottom": 6350.515625,
+        "height": 434.09375,
+        "left": 16,
+        "right": 374,
+        "top": 5916.421875,
+        "width": 358
+      },
+      "host": {
+        "bottom": 7001.5,
+        "height": 463.40625,
+        "left": 30.59375,
+        "right": 359.40625,
+        "top": 6538.09375,
+        "width": 328.8125
+      },
+      "proof": {
+        "bottom": 8131.796875,
+        "height": 1737.28125,
+        "left": 16,
+        "right": 374,
+        "top": 6394.515625,
+        "width": 358
+      },
+      "section": {
+        "bottom": 8204.796875,
+        "height": 2360.375,
+        "left": 0,
+        "right": 390,
+        "top": 5844.421875,
+        "width": 390
+      },
+      "shadow": {
+        "bottom": 7795.125,
+        "height": 726.4375,
+        "left": 30.59375,
+        "right": 359.40625,
+        "top": 7068.6875,
+        "width": 328.8125
+      },
+      "smallestText": 12,
+      "widget": {
+        "bottom": 7785.328125,
+        "height": 614.828125,
+        "left": 40.390625,
+        "right": 349.609375,
+        "top": 7170.5,
+        "width": 309.21875
+      }
+    },
+    "viewport": "390"
+  },
+  {
+    "documentHeight": 10076,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "comparison": {
+        "bottom": 7875.40625,
+        "height": 1302.9375,
+        "left": 17,
+        "right": 358,
+        "top": 6572.46875,
+        "width": 341
+      },
+      "contract": {
+        "bottom": 8197.484375,
+        "height": 322.078125,
+        "left": 17,
+        "right": 358,
+        "top": 7875.40625,
+        "width": 341
+      },
+      "heading": {
+        "bottom": 6398.484375,
+        "height": 427.09375,
+        "left": 16,
+        "right": 359,
+        "top": 5971.390625,
+        "width": 343
+      },
+      "host": {
+        "bottom": 7049.46875,
+        "height": 463.40625,
+        "left": 30.59375,
+        "right": 344.40625,
+        "top": 6586.0625,
+        "width": 313.8125
+      },
+      "proof": {
+        "bottom": 8198.484375,
+        "height": 1756,
+        "left": 16,
+        "right": 359,
+        "top": 6442.484375,
+        "width": 343
+      },
+      "section": {
+        "bottom": 8271.484375,
+        "height": 2372.09375,
+        "left": 0,
+        "right": 375,
+        "top": 5899.390625,
+        "width": 375
+      },
+      "shadow": {
+        "bottom": 7861.8125,
+        "height": 745.15625,
+        "left": 30.59375,
+        "right": 344.40625,
+        "top": 7116.65625,
+        "width": 313.8125
+      },
+      "smallestText": 12,
+      "widget": {
+        "bottom": 7852.015625,
+        "height": 633.546875,
+        "left": 40.390625,
+        "right": 334.609375,
+        "top": 7218.46875,
+        "width": 294.21875
+      }
+    },
+    "viewport": "375"
+  },
+  {
+    "documentHeight": 10444,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "comparison": {
+        "bottom": 8204.1875,
+        "height": 1339.28125,
+        "left": 13,
+        "right": 307,
+        "top": 6864.90625,
+        "width": 294
+      },
+      "contract": {
+        "bottom": 8526.265625,
+        "height": 322.078125,
+        "left": 13,
+        "right": 307,
+        "top": 8204.1875,
+        "width": 294
+      },
+      "heading": {
+        "bottom": 6670.015625,
+        "height": 404.53125,
+        "left": 12,
+        "right": 308,
+        "top": 6265.484375,
+        "width": 296
+      },
+      "host": {
+        "bottom": 7378.25,
+        "height": 499.75,
+        "left": 26.59375,
+        "right": 293.40625,
+        "top": 6878.5,
+        "width": 266.8125
+      },
+      "proof": {
+        "bottom": 8527.265625,
+        "height": 1813.25,
+        "left": 12,
+        "right": 308,
+        "top": 6714.015625,
+        "width": 296
+      },
+      "section": {
+        "bottom": 8600.265625,
+        "height": 2406.78125,
+        "left": 0,
+        "right": 320,
+        "top": 6193.484375,
+        "width": 320
+      },
+      "shadow": {
+        "bottom": 8190.59375,
+        "height": 745.15625,
+        "left": 26.59375,
+        "right": 293.40625,
+        "top": 7445.4375,
+        "width": 266.8125
+      },
+      "smallestText": 12,
+      "widget": {
+        "bottom": 8180.796875,
+        "height": 633.546875,
+        "left": 36.390625,
+        "right": 283.609375,
+        "top": 7547.25,
+        "width": 247.21875
+      }
+    },
+    "viewport": "320"
+  }
+]

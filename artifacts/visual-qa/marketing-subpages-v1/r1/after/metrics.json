@@ -1,0 +1,248 @@
+[
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/produkt",
+    "phase": "after",
+    "viewport": "1440",
+    "activeNavigation": "Produkt",
+    "breadcrumbs": {
+      "height": 38.59375,
+      "left": 55.15625,
+      "right": 1384.84375,
+      "top": 121,
+      "width": 1329.6875
+    },
+    "documentHeight": 3642,
+    "footer": {
+      "height": 333.8125,
+      "left": 64,
+      "right": 1376,
+      "top": 3276.328125,
+      "width": 1312
+    },
+    "header": {
+      "height": 96,
+      "left": 56,
+      "right": 1384,
+      "top": 0,
+      "width": 1328
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/cennik",
+    "phase": "after",
+    "viewport": "1440",
+    "activeNavigation": "Cennik",
+    "breadcrumbs": {
+      "height": 38.59375,
+      "left": 55.15625,
+      "right": 1384.84375,
+      "top": 121,
+      "width": 1329.6875
+    },
+    "documentHeight": 2742,
+    "footer": {
+      "height": 333.8125,
+      "left": 64,
+      "right": 1376,
+      "top": 2375.6875,
+      "width": 1312
+    },
+    "header": {
+      "height": 96,
+      "left": 56,
+      "right": 1384,
+      "top": 0,
+      "width": 1328
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/meble-na-wymiar",
+    "phase": "after",
+    "viewport": "1440",
+    "activeNavigation": "Branże",
+    "breadcrumbs": {
+      "height": 38.59375,
+      "left": 55.15625,
+      "right": 1384.84375,
+      "top": 121,
+      "width": 1329.6875
+    },
+    "documentHeight": 5553,
+    "footer": {
+      "height": 333.8125,
+      "left": 64,
+      "right": 1376,
+      "top": 5186.984375,
+      "width": 1312
+    },
+    "header": {
+      "height": 96,
+      "left": 56,
+      "right": 1384,
+      "top": 0,
+      "width": 1328
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/polityka-prywatnosci",
+    "phase": "after",
+    "viewport": "1440",
+    "breadcrumbs": {
+      "height": 38.59375,
+      "left": 55.15625,
+      "right": 1384.84375,
+      "top": 169,
+      "width": 1329.6875
+    },
+    "documentHeight": 1792,
+    "footer": {
+      "height": 333.8125,
+      "left": 64,
+      "right": 1376,
+      "top": 1425.9375,
+      "width": 1312
+    },
+    "header": {
+      "height": 96,
+      "left": 56,
+      "right": 1384,
+      "top": 0,
+      "width": 1328
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/produkt",
+    "phase": "after",
+    "viewport": "390",
+    "activeNavigation": "Produkt",
+    "breadcrumbs": {
+      "height": 38.59375,
+      "left": 16,
+      "right": 374,
+      "top": 97,
+      "width": 358
+    },
+    "documentHeight": 5682,
+    "footer": {
+      "height": 1055.53125,
+      "left": 16,
+      "right": 374,
+      "top": 4602.65625,
+      "width": 358
+    },
+    "header": {
+      "height": 72,
+      "left": 16,
+      "right": 374,
+      "top": 0,
+      "width": 358
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/cennik",
+    "phase": "after",
+    "viewport": "390",
+    "activeNavigation": "Cennik",
+    "breadcrumbs": {
+      "height": 38.59375,
+      "left": 16,
+      "right": 374,
+      "top": 97,
+      "width": 358
+    },
+    "documentHeight": 4109,
+    "footer": {
+      "height": 1055.53125,
+      "left": 16,
+      "right": 374,
+      "top": 3029.78125,
+      "width": 358
+    },
+    "header": {
+      "height": 72,
+      "left": 16,
+      "right": 374,
+      "top": 0,
+      "width": 358
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/branze/meble-na-wymiar",
+    "phase": "after",
+    "viewport": "390",
+    "activeNavigation": "Branże",
+    "breadcrumbs": {
+      "height": 38.59375,
+      "left": 16,
+      "right": 374,
+      "top": 97,
+      "width": 358
+    },
+    "documentHeight": 7214,
+    "footer": {
+      "height": 1055.53125,
+      "left": 16,
+      "right": 374,
+      "top": 6134.40625,
+      "width": 358
+    },
+    "header": {
+      "height": 72,
+      "left": 16,
+      "right": 374,
+      "top": 0,
+      "width": 358
+    },
+    "horizontalOverflow": 0
+  },
+  {
+    "errors": [],
+    "httpStatus": 200,
+    "path": "/polityka-prywatnosci",
+    "phase": "after",
+    "viewport": "390",
+    "breadcrumbs": {
+      "height": 38.59375,
+      "left": 16,
+      "right": 374,
+      "top": 113,
+      "width": 358
+    },
+    "documentHeight": 2615,
+    "footer": {
+      "height": 1055.53125,
+      "left": 16,
+      "right": 374,
+      "top": 1535,
+      "width": 358
+    },
+    "header": {
+      "height": 72,
+      "left": 16,
+      "right": 374,
+      "top": 0,
+      "width": 358
+    },
+    "horizontalOverflow": 0
+  }
+]

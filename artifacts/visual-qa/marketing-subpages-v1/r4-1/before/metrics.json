@@ -1,0 +1,308 @@
+[
+  {
+    "documentHeight": 2777,
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        }
+      ],
+      "copy": {
+        "bottom": 533.53125,
+        "left": 58.828125,
+        "right": 933.25,
+        "top": 255.59375
+      },
+      "height": 580.53125,
+      "left": 58.828125,
+      "proof": {
+        "bottom": 533.53125,
+        "height": 96.359375,
+        "left": 1056.125,
+        "right": 1477.140625,
+        "top": 437.171875,
+        "width": 421.015625
+      },
+      "right": 1477.15625,
+      "smallestText": 12
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "1536"
+  },
+  {
+    "documentHeight": 2742,
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        }
+      ],
+      "copy": {
+        "bottom": 523.078125,
+        "left": 55.15625,
+        "right": 874.9375,
+        "top": 255.59375
+      },
+      "height": 570.078125,
+      "left": 55.15625,
+      "proof": {
+        "bottom": 523.078125,
+        "height": 96.359375,
+        "left": 990.125,
+        "right": 1384.84375,
+        "top": 426.71875,
+        "width": 394.71875
+      },
+      "right": 1384.84375,
+      "smallestText": 12
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "1440"
+  },
+  {
+    "documentHeight": 2625,
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        }
+      ],
+      "copy": {
+        "bottom": 499.328125,
+        "left": 49.03125,
+        "right": 777.71875,
+        "top": 249.1875
+      },
+      "height": 530.328125,
+      "left": 49.03125,
+      "proof": {
+        "bottom": 499.328125,
+        "height": 96.359375,
+        "left": 880.109375,
+        "right": 1230.96875,
+        "top": 402.96875,
+        "width": 350.859375
+      },
+      "right": 1230.96875,
+      "smallestText": 12
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "1280"
+  },
+  {
+    "documentHeight": 3066,
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        }
+      ],
+      "copy": {
+        "bottom": 459.140625,
+        "left": 39.21875,
+        "right": 984.765625,
+        "top": 231.265625
+      },
+      "height": 621.109375,
+      "left": 39.21875,
+      "proof": {
+        "bottom": 615.71875,
+        "height": 74.671875,
+        "left": 39.21875,
+        "right": 984.765625,
+        "top": 541.046875,
+        "width": 945.546875
+      },
+      "right": 984.765625,
+      "smallestText": 12
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "1024"
+  },
+  {
+    "documentHeight": 3453,
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        }
+      ],
+      "copy": {
+        "bottom": 419.46875,
+        "left": 16,
+        "right": 752,
+        "top": 191.59375
+      },
+      "height": 570.578125,
+      "left": 16,
+      "proof": {
+        "bottom": 555.578125,
+        "height": 74.671875,
+        "left": 16,
+        "right": 752,
+        "top": 480.90625,
+        "width": 736
+      },
+      "right": 752,
+      "smallestText": 12
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "768"
+  },
+  {
+    "documentHeight": 3980,
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        }
+      ],
+      "copy": {
+        "bottom": 449.703125,
+        "left": 16,
+        "right": 414,
+        "top": 191.59375
+      },
+      "height": 609.0625,
+      "left": 16,
+      "proof": {
+        "bottom": 594.0625,
+        "height": 96.359375,
+        "left": 16,
+        "right": 414,
+        "top": 497.703125,
+        "width": 398
+      },
+      "right": 414,
+      "smallestText": 12
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "430"
+  },
+  {
+    "documentHeight": 4074,
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        }
+      ],
+      "copy": {
+        "bottom": 449.703125,
+        "left": 16,
+        "right": 374,
+        "top": 191.59375
+      },
+      "height": 609.0625,
+      "left": 16,
+      "proof": {
+        "bottom": 594.0625,
+        "height": 96.359375,
+        "left": 16,
+        "right": 374,
+        "top": 497.703125,
+        "width": 358
+      },
+      "right": 374,
+      "smallestText": 12
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "390"
+  },
+  {
+    "documentHeight": 4155,
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        }
+      ],
+      "copy": {
+        "bottom": 479.9375,
+        "left": 16,
+        "right": 359,
+        "top": 191.59375
+      },
+      "height": 639.296875,
+      "left": 16,
+      "proof": {
+        "bottom": 624.296875,
+        "height": 96.359375,
+        "left": 16,
+        "right": 359,
+        "top": 527.9375,
+        "width": 343
+      },
+      "right": 359,
+      "smallestText": 12
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "375"
+  },
+  {
+    "documentHeight": 4339,
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        }
+      ],
+      "copy": {
+        "bottom": 479.9375,
+        "left": 12,
+        "right": 308,
+        "top": 191.59375
+      },
+      "height": 639.296875,
+      "left": 12,
+      "proof": {
+        "bottom": 624.296875,
+        "height": 96.359375,
+        "left": 12,
+        "right": 308,
+        "top": 527.9375,
+        "width": 296
+      },
+      "right": 308,
+      "smallestText": 12
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "320"
+  }
+]

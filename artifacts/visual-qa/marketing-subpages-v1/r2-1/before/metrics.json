@@ -1,0 +1,170 @@
+[
+  {
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        },
+        {
+          "height": 49.828125,
+          "width": 216.375
+        },
+        {
+          "height": 49.828125,
+          "width": 149.609375
+        }
+      ],
+      "description": {
+        "height": 60.46875,
+        "left": 55.15625,
+        "right": 727.15625,
+        "top": 462.609375,
+        "width": 672
+      },
+      "h1": {
+        "height": 156.234375,
+        "left": 55.15625,
+        "right": 517.765625,
+        "top": 287.1875,
+        "width": 462.609375
+      },
+      "height": 651.90625,
+      "left": 55.15625,
+      "proof": null,
+      "right": 1384.84375,
+      "top": 97
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "1440"
+  },
+  {
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        },
+        {
+          "height": 49.828125,
+          "width": 398
+        },
+        {
+          "height": 49.828125,
+          "width": 398
+        }
+      ],
+      "description": {
+        "height": 90.703125,
+        "left": 16,
+        "right": 414,
+        "top": 359,
+        "width": 398
+      },
+      "h1": {
+        "height": 116.625,
+        "left": 16,
+        "right": 361.21875,
+        "top": 223.1875,
+        "width": 345.21875
+      },
+      "height": 776,
+      "left": 16,
+      "proof": null,
+      "right": 414,
+      "top": 73
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "430"
+  },
+  {
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        },
+        {
+          "height": 49.828125,
+          "width": 358
+        },
+        {
+          "height": 49.828125,
+          "width": 358
+        }
+      ],
+      "description": {
+        "height": 120.9375,
+        "left": 16,
+        "right": 374,
+        "top": 359,
+        "width": 358
+      },
+      "h1": {
+        "height": 116.625,
+        "left": 16,
+        "right": 361.21875,
+        "top": 223.1875,
+        "width": 345.21875
+      },
+      "height": 806.234375,
+      "left": 16,
+      "proof": null,
+      "right": 374,
+      "top": 73
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "390"
+  },
+  {
+    "errors": [],
+    "hero": {
+      "actions": [
+        {
+          "height": 15,
+          "width": 30.421875
+        },
+        {
+          "height": 49.828125,
+          "width": 296
+        },
+        {
+          "height": 49.828125,
+          "width": 296
+        }
+      ],
+      "description": {
+        "height": 120.9375,
+        "left": 12,
+        "right": 308,
+        "top": 359,
+        "width": 296
+      },
+      "h1": {
+        "height": 116.625,
+        "left": 12,
+        "right": 308,
+        "top": 223.1875,
+        "width": 296
+      },
+      "height": 806.234375,
+      "left": 12,
+      "proof": null,
+      "right": 308,
+      "top": 73
+    },
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "before",
+    "viewport": "320"
+  }
+]

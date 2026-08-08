@@ -1,0 +1,114 @@
+[
+  {
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "after",
+    "section": {
+      "heading": {
+        "height": 138.890625,
+        "left": 55.15625,
+        "right": 523.71875,
+        "top": 1011.765625,
+        "width": 468.5625
+      },
+      "height": 1188.734375,
+      "left": 0,
+      "moduleCards": [],
+      "proof": {
+        "height": 728.25,
+        "left": 55.15625,
+        "right": 1384.84375,
+        "top": 1222.65625,
+        "width": 1329.6875
+      },
+      "right": 1440,
+      "top": 871.171875
+    },
+    "viewport": "1440"
+  },
+  {
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "after",
+    "section": {
+      "heading": {
+        "height": 141.0625,
+        "left": 16,
+        "right": 295.734375,
+        "top": 1988.3125,
+        "width": 279.734375
+      },
+      "height": 1983.71875,
+      "left": 0,
+      "moduleCards": [],
+      "proof": {
+        "height": 1448.9375,
+        "left": 16,
+        "right": 414,
+        "top": 2329.5,
+        "width": 398
+      },
+      "right": 430,
+      "top": 1875.71875
+    },
+    "viewport": "430"
+  },
+  {
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "after",
+    "section": {
+      "heading": {
+        "height": 141.0625,
+        "left": 16,
+        "right": 295.734375,
+        "top": 1998.71875,
+        "width": 279.734375
+      },
+      "height": 1992.6875,
+      "left": 0,
+      "moduleCards": [],
+      "proof": {
+        "height": 1457.90625,
+        "left": 16,
+        "right": 374,
+        "top": 2339.90625,
+        "width": 358
+      },
+      "right": 390,
+      "top": 1886.125
+    },
+    "viewport": "390"
+  },
+  {
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "phase": "after",
+    "section": {
+      "heading": {
+        "height": 141.0625,
+        "left": 12,
+        "right": 291.734375,
+        "top": 1972,
+        "width": 279.734375
+      },
+      "height": 2218.296875,
+      "left": 0,
+      "moduleCards": [],
+      "proof": {
+        "height": 1623.046875,
+        "left": 12,
+        "right": 308,
+        "top": 2373.65625,
+        "width": 296
+      },
+      "right": 320,
+      "top": 1859.40625
+    },
+    "viewport": "320"
+  }
+]
