@@ -108,6 +108,20 @@
   --wy-shadow-md: 0 4px 14px rgb(0 59 37 / 4%);
 }
 
+.wy-marketing-v7-theme {
+  --wy-marketing-background: #f7fafe;
+  --wy-marketing-canvas: #f3f8fd;
+  --wy-marketing-surface: #ffffff;
+  --wy-marketing-surface-soft: #f3faf6;
+  --wy-marketing-text-primary: #0b1530;
+  --wy-marketing-text-secondary: #5e6981;
+  --wy-marketing-border: #dde5ee;
+  --wy-marketing-brand: #06753a;
+  --wy-marketing-brand-hover: #056e32;
+  --wy-marketing-brand-soft: #e7f5ec;
+  --wy-marketing-success: #15964a;
+}
+
 * {
   box-sizing: border-box;
 }

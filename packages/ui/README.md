@@ -1,6 +1,6 @@
 # @wyceno/ui
 
-Centralna biblioteka dostępnych komponentów i tokenów Lorum. Komponenty nie
+Centralna biblioteka dostępnych komponentów i tokenów Kwotum. Komponenty nie
 zawierają logiki domenowej, danych tenantów ani zależności od auth.
 
 ## Użycie

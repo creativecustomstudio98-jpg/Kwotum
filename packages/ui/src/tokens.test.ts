@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { contrastRatio, relativeLuminance } from "./contrast";
-import { colorTokens } from "./tokens";
+import { colorTokens, marketingColorTokens } from "./tokens";
 
 describe("tokeny kolorystyczne", () => {
   it.each([
@@ -34,5 +34,23 @@ describe("tokeny kolorystyczne", () => {
 
   it("odrzuca nieprawidłowy zapis koloru", () => {
     expect(() => relativeLuminance("#fff")).toThrow("Nieprawidłowy kolor szesnastkowy");
+  });
+
+  it.each([
+    ["tekst / tło marketingowe", marketingColorTokens.textPrimary, marketingColorTokens.background],
+    [
+      "tekst / powierzchnia marketingowa",
+      marketingColorTokens.textPrimary,
+      marketingColorTokens.surface,
+    ],
+    [
+      "tekst drugorzędny / powierzchnia",
+      marketingColorTokens.textSecondary,
+      marketingColorTokens.surface,
+    ],
+    ["biały / CTA marketingowe", marketingColorTokens.surface, marketingColorTokens.brand],
+    ["zieleń / miękka powierzchnia", marketingColorTokens.brand, marketingColorTokens.brandSoft],
+  ])("%s spełnia WCAG AA", (_name, foreground, background) => {
+    expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
   });
 });

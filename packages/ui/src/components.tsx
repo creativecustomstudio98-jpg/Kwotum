@@ -586,7 +586,7 @@ export interface SidebarProps {
   productName?: string;
 }
 
-export const Sidebar = ({ items, productName = "Lorum" }: SidebarProps) => (
+export const Sidebar = ({ items, productName = "Kwotum" }: SidebarProps) => (
   <aside className="wy-sidebar">
     <a className="wy-brand" href="#main">
       <span>{productName}</span>

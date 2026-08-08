@@ -33,6 +33,20 @@ export const colorTokens = {
   errorSoft: "#FCE8E9",
 } as const;
 
+export const marketingColorTokens = {
+  background: "#F7FAFE",
+  canvas: "#F3F8FD",
+  surface: "#FFFFFF",
+  surfaceSoft: "#F3FAF6",
+  textPrimary: "#0B1530",
+  textSecondary: "#5E6981",
+  border: "#DDE5EE",
+  brand: "#06753A",
+  brandHover: "#056E32",
+  brandSoft: "#E7F5EC",
+  success: "#15964A",
+} as const;
+
 export const spacingTokens = {
   0: "0",
   1: "0.25rem",
