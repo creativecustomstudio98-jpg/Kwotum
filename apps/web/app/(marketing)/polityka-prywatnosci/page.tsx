@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       <Breadcrumbs items={[{ href: "/", label: "Start" }, { label: "Informacja prywatności" }]} />
       <header>
         <p className="wy-kicker marketing-eyebrow">Wersja {AUTH_PRIVACY_VERSION}</p>
-        <h1>Informacja prywatności dla konta Lorum</h1>
+        <h1>Informacja prywatności dla konta Kwotum</h1>
         <p>
           To techniczny zakres informacji dla wersji walidacyjnej. Dane administratora, kontakt
           prywatności i finalna lista podmiotów przetwarzających muszą zostać uzupełnione przed
@@ -40,7 +40,7 @@ export default function PrivacyPage() {
       <section>
         <h2>Google</h2>
         <p>
-          Wybranie Google rozpoczyna zewnętrzne uwierzytelnienie. Lorum otrzymuje dane profilu
+          Wybranie Google rozpoczyna zewnętrzne uwierzytelnienie. Kwotum otrzymuje dane profilu
           zwrócone przez providera, ale utworzenie organizacji nadal wymaga świadomego podania jej
           nazwy i zaakceptowania dokumentów.
         </p>

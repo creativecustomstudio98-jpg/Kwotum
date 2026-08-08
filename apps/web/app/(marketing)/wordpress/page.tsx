@@ -5,7 +5,7 @@ import { Breadcrumbs, CtaBand } from "../components";
 
 export const metadata = marketingMetadata(
   "Kwalifikacja zapytań w WordPress — bez danych leadów w CMS",
-  "Osadź proces Lorum na stronie WordPress przez cienki konektor bez przechowywania leadów i sekretów we froncie.",
+  "Osadź proces Kwotum na stronie WordPress przez cienki konektor bez przechowywania leadów i sekretów we froncie.",
   "/wordpress",
 );
 
@@ -20,7 +20,7 @@ export default function WordPressPage() {
             <h1>Kalkulator na stronie. Dane leadów poza WordPressem.</h1>
             <p>
               Cienka wtyczka łączy stronę z opublikowanym procesem i osadza go jako shortcode, blok
-              albo popup. Panel Lorum pozostaje źródłem danych.
+              albo popup. Panel Kwotum pozostaje źródłem danych.
             </p>
             <div className="marketing-actions">
               <Link className="marketing-button" href="/funkcje/widget-na-strone">
@@ -60,7 +60,7 @@ export default function WordPressPage() {
             </li>
             <li>
               <span>03</span>
-              <strong>Lorum</strong>
+              <strong>Kwotum</strong>
               <p>Odpowiedzi, pliki, wynik i lead trafiają do właściwego tenanta.</p>
             </li>
           </ol>

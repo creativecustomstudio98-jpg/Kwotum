@@ -5,7 +5,7 @@ import { HomeRedesign } from "./home-redesign";
 
 export const metadata = marketingMetadata(
   "Uporządkowane zapytania i leady gotowe do sprzedaży",
-  "Lorum zbiera zakres, budżet, termin, lokalizację i materiały, kwalifikuje zapytanie według reguł firmy i wskazuje następny krok sprzedażowy.",
+  "Kwotum zbiera zakres, budżet, termin, lokalizację i materiały, kwalifikuje zapytanie według reguł firmy i wskazuje następny krok sprzedażowy.",
   "/",
 );
 
@@ -18,7 +18,7 @@ export default function HomePage() {
           "@type": "Organization",
           description:
             "Oprogramowanie do porządkowania zapytań, kwalifikacji leadów i obsługi następnego kroku sprzedażowego.",
-          name: "Lorum",
+          name: "Kwotum",
           url: siteOrigin,
         }}
       />
@@ -36,7 +36,7 @@ export default function HomePage() {
             "Widget na stronę",
             "Tenantowy panel leadów",
           ],
-          name: "Lorum",
+          name: "Kwotum",
           operatingSystem: "Web",
           url: siteOrigin,
         }}

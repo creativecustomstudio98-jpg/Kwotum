@@ -16,7 +16,9 @@ test.beforeAll(async () => {
   await mkdir(artifactDirectory, { recursive: true });
 });
 
-test("auth screens keep the Lorum hierarchy on desktop and mobile", async ({ page }) => {
+test("auth screens keep the Kwotum hierarchy on desktop and mobile", async ({ page }) => {
+  test.slow();
+
   const errors: string[] = [];
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
@@ -28,7 +30,7 @@ test("auth screens keep the Lorum hierarchy on desktop and mobile", async ({ pag
   for (const screen of authScreens) {
     await page.goto(screen.path);
     await expect(page.getByRole("heading", { level: 1, name: screen.heading })).toBeVisible();
-    await expect(page.locator(".auth-brand").first()).toContainText("Lorum");
+    await expect(page.locator(".auth-brand").first()).toContainText("Kwotum");
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );

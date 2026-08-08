@@ -18,8 +18,8 @@ final class Admin
     public static function menu(): void
     {
         add_options_page(
-            __('Lorum Connector', 'wyceno-connector'),
-            __('Lorum', 'wyceno-connector'),
+            __('Kwotum Connector', 'wyceno-connector'),
+            __('Kwotum', 'wyceno-connector'),
             'manage_options',
             'wyceno-connector',
             [self::class, 'page']
@@ -38,8 +38,8 @@ final class Admin
         $diagnostics = get_transient('wyceno_connector_diagnostics');
         ?>
         <div class="wrap">
-            <h1><?php echo esc_html__('Lorum Connector', 'wyceno-connector'); ?></h1>
-            <p><?php echo esc_html__('Leady, odpowiedzi, pliki i reguły pozostają w SaaS Lorum.', 'wyceno-connector'); ?></p>
+            <h1><?php echo esc_html__('Kwotum Connector', 'wyceno-connector'); ?></h1>
+            <p><?php echo esc_html__('Leady, odpowiedzi, pliki i reguły pozostają w SaaS Kwotum.', 'wyceno-connector'); ?></p>
             <?php self::notice(); ?>
             <?php if (! $connected) : ?>
                 <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
@@ -212,7 +212,7 @@ final class Admin
         }
         $labels = [
             'apiOrigin' => __('Przypięty origin API HTTPS', 'wyceno-connector'),
-            'csp' => __('CSP strony pozwala na loader Lorum', 'wyceno-connector'),
+            'csp' => __('CSP strony pozwala na loader Kwotum', 'wyceno-connector'),
             'php' => __('PHP 8.3+', 'wyceno-connector'),
             'rest' => __('WordPress REST API', 'wyceno-connector'),
             'saas' => __('Komunikacja serwer-serwer', 'wyceno-connector'),

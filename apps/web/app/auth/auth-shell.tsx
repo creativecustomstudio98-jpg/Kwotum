@@ -95,14 +95,14 @@ const modeContent: Record<
 function Brand({ inverse = false }: Readonly<{ inverse?: boolean }>) {
   return (
     <Link
-      aria-label="Lorum — strona główna"
+      aria-label="Kwotum — strona główna"
       className={inverse ? "auth-brand auth-brand--inverse" : "auth-brand"}
       href="/"
     >
       <span className="auth-brand__mark" aria-hidden="true">
         <Image alt="" height={28} src="/Logoicon.svg" width={28} />
       </span>
-      <span>Lorum</span>
+      <span>Kwotum</span>
     </Link>
   );
 }
@@ -110,7 +110,7 @@ function Brand({ inverse = false }: Readonly<{ inverse?: boolean }>) {
 function BenefitsPanel() {
   return (
     <aside aria-labelledby="auth-benefits-title" className="auth-benefits">
-      <h2 id="auth-benefits-title">Dlaczego Lorum?</h2>
+      <h2 id="auth-benefits-title">Dlaczego Kwotum?</h2>
       <div className="auth-benefits__list">
         {benefits.map((benefit) => (
           <article className="auth-benefit" key={benefit.title}>
@@ -127,7 +127,7 @@ function BenefitsPanel() {
       <blockquote className="auth-proof">
         <span aria-hidden="true">“</span>
         <p>Każde zapytanie trafia do zespołu jako czytelny, uporządkowany brief.</p>
-        <footer>Standard pracy Lorum</footer>
+        <footer>Standard pracy Kwotum</footer>
       </blockquote>
     </aside>
   );
@@ -159,7 +159,7 @@ export function AuthShell({ children, mode }: Readonly<{ children: ReactNode; mo
   return (
     <main className={`auth-page auth-page--${mode}`}>
       <section
-        aria-label={mode === "login" ? "Logowanie do Lorum" : "Rejestracja w Lorum"}
+        aria-label={mode === "login" ? "Logowanie do Kwotum" : "Rejestracja w Kwotum"}
         className="auth-frame"
       >
         <aside className="auth-brand-panel">

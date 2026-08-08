@@ -11,7 +11,7 @@ export default function MarketingLayout({ children }: Readonly<{ children: React
         Przejdź do treści
       </a>
       <MarketingHeader />
-      <main id="main-content" tabIndex={-1}>
+      <main className="marketing-main" id="main-content" tabIndex={-1}>
         {children}
       </main>
       <MarketingFooter />

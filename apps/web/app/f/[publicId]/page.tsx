@@ -25,7 +25,7 @@ export default async function HostedFlowPage({ params }: PageProps) {
       <section id="wyceno-formularz" aria-label="Formularz zapytania">
         <HostedWidget publicId={publicId} />
       </section>
-      <footer>Bezpieczny formularz obsługiwany przez Lorum.</footer>
+      <footer>Bezpieczny formularz obsługiwany przez Kwotum.</footer>
     </main>
   );
 }

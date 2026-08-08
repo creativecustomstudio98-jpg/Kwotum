@@ -2138,3 +2138,4302 @@
     border-radius: 0;
   }
 }
+
+/* Landing desktop V7 · D1
+ * Referencja: docs/ui/landing-desktop-v7/reference/01-hero.png (1672 × 941).
+ * Te reguły są home-only i celowo kończą plik, aby odciąć historyczne warianty hero.
+ */
+.hero {
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--wy-marketing-border);
+  background:
+    radial-gradient(circle at 91% 25%, rgb(180 216 255 / 17%), transparent 29rem),
+    radial-gradient(circle at 12% 12%, rgb(196 229 255 / 14%), transparent 26rem),
+    var(--wy-marketing-background);
+  color: var(--wy-marketing-text-primary);
+}
+
+.hero::before,
+.hero::after {
+  display: none;
+}
+
+.heroGrid {
+  width: min(calc(100% - clamp(7rem, 7.66vw, 8rem)), 96.5rem);
+  min-height: 44.45rem;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 38.25rem minmax(0, 1fr);
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.heroCopy {
+  z-index: 6;
+  align-self: center;
+  padding: 0 0 0.5rem;
+  transform: translateY(-0.8rem);
+}
+
+.heroCopy .eyebrow {
+  width: max-content;
+  margin: 0 0 1.55rem;
+  padding: 0.58rem 1rem 0.52rem;
+  border-radius: 999px;
+  background: var(--wy-marketing-brand-soft);
+  color: var(--wy-marketing-brand);
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.075em;
+  line-height: 1;
+}
+
+.heroCopy h1 {
+  max-width: none;
+  margin: 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: clamp(3.65rem, 3.72vw, 3.9rem);
+  font-weight: 430;
+  letter-spacing: -0.055em;
+  line-height: 1.08;
+}
+
+.heroCopy h1 strong,
+.heroCopy h1 span {
+  display: block;
+  color: inherit;
+}
+
+.heroCopy h1 strong,
+.heroCopy h1 span:first-of-type {
+  white-space: nowrap;
+}
+
+.heroCopy h1 strong {
+  font-weight: 735;
+}
+
+.heroDescription {
+  max-width: 34rem;
+  margin: 1.85rem 0 0;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1.2rem;
+  letter-spacing: -0.015em;
+  line-height: 1.55;
+}
+
+.heroActions {
+  margin-top: 3rem;
+  gap: 1.05rem;
+}
+
+.primaryAction,
+.secondaryAction {
+  min-height: 4rem;
+  padding: 0.9rem 2.4rem;
+  border-radius: 0.68rem;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.primaryAction {
+  min-width: 11.6rem;
+  border-color: var(--wy-marketing-brand);
+  background: var(--wy-marketing-brand);
+  box-shadow: 0 0.85rem 1.8rem rgb(7 131 59 / 15%);
+}
+
+.primaryAction:hover {
+  background: var(--wy-marketing-brand-hover);
+}
+
+.secondaryAction {
+  min-width: 14.9rem;
+  padding-inline: 1.2rem;
+  border-color: #8ccca6;
+  background: rgb(255 255 255 / 70%);
+  color: var(--wy-marketing-brand);
+}
+
+.secondaryAction:hover {
+  border-color: var(--wy-marketing-brand);
+  background: white;
+}
+
+.playIcon {
+  width: 1.65rem;
+  height: 1.65rem;
+  padding-left: 0.12rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.57rem;
+}
+
+.heroFacts {
+  max-width: none;
+  margin: 3.8rem 0 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  align-items: center;
+  gap: 2.25rem;
+  list-style: none;
+}
+
+.heroFacts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.62rem;
+  color: var(--wy-marketing-text-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.heroFacts li > span {
+  width: 1.28rem;
+  height: 1.28rem;
+  border: 1.6px solid var(--wy-marketing-brand);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-brand);
+}
+
+.heroFacts svg {
+  width: 0.76rem;
+  height: 0.76rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.productScene {
+  width: 100%;
+  height: 40rem;
+  margin: 0;
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-radius: 0;
+  perspective: none;
+  transform: translateY(-1.55rem);
+}
+
+.productScene::before {
+  position: absolute;
+  z-index: -1;
+  inset: 6% -3% 2% 10%;
+  border: 0;
+  border-radius: 50%;
+  display: block;
+  background: radial-gradient(circle, rgb(175 212 244 / 26%), transparent 66%);
+  content: "";
+  filter: blur(1rem);
+}
+
+.productScene::after {
+  height: 2.8rem;
+  position: absolute;
+  z-index: -1;
+  right: 2%;
+  bottom: 0.4rem;
+  left: 16%;
+  border-radius: 50%;
+  display: block;
+  background: rgb(49 70 99 / 16%);
+  content: "";
+  filter: blur(1.7rem);
+  opacity: 0.7;
+  transform: none;
+}
+
+.productDashboard {
+  position: absolute;
+  z-index: 1;
+  top: 1.15rem;
+  right: 0;
+  bottom: 1rem;
+  left: 11.5rem;
+  overflow: hidden;
+  border: 1px solid var(--wy-marketing-border);
+  border-radius: 1.3rem;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: 0 1.4rem 3rem rgb(24 48 80 / 13%);
+}
+
+.dashboardTopbar {
+  height: 2.75rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--wy-marketing-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--wy-marketing-text-primary);
+  font-size: 0.63rem;
+}
+
+.dashboardBrand,
+.dashboardAccount {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+}
+
+.dashboardBrand i {
+  width: 0.95rem;
+  height: 0.95rem;
+  border: 0.3rem solid var(--wy-marketing-brand);
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: block;
+  transform: rotate(30deg);
+}
+
+.dashboardAccount i {
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1rem;
+  font-style: normal;
+}
+
+.dashboardAccount b {
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #eef2f7;
+  font-size: 0.52rem;
+}
+
+.dashboardLayout {
+  height: calc(100% - 2.75rem);
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+}
+
+.dashboardRail {
+  padding-top: 1.25rem;
+  border-right: 1px solid var(--wy-marketing-border);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 1.15rem;
+  color: #7a859d;
+  font-size: 0.9rem;
+}
+
+.dashboardRail span {
+  width: 1.8rem;
+  height: 1.8rem;
+  display: grid;
+  place-items: center;
+}
+
+.dashboardRail .railActive {
+  border-radius: 0.45rem;
+  background: var(--wy-marketing-brand);
+  color: white;
+}
+
+.dashboardMain {
+  min-width: 0;
+}
+
+.dashboardLeadHead {
+  min-height: 7.25rem;
+  padding: 1.1rem 1.4rem 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dashboardLeadHead small {
+  width: max-content;
+  padding: 0.28rem 0.5rem;
+  border-radius: 0.35rem;
+  display: block;
+  background: var(--wy-marketing-brand-soft);
+  color: var(--wy-marketing-brand);
+  font-size: 0.55rem;
+  font-weight: 700;
+}
+
+.dashboardLeadHead h2 {
+  margin: 0.78rem 0 0.35rem;
+  color: var(--wy-marketing-text-primary);
+  font-size: 1.13rem;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.dashboardLeadHead p {
+  margin: 0;
+  color: #7b879d;
+  font-size: 0.57rem;
+}
+
+.leadScore {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.leadScore strong {
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle closest-side, white 78%, transparent 80% 99%),
+    conic-gradient(#9ed474 0 87%, #e6ebee 87% 100%);
+  color: var(--wy-marketing-brand);
+  font-size: 1.43rem;
+}
+
+.leadScore span {
+  color: #566178;
+  font-size: 0.62rem;
+  line-height: 1.45;
+}
+
+.dashboardTabs {
+  height: 3.2rem;
+  padding: 0 1.35rem;
+  border-bottom: 1px solid var(--wy-marketing-border);
+  display: flex;
+  align-items: flex-end;
+  gap: 1.85rem;
+  color: #69758c;
+  font-size: 0.56rem;
+  white-space: nowrap;
+}
+
+.dashboardTabs span,
+.dashboardTabs strong {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.dashboardTabs strong {
+  border-bottom: 2px solid var(--wy-marketing-brand);
+  color: var(--wy-marketing-brand);
+}
+
+.dashboardContent {
+  height: calc(100% - 10.45rem);
+  padding: 1.15rem;
+  display: grid;
+  grid-template-columns: minmax(0, 2.15fr) minmax(9rem, 0.85fr);
+  gap: 1rem;
+}
+
+.leadSummary {
+  min-width: 0;
+}
+
+.leadStats {
+  margin: 0;
+  border: 1px solid #e6ebf1;
+  border-radius: 0.65rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: hidden;
+}
+
+.leadStats div {
+  min-height: 4.1rem;
+  padding: 0.72rem 0.85rem;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.leadStats div:nth-child(odd) {
+  border-right: 1px solid #edf1f5;
+}
+
+.leadStats div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.leadStats dt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--wy-marketing-brand);
+  font-size: 0.72rem;
+}
+
+.leadStats dt span {
+  color: #6f7a91;
+  font-size: 0.54rem;
+}
+
+.leadStats dd {
+  margin: 0.35rem 0 0 1.2rem;
+  color: var(--wy-marketing-text-primary);
+  font-size: 0.63rem;
+  font-weight: 650;
+}
+
+.nextStepCard {
+  min-height: 8.75rem;
+  margin-top: 0.65rem;
+  padding: 1rem;
+  border-radius: 0.65rem;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.7rem;
+  background: linear-gradient(100deg, #f1f8f3, #f8fbf8);
+}
+
+.nextStepIcon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  display: grid;
+  place-items: center;
+  background: var(--wy-marketing-brand-soft);
+  color: var(--wy-marketing-brand);
+}
+
+.nextStepCard p {
+  margin: 0;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.nextStepCard small,
+.nextStepCard p span {
+  color: #647087;
+  font-size: 0.52rem;
+}
+
+.nextStepCard strong {
+  color: var(--wy-marketing-text-primary);
+  font-size: 0.78rem;
+}
+
+.nextStepCard b {
+  width: max-content;
+  margin-left: 2.7rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.38rem;
+  background: var(--wy-marketing-brand);
+  color: white;
+  font-size: 0.51rem;
+}
+
+.contactCard {
+  padding: 1rem;
+  border: 1px solid #e5eaf0;
+  border-radius: 0.62rem;
+  color: var(--wy-marketing-text-primary);
+}
+
+.contactCard > strong {
+  font-size: 0.64rem;
+}
+
+.contactCard dl {
+  margin: 1.2rem 0 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.contactCard dl div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+}
+
+.contactCard dt,
+.contactCard dd {
+  margin: 0;
+  font-size: 0.47rem;
+}
+
+.contactCard dt {
+  color: #758097;
+}
+
+.contactCard dd {
+  font-weight: 560;
+  text-align: right;
+}
+
+.processPhone {
+  width: 14.45rem;
+  height: 31rem;
+  padding: 1.15rem 1.2rem 1rem;
+  position: absolute;
+  z-index: 3;
+  top: 9.4rem;
+  left: 0;
+  overflow: hidden;
+  border: 1px solid #dce4ed;
+  border-radius: 1.65rem;
+  background: rgb(255 255 255 / 97%);
+  box-shadow: 0 1.2rem 2.8rem rgb(22 45 76 / 18%);
+  color: var(--wy-marketing-text-primary);
+}
+
+.processPhone header {
+  height: 2rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  color: #445069;
+  font-size: 1.2rem;
+}
+
+.processPhone header i {
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-right: calc(50% - 0.7rem);
+  border: 0.37rem solid var(--wy-marketing-brand);
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: block;
+  transform: rotate(30deg);
+}
+
+.phoneProgress {
+  display: grid;
+  gap: 0.62rem;
+}
+
+.phoneProgress small {
+  color: #7a859a;
+  font-size: 0.5rem;
+  font-weight: 600;
+}
+
+.phoneProgress > span {
+  height: 2px;
+  display: block;
+  background: #e4e9ef;
+}
+
+.phoneProgress i {
+  width: 60%;
+  height: 2px;
+  display: block;
+  background: var(--wy-marketing-brand);
+}
+
+.processPhone h3 {
+  margin: 1.35rem 0 0;
+  font-size: 0.9rem;
+  letter-spacing: -0.02em;
+  line-height: 1.24;
+}
+
+.processPhone > p {
+  margin: 0.55rem 0 0;
+  color: #718097;
+  font-size: 0.55rem;
+  line-height: 1.45;
+}
+
+.processPhone ul {
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.36rem;
+  list-style: none;
+}
+
+.processPhone li {
+  min-height: 2rem;
+  padding: 0.42rem 0.55rem;
+  border: 1px solid #e1e7ed;
+  border-radius: 0.42rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #354159;
+  font-size: 0.52rem;
+}
+
+.processPhone li > span {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 1px solid #c9d2dc;
+  border-radius: 50%;
+}
+
+.processPhone .phoneOptionActive {
+  border-color: transparent;
+  background: #edf6ef;
+  color: var(--wy-marketing-brand);
+  font-weight: 650;
+}
+
+.processPhone .phoneOptionActive > span {
+  border: 0.23rem solid var(--wy-marketing-brand);
+}
+
+.processPhone footer {
+  margin-top: 1.2rem;
+  display: grid;
+  grid-template-columns: 1fr 1.18fr;
+  gap: 0.55rem;
+}
+
+.processPhone footer span,
+.processPhone footer strong {
+  min-height: 2.3rem;
+  border: 1px solid #dce4ec;
+  border-radius: 0.4rem;
+  display: grid;
+  place-items: center;
+  font-size: 0.56rem;
+}
+
+.processPhone footer strong {
+  border-color: var(--wy-marketing-brand);
+  background: var(--wy-marketing-brand);
+  color: white;
+}
+
+.heroSignalRail {
+  width: 100%;
+  min-height: 8.35rem;
+  padding-inline: max(4rem, calc((100% - 96.5rem) / 2));
+  position: relative;
+  z-index: 4;
+  border-top: 1px solid #e7edf4;
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  align-items: center;
+  gap: 2.5rem;
+  background: rgb(255 255 255 / 72%);
+}
+
+.heroSignalRail > p {
+  margin: 0;
+  color: #758095;
+  font-size: 0.95rem;
+}
+
+.heroSignalRail ul {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  background: transparent;
+  box-shadow: none;
+  list-style: none;
+}
+
+.heroSignalRail li {
+  min-width: 0;
+  min-height: 3rem;
+  padding: 0 1.1rem;
+  border: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  color: #8993a7;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+.heroSignalRail li > span {
+  width: 1.45rem;
+  height: 1.45rem;
+  border: 0.28rem solid #aeb8c7;
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: block;
+  transform: rotate(30deg);
+}
+
+@media (max-width: 75rem) {
+  .heroGrid {
+    width: min(calc(100% - 4rem), 96.5rem);
+    grid-template-columns: minmax(28rem, 0.85fr) minmax(38rem, 1.15fr);
+  }
+
+  .heroCopy h1 {
+    font-size: 3.35rem;
+  }
+
+  .productScene {
+    width: 100%;
+    margin: 0;
+    transform: translateY(-1rem) scale(0.93);
+    transform-origin: right center;
+  }
+
+  .heroFacts {
+    gap: 1rem;
+  }
+
+  .heroFacts li {
+    font-size: 0.75rem;
+  }
+
+  .heroSignalRail {
+    padding-inline: 2rem;
+    grid-template-columns: 10rem minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .heroSignalRail li {
+    padding-inline: 0.35rem;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 64rem) {
+  .heroGrid {
+    min-height: 0;
+    padding-block: 4rem;
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy {
+    max-width: 39rem;
+    transform: none;
+  }
+
+  .productScene {
+    width: min(100%, 54rem);
+    height: 39rem;
+    margin: 0 auto;
+    transform: none;
+  }
+
+  .heroSignalRail {
+    padding-block: 2rem;
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .heroSignalRail ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 1rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .heroGrid {
+    width: min(calc(100% - 2rem), 96.5rem);
+    padding-block: 2.5rem 1.5rem;
+  }
+
+  .heroCopy h1 {
+    font-size: clamp(2.65rem, 12.5vw, 3.35rem);
+  }
+
+  .heroDescription {
+    font-size: 1rem;
+  }
+
+  .heroActions {
+    display: grid;
+  }
+
+  .primaryAction,
+  .secondaryAction {
+    width: 100%;
+  }
+
+  .heroFacts {
+    margin-top: 2rem;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .productScene {
+    width: calc(100% + 1rem);
+    height: 31rem;
+    margin: 0 -0.5rem;
+    overflow: hidden;
+  }
+
+  .productDashboard {
+    left: 3.5rem;
+    transform: scale(0.74);
+    transform-origin: left top;
+    width: 43rem;
+    height: 38rem;
+  }
+
+  .processPhone {
+    top: 6.5rem;
+    left: 0;
+    transform: scale(0.78);
+    transform-origin: left top;
+  }
+
+  .heroSignalRail ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (forced-colors: active) {
+  .productDashboard,
+  .processPhone,
+  .leadStats,
+  .contactCard,
+  .processPhone li {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Landing desktop V7 · D2
+ * Referencja: docs/ui/landing-desktop-v7/reference/02-process.png (1672 × 941).
+ */
+.flowSection {
+  min-height: 58.8125rem;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 0;
+  background:
+    radial-gradient(circle at 8% 33%, rgb(195 225 255 / 12%), transparent 24rem),
+    radial-gradient(circle at 90% 12%, rgb(208 231 255 / 10%), transparent 26rem),
+    var(--wy-marketing-background);
+  color: var(--wy-marketing-text-primary);
+}
+
+.flowSection::before {
+  position: absolute;
+  z-index: -2;
+  inset: 20.75rem 0 7.1rem;
+  border-radius: 0 0 3.25rem 3.25rem;
+  background: rgb(248 251 255 / 78%);
+  content: "";
+  box-shadow: 0 1.8rem 3.5rem rgb(35 64 94 / 8%);
+}
+
+.flowSection::after {
+  position: absolute;
+  z-index: -1;
+  inset: 20.75rem 0 7.1rem;
+  background: radial-gradient(circle, rgb(156 207 255 / 15%) 0 1.3px, transparent 1.7px);
+  background-size: 1.35rem 1.35rem;
+  content: "";
+  -webkit-mask-image: linear-gradient(90deg, #000 0, transparent 18% 82%, #000 100%);
+  mask-image: linear-gradient(90deg, #000 0, transparent 18% 82%, #000 100%);
+}
+
+.processSectionInner {
+  width: 100%;
+  min-height: 58.8125rem;
+  padding-top: 7.925rem;
+  position: relative;
+  z-index: 1;
+}
+
+.processHeading {
+  text-align: center;
+}
+
+.processHeading .eyebrow {
+  margin: 0 0 2rem;
+  color: var(--wy-marketing-brand);
+  font-size: 0.84rem;
+  font-weight: 760;
+  letter-spacing: 0.095em;
+  line-height: 1;
+}
+
+.processHeading h2 {
+  margin: 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: 3.52rem;
+  font-weight: 430;
+  letter-spacing: -0.052em;
+  line-height: 1.12;
+}
+
+.processHeading h2 strong,
+.processHeading h2 span {
+  display: block;
+}
+
+.processHeading h2 strong {
+  font-weight: 735;
+}
+
+.processCards {
+  width: min(calc(100% - 16rem), 88.5rem);
+  margin: 3.275rem auto 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.9rem;
+  list-style: none;
+}
+
+.processCards > li {
+  min-width: 0;
+  position: relative;
+}
+
+.processCard {
+  height: 24.8rem;
+  padding: 2rem 1.9rem 1.9rem;
+  border: 1px solid var(--wy-marketing-border);
+  border-radius: 1.2rem;
+  background: rgb(255 255 255 / 93%);
+  box-shadow: 0 1.15rem 2.7rem rgb(31 58 91 / 7%);
+}
+
+.processNumber {
+  width: 2.65rem;
+  height: 2.65rem;
+  border: 1px solid #d9ebdf;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #f2f9f4, #eaf5ed);
+  color: var(--wy-marketing-brand);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.processIcon {
+  width: 5rem;
+  height: 5rem;
+  margin-top: 1.75rem;
+  border: 1px solid #dcece1;
+  border-radius: 0.85rem;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #f4faf6, #e9f5ed);
+  color: var(--wy-marketing-brand);
+}
+
+.processIcon svg {
+  width: 3.25rem;
+  height: 3.25rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.processCard h3 {
+  margin: 2.05rem 0 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: 1.3rem;
+  font-weight: 710;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+}
+
+.processCard p {
+  max-width: 23rem;
+  margin: 1.35rem 0 0;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1.06rem;
+  letter-spacing: -0.012em;
+  line-height: 1.7;
+}
+
+.processConnector {
+  width: 4rem;
+  height: 4rem;
+  position: absolute;
+  z-index: 3;
+  top: 9.7rem;
+  right: -3.45rem;
+  border: 1px solid #edf1f5;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: white;
+  color: var(--wy-marketing-brand);
+  box-shadow: 0 0.8rem 2rem rgb(42 66 91 / 7%);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+@media (max-width: 75rem) {
+  .processCards {
+    width: min(calc(100% - 4rem), 88.5rem);
+    gap: 2rem;
+  }
+
+  .processCard {
+    padding-inline: 1.5rem;
+  }
+
+  .processCard h3 {
+    font-size: 1.08rem;
+  }
+
+  .processConnector {
+    right: -3rem;
+  }
+}
+
+@media (max-width: 64rem) {
+  .flowSection,
+  .processSectionInner {
+    min-height: 0;
+  }
+
+  .processSectionInner {
+    padding: 5.5rem 0;
+  }
+
+  .processCards {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+
+  .processCard {
+    height: auto;
+    min-height: 22rem;
+  }
+
+  .processConnector {
+    top: auto;
+    right: 50%;
+    bottom: -4rem;
+    transform: translateX(50%) rotate(90deg);
+  }
+}
+
+@media (max-width: 40rem) {
+  .processSectionInner {
+    padding: 4rem 0;
+  }
+
+  .processHeading {
+    padding-inline: 1rem;
+  }
+
+  .processHeading h2 {
+    font-size: 2.55rem;
+  }
+
+  .processCards {
+    width: calc(100% - 2rem);
+    margin-top: 3rem;
+  }
+
+  .processCard {
+    min-height: 0;
+  }
+}
+
+@media (forced-colors: active) {
+  .processCard,
+  .processNumber,
+  .processIcon,
+  .processConnector {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Landing desktop V7 · D3
+ * Referencja: docs/ui/landing-desktop-v7/reference/03-key-information.png (1672 × 941).
+ */
+.keyInformationSection {
+  min-height: 58.8125rem;
+  padding: 0;
+  overflow: hidden;
+  border-bottom: 0;
+  background:
+    radial-gradient(circle at 9% 18%, rgb(199 228 255 / 12%), transparent 25rem),
+    radial-gradient(circle at 91% 16%, rgb(205 232 255 / 11%), transparent 28rem),
+    var(--wy-marketing-background);
+  color: var(--wy-marketing-text-primary);
+}
+
+.keyInformationInner {
+  width: 100%;
+  min-height: 58.8125rem;
+  padding-top: 7.55rem;
+}
+
+.keyInformationHeading {
+  text-align: center;
+}
+
+.keyInformationHeading .eyebrow {
+  width: max-content;
+  margin: 0 auto;
+  padding: 0.67rem 1.2rem 0.62rem;
+  border-radius: 999px;
+  background: var(--wy-marketing-brand-soft);
+  color: var(--wy-marketing-brand);
+  font-size: 0.84rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.keyInformationHeading h2 {
+  margin: 1.625rem 0 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: 4rem;
+  font-weight: 430;
+  letter-spacing: 0.005em;
+  line-height: 1.19;
+}
+
+.keyInformationHeading h2 strong,
+.keyInformationHeading h2 span {
+  display: block;
+}
+
+.keyInformationHeading h2 strong {
+  font-weight: 735;
+  letter-spacing: -0.036em;
+}
+
+.keyInformationHeading > p:last-child {
+  margin: 1.7125rem 0 0;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1.17rem;
+  letter-spacing: -0.015em;
+  line-height: 1.7;
+}
+
+.keyInformationHeading > p:last-child span {
+  display: block;
+}
+
+.keyInformationCards {
+  width: 90.9375rem;
+  margin: 3.45rem auto 0;
+  display: grid;
+  grid-template-columns: 20.25rem 20rem 21.5625rem 22.1875rem;
+  gap: 2.125rem;
+}
+
+.keyInformationCard {
+  height: 20.9375rem;
+  padding: 2.15rem 1.1rem 1.4rem;
+  border: 1px solid var(--wy-marketing-border);
+  border-radius: 1.15rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background: rgb(255 255 255 / 93%);
+  box-shadow: 0 1.2rem 2.8rem rgb(28 55 86 / 7%);
+  text-align: center;
+}
+
+.keyInformationIcon {
+  width: 4.85rem;
+  height: 4.85rem;
+  border: 1px solid #dcece1;
+  border-radius: 0.95rem;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #f5faf6, #edf7f0);
+  color: var(--wy-marketing-brand);
+}
+
+.keyInformationIcon svg {
+  width: 3rem;
+  height: 3rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.keyInformationCard h3 {
+  margin: 1.85rem 0 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: 1.23rem;
+  font-weight: 710;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+}
+
+.keyInformationValue {
+  width: max-content;
+  margin: 2rem 0 0;
+  padding: 0.52rem 1.15rem;
+  border: 1px solid #d9ebdf;
+  border-radius: 0.65rem;
+  background: linear-gradient(145deg, #f6fbf7, #eef7f1);
+  color: var(--wy-marketing-brand);
+  font-size: 1.23rem;
+  font-weight: 690;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.keyInformationFiles {
+  padding-inline: 1.1rem;
+}
+
+.keyInformationThumbnails {
+  width: 100%;
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 4.5rem) 3.8rem;
+  justify-content: center;
+  gap: 0.55rem;
+}
+
+.planThumbnail,
+.photoThumbnail,
+.moreThumbnail {
+  height: 4.55rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #d7e0e8;
+  border-radius: 0.65rem;
+  background: white;
+}
+
+.planThumbnail {
+  background:
+    linear-gradient(
+      90deg,
+      transparent 23%,
+      #b5bdc8 24% 25%,
+      transparent 26% 67%,
+      #b5bdc8 68% 69%,
+      transparent 70%
+    ),
+    linear-gradient(
+      transparent 28%,
+      #b5bdc8 29% 30%,
+      transparent 31% 72%,
+      #b5bdc8 73% 74%,
+      transparent 75%
+    ),
+    repeating-linear-gradient(0deg, transparent 0 8px, rgb(170 180 193 / 22%) 9px 10px),
+    repeating-linear-gradient(90deg, transparent 0 9px, rgb(170 180 193 / 20%) 10px 11px), #fbfcfd;
+}
+
+.planThumbnail::after {
+  position: absolute;
+  inset: 0.65rem 0.55rem 0.7rem;
+  border: 1px solid #8e99a8;
+  content: "";
+  clip-path: polygon(0 0, 70% 0, 70% 28%, 100% 28%, 100% 100%, 38% 100%, 38% 72%, 0 72%);
+}
+
+.photoThumbnail img {
+  object-fit: cover;
+  object-position: 25% center;
+}
+
+.outdoorThumbnail img {
+  object-position: 28% center;
+}
+
+.moreThumbnail {
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-brand);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.keyInformationScore {
+  padding-top: 1.75rem;
+}
+
+.keyInformationScore h3 {
+  margin-top: 1.15rem;
+}
+
+.keyScore {
+  width: 5.15rem;
+  height: 5.15rem;
+  margin-top: 1.15rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle closest-side, white 78%, transparent 80% 99%),
+    conic-gradient(#55b46f 0 87%, #e1e7e5 87% 100%);
+  color: var(--wy-marketing-brand);
+  font-size: 1.7rem;
+  font-weight: 720;
+}
+
+.keyInformationScore .keyInformationValue {
+  margin-top: 0.85rem;
+  padding-block: 0.48rem;
+  font-size: 1rem;
+}
+
+@media (max-width: 94rem) {
+  .keyInformationCards {
+    width: min(calc(100% - 4rem), 90.3125rem);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .keyInformationThumbnails {
+    grid-template-columns: repeat(3, minmax(3.5rem, 1fr)) 3.4rem;
+    gap: 0.4rem;
+  }
+}
+
+@media (max-width: 64rem) {
+  .keyInformationSection,
+  .keyInformationInner {
+    min-height: 0;
+  }
+
+  .keyInformationInner {
+    padding: 5.5rem 0;
+  }
+
+  .keyInformationCards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  .keyInformationInner {
+    padding: 4rem 0;
+  }
+
+  .keyInformationHeading {
+    padding-inline: 1rem;
+  }
+
+  .keyInformationHeading h2 {
+    font-size: 2.55rem;
+  }
+
+  .keyInformationHeading > p:last-child {
+    font-size: 1rem;
+  }
+
+  .keyInformationCards {
+    width: calc(100% - 2rem);
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (forced-colors: active) {
+  .keyInformationCard,
+  .keyInformationIcon,
+  .keyInformationValue,
+  .planThumbnail,
+  .photoThumbnail,
+  .moreThumbnail {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Landing desktop V7 · D4 micro-pass
+ * Referencja kompozycyjna: 08-full-overview.png, fragment przykładowego leada.
+ * Overview ma 941 px szerokości, dlatego wartości desktopowe zachowują proporcje po skalowaniu,
+ * ale nie są deklarowane jako natywny pixel-perfect viewport.
+ */
+.decisionSection {
+  min-height: 36rem;
+  padding: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 11% 24%, rgb(199 228 255 / 10%), transparent 24rem),
+    radial-gradient(circle at 90% 20%, rgb(205 232 255 / 9%), transparent 27rem),
+    var(--wy-marketing-background);
+  color: var(--wy-marketing-text-primary);
+}
+
+.decisionSection::before {
+  display: none;
+}
+
+.leadExampleInner {
+  width: 100%;
+  min-height: 36rem;
+  padding-top: 2.45rem;
+}
+
+.leadExampleHeading {
+  text-align: center;
+}
+
+.leadExampleHeading .eyebrow {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--wy-marketing-brand);
+  font-size: 0.73rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.leadExampleHeading h2 {
+  margin: 0.82rem 0 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: 1.8rem;
+  font-weight: 690;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.decisionDocument {
+  width: 88.75rem;
+  min-height: 24.8rem;
+  margin: 1.65rem auto 0;
+  padding: 0.9rem 1.35rem;
+  border: 1px solid #cdddec;
+  border-radius: 1.25rem;
+  display: grid;
+  grid-template-columns: 19.05rem 36.5rem minmax(0, 1fr);
+  align-items: stretch;
+  gap: 1.75rem;
+  overflow: hidden;
+  background: rgb(255 255 255 / 95%);
+  box-shadow: 0 1.25rem 3rem rgb(36 67 100 / 9%);
+  color: var(--wy-marketing-text-primary);
+  transform: none;
+}
+
+.leadFacts {
+  min-width: 0;
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+}
+
+.leadFacts > div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  align-items: center;
+  column-gap: 1.4rem;
+  row-gap: 0.3rem;
+}
+
+.leadFactIcon {
+  width: 1.85rem;
+  height: 1.85rem;
+  display: grid;
+  grid-row: 1 / 3;
+  place-items: center;
+  color: #61708a;
+}
+
+.leadFactIcon svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.leadFacts dt,
+.leadFacts dd {
+  min-width: 0;
+  margin: 0;
+}
+
+.leadFacts dt {
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.1;
+}
+
+.leadFacts dd {
+  color: var(--wy-marketing-text-primary);
+  font-size: 0.84rem;
+  font-weight: 670;
+  line-height: 1.2;
+}
+
+.leadGallery {
+  min-width: 0;
+  height: 21.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 2.25fr) minmax(0, 1fr);
+  gap: 0.65rem;
+}
+
+.leadGalleryMain,
+.leadGallerySide > div {
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.52rem;
+  background: #e8ece8;
+}
+
+.leadGallery img {
+  object-fit: cover;
+}
+
+.leadGalleryMain img {
+  object-position: center;
+}
+
+.leadGallerySide {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.leadGallerySide > div:first-child img {
+  object-position: center;
+}
+
+.leadGallerySide > div:last-child img {
+  object-position: center;
+}
+
+.leadGallerySide > div:last-child > span {
+  width: 2.15rem;
+  height: 2.15rem;
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0.8rem;
+  border: 1px solid rgb(255 255 255 / 68%);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgb(255 255 255 / 78%);
+  color: var(--wy-marketing-text-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  backdrop-filter: blur(0.25rem);
+}
+
+.leadRecommendation {
+  min-width: 0;
+  padding: 0.85rem 0.65rem 0 2.65rem;
+  border-left: 1px solid var(--wy-marketing-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.leadResult {
+  display: flex;
+  align-items: center;
+  gap: 1.3rem;
+}
+
+.leadResultGauge {
+  width: 5.4rem;
+  height: 3.55rem;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: end center;
+}
+
+.leadResultGauge::before {
+  width: 5.15rem;
+  height: 5.15rem;
+  position: absolute;
+  top: 0.15rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle closest-side, white 72%, transparent 74% 99%),
+    conic-gradient(
+      from 225deg,
+      #b8dc8a 0 11%,
+      var(--wy-marketing-brand) 11% 40%,
+      #e4e9e7 40% 75%,
+      transparent 75%
+    );
+  content: "";
+}
+
+.leadResultGauge i {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 0.2rem;
+  color: var(--wy-marketing-text-primary);
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 750;
+}
+
+.leadResult p {
+  margin: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.leadResult strong {
+  font-size: 2rem;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.leadResult strong small {
+  margin-left: 0.2rem;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.75rem;
+  letter-spacing: 0;
+}
+
+.leadResult p > span {
+  color: var(--wy-marketing-brand);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.leadNextStep {
+  margin-top: 2.5rem;
+  display: grid;
+}
+
+.leadNextStep > span {
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.8rem;
+}
+
+.leadNextStep > strong {
+  margin-top: 0.45rem;
+  font-size: 1.05rem;
+  letter-spacing: -0.025em;
+}
+
+.leadNextStep p {
+  max-width: 19rem;
+  margin: 0.65rem 0 0;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.leadRecommendationActions {
+  width: 100%;
+  max-width: 15.25rem;
+  margin-top: auto;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.leadRecommendationActions a {
+  min-height: 2.9rem;
+  padding-inline: 1rem;
+  border: 1px solid #d2dce7;
+  border-radius: 0.55rem;
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-brand);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.leadRecommendationActions a:first-child {
+  border-color: var(--wy-marketing-brand);
+  background: var(--wy-marketing-brand);
+  color: white;
+}
+
+.leadRecommendationActions a:hover {
+  border-color: var(--wy-marketing-brand);
+  background: var(--wy-marketing-brand-soft);
+}
+
+.leadRecommendationActions a:first-child:hover {
+  background: var(--wy-marketing-brand-hover);
+}
+
+@media (max-width: 94rem) {
+  .decisionDocument {
+    width: calc(100% - 4rem);
+    grid-template-columns: 18rem minmax(29rem, 1.5fr) minmax(18rem, 0.9fr);
+    gap: 1.25rem;
+  }
+
+  .leadRecommendation {
+    padding-left: 1.5rem;
+  }
+}
+
+@media (max-width: 64rem) {
+  .decisionSection,
+  .leadExampleInner {
+    min-height: 0;
+  }
+
+  .leadExampleInner {
+    padding: 4rem 0;
+  }
+
+  .decisionDocument {
+    grid-template-columns: minmax(14rem, 0.72fr) minmax(0, 1.28fr);
+  }
+
+  .leadRecommendation {
+    min-height: 18rem;
+    padding: 1.5rem 0.5rem 0.5rem;
+    border-top: 1px solid var(--wy-marketing-border);
+    border-left: 0;
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 40rem) {
+  .leadExampleInner {
+    padding: 3rem 0;
+  }
+
+  .leadExampleHeading {
+    padding-inline: 1rem;
+  }
+
+  .leadExampleHeading h2 {
+    font-size: 1.55rem;
+  }
+
+  .decisionDocument {
+    width: calc(100% - 2rem);
+    padding: 1rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .leadFacts {
+    min-height: 22rem;
+  }
+
+  .leadGallery {
+    min-height: 25rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .leadGallerySide {
+    min-height: 11rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .leadRecommendation {
+    grid-column: auto;
+  }
+
+  .leadRecommendationActions {
+    width: 100%;
+    max-width: none;
+    margin-top: 2rem;
+  }
+}
+
+@media (forced-colors: active) {
+  .decisionDocument,
+  .leadGalleryMain,
+  .leadGallerySide > div,
+  .leadRecommendationActions a {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Landing desktop V7 · integracje
+ * Natywna referencja: 04-integrations.png, 1672 × 941 px.
+ * Układ pięciu powierzchni zachowuje geometrię obrazu, a treść ogranicza się
+ * do rzeczywistych kanałów produktu: e-mail, webhook, WordPress i hosted link.
+ */
+.integrationSection {
+  min-height: 58.75rem;
+  padding: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 10% 18%, rgb(207 231 255 / 12%), transparent 31rem),
+    radial-gradient(circle at 88% 16%, rgb(205 231 255 / 13%), transparent 30rem),
+    var(--wy-marketing-background);
+  color: var(--wy-marketing-text-primary);
+}
+
+.integrationInner {
+  width: 100%;
+  min-height: 58.75rem;
+  padding-top: 3.65rem;
+}
+
+.integrationHeading {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.integrationHeading .eyebrow {
+  min-height: 2.7rem;
+  margin: 0;
+  padding: 0.75rem 1.9rem;
+  border-radius: 999px;
+  background: #e5f3e9;
+  color: var(--wy-marketing-brand);
+  font-size: 0.86rem;
+  font-weight: 760;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+}
+
+.integrationHeading h2 {
+  max-width: none;
+  margin: 2.35rem 0 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: clamp(3.15rem, 3.65vw, 3.8rem);
+  font-weight: 690;
+  letter-spacing: -0.055em;
+  line-height: 1.06;
+}
+
+.integrationHeading > p:last-child {
+  margin: 1.56rem 0 0;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1.34rem;
+  line-height: 1.6;
+}
+
+.integrationHeading > p:last-child span {
+  display: block;
+}
+
+.integrationStage {
+  width: 87.125rem;
+  height: 24.375rem;
+  margin: 2.28rem auto 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: 23.375rem 8.9375rem 22.4375rem 6.4375rem 25.4375rem;
+  grid-template-rows: 10.5rem 3.1875rem 10.6875rem;
+  grid-template-areas:
+    "email . lead . wordpress"
+    ". . lead . ."
+    "webhook . lead . hosted";
+}
+
+.integrationChannel,
+.integrationLeadCard {
+  position: relative;
+  z-index: 2;
+  border: 1px solid #d9e0e8;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 1.1rem 2.9rem rgb(39 66 92 / 8%);
+}
+
+.integrationChannel {
+  min-width: 0;
+  min-height: 10.5rem;
+  padding: 2rem 1.7rem;
+  display: grid;
+  grid-template-columns: 5.25rem minmax(0, 1fr);
+  align-items: center;
+  gap: 1.8rem;
+}
+
+.integrationemail {
+  grid-area: email;
+}
+
+.integrationwebhook {
+  grid-area: webhook;
+}
+
+.integrationwordpress {
+  grid-area: wordpress;
+}
+
+.integrationhosted {
+  grid-area: hosted;
+}
+
+.integrationChannelIcon {
+  width: 5.25rem;
+  height: 5.65rem;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-text-primary);
+}
+
+.integrationChannelIcon svg {
+  width: 2.9rem;
+  height: 2.9rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.integrationIconemail {
+  background: linear-gradient(145deg, #dce5ff, #cbd1ff);
+}
+
+.integrationIconwebhook {
+  background: linear-gradient(145deg, #ffdff7, #f5c8f6);
+}
+
+.integrationIconwordpress {
+  background: linear-gradient(145deg, #dcf8ee, #c8f1df);
+  color: var(--wy-marketing-brand);
+}
+
+.integrationIconhosted {
+  background: linear-gradient(145deg, #edf8e9, #dcefd8);
+  color: var(--wy-marketing-brand);
+}
+
+.integrationChannel h3 {
+  margin: 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: 1.23rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.integrationChannel p {
+  max-width: 17rem;
+  margin: 0.7rem 0 0;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.87rem;
+  line-height: 1.65;
+}
+
+.integrationLeadCard {
+  grid-area: lead;
+  overflow: hidden;
+}
+
+.integrationLeadCard > header {
+  height: 4rem;
+  padding: 0 1.55rem;
+  border-bottom: 1px solid #dde3e9;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.integrationBrandMark {
+  width: 1.45rem;
+  height: 1.45rem;
+  position: relative;
+  border: 0.27rem solid var(--wy-marketing-brand);
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: block;
+  transform: rotate(37deg);
+}
+
+.integrationBrandMark::after {
+  width: 0.55rem;
+  height: 0.55rem;
+  position: absolute;
+  top: -0.28rem;
+  right: -0.27rem;
+  border-radius: 0 0.4rem 0;
+  background: var(--wy-marketing-brand);
+  content: "";
+}
+
+.integrationLeadCard > header strong {
+  font-size: 0.93rem;
+}
+
+.integrationLeadCard > div {
+  padding: 1rem 1.8rem 1.4rem;
+}
+
+.integrationLeadBadge {
+  padding: 0.32rem 0.66rem;
+  border-radius: 0.45rem;
+  display: inline-block;
+  background: var(--wy-marketing-brand-soft);
+  color: var(--wy-marketing-brand);
+  font-size: 0.75rem;
+  font-weight: 720;
+}
+
+.integrationLeadCard h3 {
+  margin: 0.85rem 0 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: 1.18rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.integrationLeadCard dl {
+  margin: 1.1rem 0 0;
+  display: grid;
+  gap: 0.68rem;
+}
+
+.integrationLeadCard dl > div {
+  display: grid;
+  grid-template-columns: 7.7rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.integrationLeadCard dt,
+.integrationLeadCard dd {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.integrationLeadCard dt {
+  color: var(--wy-marketing-text-secondary);
+}
+
+.integrationLeadCard dd {
+  color: var(--wy-marketing-text-primary);
+  font-weight: 650;
+}
+
+.integrationLeadStatus {
+  margin: 1.05rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid #e3e8ed;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--wy-marketing-text-primary);
+  font-size: 0.75rem;
+  font-weight: 640;
+}
+
+.integrationLeadStatus > span {
+  width: 1.22rem;
+  height: 1.22rem;
+  border: 2px solid var(--wy-marketing-brand);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-brand);
+  font-size: 0.68rem;
+}
+
+.integrationConnector {
+  position: absolute;
+  z-index: 1;
+  border: 0;
+  opacity: 0.9;
+}
+
+.integrationConnector::before,
+.integrationConnector::after {
+  width: 0.72rem;
+  height: 0.72rem;
+  position: absolute;
+  border: 0.18rem solid #bfe7c7;
+  border-radius: 50%;
+  background: #76c486;
+  content: "";
+}
+
+.connectorEmail,
+.connectorWebhook {
+  left: 23.375rem;
+  width: 8.9375rem;
+}
+
+.connectorEmail {
+  height: 6.35rem;
+  top: 4.45rem;
+  background:
+    repeating-linear-gradient(90deg, #6aba79 0 0.36rem, transparent 0.36rem 0.65rem) left top / 53%
+      1px no-repeat,
+    repeating-linear-gradient(#6aba79 0 0.36rem, transparent 0.36rem 0.65rem) 53% top / 1px 100%
+      no-repeat,
+    repeating-linear-gradient(90deg, #6aba79 0 0.36rem, transparent 0.36rem 0.65rem) right bottom /
+      47% 1px no-repeat;
+}
+
+.connectorWebhook {
+  height: 5.25rem;
+  bottom: 4.35rem;
+  background:
+    repeating-linear-gradient(90deg, #6aba79 0 0.36rem, transparent 0.36rem 0.65rem) left bottom /
+      53% 1px no-repeat,
+    repeating-linear-gradient(#6aba79 0 0.36rem, transparent 0.36rem 0.65rem) 53% top / 1px 100%
+      no-repeat,
+    repeating-linear-gradient(90deg, #6aba79 0 0.36rem, transparent 0.36rem 0.65rem) right top / 47%
+      1px no-repeat;
+}
+
+.connectorWordpress,
+.connectorHosted {
+  right: 25.4375rem;
+  width: 6.4375rem;
+}
+
+.connectorWordpress {
+  height: 6.15rem;
+  top: 4.7rem;
+  background:
+    repeating-linear-gradient(90deg, #6aba79 0 0.36rem, transparent 0.36rem 0.65rem) left bottom /
+      53% 1px no-repeat,
+    repeating-linear-gradient(#6aba79 0 0.36rem, transparent 0.36rem 0.65rem) 53% top / 1px 100%
+      no-repeat,
+    repeating-linear-gradient(90deg, #6aba79 0 0.36rem, transparent 0.36rem 0.65rem) right top / 47%
+      1px no-repeat;
+}
+
+.connectorHosted {
+  height: 5.2rem;
+  bottom: 4.4rem;
+  background:
+    repeating-linear-gradient(90deg, #6aba79 0 0.36rem, transparent 0.36rem 0.65rem) left top / 53%
+      1px no-repeat,
+    repeating-linear-gradient(#6aba79 0 0.36rem, transparent 0.36rem 0.65rem) 53% top / 1px 100%
+      no-repeat,
+    repeating-linear-gradient(90deg, #6aba79 0 0.36rem, transparent 0.36rem 0.65rem) right bottom /
+      47% 1px no-repeat;
+}
+
+.connectorEmail::before,
+.connectorWebhook::before {
+  left: -0.4rem;
+}
+
+.connectorEmail::after,
+.connectorWebhook::after {
+  right: -0.4rem;
+}
+
+.connectorWordpress::before,
+.connectorHosted::before {
+  left: -0.4rem;
+}
+
+.connectorWordpress::after,
+.connectorHosted::after {
+  right: -0.4rem;
+}
+
+.connectorEmail::before,
+.connectorWordpress::after {
+  top: -0.42rem;
+}
+
+.connectorEmail::after,
+.connectorWordpress::before {
+  bottom: -0.42rem;
+}
+
+.connectorWebhook::before,
+.connectorHosted::after {
+  bottom: -0.42rem;
+}
+
+.connectorWebhook::after,
+.connectorHosted::before {
+  top: -0.42rem;
+}
+
+.integrationRail {
+  width: 87.125rem;
+  min-height: 7.25rem;
+  margin: 2.625rem auto 0;
+  padding: 0;
+  border: 1px solid #d9e0e8;
+  border-radius: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: rgb(255 255 255 / 90%);
+  box-shadow: 0 0.9rem 2.5rem rgb(39 66 92 / 6%);
+  list-style: none;
+}
+
+.integrationRail li {
+  min-width: 0;
+  padding: 1.45rem 2.85rem;
+  display: flex;
+  align-items: center;
+  gap: 1.35rem;
+}
+
+.integrationRail li + li {
+  border-left: 1px solid #dfe5ea;
+}
+
+.integrationRail li > span {
+  width: 1.55rem;
+  height: 1.55rem;
+  flex: 0 0 auto;
+  border: 2px solid var(--wy-marketing-brand);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-brand);
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.integrationRail p {
+  min-width: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.38rem;
+}
+
+.integrationRail strong {
+  font-size: 0.88rem;
+  line-height: 1.2;
+}
+
+.integrationRail small {
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 94rem) {
+  .integrationStage,
+  .integrationRail {
+    width: calc(100% - 4rem);
+  }
+
+  .integrationStage {
+    grid-template-columns:
+      minmax(20rem, 1fr) minmax(6rem, 0.38fr) minmax(20rem, 0.96fr) minmax(5rem, 0.3fr)
+      minmax(21rem, 1.08fr);
+  }
+
+  .integrationChannel {
+    padding-inline: 1.35rem;
+    gap: 1.25rem;
+  }
+
+  .connectorEmail,
+  .connectorWebhook,
+  .connectorWordpress,
+  .connectorHosted {
+    display: none;
+  }
+
+  .integrationRail li {
+    padding-inline: 2rem;
+  }
+}
+
+@media (max-width: 64rem) {
+  .integrationSection,
+  .integrationInner {
+    min-height: 0;
+  }
+
+  .integrationInner {
+    padding: 5.5rem 0;
+  }
+
+  .integrationHeading {
+    padding-inline: 2rem;
+  }
+
+  .integrationHeading h2 {
+    max-width: 16ch;
+  }
+
+  .integrationStage {
+    height: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+    grid-template-areas:
+      "email wordpress"
+      "lead lead"
+      "webhook hosted";
+    gap: 1.5rem;
+  }
+
+  .integrationChannel {
+    min-height: 11rem;
+  }
+
+  .integrationLeadCard {
+    width: min(100%, 31rem);
+    min-height: 24.375rem;
+    justify-self: center;
+  }
+
+  .integrationRail {
+    grid-template-columns: 1fr;
+  }
+
+  .integrationRail li + li {
+    border-top: 1px solid #dfe5ea;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 40rem) {
+  .integrationInner {
+    padding: 4rem 0;
+  }
+
+  .integrationHeading {
+    padding-inline: 1rem;
+  }
+
+  .integrationHeading .eyebrow {
+    min-height: 0;
+    padding: 0.65rem 1rem;
+    font-size: 0.72rem;
+  }
+
+  .integrationHeading h2 {
+    margin-top: 1.5rem;
+    font-size: 2.55rem;
+  }
+
+  .integrationHeading > p:last-child {
+    font-size: 1rem;
+  }
+
+  .integrationStage,
+  .integrationRail {
+    width: calc(100% - 2rem);
+  }
+
+  .integrationStage {
+    margin-top: 2rem;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "email"
+      "wordpress"
+      "lead"
+      "webhook"
+      "hosted";
+    gap: 1rem;
+  }
+
+  .integrationChannel {
+    padding: 1.4rem;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .integrationChannelIcon {
+    width: 4rem;
+    height: 4.2rem;
+  }
+
+  .integrationChannelIcon svg {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .integrationLeadCard {
+    min-height: 0;
+  }
+
+  .integrationLeadCard > div {
+    padding-inline: 1.25rem;
+  }
+
+  .integrationLeadCard dl > div {
+    grid-template-columns: 6rem minmax(0, 1fr);
+  }
+
+  .integrationRail {
+    margin-top: 2rem;
+  }
+
+  .integrationRail li {
+    padding: 1.35rem;
+  }
+}
+
+@media (forced-colors: active) {
+  .integrationChannel,
+  .integrationLeadCard,
+  .integrationRail,
+  .integrationChannelIcon {
+    border: 1px solid CanvasText;
+  }
+
+  .integrationConnector {
+    border-color: CanvasText;
+  }
+}
+
+/* Landing desktop V7 · pricing
+ * Natywna referencja: 05-pricing.png, 1672 × 941 px.
+ * Kwoty, limity, trial i płatności z obrazu nie są zatwierdzonym produktem.
+ * Dwukolumnowa geometria opisuje więc rzeczywisty pilotaż i decyzję po nim.
+ */
+.pricingSection {
+  min-height: 58.8125rem;
+  padding: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 10% 24%, rgb(207 231 255 / 10%), transparent 31rem),
+    radial-gradient(circle at 90% 20%, rgb(205 231 255 / 11%), transparent 30rem),
+    var(--wy-marketing-background);
+  color: var(--wy-marketing-text-primary);
+}
+
+.pricingInner {
+  width: 100%;
+  min-height: 58.8125rem;
+  padding-top: 3.35rem;
+}
+
+.pricingHeading {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.pricingHeading .eyebrow {
+  min-height: 2.25rem;
+  margin: 0;
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  background: #e5f3e9;
+  color: var(--wy-marketing-brand);
+  font-size: 0.86rem;
+  font-weight: 760;
+  letter-spacing: 0.15em;
+  line-height: 1.2;
+}
+
+.pricingHeading h2 {
+  max-width: none;
+  margin: 2rem 0 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: clamp(3rem, 3.65vw, 3.7rem);
+  font-weight: 690;
+  letter-spacing: -0.05em;
+  line-height: 1.06;
+}
+
+.pricingHeading > p:last-child {
+  margin: 0.63rem 0 0;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1.3rem;
+  line-height: 1.45;
+}
+
+.pricingHeading > p:last-child span {
+  display: block;
+}
+
+.pricingCards {
+  width: 63.8125rem;
+  height: 33.8125rem;
+  margin: 1.65rem auto 0;
+  display: grid;
+  grid-template-columns: 30.875rem 31.5rem;
+  gap: 1.4375rem;
+  transform: translateX(-0.75rem);
+}
+
+.pricingCard {
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid #d6dee7;
+  border-radius: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: 0 1.1rem 3rem rgb(37 64 91 / 8%);
+}
+
+.pricingCardFeatured {
+  border-color: #5bb073;
+}
+
+.pricingCard > header {
+  min-height: 8.95rem;
+  padding: 1.85rem 2rem;
+  position: relative;
+  border-bottom: 1px solid #dce3ea;
+  display: grid;
+  grid-template-columns: 4.4rem minmax(0, 1fr);
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.pricingCardIcon {
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #eef6f0;
+  color: var(--wy-marketing-brand);
+}
+
+.pricingCardIcon svg {
+  width: 2.8rem;
+  height: 2.8rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.pricingCard h3 {
+  max-width: 17rem;
+  margin: 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: 1.68rem;
+  font-weight: 690;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.pricingCard header div > strong {
+  margin-top: 0.75rem;
+  display: block;
+  color: var(--wy-marketing-brand);
+  font-size: 1.72rem;
+  font-weight: 730;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.pricingBadge {
+  padding: 0.55rem 0.85rem;
+  position: absolute;
+  top: 1.3rem;
+  right: 1.3rem;
+  border-radius: 0.55rem;
+  background: var(--wy-marketing-brand-soft);
+  color: var(--wy-marketing-brand);
+  font-size: 0.75rem;
+  font-weight: 720;
+}
+
+.pricingCard > ul {
+  margin: 0;
+  padding: 2rem 2.2rem 1rem;
+  display: grid;
+  gap: 1.03rem;
+  list-style: none;
+}
+
+.pricingCard > ul li {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1.55rem minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  color: var(--wy-marketing-text-primary);
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.pricingCard > ul li > span {
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 2px solid var(--wy-marketing-brand);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-brand);
+  font-size: 0.7rem;
+  font-weight: 760;
+}
+
+.pricingCard > a {
+  min-height: 4rem;
+  margin: auto 1.75rem 1.9rem;
+  border: 1px solid var(--wy-marketing-brand);
+  border-radius: 0.55rem;
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-brand);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pricingCardFeatured > a {
+  background: var(--wy-marketing-brand);
+  color: white;
+}
+
+.pricingCard > a:hover {
+  background: var(--wy-marketing-brand-soft);
+}
+
+.pricingCardFeatured > a:hover {
+  background: var(--wy-marketing-brand-hover);
+}
+
+.pricingCard > a:focus-visible {
+  outline: 3px solid #8bc6a7;
+  outline-offset: 3px;
+}
+
+.pricingAssurances {
+  width: 52rem;
+  min-height: 3rem;
+  margin: 1.9rem auto 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+}
+
+.pricingAssurances li {
+  min-width: 0;
+  padding-inline: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.pricingAssurances li + li {
+  border-left: 1px solid #cbd5df;
+}
+
+.pricingAssurances svg {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  color: var(--wy-marketing-brand);
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+@media (max-width: 64rem) {
+  .pricingSection,
+  .pricingInner {
+    min-height: 0;
+  }
+
+  .pricingInner {
+    padding: 5.5rem 0;
+  }
+
+  .pricingHeading {
+    padding-inline: 2rem;
+  }
+
+  .pricingHeading h2 {
+    max-width: 15ch;
+  }
+
+  .pricingCards {
+    width: calc(100% - 4rem);
+    height: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    transform: none;
+  }
+
+  .pricingCard {
+    min-height: 35rem;
+  }
+
+  .pricingCard > header {
+    padding-inline: 1.5rem;
+    grid-template-columns: 3.8rem minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .pricingCardIcon {
+    width: 3.8rem;
+    height: 3.8rem;
+  }
+
+  .pricingCard h3 {
+    font-size: 1.4rem;
+  }
+
+  .pricingCard header div > strong {
+    font-size: 1.4rem;
+  }
+
+  .pricingAssurances {
+    width: calc(100% - 4rem);
+  }
+}
+
+@media (max-width: 48rem) {
+  .pricingCards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pricingCard {
+    min-height: 33.875rem;
+  }
+
+  .pricingAssurances {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pricingAssurances li {
+    min-height: 4.25rem;
+  }
+
+  .pricingAssurances li + li {
+    border-top: 1px solid #cbd5df;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 40rem) {
+  .pricingInner {
+    padding: 4rem 0;
+  }
+
+  .pricingHeading {
+    padding-inline: 1rem;
+  }
+
+  .pricingHeading .eyebrow {
+    padding: 0.6rem 1rem;
+    font-size: 0.72rem;
+  }
+
+  .pricingHeading h2 {
+    margin-top: 1.5rem;
+    font-size: 2.55rem;
+  }
+
+  .pricingHeading > p:last-child {
+    font-size: 1rem;
+  }
+
+  .pricingCards,
+  .pricingAssurances {
+    width: calc(100% - 2rem);
+  }
+
+  .pricingCards {
+    margin-top: 2rem;
+    gap: 1rem;
+  }
+
+  .pricingCard > header {
+    min-height: 9.8rem;
+    padding: 1.5rem 1.25rem;
+  }
+
+  .pricingBadge {
+    top: 0.85rem;
+    right: 0.85rem;
+  }
+
+  .pricingCard > ul {
+    padding-inline: 1.4rem;
+  }
+
+  .pricingCard > a {
+    margin-inline: 1.25rem;
+  }
+}
+
+@media (forced-colors: active) {
+  .pricingCard,
+  .pricingCardIcon,
+  .pricingCard > a {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Landing desktop V7 · FAQ i panel pomocy
+ * Natywna referencja: 06-faq.png, 1672 × 941 px.
+ * Geometria panelu jest zachowana, ale kanały kontaktu, SLA i oceny z obrazu
+ * zastępują istniejące strony produktu oraz zweryfikowane zasady MVP.
+ */
+.faqSection {
+  min-height: 58.8125rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 19%, rgb(210 231 252 / 13%), transparent 32rem),
+    radial-gradient(circle at 88% 20%, rgb(205 227 251 / 12%), transparent 31rem),
+    var(--wy-marketing-background);
+  color: var(--wy-marketing-text-primary);
+}
+
+.faqInner {
+  width: 93.625rem;
+  min-height: 58.8125rem;
+  margin: 0 auto;
+  padding-top: 5.5rem;
+  display: grid;
+  grid-template-columns: 55.0625rem 31.625rem;
+  align-items: start;
+  gap: 6.9375rem;
+}
+
+.faqMain {
+  min-width: 0;
+}
+
+.faqHeading .eyebrow {
+  width: max-content;
+  min-height: 2.5rem;
+  margin: 0;
+  padding: 0.7rem 1.25rem;
+  border-radius: 999px;
+  background: #e5f3e9;
+  color: var(--wy-marketing-brand);
+  font-size: 0.86rem;
+  font-weight: 760;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+}
+
+.faqHeading h2 {
+  max-width: 10.5em;
+  margin: 1.9rem 0 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: 4rem;
+  font-weight: 690;
+  letter-spacing: -0.055em;
+  line-height: 1.17;
+}
+
+.faqHeading > p:last-child {
+  max-width: 53rem;
+  margin: 0.9rem 0 0;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1.22rem;
+  line-height: 1.55;
+}
+
+.faqAccordion {
+  margin-top: 2.1rem;
+  border: 1px solid #d5dde7;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: rgb(255 255 255 / 74%);
+  box-shadow: 0 1rem 3rem rgb(37 64 91 / 4%);
+}
+
+.faqItem + .faqItem {
+  border-top: 1px solid #d5dde7;
+}
+
+.faqItem summary {
+  min-height: 5.18rem;
+  padding: 0 2rem 0 1.15rem;
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr) 1.5rem;
+  align-items: center;
+  gap: 1.25rem;
+  color: var(--wy-marketing-text-primary);
+  cursor: pointer;
+  font-size: 1.18rem;
+  font-weight: 650;
+  line-height: 1.35;
+  list-style: none;
+}
+
+.faqItem summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem summary:hover {
+  background: rgb(235 247 239 / 52%);
+}
+
+.faqItem summary:focus-visible {
+  outline: 3px solid #8bc6a7;
+  outline-offset: -4px;
+}
+
+.faqItemIcon {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 0.8rem;
+  display: grid;
+  place-items: center;
+  background: #eaf5ed;
+  color: var(--wy-marketing-brand);
+}
+
+.faqItemIcon svg {
+  width: 2.15rem;
+  height: 2.15rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.faqToggle {
+  width: 1.25rem;
+  height: 1.25rem;
+  position: relative;
+}
+
+.faqToggle::before,
+.faqToggle::after {
+  width: 0.9rem;
+  height: 2px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: var(--wy-marketing-text-secondary);
+  content: "";
+  transform: translate(-50%, -50%);
+  transition: transform 160ms ease;
+}
+
+.faqToggle::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.faqItem[open] .faqToggle::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.faqItem > p {
+  margin: -0.35rem 4.75rem 1.35rem 5.65rem;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.faqSupport {
+  height: 44.75rem;
+  margin-top: 3.58rem;
+  padding: 2.15rem 2.5rem 2rem;
+  border: 1px solid #e2e8ef;
+  border-radius: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 1rem 3rem rgb(37 64 91 / 9%);
+}
+
+.faqSupportIcon {
+  width: 4.1rem;
+  height: 4.1rem;
+  border-radius: 0.9rem;
+  display: grid;
+  place-items: center;
+  background: #e9f5ec;
+  color: var(--wy-marketing-brand);
+}
+
+.faqSupportIcon svg {
+  width: 2.55rem;
+  height: 2.55rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.faqSupport h3 {
+  margin: 1.35rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 690;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.faqSupportIntro {
+  margin: 0.75rem 0 0;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.faqSupportLinks {
+  margin-top: 1.35rem;
+  display: grid;
+}
+
+.faqSupportLinks > a {
+  min-height: 4.85rem;
+  border-radius: 0.75rem;
+  display: grid;
+  grid-template-columns: 2.85rem minmax(0, 1fr) 1rem;
+  align-items: center;
+  gap: 1.15rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.faqSupportLinks > a:hover {
+  background: rgb(235 247 239 / 62%);
+}
+
+.faqSupportLinks > a:focus-visible,
+.faqSupportAction:focus-visible {
+  outline: 3px solid #8bc6a7;
+  outline-offset: 3px;
+}
+
+.faqSupportLinkIcon {
+  width: 2.85rem;
+  height: 2.85rem;
+  border-radius: 0.7rem;
+  display: grid;
+  place-items: center;
+  background: #e9f5ec;
+  color: var(--wy-marketing-brand);
+}
+
+.faqSupportLinkIcon svg {
+  width: 1.85rem;
+  height: 1.85rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.faqSupportLinks strong,
+.faqSupportLinks small {
+  display: block;
+}
+
+.faqSupportLinks strong {
+  font-size: 1rem;
+  font-weight: 680;
+  line-height: 1.25;
+}
+
+.faqSupportLinks small {
+  margin-top: 0.25rem;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+
+.faqSupportArrow {
+  color: #0d6e45;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.faqSupportFacts {
+  min-height: 8.35rem;
+  margin-top: 0.55rem;
+  padding-top: 1.8rem;
+  border-top: 1px solid #d8e0e8;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.faqSupportFacts > div {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.faqSupportFacts strong {
+  width: 3.35rem;
+  height: 3.35rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #e9f5ec;
+  color: var(--wy-marketing-brand);
+  font-size: 0.8rem;
+  font-weight: 760;
+  letter-spacing: 0.02em;
+}
+
+.faqSupportFacts b {
+  margin-top: 0.65rem;
+  font-size: 0.77rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.faqSupportFacts span {
+  margin-top: 0.3rem;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+
+.faqSupportAction {
+  min-height: 3.1rem;
+  margin-top: auto;
+  border: 1px solid var(--wy-marketing-brand);
+  border-radius: 0.55rem;
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-brand);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.faqSupportAction:hover {
+  background: var(--wy-marketing-brand-soft);
+}
+
+@media (max-width: 96rem) {
+  .faqInner {
+    width: calc(100% - 6rem);
+    grid-template-columns: minmax(0, 1.7fr) minmax(24rem, 1fr);
+    gap: 4rem;
+  }
+}
+
+@media (max-width: 64rem) {
+  .faqSection,
+  .faqInner {
+    min-height: 0;
+  }
+
+  .faqInner {
+    width: calc(100% - 4rem);
+    padding: 5.5rem 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+
+  .faqHeading h2 {
+    max-width: 14ch;
+  }
+
+  .faqSupport {
+    width: 100%;
+    height: auto;
+    min-height: 42rem;
+    margin: 0;
+  }
+}
+
+@media (max-width: 40rem) {
+  .faqInner {
+    width: calc(100% - 2rem);
+    padding: 4rem 0;
+  }
+
+  .faqHeading .eyebrow {
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+  }
+
+  .faqHeading h2 {
+    margin-top: 1.5rem;
+    font-size: 2.55rem;
+  }
+
+  .faqHeading > p:last-child {
+    font-size: 1rem;
+  }
+
+  .faqItem summary {
+    min-height: 5.5rem;
+    padding: 0.8rem 1rem;
+    grid-template-columns: 2.8rem minmax(0, 1fr) 1.25rem;
+    gap: 0.8rem;
+    font-size: 1rem;
+  }
+
+  .faqItemIcon {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+
+  .faqItem > p {
+    margin: 0 1rem 1.25rem 4.6rem;
+    font-size: 0.93rem;
+  }
+
+  .faqSupport {
+    min-height: 0;
+    padding: 1.5rem;
+  }
+
+  .faqSupportFacts {
+    min-height: 9.5rem;
+  }
+
+  .faqSupportAction {
+    margin-top: 1.75rem;
+  }
+}
+
+@media (forced-colors: active) {
+  .faqAccordion,
+  .faqSupport,
+  .faqItemIcon,
+  .faqSupportIcon,
+  .faqSupportLinkIcon,
+  .faqSupportFacts strong,
+  .faqSupportAction {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Landing desktop V7 · finalne CTA
+ * Natywna referencja: 07-final-cta.png, 1672 × 941 px.
+ * Geometria KPI pozostaje, ale wzrosty i procenty zastępują fakty produktu:
+ * pięć grup danych, cztery kanały i jawnie demonstracyjny score 87/100.
+ */
+.finalCtaSection {
+  min-height: 58.8125rem;
+  padding: 5rem 4rem 5.25rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 8% 15%, rgb(210 231 252 / 13%), transparent 30rem),
+    radial-gradient(circle at 91% 18%, rgb(208 230 251 / 12%), transparent 31rem),
+    var(--wy-marketing-background);
+  color: var(--wy-marketing-text-primary);
+}
+
+.finalCtaPanel {
+  width: 100%;
+  max-width: 96.5rem;
+  height: 48.5625rem;
+  margin: 0 auto;
+  position: relative;
+  border: 1px solid #e0e7ed;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: rgb(255 255 255 / 91%);
+  box-shadow: 0 1.25rem 3.4rem rgb(37 64 91 / 7%);
+}
+
+.finalCtaPanel::before,
+.finalCtaPanel::after {
+  width: 52rem;
+  height: 52rem;
+  position: absolute;
+  border: 2px solid rgb(44 160 90 / 9%);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.finalCtaPanel::before {
+  top: -15rem;
+  left: 10rem;
+}
+
+.finalCtaPanel::after {
+  top: -20rem;
+  left: 50rem;
+}
+
+.finalCtaBrand {
+  position: absolute;
+  z-index: 1;
+  top: 2.95rem;
+  left: 3.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.finalCtaBrand > img {
+  width: 1.85rem;
+  height: 1.85rem;
+  display: block;
+}
+
+.finalCtaBrand strong {
+  font-weight: 720;
+  letter-spacing: -0.035em;
+}
+
+.finalCtaCopy {
+  width: 35.5rem;
+  position: absolute;
+  z-index: 1;
+  top: 8.55rem;
+  left: 3.2rem;
+}
+
+.finalCtaCopy .eyebrow {
+  width: max-content;
+  min-height: 2rem;
+  margin: 0;
+  padding: 0.52rem 1rem;
+  border-radius: 999px;
+  background: #e6f4e9;
+  color: var(--wy-marketing-brand);
+  font-size: 0.8rem;
+  font-weight: 760;
+  letter-spacing: 0.09em;
+  line-height: 1.2;
+}
+
+.finalCtaCopy h2 {
+  max-width: 8.9em;
+  margin: 2.05rem 0 0;
+  color: var(--wy-marketing-text-primary);
+  font-size: 3.75rem;
+  font-weight: 690;
+  letter-spacing: -0.055em;
+  line-height: 1.08;
+}
+
+.finalCtaCopy > p:last-of-type {
+  max-width: 35rem;
+  margin: 2rem 0 0;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 1.22rem;
+  line-height: 1.55;
+}
+
+.finalCtaActions {
+  margin-top: 2.65rem;
+  display: grid;
+  grid-template-columns: 14rem 15.75rem;
+  gap: 1.4rem;
+}
+
+.finalCtaActions a {
+  min-height: 4.25rem;
+  border: 1px solid var(--wy-marketing-brand);
+  border-radius: 0.55rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  color: var(--wy-marketing-brand);
+  font-size: 1.08rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.finalCtaActions a:first-child {
+  background: var(--wy-marketing-brand);
+  color: white;
+}
+
+.finalCtaActions a:hover {
+  background: var(--wy-marketing-brand-soft);
+}
+
+.finalCtaActions a:first-child:hover {
+  background: var(--wy-marketing-brand-hover);
+}
+
+.finalCtaActions a:focus-visible {
+  outline: 3px solid #8bc6a7;
+  outline-offset: 3px;
+}
+
+.finalCtaPlay {
+  width: 1.65rem;
+  height: 1.65rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.65rem;
+  line-height: 1;
+}
+
+.finalProof {
+  width: 42.125rem;
+  position: absolute;
+  z-index: 1;
+  top: 6.7rem;
+  left: 50.1rem;
+  display: grid;
+  grid-template-columns: 20.25rem 20.625rem;
+  grid-template-rows: 17.5rem 16.625rem;
+  gap: 1.25rem;
+}
+
+.finalSnapshotCard,
+.finalScoreCard {
+  min-width: 0;
+  border: 1px solid #e3e8ed;
+  border-radius: 1.1rem;
+  background: rgb(255 255 255 / 95%);
+  box-shadow: 0 1rem 2.6rem rgb(37 64 91 / 8%);
+}
+
+.finalSnapshotCard {
+  padding: 1.85rem 1.6rem 1.45rem;
+}
+
+.finalSnapshotCard h3,
+.finalScoreCard h3 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 680;
+  line-height: 1.3;
+}
+
+.finalSnapshotCard > p {
+  margin: 1.25rem 0 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+}
+
+.finalSnapshotCard > p strong {
+  font-size: 2.75rem;
+  font-weight: 720;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.finalSnapshotCard > p span {
+  color: var(--wy-marketing-brand);
+  font-size: 1rem;
+  font-weight: 720;
+}
+
+.finalSignalLine {
+  height: 5.5rem;
+  margin-top: 1rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.finalSignalLine::before {
+  height: 2px;
+  position: absolute;
+  right: 0.3rem;
+  left: 0.3rem;
+  background: #a6d8b8;
+  content: "";
+}
+
+.finalSignalLine span {
+  width: 0.72rem;
+  height: 0.72rem;
+  position: relative;
+  z-index: 1;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: #55b974;
+  box-shadow: 0 0 0 1px #55b974;
+}
+
+.finalSnapshotCard > small {
+  margin-top: 1rem;
+  display: block;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.finalScoreCard {
+  padding: 1.75rem 1.6rem 1.4rem;
+  grid-column: 1 / -1;
+}
+
+.finalScoreBody {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 8.6rem;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.finalScoreBody ul {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  list-style: none;
+}
+
+.finalScoreBody li {
+  min-height: 2.45rem;
+  display: grid;
+  grid-template-columns: 1.7rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.finalReasonIcon {
+  width: 1.45rem;
+  height: 1.45rem;
+  border: 1.5px solid var(--wy-marketing-brand);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-brand);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.finalScoreBody li strong {
+  font-size: 0.83rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.finalScoreBody li small {
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.finalScoreResult {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.finalScoreResult strong {
+  width: 5.3rem;
+  height: 5.3rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(#52b96f 0 87%, #e5ebed 87% 100%);
+  font-size: 1.6rem;
+  font-weight: 720;
+  line-height: 1;
+}
+
+.finalScoreResult strong > span {
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: white;
+}
+
+.finalScoreResult > span {
+  max-width: 8.5rem;
+  margin-top: 0.65rem;
+  color: var(--wy-marketing-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+.finalCtaFacts {
+  width: max-content;
+  max-width: 35rem;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  z-index: 1;
+  top: 43.125rem;
+  left: 3.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  list-style: none;
+}
+
+.finalCtaFacts li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.finalCtaFacts li > span {
+  width: 1.3rem;
+  height: 1.3rem;
+  border: 1.5px solid var(--wy-marketing-brand);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--wy-marketing-brand);
+  font-size: 0.64rem;
+  font-weight: 800;
+}
+
+@media (max-width: 96rem) {
+  .finalCtaSection {
+    padding-inline: 2rem;
+  }
+
+  .finalCtaCopy {
+    width: 40%;
+    left: 3rem;
+  }
+
+  .finalCtaCopy h2 {
+    font-size: 3.25rem;
+  }
+
+  .finalProof {
+    width: 46%;
+    right: 3rem;
+    left: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .finalCtaFacts {
+    left: 3rem;
+    column-gap: 1.2rem;
+  }
+}
+
+@media (max-width: 64rem) {
+  .finalCtaSection {
+    min-height: 0;
+    padding: 4rem 2rem;
+  }
+
+  .finalCtaPanel {
+    height: auto;
+    padding: 2.5rem;
+    display: grid;
+    gap: 2.75rem;
+  }
+
+  .finalCtaBrand,
+  .finalCtaCopy,
+  .finalProof,
+  .finalCtaFacts {
+    width: 100%;
+    position: relative;
+    inset: auto;
+  }
+
+  .finalCtaCopy h2 {
+    max-width: 11ch;
+    font-size: 3.6rem;
+  }
+
+  .finalCtaCopy > p:last-of-type {
+    max-width: 40rem;
+  }
+
+  .finalProof {
+    grid-template-rows: 17.5rem 16.625rem;
+  }
+
+  .finalCtaFacts {
+    max-width: none;
+    gap: 1rem 1.5rem;
+  }
+}
+
+@media (max-width: 48rem) {
+  .finalCtaPanel {
+    padding: 2rem;
+  }
+
+  .finalCtaActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .finalProof {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(2, 17rem) auto;
+  }
+
+  .finalScoreCard {
+    grid-column: auto;
+  }
+
+  .finalCtaFacts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 40rem) {
+  .finalCtaSection {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .finalCtaPanel {
+    min-width: 0;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    gap: 2rem;
+  }
+
+  .finalCtaBrand,
+  .finalCtaCopy,
+  .finalProof,
+  .finalCtaFacts {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .finalCtaBrand {
+    gap: 0.6rem;
+    font-size: 1.25rem;
+  }
+
+  .finalCtaBrand > img {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .finalCtaCopy .eyebrow {
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.55rem 0.8rem;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  .finalCtaCopy h2 {
+    margin-top: 1.5rem;
+    font-size: clamp(2.2rem, 10.5vw, 2.55rem);
+  }
+
+  .finalCtaCopy > p:last-of-type {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .finalCtaActions {
+    width: 100%;
+    margin-top: 1.75rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+  }
+
+  .finalCtaActions a {
+    width: 100%;
+    min-width: 0;
+    min-height: 3.75rem;
+    padding-inline: 1rem;
+  }
+
+  .finalProof {
+    gap: 1rem;
+  }
+
+  .finalSnapshotCard,
+  .finalScoreCard {
+    min-width: 0;
+  }
+
+  .finalSnapshotCard {
+    padding-inline: 1.35rem;
+  }
+
+  .finalScoreCard {
+    padding-inline: 1.35rem;
+  }
+
+  .finalScoreBody {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .finalScoreBody li {
+    grid-template-columns: 1.7rem minmax(0, 1fr);
+  }
+
+  .finalScoreBody li small {
+    grid-column: 2;
+  }
+
+  .finalScoreResult {
+    margin-top: 1rem;
+  }
+
+  .finalCtaFacts {
+    gap: 0.85rem;
+  }
+
+  .finalCtaFacts li {
+    min-width: 0;
+    white-space: normal;
+  }
+}
+
+@media (forced-colors: active) {
+  .finalCtaPanel,
+  .finalSnapshotCard,
+  .finalScoreCard,
+  .finalCtaActions a,
+  .finalReasonIcon,
+  .finalScoreResult strong,
+  .finalCtaFacts li > span {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Landing mobile V1 · M1 — header/hero transformation.
+ * Content remains V7; this block fixes real mobile geometry instead of
+ * allowing the desktop min-content width to be hidden by the hero crop.
+ */
+@media (max-width: 40rem) {
+  .heroGrid {
+    width: calc(100% - 2rem);
+    min-width: 0;
+    padding-block: 2.5rem 1.25rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .heroCopy {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .heroCopy .eyebrow {
+    max-width: 100%;
+    margin-bottom: 1.45rem;
+    padding: 0.55rem 0.85rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.15;
+    white-space: normal;
+  }
+
+  .heroCopy h1 {
+    width: 100%;
+    max-width: 100%;
+    font-size: clamp(2.2rem, 10.8vw, 2.7rem);
+    letter-spacing: -0.048em;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  .heroCopy h1 strong,
+  .heroCopy h1 span:first-of-type {
+    white-space: normal;
+  }
+
+  .heroDescription {
+    max-width: 34rem;
+    margin-top: 1.4rem;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+    line-height: 1.55;
+  }
+
+  .heroActions {
+    min-width: 0;
+    margin-top: 1.75rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .primaryAction,
+  .secondaryAction {
+    width: auto;
+    min-width: 0;
+    min-height: 3.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+
+  .heroFacts {
+    width: 100%;
+    min-width: 0;
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .heroFacts li {
+    min-width: 0;
+    display: grid;
+    grid-template-rows: 1.5rem auto;
+    justify-items: center;
+    align-content: start;
+    gap: 0.45rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .heroFacts li > span {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .heroFacts svg {
+    width: 0.82rem;
+    height: 0.82rem;
+  }
+
+  .productScene {
+    width: 100%;
+    max-width: 100%;
+    height: 27rem;
+    min-width: 0;
+    margin: 1.75rem 0 0;
+    overflow: hidden;
+  }
+
+  .productDashboard {
+    width: 43rem;
+    height: 38rem;
+    top: 0.5rem;
+    right: auto;
+    bottom: auto;
+    left: 2.6rem;
+    transform: scale(0.65);
+    transform-origin: left top;
+  }
+
+  .processPhone {
+    top: 4.5rem;
+    left: -0.1rem;
+    transform: scale(0.72);
+    transform-origin: left top;
+  }
+
+  .heroSignalRail {
+    min-width: 0;
+    padding: 1.5rem 1rem 1.75rem;
+    gap: 1rem;
+  }
+
+  .heroSignalRail > p {
+    font-size: 0.8rem;
+    font-weight: 650;
+  }
+
+  .heroSignalRail ul {
+    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem 0.5rem;
+  }
+
+  .heroSignalRail li {
+    min-width: 0;
+    min-height: 2.75rem;
+    padding: 0.35rem;
+    gap: 0.45rem;
+    justify-content: flex-start;
+    font-size: 0.75rem;
+    line-height: 1.25;
+    white-space: normal;
+  }
+
+  .heroSignalRail li > span {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex: 0 0 auto;
+    border-width: 0.2rem;
+  }
+}
+
+/* Landing mobile V1 · M2 — trzy kroki jako jedna zwarta sekwencja.
+ * Desktop V7 i tablet pozostają bez zmian. Mobile łączy numer i ikonę w
+ * jednym wierszu, skraca puste pola kart i zachowuje czytelny pionowy kierunek.
+ */
+@media (max-width: 40rem) {
+  .flowSection {
+    min-height: 0;
+  }
+
+  .flowSection::before,
+  .flowSection::after {
+    inset: 14.5rem 0 1.5rem;
+    border-radius: 0 0 2rem 2rem;
+  }
+
+  .processSectionInner {
+    min-width: 0;
+    min-height: 0;
+    padding: 3.5rem 0 3.75rem;
+  }
+
+  .processHeading {
+    width: calc(100% - 2rem);
+    max-width: 32rem;
+    margin-inline: auto;
+    padding-inline: 0;
+  }
+
+  .processHeading .eyebrow {
+    margin-bottom: 1.35rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.085em;
+  }
+
+  .processHeading h2 {
+    max-width: 9.5em;
+    margin-inline: auto;
+    font-size: clamp(2.15rem, 10.25vw, 2.5rem);
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .processCards {
+    width: calc(100% - 2rem);
+    min-width: 0;
+    max-width: 32rem;
+    margin-top: 2.5rem;
+    gap: 3rem;
+  }
+
+  .processCards > li {
+    min-width: 0;
+  }
+
+  .processCard {
+    min-width: 0;
+    min-height: 0;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    grid-template-areas:
+      "number icon"
+      "heading heading"
+      "copy copy";
+    align-items: center;
+    box-shadow: 0 0.9rem 2.2rem rgb(31 58 91 / 6%);
+  }
+
+  .processNumber {
+    width: 2.35rem;
+    height: 2.35rem;
+    grid-area: number;
+    font-size: 0.78rem;
+  }
+
+  .processIcon {
+    width: 4rem;
+    height: 4rem;
+    margin: 0;
+    grid-area: icon;
+    justify-self: end;
+    border-radius: 0.75rem;
+  }
+
+  .processIcon svg {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+
+  .processCard h3 {
+    margin: 1.25rem 0 0;
+    grid-area: heading;
+    font-size: 1.125rem;
+    line-height: 1.3;
+  }
+
+  .processCard p {
+    max-width: none;
+    margin: 0.75rem 0 0;
+    grid-area: copy;
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .processConnector {
+    width: 3rem;
+    height: 3rem;
+    right: 50%;
+    bottom: -3rem;
+    font-size: 1.55rem;
+    box-shadow: 0 0.6rem 1.5rem rgb(42 66 91 / 6%);
+  }
+}
+
+/* Landing mobile V1 · M3 — cztery grupy danych jako porównywalna siatka 2 × 2.
+ * Każda karta ma tę samą skalę, a wartość, galeria i score zachowują własną
+ * hierarchię bez powiększania sekcji do czterech desktopowych ekranów.
+ */
+@media (max-width: 40rem) {
+  .keyInformationSection {
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .keyInformationInner {
+    min-height: 0;
+    padding: 3.5rem 0;
+  }
+
+  .keyInformationHeading {
+    width: calc(100% - 2rem);
+    max-width: 32rem;
+    margin-inline: auto;
+    padding-inline: 0;
+  }
+
+  .keyInformationHeading .eyebrow {
+    padding: 0.58rem 0.9rem 0.54rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.075em;
+  }
+
+  .keyInformationHeading h2 {
+    max-width: 9.5em;
+    margin: 1.35rem auto 0;
+    font-size: clamp(2.15rem, 10.25vw, 2.5rem);
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .keyInformationHeading > p:last-child {
+    max-width: 25rem;
+    margin: 1.25rem auto 0;
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .keyInformationHeading > p:last-child span {
+    margin-top: 0.25rem;
+  }
+
+  .keyInformationCards {
+    width: calc(100% - 2rem);
+    max-width: 32rem;
+    margin: 2.5rem auto 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    gap: 0.75rem;
+  }
+
+  .keyInformationCard {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 16.25rem;
+    padding: 1.125rem 0.75rem;
+    border-radius: 1rem;
+    box-shadow: 0 0.9rem 2.2rem rgb(31 58 91 / 6%);
+  }
+
+  .keyInformationIcon {
+    width: 3.5rem;
+    height: 3.5rem;
+    flex: 0 0 auto;
+    border-radius: 0.75rem;
+  }
+
+  .keyInformationIcon svg {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .keyInformationCard h3 {
+    min-height: 2.5rem;
+    margin: 0.875rem 0 0;
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  .keyInformationValue {
+    width: auto;
+    max-width: 100%;
+    margin: 0.875rem 0 0;
+    padding: 0.45rem 0.6rem;
+    font-size: 1rem;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  .keyInformationFiles {
+    padding-inline: 0.75rem;
+  }
+
+  .keyInformationThumbnails {
+    width: min(100%, 7.5rem);
+    margin-top: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+
+  .planThumbnail,
+  .photoThumbnail,
+  .moreThumbnail {
+    height: 2.75rem;
+    border-radius: 0.5rem;
+  }
+
+  .moreThumbnail {
+    font-size: 0.9rem;
+  }
+
+  .keyInformationScore {
+    padding-top: 1.125rem;
+  }
+
+  .keyInformationScore h3 {
+    margin-top: 0.875rem;
+  }
+
+  .keyScore {
+    width: 4rem;
+    height: 4rem;
+    margin-top: 0.5rem;
+    flex: 0 0 auto;
+    font-size: 1.5rem;
+  }
+
+  .keyInformationScore .keyInformationValue {
+    margin-top: 0.45rem;
+    padding-block: 0.4rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 22rem) {
+  .heroGrid {
+    width: calc(100% - 1.5rem);
+  }
+
+  .heroCopy .eyebrow {
+    padding-inline: 0.7rem;
+    letter-spacing: 0.06em;
+  }
+
+  .heroFacts {
+    gap: 0.25rem;
+  }
+
+  .productDashboard {
+    left: 2.1rem;
+    transform: scale(0.58);
+  }
+
+  .processPhone {
+    transform: scale(0.66);
+  }
+
+  .processHeading,
+  .processCards {
+    width: calc(100% - 1.5rem);
+  }
+
+  .processCard {
+    padding: 1.25rem;
+  }
+
+  .keyInformationHeading,
+  .keyInformationCards {
+    width: calc(100% - 1.5rem);
+  }
+
+  .keyInformationCard {
+    min-height: 16.75rem;
+    padding-inline: 0.625rem;
+  }
+}
+
+@media (max-width: 17.5rem) {
+  .keyInformationCards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

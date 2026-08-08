@@ -77,7 +77,7 @@ final class Embed
             )
         ) {
             return '<p class="wyceno-connector-error" role="status">'
-                . esc_html__('Ten proces Lorum jest obecnie niedostępny.', 'wyceno-connector')
+                . esc_html__('Ten proces Kwotum jest obecnie niedostępny.', 'wyceno-connector')
                 . '</p>';
         }
         try {
@@ -90,7 +90,7 @@ final class Embed
             );
         } catch (\RuntimeException) {
             return '<p class="wyceno-connector-error" role="status">'
-                . esc_html__('Integracja Lorum wymaga konfiguracji.', 'wyceno-connector')
+                . esc_html__('Integracja Kwotum wymaga konfiguracji.', 'wyceno-connector')
                 . '</p>';
         }
         return sprintf(

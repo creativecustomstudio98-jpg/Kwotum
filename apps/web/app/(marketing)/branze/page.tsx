@@ -3,6 +3,7 @@ import Link from "next/link";
 import { industries } from "../../../lib/marketing/content";
 import { marketingMetadata } from "../../../lib/marketing/metadata";
 import { ArrowIcon, Breadcrumbs, CtaBand } from "../components";
+import { IndustriesHeroProof } from "./industries-hero-proof";
 
 export const metadata = marketingMetadata(
   "Formularze wyceny dla pięciu branż usługowych",
@@ -13,27 +14,24 @@ export const metadata = marketingMetadata(
 export default function IndustriesPage() {
   return (
     <>
-      <div className="marketing-container marketing-page-hero">
-        <Breadcrumbs items={[{ href: "/", label: "Start" }, { label: "Branże" }]} />
-        <div className="marketing-page-hero__grid">
-          <div className="marketing-page-hero__copy">
-            <p className="wy-kicker marketing-eyebrow">Branże</p>
-            <h1>Wspólny mechanizm, pytania wynikające z usługi.</h1>
+      <section aria-labelledby="industries-hero-title" className="industries-page-hero">
+        <div className="marketing-container industries-page-hero__inner">
+          <Breadcrumbs items={[{ href: "/", label: "Start" }, { label: "Branże" }]} />
+          <header className="industries-page-hero__heading">
+            <p className="wy-kicker marketing-eyebrow">Procesy dopasowane do branży</p>
+            <h1 id="industries-hero-title">
+              <span>Meble to nie remont.</span>
+              <span>Brief też nie powinien być ten sam.</span>
+            </h1>
             <p>
-              Każda strona pokazuje specyficzny problem, zestaw pytań, syntetyczny przykład briefu i
-              granice orientacyjnego wyniku.
+              Wybierz branżę i porównaj pytania z gotowym leadem. Kwotum zachowuje wspólny mechanizm
+              publikacji i kwalifikacji, ale dopasowuje zakres briefu do konkretnej usługi.
             </p>
-          </div>
-          <aside className="marketing-page-hero__aside">
-            <strong>Treści demonstracyjne</strong>
-            <span>
-              Szablony wymagają walidacji w rozmowach z firmami przed publicznym uznaniem ich za
-              rekomendowany standard.
-            </span>
-          </aside>
+          </header>
+          <IndustriesHeroProof />
         </div>
-      </div>
-      <section className="marketing-section marketing-section--surface">
+      </section>
+      <section className="marketing-section marketing-section--surface" id="zastosowania">
         <div className="marketing-container editorial-index">
           {industries.map((industry, index) => (
             <Link href={`/branze/${industry.slug}`} key={industry.slug}>

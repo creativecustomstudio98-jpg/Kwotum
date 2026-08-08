@@ -109,7 +109,7 @@ export function HeroTransformationProof() {
           <div className={styles.processScreen}>
             <div className={styles.processBrand}>
               <ProductMark />
-              <strong>Lorum</strong>
+              <strong>Kwotum</strong>
               <span>3 z 6</span>
             </div>
             <div className={styles.phoneProgress}>
@@ -223,7 +223,7 @@ export function ComparisonProof() {
       data-reveal-delay="2"
     >
       <figcaption className="wy-sr-only">
-        Porównanie typowego krótkiego zapytania z kompletnym leadem po przejściu procesu Lorum.
+        Porównanie typowego krótkiego zapytania z kompletnym leadem po przejściu procesu Kwotum.
       </figcaption>
 
       <article className={styles.comparisonBefore}>
@@ -255,7 +255,7 @@ export function ComparisonProof() {
 
       <article className={styles.comparisonAfter}>
         <header>
-          <strong>Lead po przejściu Lorum</strong>
+          <strong>Lead po przejściu Kwotum</strong>
         </header>
         <ul>
           {completeDetails.map((item) => (

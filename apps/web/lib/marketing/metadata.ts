@@ -11,7 +11,7 @@ export function marketingMetadata(title: string, description: string, path: stri
     openGraph: {
       description,
       locale: "pl_PL",
-      siteName: "Lorum",
+      siteName: "Kwotum",
       title,
       type: "website",
       url: path,

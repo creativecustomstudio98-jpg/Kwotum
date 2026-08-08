@@ -8,14 +8,14 @@ import { siteOrigin } from "../lib/marketing/metadata";
 
 export const metadata: Metadata = {
   description:
-    "Lorum porządkuje zapytania klientów, kwalifikuje leady i wskazuje następny krok sprzedażowy.",
+    "Kwotum porządkuje zapytania klientów, kwalifikuje leady i wskazuje następny krok sprzedażowy.",
   icons: {
     icon: [{ type: "image/svg+xml", url: "/Logoicon.svg" }],
   },
   metadataBase: new URL(siteOrigin),
   title: {
-    default: "Lorum",
-    template: "%s · Lorum",
+    default: "Kwotum",
+    template: "%s · Kwotum",
   },
   robots: {
     follow: true,

@@ -44,7 +44,7 @@
           {},
           el(
             PanelBody,
-            { title: "Ustawienia Lorum" },
+            { title: "Ustawienia Kwotum" },
             el(SelectControl, {
               label: "Proces",
               onChange: function (value) {
@@ -77,7 +77,7 @@
           ),
         ),
         error
-          ? el(Notice, { status: "error" }, "Nie udało się pobrać procesów Lorum.")
+          ? el(Notice, { status: "error" }, "Nie udało się pobrać procesów Kwotum.")
           : el(
               "div",
               {

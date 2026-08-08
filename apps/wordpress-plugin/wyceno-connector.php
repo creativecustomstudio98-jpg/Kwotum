@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: Lorum Connector
- * Description: Bezpiecznie osadza opublikowane procesy Lorum bez przechowywania leadów w WordPressie.
+ * Plugin Name: Kwotum Connector
+ * Description: Bezpiecznie osadza opublikowane procesy Kwotum bez przechowywania leadów w WordPressie.
  * Version: 1.0.0
  * Requires at least: 6.8
  * Requires PHP: 8.3
- * Author: Lorum
+ * Author: Kwotum
  * License: GPL-2.0-or-later
  * Text Domain: wyceno-connector
  */

@@ -64,7 +64,7 @@ export function HomeConversionJourney() {
             </div>
             <div className={styles.industryIntroCopy}>
               <p>
-                Każda branża zbiera inne informacje. Lorum nie zaczyna od pustego formularza —
+                Każda branża zbiera inne informacje. Kwotum nie zaczyna od pustego formularza —
                 dostajesz logiczny proces, który można dopasować do własnej oferty.
               </p>
             </div>
@@ -447,7 +447,7 @@ export function HomeConversionJourney() {
             >
               <figcaption className="wy-sr-only">
                 Zakres demonstracyjnego wdrożenia pilotażowego podzielony na cztery etapy oraz
-                odpowiedzialność firmy i Lorum.
+                odpowiedzialność firmy i Kwotum.
               </figcaption>
               <header>
                 <span>
@@ -474,7 +474,7 @@ export function HomeConversionJourney() {
                   </ul>
                 </article>
                 <article>
-                  <span>Lorum przygotowuje</span>
+                  <span>Kwotum przygotowuje</span>
                   <ul>
                     <li>strukturę pytań i warunki;</li>
                     <li>orientacyjny wynik i score;</li>

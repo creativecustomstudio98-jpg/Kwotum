@@ -376,6 +376,7 @@ export const indexedRoutes = [
   "/",
   "/produkt",
   "/jak-dziala",
+  "/integracje",
   "/cennik",
   "/dla-agencji",
   "/wordpress",

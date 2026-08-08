@@ -1,6 +1,6 @@
-# Lorum Connector
+# Kwotum Connector
 
-Cienka wtyczka WordPress osadza publiczny widget Lorum. Nie przechowuje
+Cienka wtyczka WordPress osadza publiczny widget Kwotum. Nie przechowuje
 leadów, odpowiedzi, plików, reguł ani snapshotów flow.
 
 ## Wymagania i instalacja
@@ -17,7 +17,7 @@ define('WYCENO_CONNECTOR_API_ORIGIN', 'https://zatwierdzony-origin-saas.example'
 
 W panelu SaaS Owner/Admin wskazuje dokładny origin strony i generuje
 jednorazowy token ważny 10 minut. Administrator WordPress wkleja token w
-`Ustawienia → Lorum`. Credential jest wymieniany serwer-serwer, szyfrowany
+`Ustawienia → Kwotum`. Credential jest wymieniany serwer-serwer, szyfrowany
 authenticated encryption i nigdy nie jest dodawany do HTML ani JavaScriptu.
 
 Shortcode:
@@ -27,7 +27,7 @@ Shortcode:
 ```
 
 Tryby: `inline`, `popup`, `fullscreen`. Ten sam kontrakt udostępnia blok
-Gutenberg „Lorum”.
+Gutenberg „Kwotum”.
 
 ## Macierz kompatybilności
 

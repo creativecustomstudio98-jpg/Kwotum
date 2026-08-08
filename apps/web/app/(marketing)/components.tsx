@@ -2,45 +2,52 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import type { FaqItem } from "../../lib/marketing/content";
+import { Brand } from "./marketing-header";
 
 export function MarketingFooter() {
   return (
     <footer className="marketing-footer">
-      <div className="marketing-container marketing-footer__grid">
-        <div className="marketing-footer__intro">
-          <Link className="marketing-brand marketing-brand--footer" href="/">
-            <span className="marketing-brand__name">Lorum</span>
-          </Link>
-          <p>Od chaotycznego zapytania do leada gotowego do sprzedaży.</p>
-          <p className="marketing-footer__legal">
-            Nazwa „Lorum” wymaga profesjonalnej weryfikacji przed publicznym startem.
-          </p>
+      <div className="marketing-container marketing-footer__shell" data-footer-layout>
+        <div className="marketing-footer__grid">
+          <div className="marketing-footer__intro">
+            <Brand className="marketing-brand--footer" withMark />
+            <p className="marketing-footer__tagline">
+              Od chaotycznego zapytania do uporządkowanego leada gotowego do działania.
+            </p>
+            <span className="marketing-footer__status">Produkt w fazie walidacji</span>
+            <p className="marketing-footer__legal">
+              Nazwa „Kwotum” wymaga profesjonalnej weryfikacji przed publicznym startem.
+            </p>
+          </div>
+          <nav aria-label="Produkt">
+            <strong>Produkt</strong>
+            <Link href="/produkt">Możliwości</Link>
+            <Link href="/jak-dziala">Jak działa</Link>
+            <Link href="/funkcje">Funkcje</Link>
+            <Link href="/cennik">Program pilotażowy</Link>
+          </nav>
+          <nav aria-label="Zastosowania">
+            <strong>Zastosowania</strong>
+            <Link href="/branze">Branże</Link>
+            <Link href="/dla-agencji">Agencje</Link>
+            <Link href="/wordpress">WordPress</Link>
+            <Link href="/funkcje/widget-na-strone">Widget na stronę</Link>
+          </nav>
+          <nav aria-label="Informacje">
+            <strong>Informacje</strong>
+            <Link href="/logowanie" prefetch={false}>
+              Logowanie
+            </Link>
+            <Link href="/jak-dziala#bezpieczenstwo">Bezpieczeństwo procesu</Link>
+            <Link href="/polityka-prywatnosci">Polityka prywatności</Link>
+            <Link href="/regulamin">Regulamin</Link>
+          </nav>
         </div>
-        <nav aria-label="Produkt">
-          <strong>Produkt</strong>
-          <Link href="/produkt">Możliwości</Link>
-          <Link href="/jak-dziala">Jak działa</Link>
-          <Link href="/funkcje">Funkcje</Link>
-          <Link href="/cennik">Program pilotażowy</Link>
-        </nav>
-        <nav aria-label="Zastosowania">
-          <strong>Zastosowania</strong>
-          <Link href="/branze">Branże</Link>
-          <Link href="/dla-agencji">Agencje</Link>
-          <Link href="/wordpress">WordPress</Link>
-          <Link href="/funkcje/widget-na-strone">Widget na stronę</Link>
-        </nav>
-        <nav aria-label="Dostęp">
-          <strong>Dostęp</strong>
-          <Link href="/logowanie" prefetch={false}>
-            Logowanie
-          </Link>
-          <Link href="/jak-dziala#bezpieczenstwo">Bezpieczeństwo procesu</Link>
-        </nav>
-      </div>
-      <div className="marketing-container marketing-footer__bottom">
-        <span>© 2026 Lorum · produkt w fazie walidacji</span>
-        <span>Polska wersja · wynik orientacyjny · prywatny panel</span>
+        <div className="marketing-footer__bottom">
+          <span>© 2026 Kwotum</span>
+          <span>Polska wersja · wynik orientacyjny · prywatny panel</span>
+          <Link href="#main-content">Wróć na górę ↑</Link>
+        </div>
       </div>
     </footer>
   );

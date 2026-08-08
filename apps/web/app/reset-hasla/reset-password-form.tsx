@@ -19,7 +19,7 @@ export function ResetPasswordForm() {
           <AuthIcon name="check" />
         </span>
         <h1 id="reset-title">Hasło zostało zmienione</h1>
-        <p>Możesz bezpiecznie zalogować się do Lorum nowym hasłem.</p>
+        <p>Możesz bezpiecznie zalogować się do Kwotum nowym hasłem.</p>
         <div className="auth-status__actions">
           <Link className="auth-primary" href="/logowanie">
             <span>Zaloguj się</span>

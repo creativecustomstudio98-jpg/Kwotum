@@ -1,80 +1,172 @@
 import Link from "next/link";
 
 import { marketingMetadata } from "../../../lib/marketing/metadata";
-import { Breadcrumbs, CtaBand } from "../components";
+import { Breadcrumbs } from "../components";
 
 export const metadata = marketingMetadata(
-  "Cennik — program pilotażowy Lorum",
-  "Model self-service nie został jeszcze zatwierdzony. Program pilotażowy Lorum jest wyceniany indywidualnie po ustaleniu zakresu wdrożenia.",
+  "Cennik — program pilotażowy Kwotum",
+  "Program pilotażowy Kwotum jest wyceniany indywidualnie po ustaleniu jednego procesu. Publiczny model self-service pozostaje w walidacji.",
   "/cennik",
 );
+
+const pilotBenefits = [
+  "Warsztat i dopasowanie jednego procesu",
+  "Konfiguracja pytań, wyniku i kwalifikacji",
+  "Widget na stronie albo osobny hosted link",
+  "Weryfikacja kompletności briefów i jakości leadów",
+  "Wsparcie podczas uzgodnionego pilotażu",
+] as const;
+
+const validationFacts = [
+  "Kwota miesięczna nie została zatwierdzona",
+  "Limity procesów i leadów pozostają otwarte",
+  "Płatności samoobsługowe są poza obecnym MVP",
+  "Dalszy model zależy od wyników pilotaży",
+] as const;
 
 export default function PricingPage() {
   return (
     <>
-      <div className="marketing-container marketing-page-hero">
-        <Breadcrumbs items={[{ href: "/", label: "Start" }, { label: "Cennik" }]} />
-        <div className="marketing-page-hero__grid">
-          <div className="marketing-page-hero__copy">
-            <p className="wy-kicker marketing-eyebrow">Cennik bez zgadywania</p>
-            <h1>Najpierw pilotaż. Model self-service po walidacji.</h1>
-            <p>
-              Nie publikujemy sztucznych pakietów ani przekreślonych cen. Zakres pilotażu zależy od
-              procesu, branży i sposobu osadzenia.
-            </p>
-          </div>
-          <aside className="marketing-page-hero__aside">
-            <strong>Status modelu</strong>
-            <span>Kwoty subskrypcji, limity planów i rozliczenia nie są zatwierdzone.</span>
-          </aside>
-        </div>
-      </div>
+      <section aria-labelledby="pricing-title" className="pricing-simple-hero" data-pricing-simple>
+        <div className="marketing-container">
+          <Breadcrumbs items={[{ href: "/", label: "Start" }, { label: "Cennik" }]} />
 
-      <section className="marketing-section marketing-section--surface">
-        <div className="marketing-container pricing-sheet">
-          <article className="marketing-price-card">
-            <p className="wy-kicker marketing-eyebrow">Program pilotażowy</p>
-            <h2>Wdrożenie z ustalonym zakresem</h2>
-            <div className="marketing-price-card__value">Wycena indywidualna</div>
-            <ul className="marketing-list">
-              <li>Warsztat procesu i dopasowanie jednego flow</li>
-              <li>Konfiguracja pytań, wyniku i kwalifikacji</li>
-              <li>Osadzenie lub hosted link</li>
-              <li>Weryfikacja jakości leadów w pilotażu</li>
-            </ul>
-          </article>
-          <article className="marketing-price-card">
-            <p className="wy-kicker marketing-eyebrow">Self-service</p>
-            <h2>Model w trakcie walidacji</h2>
-            <div className="marketing-price-card__value">Jeszcze nieustalony</div>
-            <ul className="marketing-list">
-              <li>Brak zatwierdzonych kwot miesięcznych</li>
-              <li>Brak zatwierdzonych limitów leadów i procesów</li>
-              <li>Brak płatności w zakresie obecnego MVP</li>
-              <li>Decyzja po rozmowach z firmami pilotażowymi</li>
-            </ul>
-          </article>
-          <div className="pricing-sheet__footer">
-            <p className="marketing-price-card__note">
-              Ta strona opisuje aktualny model współpracy, a nie ofertę handlową. Publiczny cennik
-              kwotowy powstanie dopiero po zatwierdzeniu modelu przez właściciela produktu.
+          <header className="pricing-simple-hero__heading">
+            <p className="wy-kicker marketing-eyebrow">Przejrzysty model współpracy</p>
+            <h1 id="pricing-title">Najpierw pilotaż. Potem świadoma decyzja.</h1>
+            <p>
+              Nie publikujemy sztucznych pakietów. Zaczynamy od jednego rzeczywistego procesu,
+              ustalamy zakres wdrożenia i dopiero wtedy przygotowujemy indywidualną wycenę.
             </p>
-            <div className="marketing-actions">
-              <Link className="marketing-button" href="/jak-dziala">
-                Oceń zakres procesu
+          </header>
+
+          <div
+            aria-label="Dwa aktualne modele współpracy"
+            className="pricing-simple-plans"
+            data-pricing-paths
+          >
+            <article className="pricing-simple-card pricing-simple-card--pilot">
+              <header className="pricing-simple-card__header">
+                <span aria-hidden="true" className="pricing-simple-card__icon">
+                  <svg fill="none" viewBox="0 0 32 32">
+                    <path d="M7 22.5 14 15l4.5 4.5L26 10" />
+                    <path d="M19.5 10H26v6.5" />
+                  </svg>
+                </span>
+                <div>
+                  <p className="wy-kicker marketing-eyebrow">Program pilotażowy</p>
+                  <h2>Wdrożenie z ustalonym zakresem</h2>
+                </div>
+                <span className="pricing-simple-card__status">Dostępne teraz</span>
+              </header>
+
+              <div className="pricing-simple-card__value">
+                <strong>Wycena indywidualna</strong>
+                <span>po ustaleniu jednego procesu</span>
+              </div>
+
+              <p className="pricing-simple-card__description">
+                Uruchamiamy jeden realny przepływ i sprawdzamy, czy zebrany brief pozwala zespołowi
+                działać bez kolejnej rundy pytań.
+              </p>
+
+              <ul aria-label="Zakres programu pilotażowego" className="pricing-simple-card__list">
+                {pilotBenefits.map((benefit) => (
+                  <li key={benefit}>{benefit}</li>
+                ))}
+              </ul>
+
+              <Link
+                className="marketing-button pricing-simple-card__action"
+                href="/jak-dziala#proces"
+              >
+                Zobacz przebieg pilotażu
               </Link>
-              <Link className="marketing-button marketing-button--secondary" href="/produkt">
-                Poznaj produkt
+
+              <footer>
+                <small>Rezultat</small>
+                <strong>Gotowy proces do weryfikacji z klientami</strong>
+              </footer>
+            </article>
+
+            <article className="pricing-simple-card pricing-simple-card--validation">
+              <header className="pricing-simple-card__header">
+                <span aria-hidden="true" className="pricing-simple-card__icon">
+                  <svg fill="none" viewBox="0 0 32 32">
+                    <path d="M8 9.5h16M8 16h16M8 22.5h10" />
+                    <circle cx="24" cy="22.5" r="2.5" />
+                  </svg>
+                </span>
+                <div>
+                  <p className="wy-kicker marketing-eyebrow">Self-service</p>
+                  <h2>Model w trakcie walidacji</h2>
+                </div>
+                <span className="pricing-simple-card__status">W walidacji</span>
+              </header>
+
+              <div className="pricing-simple-card__value">
+                <strong>Bez publicznej ceny</strong>
+                <span>do czasu zatwierdzenia modelu</span>
+              </div>
+
+              <p className="pricing-simple-card__description">
+                Nie pokazujemy przyszłego self-service jak gotowego planu. Najpierw oceniamy
+                rzeczywiste potrzeby i wyniki programu pilotażowego.
+              </p>
+
+              <ul
+                aria-label="Otwarte decyzje modelu self-service"
+                className="pricing-simple-card__list"
+              >
+                {validationFacts.map((fact) => (
+                  <li key={fact}>{fact}</li>
+                ))}
+              </ul>
+
+              <Link
+                className="marketing-button marketing-button--secondary pricing-simple-card__action"
+                href="/produkt"
+              >
+                Poznaj obecny produkt
               </Link>
-            </div>
+
+              <footer>
+                <small>Stan obecny</small>
+                <strong>Brak planu dostępnego do samodzielnego zakupu</strong>
+              </footer>
+            </article>
           </div>
+
+          <ul aria-label="Zasady programu pilotażowego" className="pricing-simple-assurances">
+            <li>Bez fikcyjnych cen</li>
+            <li>Bez karty płatniczej</li>
+            <li>Decyzja po pilotażu</li>
+          </ul>
         </div>
       </section>
 
-      <CtaBand
-        description="Przejdź przez architekturę procesu i wybierz branżę. To pozwala ocenić zakres bez udawania gotowego pakietu."
-        title="Zakres przed ceną — tak samo jak w dobrym formularzu."
-      />
+      <section
+        aria-labelledby="pricing-next-title"
+        className="marketing-container pricing-simple-next"
+        data-pricing-final-cta
+      >
+        <div>
+          <p className="wy-kicker marketing-eyebrow">Następny krok</p>
+          <h2 id="pricing-next-title">Zobacz proces, zanim porozmawiamy o zakresie.</h2>
+          <p>
+            Przejdź przez architekturę Kwotum albo zaloguj się do istniejącej organizacji. Nie ma tu
+            fikcyjnego formularza kontaktowego.
+          </p>
+        </div>
+        <div className="marketing-actions pricing-simple-next__actions">
+          <Link className="marketing-button" href="/jak-dziala#proces">
+            Zobacz, jak działa
+          </Link>
+          <Link className="marketing-button marketing-button--secondary" href="/logowanie">
+            Przejdź do logowania
+          </Link>
+        </div>
+      </section>
     </>
   );
 }

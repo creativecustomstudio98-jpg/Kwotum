@@ -32,7 +32,7 @@ describe("auth form validation", () => {
   it("requires matching strong passwords and legal consent during registration", () => {
     const mismatchResult = validateRegistration(
       formData({
-        companyName: "Lorum Studio",
+        companyName: "Kwotum Studio",
         confirmPassword: "InneHaslo8",
         email: "anna@example.com",
         fullName: "Anna Kowalska",
@@ -48,7 +48,7 @@ describe("auth form validation", () => {
 
     const consentResult = validateRegistration(
       formData({
-        companyName: "Lorum Studio",
+        companyName: "Kwotum Studio",
         confirmPassword: "Bezpieczne7",
         email: "anna@example.com",
         fullName: "Anna Kowalska",

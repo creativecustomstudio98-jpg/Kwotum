@@ -3,10 +3,10 @@
   "apiVersion": 3,
   "name": "wyceno/flow",
   "version": "1.0.0",
-  "title": "Lorum",
+  "title": "Kwotum",
   "category": "widgets",
   "icon": "feedback",
-  "description": "Osadza opublikowany proces Lorum.",
+  "description": "Osadza opublikowany proces Kwotum.",
   "textdomain": "wyceno-connector",
   "attributes": {
     "flowId": {

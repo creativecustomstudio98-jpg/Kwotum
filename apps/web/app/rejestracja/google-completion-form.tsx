@@ -48,7 +48,7 @@ export function GoogleCompletionForm() {
           type="submit"
         >
           {pending ? <span aria-hidden="true" className="wy-spinner" /> : null}
-          <span>{pending ? "Tworzenie organizacji…" : "Przejdź do Lorum"}</span>
+          <span>{pending ? "Tworzenie organizacji…" : "Przejdź do Kwotum"}</span>
           <AuthIcon name="arrow" />
         </button>
       </form>

@@ -14,7 +14,7 @@ export default function TermsPage() {
       <Breadcrumbs items={[{ href: "/", label: "Start" }, { label: "Warunki korzystania" }]} />
       <header>
         <p className="wy-kicker marketing-eyebrow">Wersja {AUTH_TERMS_VERSION}</p>
-        <h1>Warunki korzystania z wersji pilotażowej Lorum</h1>
+        <h1>Warunki korzystania z wersji pilotażowej Kwotum</h1>
         <p>
           Ten dokument opisuje zasady konta firmowego w środowisku walidacyjnym. Dane operatora i
           finalne warunki komercyjne muszą zostać uzupełnione i zatwierdzone przed publicznym
@@ -24,7 +24,7 @@ export default function TermsPage() {
       <section>
         <h2>Charakter usługi</h2>
         <p>
-          Lorum pomaga budować procesy pytań, kwalifikować zapytania i prezentować orientacyjny
+          Kwotum pomaga budować procesy pytań, kwalifikować zapytania i prezentować orientacyjny
           wynik. Nie tworzy wiążącej oferty, kosztorysu, umowy ani porady prawnej.
         </p>
       </section>

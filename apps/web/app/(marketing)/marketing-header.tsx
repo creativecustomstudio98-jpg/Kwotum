@@ -1,21 +1,25 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-const defaultNavigation = [
+const subpageNavigation = [
   { href: "/produkt", label: "Produkt" },
   { href: "/jak-dziala", label: "Jak działa" },
-  { href: "/branze", label: "Zastosowania" },
+  { href: "/integracje", label: "Integracje" },
+  { href: "/cennik", label: "Cennik" },
+  { href: "/branze", label: "Branże" },
+  { href: "/dla-agencji", label: "Dla agencji" },
 ] as const;
 
 const homeNavigation = [
-  { href: "#jak-dziala", label: "Jak działa" },
-  { href: "#demo-procesu", label: "Demo" },
-  { href: "#przykladowy-lead", label: "Przykładowy lead" },
-  { href: "#pilotaz", label: "Pilotaż" },
+  { href: "/produkt", label: "Produkt" },
+  { href: "#jak-dziala", label: "Jak to działa" },
+  { href: "/integracje", label: "Integracje" },
+  { href: "/cennik", label: "Cennik" },
+  { href: "/branze", label: "Branże" },
+  { href: "/dla-agencji", label: "Dla agencji" },
 ] as const;
 
 export function MarketingHeader() {
@@ -24,7 +28,13 @@ export function MarketingHeader() {
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const isHome = pathname === "/";
-  const navigation = isHome ? homeNavigation : defaultNavigation;
+  const navigation = isHome ? homeNavigation : subpageNavigation;
+  const isCurrent = (href: string) => {
+    if (href.startsWith("#")) return false;
+    if (href === "/produkt" && pathname.startsWith("/funkcje")) return true;
+    if (href === "/integracje" && pathname === "/wordpress") return true;
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -70,25 +80,33 @@ export function MarketingHeader() {
   }, [open]);
 
   return (
-    <header className={`marketing-header${isHome ? " marketing-header--home" : ""}`}>
+    <header
+      className={`marketing-header marketing-header--v7${
+        isHome ? " marketing-header--home" : " marketing-header--subpage"
+      }`}
+    >
       <div className="marketing-container marketing-header__inner">
-        <Brand withMark={isHome} />
+        <Brand withMark />
         <nav aria-label="Główna nawigacja" className="marketing-nav">
           {navigation.map((item) => (
-            <Link href={item.href} key={item.href}>
+            <Link
+              aria-current={isCurrent(item.href) ? "page" : undefined}
+              href={item.href}
+              key={item.href}
+            >
               {item.label}
             </Link>
           ))}
         </nav>
         <div className="marketing-header__actions">
-          {isHome ? null : (
-            <Link className="marketing-header__login" href="/logowanie" prefetch={false}>
-              Zaloguj się
-            </Link>
-          )}
-          <Link className="marketing-header__cta" href={isHome ? "#demo-procesu" : "/jak-dziala"}>
+          <Link className="marketing-header__login" href="/logowanie" prefetch={false}>
+            Zaloguj się
+          </Link>
+          <Link
+            className="marketing-header__cta"
+            href={isHome ? "#przykladowy-lead" : "/jak-dziala"}
+          >
             {isHome ? "Zobacz demo" : "Zobacz proces"}
-            {isHome ? <span aria-hidden="true">→</span> : null}
           </Link>
         </div>
         <button
@@ -115,25 +133,24 @@ export function MarketingHeader() {
         >
           <nav aria-label="Główna nawigacja mobilna">
             {navigation.map((item, index) => (
-              <Link href={item.href} key={item.href} onClick={() => setOpen(false)}>
+              <Link
+                aria-current={isCurrent(item.href) ? "page" : undefined}
+                href={item.href}
+                key={item.href}
+                onClick={() => setOpen(false)}
+              >
                 <span aria-hidden="true">0{index + 1}</span>
                 {item.label}
               </Link>
             ))}
           </nav>
           <div className="marketing-mobile-menu__actions">
-            {isHome ? (
-              <Link href="/cennik" onClick={() => setOpen(false)}>
-                Sprawdź pilotaż
-              </Link>
-            ) : (
-              <Link href="/logowanie" onClick={() => setOpen(false)} prefetch={false}>
-                Zaloguj się
-              </Link>
-            )}
+            <Link href="/logowanie" onClick={() => setOpen(false)} prefetch={false}>
+              Zaloguj się
+            </Link>
             <Link
               className="marketing-button"
-              href={isHome ? "#demo-procesu" : "/jak-dziala"}
+              href={isHome ? "#przykladowy-lead" : "/jak-dziala"}
               onClick={() => setOpen(false)}
             >
               {isHome ? "Zobacz demo" : "Zobacz działający proces"}
@@ -145,15 +162,33 @@ export function MarketingHeader() {
   );
 }
 
-export function Brand({ withMark = false }: { withMark?: boolean }) {
+export function Brand({ className, withMark = false }: { className?: string; withMark?: boolean }) {
   return (
-    <Link aria-label="Lorum — strona główna" className="marketing-brand" href="/">
+    <Link
+      aria-label="Kwotum — strona główna"
+      className={`marketing-brand${className ? ` ${className}` : ""}`}
+      href="/"
+    >
       {withMark ? (
         <span aria-hidden="true" className="marketing-brand__mark">
-          <Image alt="" height={22} src="/Logoicon.svg" unoptimized width={22} />
+          <svg fill="none" viewBox="0 0 32 32">
+            <path
+              d="M22.9 6.45A11.4 11.4 0 1 0 27.4 15.6M19.35 19.35 28.4 28.4"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="4.8"
+            />
+            <path
+              d="M22.9 6.45A11.4 11.4 0 0 1 27.4 15.6"
+              stroke="#9ad672"
+              strokeLinecap="round"
+              strokeWidth="4.8"
+            />
+          </svg>
         </span>
       ) : null}
-      <span className="marketing-brand__name">Lorum</span>
+      <span className="marketing-brand__name">kwotum</span>
     </Link>
   );
 }

@@ -156,7 +156,7 @@ final class Api
     {
         $encrypted = get_option(self::OPTION_CREDENTIAL, '');
         if (! is_string($encrypted) || $encrypted === '') {
-            throw new \RuntimeException('WordPress nie jest połączony z Lorum.');
+            throw new \RuntimeException('WordPress nie jest połączony z Kwotum.');
         }
         return Crypto::decrypt($encrypted);
     }
@@ -191,7 +191,7 @@ final class Api
         ];
         $response = wp_remote_request(self::api_origin() . $path, $arguments);
         if (is_wp_error($response)) {
-            throw new \RuntimeException('Nie udało się połączyć z API Lorum.');
+            throw new \RuntimeException('Nie udało się połączyć z API Kwotum.');
         }
         $status = wp_remote_retrieve_response_code($response);
         $raw_body = wp_remote_retrieve_body($response);
@@ -200,7 +200,7 @@ final class Api
         }
         $decoded = json_decode($raw_body, true, 32, JSON_THROW_ON_ERROR);
         if ($status < 200 || $status >= 300 || ! is_array($decoded)) {
-            throw new \RuntimeException('API Lorum odrzuciło żądanie.');
+            throw new \RuntimeException('API Kwotum odrzuciło żądanie.');
         }
         return $decoded;
     }
