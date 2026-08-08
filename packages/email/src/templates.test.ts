@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { renderNotificationEmail } from "./templates";
+import { renderFlowInvitationEmail, renderNotificationEmail } from "./templates";
 
 const baseInput = {
   appUrl: "https://app.wyceno.test",
@@ -40,5 +40,23 @@ describe("notification templates", () => {
     expect(message.text).not.toContain("80/100");
     expect(message.text).not.toContain("/panel/");
     expect(message.text).not.toContain(baseInput.contactEmail);
+  });
+
+  it("renders a flow invitation without recipient data or tracking in the URL", () => {
+    const message = renderFlowInvitationEmail({
+      appUrl: baseInput.appUrl,
+      companyName: baseInput.companyName,
+      flowTitle: baseInput.flowTitle,
+      personalMessage: "Proszę opisać zakres <dokładnie>.",
+      publicId: "f0000000-0000-4000-8000-000000000001",
+      recipientName: baseInput.contactName,
+    });
+
+    expect(message.templateVersion).toBe("flow-invitation-v1");
+    expect(message.html).toContain("/f/f0000000-0000-4000-8000-000000000001");
+    expect(message.html).toContain("&lt;dokładnie&gt;");
+    expect(message.html).not.toContain("utm_");
+    expect(message.html).not.toContain("tracking");
+    expect(message.subject).not.toMatch(/[\r\n]/);
   });
 });

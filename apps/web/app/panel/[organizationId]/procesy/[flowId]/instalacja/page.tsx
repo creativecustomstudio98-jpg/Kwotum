@@ -10,7 +10,7 @@ import { InstallationPanel } from "./installation-panel";
 
 export const metadata: Metadata = {
   robots: { follow: false, index: false },
-  title: "Instalacja procesu",
+  title: "Podgląd i udostępnianie procesu",
 };
 
 export const dynamic = "force-dynamic";
@@ -45,15 +45,19 @@ export default async function FlowInstallationPage({
           </LinkButton>
         }
         eyebrow={installation.organizationName}
-        title="Instalacja procesu"
+        title="Podgląd i udostępnianie"
       />
       <div className="panel-page">
         {installation.publicId && installation.publishedAt ? (
           <InstallationPanel
             appOrigin={appOrigin}
+            currentVersion={installation.currentVersion ?? 1}
+            flowId={flowId}
             flowName={installation.flowName}
+            invitations={installation.invitations}
             lastWidgetOpenedAt={installation.lastWidgetOpenedAt}
             organizationId={organizationId}
+            manifest={installation.manifest}
             publicId={installation.publicId}
             publishedAt={installation.publishedAt}
             wordpressConnection={installation.wordpressConnection}

@@ -50,7 +50,7 @@ export default async function WordPressIntegrationPage({
               </span>
               <div>
                 <h2 id="wordpress-title">WordPress</h2>
-                <p>Shortcode, blok Gutenberg i popup korzystają z publicznego procesu Lorum.</p>
+                <p>Shortcode, blok Gutenberg i popup korzystają z publicznego procesu Kwotum.</p>
               </div>
               <span className={`panel-status panel-status--${connected ? "qualified" : "neutral"}`}>
                 {connected ? `${activeConnections.length} połączone` : "Niepołączono"}
@@ -59,7 +59,7 @@ export default async function WordPressIntegrationPage({
             <div className="integration-security-note">
               <PanelIcon name="privacy" />
               <span>
-                Odpowiedzi, leady i obliczenia pozostają w Lorum. WordPress przechowuje wyłącznie
+                Odpowiedzi, leady i obliczenia pozostają w Kwotum. WordPress przechowuje wyłącznie
                 credential połączenia.
               </span>
             </div>

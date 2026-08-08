@@ -4,13 +4,31 @@ import {
   AuthorizationError,
   type TenantContext,
 } from "@wyceno/database";
+import { widgetManifestSchema, type WidgetManifestContract } from "@wyceno/validation";
+import { z } from "zod";
 
 import { createClient } from "../supabase/server";
 
 export type FlowInstallation = Readonly<{
+  currentVersion: number | null;
   flowId: string;
   flowName: string;
+  invitations: ReadonlyArray<
+    Readonly<{
+      attemptCount: number;
+      createdAt: string;
+      createdByName: string;
+      id: string;
+      lastErrorCode: string | null;
+      recipientEmail: string;
+      recipientName: string | null;
+      sentAt: string | null;
+      status: "failed" | "pending" | "processing" | "retry" | "sent";
+      versionNumber: number;
+    }>
+  >;
   lastWidgetOpenedAt: string | null;
+  manifest: WidgetManifestContract | null;
   organizationName: string;
   publicId: string | null;
   publishedAt: string | null;
@@ -37,7 +55,7 @@ export async function getFlowInstallation(
         .maybeSingle(),
       supabase
         .from("published_flows")
-        .select("public_id, published_at")
+        .select("public_id, published_at, flow_version_id")
         .eq("flow_id", flowId)
         .eq("organization_id", context.organizationId)
         .maybeSingle(),
@@ -75,10 +93,77 @@ export async function getFlowInstallation(
     throw new Error("Nie udało się pobrać danych instalacji.");
   }
 
+  const [manifestResult, invitationsResult, currentVersionResult] = await Promise.all([
+    publishedResult.data?.public_id
+      ? supabase.rpc("get_widget_manifest", { target_public_id: publishedResult.data.public_id })
+      : Promise.resolve({ data: null, error: null }),
+    supabase
+      .from("flow_invitations")
+      .select(
+        "id, flow_version_id, recipient_email, recipient_name, status, attempt_count, last_error_code, sent_at, created_at, created_by",
+      )
+      .eq("organization_id", context.organizationId)
+      .eq("flow_id", flowId)
+      .order("created_at", { ascending: false })
+      .limit(20),
+    publishedResult.data?.flow_version_id
+      ? supabase
+          .from("flow_versions")
+          .select("version_number")
+          .eq("organization_id", context.organizationId)
+          .eq("id", publishedResult.data.flow_version_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
+  if (manifestResult.error || invitationsResult.error || currentVersionResult.error) {
+    throw new Error("Nie udało się pobrać podglądu i historii udostępnień.");
+  }
+  const manifest = manifestResult.data ? widgetManifestSchema.parse(manifestResult.data) : null;
+  const creatorIds = [...new Set(invitationsResult.data.map((item) => item.created_by))];
+  const versionIds = [...new Set(invitationsResult.data.map((item) => item.flow_version_id))];
+  const [creatorsResult, versionsResult] = await Promise.all([
+    creatorIds.length
+      ? supabase.from("profiles").select("id, display_name").in("id", creatorIds)
+      : Promise.resolve({ data: [], error: null }),
+    versionIds.length
+      ? supabase
+          .from("flow_versions")
+          .select("id, version_number")
+          .eq("organization_id", context.organizationId)
+          .in("id", versionIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  if (creatorsResult.error || versionsResult.error) {
+    throw new Error("Nie udało się pobrać autorów historii udostępnień.");
+  }
+  const creatorNames = new Map(
+    creatorsResult.data.map((profile) => [
+      profile.id,
+      profile.display_name ?? "Użytkownik zespołu",
+    ]),
+  );
+  const versionNumbers = new Map(
+    versionsResult.data.map((version) => [version.id, version.version_number]),
+  );
+
   return {
+    currentVersion: currentVersionResult.data?.version_number ?? null,
     flowId: flowResult.data.id,
     flowName: flowResult.data.name,
+    invitations: invitationsResult.data.map((invitation) => ({
+      attemptCount: invitation.attempt_count,
+      createdAt: invitation.created_at,
+      createdByName: creatorNames.get(invitation.created_by) ?? "Użytkownik zespołu",
+      id: invitation.id,
+      lastErrorCode: invitation.last_error_code,
+      recipientEmail: invitation.recipient_email,
+      recipientName: invitation.recipient_name,
+      sentAt: invitation.sent_at,
+      status: invitation.status,
+      versionNumber: versionNumbers.get(invitation.flow_version_id) ?? 0,
+    })),
     lastWidgetOpenedAt: eventResult.data?.occurred_at ?? null,
+    manifest,
     organizationName: organizationResult.data.name,
     publicId: publishedResult.data?.public_id ?? null,
     publishedAt: publishedResult.data?.published_at ?? null,
@@ -89,4 +174,39 @@ export async function getFlowInstallation(
         }
       : null,
   };
+}
+
+const invitationResultSchema = z.object({
+  createdAt: z.iso.datetime({ offset: true }),
+  id: z.uuid(),
+  status: z.enum(["pending", "processing", "retry", "sent", "failed"]),
+});
+
+export async function createFlowInvitation(
+  context: TenantContext,
+  input: Readonly<{
+    flowId: string;
+    message: string | null;
+    recipientEmail: string;
+    recipientName: string | null;
+    requestId: string;
+  }>,
+) {
+  assertCapability(context, "flow:share");
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("create_flow_invitation", {
+    idempotency_key: input.requestId,
+    target_flow_id: input.flowId,
+    target_organization_id: context.organizationId,
+    target_personal_message: input.message,
+    target_recipient_email: input.recipientEmail,
+    target_recipient_name: input.recipientName,
+  });
+  if (error) {
+    if (error.code === "42501" || error.code === "P0002") {
+      throw new AuthorizationError("NOT_FOUND", "Resource not found.");
+    }
+    throw new Error("Nie udało się dodać wiadomości do kolejki.");
+  }
+  return invitationResultSchema.parse(data);
 }

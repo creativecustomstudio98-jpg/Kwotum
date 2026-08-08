@@ -56,4 +56,21 @@ describe("wyceno-widget element", () => {
     expect(shadow?.querySelectorAll('input[type="radio"]')).toHaveLength(2);
     expect(ready).toHaveBeenCalledOnce();
   });
+
+  it("uses the memory-only adapter in preview mode without fetch or localStorage", async () => {
+    const element = document.createElement("wyceno-widget") as HTMLElement & {
+      previewManifest: typeof testManifest;
+    };
+    element.setAttribute("public-id", testPublicId);
+    element.setAttribute("preview", "");
+    element.previewManifest = testManifest;
+    document.body.append(element);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(fetch).not.toHaveBeenCalled();
+    expect(localStorage).toHaveLength(0);
+    expect(element.shadowRoot?.textContent).toContain("Tryb podglądu");
+    expect(element.shadowRoot?.textContent).toContain("nic nie zapisujemy");
+    expect(element.shadowRoot?.querySelector(".wyceno-analytics")).toBeNull();
+  });
 });

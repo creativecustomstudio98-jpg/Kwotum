@@ -17,7 +17,7 @@ const message = renderNotificationEmail({
 });
 
 const request = {
-  from: "Lorum <powiadomienia@example.test>",
+  from: "Kwotum <powiadomienia@example.test>",
   idempotencyKey: "notification/e0000000-0000-4000-8000-000000000001",
   message,
   notificationId: "e0000000-0000-4000-8000-000000000001",

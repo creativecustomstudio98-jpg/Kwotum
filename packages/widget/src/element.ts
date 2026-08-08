@@ -1,7 +1,8 @@
 import { HttpWidgetApi } from "./api.js";
-import type { WidgetAnswer, WidgetStep } from "./contracts.js";
+import type { WidgetAnswer, WidgetManifest, WidgetStep } from "./contracts.js";
 import { WidgetSessionController, type WidgetState } from "./controller.js";
-import { LocalWidgetStorage, widgetStorageKey } from "./storage.js";
+import { PreviewWidgetApi } from "./preview.js";
+import { LocalWidgetStorage, MemoryWidgetStorage, widgetStorageKey } from "./storage.js";
 
 const elementName = "wyceno-widget";
 const publicIdPattern =
@@ -42,7 +43,7 @@ function initials(value: string): string {
 }
 
 export class WycenoWidgetElement extends HTMLElement {
-  static observedAttributes = ["api-base", "button-label", "mode", "public-id"];
+  static observedAttributes = ["api-base", "button-label", "mode", "preview", "public-id"];
 
   readonly #shadow: ShadowRoot;
   #controller: WidgetSessionController | null = null;
@@ -57,6 +58,7 @@ export class WycenoWidgetElement extends HTMLElement {
   #contactStarted = false;
   #dialog: HTMLDialogElement | null = null;
   #lastStatus: WidgetState["status"] = "idle";
+  #previewManifest: WidgetManifest | null = null;
   #resizeObserver: ResizeObserver | null = null;
   #started = false;
   #unsubscribe: (() => void) | null = null;
@@ -99,6 +101,19 @@ export class WycenoWidgetElement extends HTMLElement {
     return mode === "popup" || mode === "fullscreen" ? mode : "inline";
   }
 
+  get previewManifest(): WidgetManifest | null {
+    return this.#previewManifest;
+  }
+
+  set previewManifest(value: WidgetManifest | null) {
+    this.#previewManifest = value ? structuredClone(value) : null;
+    if (this.isConnected) void this.#initialize();
+  }
+
+  get previewMode(): boolean {
+    return this.hasAttribute("preview") && this.#previewManifest !== null;
+  }
+
   async #initialize(): Promise<void> {
     const publicId = this.getAttribute("public-id") ?? "";
     if (!publicIdPattern.test(publicId)) {
@@ -107,10 +122,12 @@ export class WycenoWidgetElement extends HTMLElement {
     }
     this.#unsubscribe?.();
     const baseUrl = this.getAttribute("api-base") ?? window.location.origin;
-    this.#controller = new WidgetSessionController(
-      new HttpWidgetApi(baseUrl),
-      new LocalWidgetStorage(),
-    );
+    this.#controller = this.previewMode
+      ? new WidgetSessionController(
+          new PreviewWidgetApi(this.#previewManifest as WidgetManifest),
+          new MemoryWidgetStorage(),
+        )
+      : new WidgetSessionController(new HttpWidgetApi(baseUrl), new LocalWidgetStorage());
     this.#unsubscribe = this.#controller.subscribe((state) => this.#render(state));
     await this.#controller.initialize(publicId);
   }
@@ -120,6 +137,7 @@ export class WycenoWidgetElement extends HTMLElement {
   };
 
   readonly #handleStorage = (event: StorageEvent): void => {
+    if (this.previewMode) return;
     const publicId = this.getAttribute("public-id");
     if (publicId && event.key === widgetStorageKey(publicId) && event.newValue) {
       void this.#initialize();
@@ -171,7 +189,7 @@ export class WycenoWidgetElement extends HTMLElement {
       dispatchWidgetEvent(this, "ready");
       if (this.mode === "inline") this.#controller?.trackAnalytics("widget_opened");
     }
-    if (this.#lastStatus === "submitting" && state.status === "submitted") {
+    if (!this.previewMode && this.#lastStatus === "submitting" && state.status === "submitted") {
       dispatchWidgetEvent(this, "submitted", {
         leadPublicId: state.submission?.leadPublicId,
       });
@@ -196,6 +214,16 @@ export class WycenoWidgetElement extends HTMLElement {
         ? "true"
         : "false",
     );
+
+    if (this.previewMode) {
+      const previewNotice = create(
+        "p",
+        "wyceno-preview-notice",
+        "Tryb podglądu — odpowiedzi, pliki i dane kontaktowe nie zostaną zapisane ani wysłane.",
+      );
+      previewNotice.setAttribute("role", "status");
+      content.append(previewNotice);
+    }
 
     if (state.status === "loading_manifest" || state.status === "idle") {
       content.append(create("p", "wyceno-status", "Uruchamiamy formularz…"));
@@ -236,8 +264,9 @@ export class WycenoWidgetElement extends HTMLElement {
     const sync = create("p", "wyceno-sync");
     sync.setAttribute("role", "status");
     sync.setAttribute("aria-live", "polite");
-    sync.textContent =
-      state.syncStatus === "offline"
+    sync.textContent = this.previewMode
+      ? "Podgląd lokalny — nic nie zapisujemy."
+      : state.syncStatus === "offline"
         ? "Brak połączenia — odpowiedź jest zachowana na tym urządzeniu."
         : state.syncStatus === "saving"
           ? "Zapisujemy odpowiedź…"
@@ -277,7 +306,7 @@ export class WycenoWidgetElement extends HTMLElement {
       introduction.append(create("p", "wyceno-intro", manifest.intro));
       stage.append(introduction);
     }
-    stage.append(this.#renderAnalyticsConsent(state));
+    if (!this.previewMode) stage.append(this.#renderAnalyticsConsent(state));
     content.append(stage);
 
     if (state.status === "calculating_result") {
@@ -334,15 +363,23 @@ export class WycenoWidgetElement extends HTMLElement {
         const confirmation = create("div", "wyceno-confirmation");
         confirmation.setAttribute("role", "status");
         confirmation.append(create("span", "wyceno-result-icon", "✓"));
-        confirmation.append(create("h2", undefined, "Zapytanie zostało wysłane"));
+        confirmation.append(
+          create(
+            "h2",
+            undefined,
+            this.previewMode ? "Podgląd formularza zakończony" : "Zapytanie zostało wysłane",
+          ),
+        );
         confirmation.append(
           create(
             "p",
             undefined,
-            "Firma otrzymała odpowiedzi i dane kontaktowe. Może teraz skontaktować się w sprawie zapytania.",
+            this.previewMode
+              ? "To była bezpieczna próba. Nie utworzono leada i nic nie wysłano do firmy."
+              : "Firma otrzymała odpowiedzi i dane kontaktowe. Może teraz skontaktować się w sprawie zapytania.",
           ),
         );
-        if (state.submission?.leadPublicId) {
+        if (!this.previewMode && state.submission?.leadPublicId) {
           confirmation.append(
             create(
               "small",
@@ -503,7 +540,11 @@ export class WycenoWidgetElement extends HTMLElement {
       error.setAttribute("role", "alert");
       form.append(error);
     }
-    const submit = create("button", "wyceno-primary", "Wyślij zapytanie");
+    const submit = create(
+      "button",
+      "wyceno-primary",
+      this.previewMode ? "Zakończ podgląd" : "Wyślij zapytanie",
+    );
     submit.type = "submit";
     form.append(submit);
     form.addEventListener("submit", (event) => {

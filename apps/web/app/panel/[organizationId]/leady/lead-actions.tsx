@@ -1,12 +1,14 @@
 "use client";
 
 import { Button, Select, Textarea } from "@wyceno/ui";
-import { useActionState, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useRef } from "react";
 
 import { leadStatusLabels, leadStatuses } from "../../../../lib/leads/presentation";
 import { addLeadNoteAction, changeLeadStatusAction, type LeadActionState } from "./actions";
 
 const initialState: LeadActionState = { error: null, success: null };
+type CreatedNote = NonNullable<LeadActionState["createdNote"]>;
 
 export function LeadStatusForm({
   currentStatus,
@@ -18,6 +20,7 @@ export function LeadStatusForm({
   organizationId: string;
 }) {
   const [state, action, pending] = useActionState(changeLeadStatusAction, initialState);
+  useRefreshAfterSuccess(state);
   return (
     <form action={action} className="lead-action-form" id="lead-status-form">
       <input name="organizationId" type="hidden" value={organizationId} />
@@ -50,6 +53,7 @@ export function LeadStatusSelect({
   organizationId: string;
 }) {
   const [state, action, pending] = useActionState(changeLeadStatusAction, initialState);
+  useRefreshAfterSuccess(state);
   return (
     <form action={action} className="lead-reference-status-form">
       <input name="organizationId" type="hidden" value={organizationId} />
@@ -86,6 +90,7 @@ export function LeadStartForm({
   organizationId: string;
 }) {
   const [state, action, pending] = useActionState(changeLeadStatusAction, initialState);
+  useRefreshAfterSuccess(state);
   return (
     <form action={action} className="lead-reference-start-form">
       <input name="organizationId" type="hidden" value={organizationId} />
@@ -102,30 +107,37 @@ export function LeadStartForm({
 export function LeadNoteForm({
   compact = false,
   leadId,
+  onCreated,
   organizationId,
 }: {
   compact?: boolean;
   leadId: string;
+  onCreated?: (note: CreatedNote) => void;
   organizationId: string;
 }) {
   const [state, action, pending] = useActionState(addLeadNoteAction, initialState);
-  const [length, setLength] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (!state.success) return;
+    formRef.current?.reset();
+    if (state.createdNote) onCreated?.(state.createdNote);
+  }, [onCreated, state]);
   return (
     <form
       action={action}
       className={`lead-action-form${compact ? " lead-action-form--reference-note" : ""}`}
+      ref={formRef}
     >
       <input name="organizationId" type="hidden" value={organizationId} />
       <input name="leadId" type="hidden" value={leadId} />
       <div className={compact ? "wy-sr-only" : "lead-action-form__label"}>
         <label htmlFor="lead-note">Nowa notatka</label>
-        <span>{length}/4000</span>
+        <span>Maksymalnie 4000 znaków</span>
       </div>
       <Textarea
         id="lead-note"
         maxLength={4000}
         name="body"
-        onChange={(event) => setLength(event.currentTarget.value.length)}
         placeholder={compact ? "Dodaj notatkę…" : "Dodaj kontekst dla zespołu…"}
         required
         rows={compact ? 5 : 4}
@@ -145,4 +157,13 @@ function ActionMessage({ state }: { state: LeadActionState }) {
       {state.error ?? state.success}
     </p>
   );
+}
+
+function useRefreshAfterSuccess(state: LeadActionState): void {
+  const router = useRouter();
+  useEffect(() => {
+    if (!state.success) return;
+    const refreshTimeout = window.setTimeout(() => router.refresh(), 250);
+    return () => window.clearTimeout(refreshTimeout);
+  }, [router, state]);
 }

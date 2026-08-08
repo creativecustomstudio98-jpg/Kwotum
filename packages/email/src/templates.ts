@@ -13,10 +13,19 @@ export type NotificationTemplateInput = Readonly<{
   score: number | null;
 }>;
 
+export type FlowInvitationTemplateInput = Readonly<{
+  appUrl: string;
+  companyName: string;
+  flowTitle: string;
+  personalMessage: string | null;
+  publicId: string;
+  recipientName: string | null;
+}>;
+
 export type RenderedEmail = Readonly<{
   html: string;
   subject: string;
-  templateVersion: "lead-company-v1" | "lead-customer-v1";
+  templateVersion: "flow-invitation-v1" | "lead-company-v1" | "lead-customer-v1";
   text: string;
 }>;
 
@@ -56,7 +65,7 @@ function document(subject: string, content: string): string {
 <body style="${bodyStyle}">
   <main style="${mainStyle}">
     ${content}
-    <p style="margin-top:32px;color:#52675f;font-size:14px">Wiadomość transakcyjna wygenerowana przez Lorum.</p>
+    <p style="margin-top:32px;color:#52675f;font-size:14px">Wiadomość transakcyjna wygenerowana przez Kwotum.</p>
   </main>
 </body>
 </html>`;
@@ -90,7 +99,7 @@ ${priceText}
 
 Wynik ma charakter orientacyjny i nie stanowi oferty. Firma może skontaktować się, aby potwierdzić zakres i warunki.
 
-Wiadomość transakcyjna wygenerowana przez Lorum.`,
+Wiadomość transakcyjna wygenerowana przez Kwotum.`,
   };
 }
 
@@ -134,10 +143,51 @@ Score: ${scoreLine}
 Otwórz szczegóły leada w panelu:
 ${detailsUrl}
 
-Wiadomość transakcyjna wygenerowana przez Lorum.`,
+Wiadomość transakcyjna wygenerowana przez Kwotum.`,
   };
 }
 
 export function renderNotificationEmail(input: NotificationTemplateInput): RenderedEmail {
   return input.kind === "lead_company_alert" ? companyTemplate(input) : customerTemplate(input);
+}
+
+export function renderFlowInvitationEmail(input: FlowInvitationTemplateInput): RenderedEmail {
+  const company = safeLine(input.companyName);
+  const flow = safeLine(input.flowTitle);
+  const greeting = input.recipientName
+    ? `Dzień dobry, ${safeLine(input.recipientName)}!`
+    : "Dzień dobry!";
+  const personalMessage = input.personalMessage ? safeLine(input.personalMessage) : null;
+  const hostedUrl = new URL(input.appUrl);
+  hostedUrl.pathname = `/f/${encodeURIComponent(input.publicId)}`;
+  hostedUrl.search = "";
+  hostedUrl.hash = "";
+  const processUrl = hostedUrl.toString();
+  const subject = safeHeader(`${company} zaprasza do uzupełnienia formularza`);
+  const optionalHtml = personalMessage
+    ? `<p style="margin:20px 0;padding:16px;border-left:3px solid #9ad672;background:#f4f8f5">${escapeHtml(personalMessage)}</p>`
+    : "";
+  const optionalText = personalMessage ? `\nWiadomość od firmy:\n${personalMessage}\n` : "";
+  return {
+    html: document(
+      subject,
+      `<h1 style="margin:0 0 16px;font-size:28px">${escapeHtml(greeting)}</h1>
+    <p>Firma ${escapeHtml(company)} prosi o uzupełnienie formularza „${escapeHtml(flow)}”.</p>
+    ${optionalHtml}
+    <p><a href="${escapeHtml(processUrl)}" style="display:inline-block;padding:12px 18px;background:#06753a;color:#ffffff;text-decoration:none;font-weight:bold">Otwórz formularz</a></p>
+    <p style="color:#52675f;font-size:14px">Link prowadzi do bezpiecznego formularza Kwotum. Nie odpowiadaj na tę automatyczną wiadomość.</p>`,
+    ),
+    subject,
+    templateVersion: "flow-invitation-v1",
+    text: `${greeting}
+
+Firma ${company} prosi o uzupełnienie formularza „${flow}”.
+${optionalText}
+Otwórz formularz:
+${processUrl}
+
+Link prowadzi do bezpiecznego formularza Kwotum. Nie odpowiadaj na tę automatyczną wiadomość.
+
+Wiadomość transakcyjna wygenerowana przez Kwotum.`,
+  };
 }

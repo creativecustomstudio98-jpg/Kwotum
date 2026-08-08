@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { PanelIcon } from "./panel-icon";
+import { PanelNavigationIcon } from "./panel-navigation-icon";
 import {
   isMobilePanelDetailPath,
   isPanelNavigationItemActive,
@@ -126,9 +127,14 @@ export function PanelNavigation({
         id="panel-sidebar"
       >
         <div className="panel-rail__header">
-          <Link aria-label="Lorum — wybór organizacji" className="panel-rail__brand" href="/panel">
-            <Image alt="" height={38} priority src="/Logoicon.svg" width={38} />
-            <span className="panel-rail__brand-name">Lorum</span>
+          <Link aria-label="Kwotum — wybór organizacji" className="panel-rail__brand" href="/panel">
+            <span className="panel-rail__brand-mark">
+              <Image alt="" height={38} priority src="/Logoicon.svg" width={38} />
+            </span>
+            <span className="panel-rail__brand-copy">
+              <strong className="panel-rail__brand-name">Kwotum</strong>
+              <small>Panel operacyjny</small>
+            </span>
           </Link>
           <button
             aria-controls="panel-primary-navigation"
@@ -139,7 +145,7 @@ export function PanelNavigation({
             title={collapsed ? "Rozwiń menu" : "Zwiń menu"}
             type="button"
           >
-            <PanelIcon name={collapsed ? "chevron-right" : "chevron-left"} />
+            <PanelIcon name="chevron-left" />
           </button>
         </div>
         <nav aria-label="Narzędzia organizacji" id="panel-primary-navigation">
@@ -152,7 +158,9 @@ export function PanelNavigation({
                 href={item.href}
                 key={item.href}
               >
-                <PanelIcon name={item.icon} />
+                <span aria-hidden="true" className="panel-rail__nav-icon">
+                  <PanelNavigationIcon name={item.icon} />
+                </span>
                 <span className="panel-rail__label">{item.label}</span>
               </Link>
             );
@@ -160,11 +168,15 @@ export function PanelNavigation({
         </nav>
         <div aria-label="Skróty i konto" className="panel-rail__utilities" role="group">
           <Link aria-label="Powiadomienia" href={notificationsHref}>
-            <PanelIcon name="notification" />
+            <span aria-hidden="true" className="panel-rail__nav-icon">
+              <PanelNavigationIcon name="notification" />
+            </span>
             <span className="panel-rail__label">Powiadomienia</span>
           </Link>
           <Link aria-label="Pomoc" href="/jak-dziala">
-            <PanelIcon name="help" />
+            <span aria-hidden="true" className="panel-rail__nav-icon">
+              <PanelNavigationIcon name="help" />
+            </span>
             <span className="panel-rail__label">Pomoc</span>
           </Link>
           <Link
@@ -198,7 +210,7 @@ export function PanelNavigation({
               key={item.href}
             >
               <span className="panel-mobile-navigation__icon">
-                <PanelIcon name={item.icon} strokeWidth={1.7} />
+                <PanelNavigationIcon name={item.icon} strokeWidth={1.65} />
               </span>
               <span>{item.mobileLabel ?? item.label}</span>
             </Link>
@@ -216,7 +228,7 @@ export function PanelNavigation({
           type="button"
         >
           <span className="panel-mobile-navigation__icon">
-            <PanelIcon name="more" strokeWidth={1.6} />
+            <PanelNavigationIcon name="more" strokeWidth={1.55} />
           </span>
           <span>Więcej</span>
         </button>
@@ -289,7 +301,7 @@ export function PanelNavigation({
                     onClick={() => setMoreOpen(false)}
                   >
                     <span>
-                      <PanelIcon name={item.icon} />
+                      <PanelNavigationIcon name={item.icon} />
                     </span>
                     <strong>{item.label}</strong>
                     <PanelIcon name="chevron-right" />
@@ -306,7 +318,7 @@ export function PanelNavigation({
                   onClick={() => setMoreOpen(false)}
                 >
                   <span>
-                    <PanelIcon name="privacy" />
+                    <PanelNavigationIcon name="privacy" />
                   </span>
                   <strong>Dane i prywatność</strong>
                   <PanelIcon name="chevron-right" />
@@ -319,14 +331,14 @@ export function PanelNavigation({
                 onClick={() => setMoreOpen(false)}
               >
                 <span>
-                  <PanelIcon name="notification" />
+                  <PanelNavigationIcon name="notification" />
                 </span>
                 <strong>Powiadomienia</strong>
                 <PanelIcon name="chevron-right" />
               </Link>
               <Link href="/jak-dziala" onClick={() => setMoreOpen(false)}>
                 <span>
-                  <PanelIcon name="help" />
+                  <PanelNavigationIcon name="help" />
                 </span>
                 <strong>Pomoc i instrukcje</strong>
                 <PanelIcon name="external" />

@@ -1,5 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
+import { processConfiguredFlowInvitationBatch } from "../../../../../../lib/invitations/worker";
 import { processConfiguredNotificationBatch } from "../../../../../../lib/notifications/worker";
 
 export const runtime = "nodejs";
@@ -23,10 +24,21 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
   try {
-    const result = await processConfiguredNotificationBatch();
-    return Response.json(result, {
-      headers: privateNoStoreHeaders,
-    });
+    const [notifications, invitations] = await Promise.all([
+      processConfiguredNotificationBatch(),
+      processConfiguredFlowInvitationBatch(),
+    ]);
+    return Response.json(
+      {
+        claimed: notifications.claimed + invitations.claimed,
+        failed: notifications.failed + invitations.failed,
+        retrying: notifications.retrying + invitations.retrying,
+        sent: notifications.sent + invitations.sent,
+      },
+      {
+        headers: privateNoStoreHeaders,
+      },
+    );
   } catch {
     return Response.json(
       {

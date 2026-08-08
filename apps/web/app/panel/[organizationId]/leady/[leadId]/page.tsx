@@ -1,4 +1,4 @@
-import { AuthorizationError, type Json } from "@wyceno/database";
+import { AuthorizationError, hasCapability, type Json } from "@wyceno/database";
 import { LinkButton } from "@wyceno/ui";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -7,10 +7,10 @@ import { notFound } from "next/navigation";
 
 import { requireTenantContext } from "../../../../../lib/auth/tenant-context";
 import { leadStatusLabels } from "../../../../../lib/leads/presentation";
-import { getLeadDetail } from "../../../../../lib/leads/service";
+import { getLeadDetail, type LeadDetail } from "../../../../../lib/leads/service";
 import { getLeadLegalHold } from "../../../../../lib/privacy/service";
 import { PanelIcon, type PanelIconName } from "../../../panel-icon";
-import { LeadNoteForm, LeadStartForm, LeadStatusSelect } from "../lead-actions";
+import { LeadOperationsPanel } from "../lead-operations-panel";
 import { LeadPrivacyControls } from "./privacy-controls";
 
 export const metadata: Metadata = { title: "Szczegóły leada" };
@@ -52,6 +52,11 @@ export default async function LeadDetailPage({ params }: PageProps) {
     lead.files.length === 0
       ? "Brak materiałów"
       : `${lead.files.length} ${lead.files.length === 1 ? "załącznik" : "załączniki"}`;
+  const previewFile =
+    lead.files.find((file) => file.downloadUrl && file.mimeType.startsWith("image/")) ??
+    lead.files.find((file) => file.downloadUrl) ??
+    lead.files[0] ??
+    null;
 
   return (
     <main className="panel-workspace lead-operation lead-reference-page">
@@ -179,34 +184,29 @@ export default async function LeadDetailPage({ params }: PageProps) {
             </dl>
           </div>
 
-          <aside className="lead-reference-summary__side">
-            <section>
-              <h2>Notatki</h2>
-              <LeadNoteForm compact leadId={lead.id} organizationId={organizationId} />
-              {lead.notes[0] ? (
-                <p className="lead-reference-latest-note">{lead.notes[0].body}</p>
-              ) : null}
-            </section>
-            <section id="lead-status-form">
-              <h2>Status</h2>
-              <LeadStatusSelect
-                currentStatus={lead.status}
-                leadId={lead.id}
-                organizationId={organizationId}
-              />
-              {lead.status === "new" ? (
-                <LeadStartForm leadId={lead.id} organizationId={organizationId} />
-              ) : (
-                <a className="lead-reference-primary-action" href={`mailto:${lead.contactEmail}`}>
-                  Skontaktuj się z klientem
-                </a>
-              )}
-            </section>
-          </aside>
+          <LeadOperationsPanel
+            canAssign={hasCapability(context, "lead:assign")}
+            canManageAllTasks={context.role === "owner" || context.role === "admin"}
+            contactEmail={lead.contactEmail}
+            currentUserId={context.userId}
+            leadId={lead.id}
+            notes={lead.notes}
+            operation={lead.operation}
+            organizationId={organizationId}
+            status={lead.status}
+          />
         </section>
 
         <section className="lead-reference-panel lead-reference-answers" id="answers-panel">
-          <h2>Odpowiedzi klienta</h2>
+          <div className="lead-reference-panel-heading">
+            <div>
+              <h2>Odpowiedzi klienta</h2>
+              <p>Komplet informacji przekazanych w prowadzonym procesie.</p>
+            </div>
+            <span>
+              {lead.answers.length} {lead.answers.length === 1 ? "odpowiedź" : "odpowiedzi"}
+            </span>
+          </div>
           <dl>
             {lead.answers.map((answer) => (
               <div key={answer.stepKey}>
@@ -218,29 +218,81 @@ export default async function LeadDetailPage({ params }: PageProps) {
         </section>
 
         <section className="lead-reference-panel lead-reference-files" id="files-panel">
-          <h2>Pliki</h2>
+          <div className="lead-reference-panel-heading">
+            <div>
+              <h2>Pliki klienta</h2>
+              <p>Materiały źródłowe do weryfikacji zakresu zapytania.</p>
+            </div>
+            <span>
+              {lead.files.length} {fileCountLabel(lead.files.length)}
+            </span>
+          </div>
           {lead.files.length === 0 ? (
             <p>Klient nie dodał plików do tego zapytania.</p>
           ) : (
-            <ul>
-              {lead.files.map((file) => (
-                <li key={file.id}>
-                  <PanelIcon name="file" />
-                  <span>
+            <div className="lead-reference-files-layout">
+              <ul aria-label="Lista plików klienta">
+                {lead.files.map((file) => (
+                  <li key={file.id}>
+                    <PanelIcon name="file" />
+                    <span>
+                      {file.downloadUrl ? (
+                        <a href={file.downloadUrl} rel="noreferrer" target="_blank">
+                          {file.name}
+                        </a>
+                      ) : (
+                        <strong>{file.name}</strong>
+                      )}
+                      <small>
+                        {formatFileType(file.mimeType)} · {formatFileSize(file.sizeBytes)}
+                      </small>
+                    </span>
                     {file.downloadUrl ? (
-                      <a href={file.downloadUrl} rel="noreferrer">
-                        {file.name}
+                      <a
+                        aria-label={`Otwórz plik ${file.name}`}
+                        className="lead-reference-file-open"
+                        href={file.downloadUrl}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        <PanelIcon name="external" />
                       </a>
-                    ) : (
-                      <strong>{file.name}</strong>
-                    )}
-                    <small>
-                      {file.mimeType} · {formatFileSize(file.sizeBytes)}
-                    </small>
-                  </span>
-                </li>
-              ))}
-            </ul>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+              {previewFile ? (
+                <aside
+                  aria-label={`Podgląd pliku ${previewFile.name}`}
+                  className="lead-reference-file-preview"
+                >
+                  <div className="lead-reference-file-preview__header">
+                    <span>Podgląd</span>
+                    <small>{formatFileType(previewFile.mimeType)}</small>
+                  </div>
+                  {previewFile.downloadUrl && previewFile.mimeType.startsWith("image/") ? (
+                    <a href={previewFile.downloadUrl} rel="noreferrer" target="_blank">
+                      <Image
+                        alt={`Podgląd pliku ${previewFile.name}`}
+                        height={180}
+                        src={previewFile.downloadUrl}
+                        unoptimized
+                        width={280}
+                      />
+                    </a>
+                  ) : (
+                    <div className="lead-reference-file-preview__fallback">
+                      <PanelIcon name="file" />
+                      <span>Podgląd niedostępny</span>
+                    </div>
+                  )}
+                  <div className="lead-reference-file-preview__meta">
+                    <strong>{previewFile.name}</strong>
+                    <small>{formatFileSize(previewFile.sizeBytes)}</small>
+                  </div>
+                </aside>
+              ) : null}
+            </div>
           )}
         </section>
 
@@ -261,6 +313,31 @@ export default async function LeadDetailPage({ params }: PageProps) {
                       {leadStatusLabels[entry.toStatus]}
                     </strong>
                     <small>{formatDateTime(entry.changedAt)}</small>
+                  </span>
+                </li>
+              ))}
+              {lead.notes.map((note) => (
+                <li key={`note-${note.id}`}>
+                  <span className="lead-reference-check" aria-hidden="true">
+                    <PanelIcon name="edit" />
+                  </span>
+                  <span>
+                    <strong>Notatka · {note.createdByName}</strong>
+                    <small>{formatDateTime(note.createdAt)}</small>
+                    <p>{note.body}</p>
+                  </span>
+                </li>
+              ))}
+              {lead.operation.activities.map((activity) => (
+                <li key={`operation-${activity.id}`}>
+                  <span className="lead-reference-check" aria-hidden="true">
+                    <PanelIcon name={activity.kind.startsWith("task_") ? "check" : "settings"} />
+                  </span>
+                  <span>
+                    <strong>{operationActivityLabel(activity)}</strong>
+                    <small>
+                      {activity.actorName} · {formatDateTime(activity.occurredAt)}
+                    </small>
                   </span>
                 </li>
               ))}
@@ -422,6 +499,48 @@ function formatFileSize(size: number): string {
   return `${new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 1 }).format(
     size / (1024 * 1024),
   )} MB`;
+}
+
+function formatFileType(mimeType: string): string {
+  const labels: Readonly<Record<string, string>> = {
+    "application/pdf": "Dokument PDF",
+    "image/jpeg": "Obraz JPG",
+    "image/png": "Obraz PNG",
+    "image/webp": "Obraz WEBP",
+  };
+  return labels[mimeType] ?? mimeType;
+}
+
+function fileCountLabel(count: number): string {
+  if (count === 1) return "plik";
+  const lastTwoDigits = count % 100;
+  const lastDigit = count % 10;
+  if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) {
+    return "pliki";
+  }
+  return "plików";
+}
+
+function operationActivityLabel(activity: LeadDetail["operation"]["activities"][number]): string {
+  switch (activity.kind) {
+    case "assignee_changed":
+      return `Właściciel: ${activity.fromLabel ?? "Bez właściciela"} → ${activity.toLabel ?? "Bez właściciela"}`;
+    case "priority_changed":
+      return `Priorytet: ${priorityLabel(activity.fromLabel)} → ${priorityLabel(activity.toLabel)}`;
+    case "task_created":
+      return `Utworzono: ${activity.taskTitle ?? "działanie"}`;
+    case "task_completed":
+      return `Wykonano: ${activity.taskTitle ?? "działanie"}`;
+    case "task_cancelled":
+      return `Anulowano: ${activity.taskTitle ?? "działanie"}`;
+  }
+}
+
+function priorityLabel(value: string | null): string {
+  if (value === "high") return "Wysoki";
+  if (value === "low") return "Niski";
+  if (value === "medium") return "Średni";
+  return "Nie ustawiono";
 }
 
 function initials(value: string): string {

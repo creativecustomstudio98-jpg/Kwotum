@@ -7,7 +7,9 @@ export {
   type EmailDeliveryResult,
 } from "./delivery";
 export {
+  renderFlowInvitationEmail,
   renderNotificationEmail,
+  type FlowInvitationTemplateInput,
   type NotificationKind,
   type NotificationTemplateInput,
   type RenderedEmail,

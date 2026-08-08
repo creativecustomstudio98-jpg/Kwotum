@@ -35,13 +35,20 @@ oknie awarii między dostawcą a zapisem statusu.
 `@wyceno/email` zawiera wersjonowane szablony:
 
 - `lead-customer-v1`;
-- `lead-company-v1`.
+- `lead-company-v1`;
+- `flow-invitation-v1`.
 
 Każdy render zwraca temat, pełny HTML i odpowiednik tekstowy. HTML ma język
 polski, tytuł, jeden główny region i nagłówek pierwszego poziomu; treść pozostaje
 czytelna bez CSS. Dane dynamiczne są escapowane, a temat usuwa znaki sterujące.
 Wiadomość klienta nie zawiera prywatnego score ani linku do panelu. Wiadomość
 firmy prowadzi do tenantowego szczegółu leada.
+
+`flow-invitation-v1` służy do wysłania klientowi aktualnego hosted flow przed
+powstaniem leada. Zawiera nazwę firmy i procesu, opcjonalne imię oraz osobistą
+wiadomość i zwykły link `/f/{publicId}`. Nie zawiera score, prywatnych reguł,
+identyfikatora zaproszenia, PII w URL, piksela śledzącego ani deklaracji o
+otwarciu wiadomości.
 
 Zmiana treści lub kontraktu danych wymaga nowej wersji szablonu, testów obu
 formatów i kompatybilnego odczytu istniejących rekordów outboxu.
@@ -78,6 +85,13 @@ Odpowiedź zawiera wyłącznie liczniki `claimed`, `sent`, `retrying` i `failed`
 Endpoint zawsze używa `private, no-store`; błąd nie ujawnia odbiorcy, tematu ani
 treści. Scheduler i jego alerty produkcyjne powstają przy wdrożeniu Etapu 13.
 
+Ten sam chroniony endpoint przetwarza również osobny outbox
+`flow_invitations`. Odpowiedź sumuje bezpieczne liczniki obu kolejek. Worker
+zaproszeń używa stabilnego
+`Idempotency-Key: flow-invitation/<invitation_id>`, tej samej klasyfikacji
+błędów i tego samego backoffu, ale zachowuje osobną historię oraz kontrakt
+retencji.
+
 ## Prywatność i obserwowalność
 
 Adres odbiorcy jest dodatkową kopią PII. Obejmuje go tenantowe RLS, retencja,
@@ -98,7 +112,12 @@ gdy region wysyłkowy jest ustawiony na UE.
 - test workera sprawdza wysyłkę bez sieci, retry i brak PII w logach;
 - `pnpm test:rls` sprawdza enqueue w transakcji submitu, izolację tenantów,
   minimalne granty, retry oraz historię prób;
-- statusy są widoczne w tenantowym szczególe leada.
+- statusy są widoczne w tenantowym szczególe leada;
+- `flow-invitation-v1` ma testy HTML/text, escapowania i braku trackingu;
+- worker zaproszeń ma test sent/retry/configuration bez ruchu sieciowego;
+- `supabase/tests/flow_invitations.sql` sprawdza idempotencję, aktualną
+  publikację, role, drugi tenant, minimalne granty i historię prób;
+- panel pokazuje status, wersję, autora i datę każdej wysyłki.
 
 ## Ograniczenia produkcyjne
 

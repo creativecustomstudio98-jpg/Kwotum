@@ -18,6 +18,21 @@ stany `synced`, `saving` i `offline`, więc zapis nie blokuje procesu. Odpowiedz
 zapisują się lokalnie i serwerowo; UUID mutacji zapobiega duplikatom. Konflikt
 rewizji dwóch kart wymusza wznowienie i bezpieczne odtworzenie kolejki.
 
+## Tryb podglądu panelowego
+
+Etap 12ZH wykorzystuje ten sam `WycenoWidgetElement`,
+`WidgetSessionController`, parser manifestu, walidację odpowiedzi i nawigację,
+ale podstawia `PreviewWidgetApi` oraz `MemoryWidgetStorage`. Manifest pochodzi
+z immutable opublikowanej wersji i jest przekazywany do elementu jako
+właściwość; adapter preview nie wykonuje `fetch`, nie tworzy publicznej sesji,
+nie wysyła analityki, plików ani odpowiedzi i nie tworzy leada. Submit kończy
+się wyłącznie lokalnym potwierdzeniem, a restart usuwa stan pamięciowy.
+
+Preview ma stałą, widoczną etykietę i nie emituje zdarzenia `submitted` do
+hosta. Nie zastępuje UAT publicznego hosted flow, ponieważ nie uruchamia
+serwerowego pricingu ani dostawy. Podgląd draftu pozostaje poza zakresem do
+czasu zdefiniowania bezpiecznego, wersjonowanego snapshotu roboczego.
+
 ## Bezpieczeństwo
 
 Manifest jest allowlistowany, a treść jest renderowana jako tekst — rich text

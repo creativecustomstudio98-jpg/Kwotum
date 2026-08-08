@@ -453,7 +453,7 @@ export function FlowBuilder({
                       )
                     }
                   >
-                    Instalacja procesu
+                    Podgląd i udostępnianie
                   </Link>
                   <Link
                     href={`/panel/${organizationId}/procesy`}
@@ -917,7 +917,7 @@ export function FlowBuilder({
                 </button>
               </div>
             </form>
-            <p className="form-preview__brand">Powered by Lorum</p>
+            <p className="form-preview__brand">Powered by Kwotum</p>
           </div>
         </section>
 

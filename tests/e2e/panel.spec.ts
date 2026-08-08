@@ -9,6 +9,9 @@ const panelPassword = process.env.PANEL_E2E_PASSWORD;
 const seededFlowId = process.env.PANEL_E2E_FLOW_ID;
 const editorFlowId = process.env.PANEL_E2E_EDITOR_FLOW_ID;
 const artifactDirectory = path.resolve("artifacts/visual-qa/12a-panel-reconstruction/actual");
+const organizationPickerArtifactDirectory = path.resolve(
+  "artifacts/visual-qa/12m-panel-shell/organization-picker-kwotum",
+);
 const processArtifactDirectory = path.resolve("artifacts/visual-qa/12n-process-list");
 const leadDetailArtifactDirectory = path.resolve("artifacts/visual-qa/12o-lead-detail-responsive");
 const templateArtifactDirectory = path.resolve(
@@ -94,16 +97,89 @@ test.describe("panel reference reconstruction", () => {
     await signIn(page);
   });
 
-  test("shared Lorum sidebar expands, collapses and persists across routes", async ({ page }) => {
+  test("organization picker follows the accepted Kwotum composition", async ({ page }) => {
+    await mkdir(organizationPickerArtifactDirectory, { recursive: true });
+    await page.setViewportSize({ height: 1_152, width: 2_048 });
+    await page.goto("/panel");
+
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Wybierz organizację" }),
+    ).toBeVisible();
+    const card = page.locator(".organization-list > li").first();
+    const summary = card.getByRole("list", { name: /Podsumowanie organizacji/ });
+    await expect(summary.getByRole("listitem")).toHaveCount(3);
+    await expect(card.getByRole("link", { name: "Otwórz panel" })).toHaveAttribute(
+      "href",
+      `/panel/${organizationId}`,
+    );
+
+    const desktop = await page.evaluate(() => {
+      const bounds = (selector: string) => {
+        const rect = document.querySelector<HTMLElement>(selector)?.getBoundingClientRect();
+        if (!rect) throw new Error(`Brak elementu ${selector}.`);
+        return { height: rect.height, width: rect.width };
+      };
+      return {
+        avatar: bounds(".organization-list__identity > span"),
+        card: bounds(".organization-list > li"),
+        content: bounds(".organization-picker__content"),
+        header: bounds(".organization-picker__header"),
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        primaryAction: bounds(".organization-actions__primary"),
+        secondaryAction: bounds(".organization-actions__secondary"),
+      };
+    });
+
+    expect(desktop.header.height).toBeGreaterThanOrEqual(101);
+    expect(desktop.header.height).toBeLessThanOrEqual(104);
+    expect(desktop.content.width).toBeGreaterThanOrEqual(1_258);
+    expect(desktop.content.width).toBeLessThanOrEqual(1_262);
+    expect(desktop.card.height).toBeGreaterThanOrEqual(230);
+    expect(desktop.card.height).toBeLessThanOrEqual(236);
+    expect(desktop.avatar.width).toBeGreaterThanOrEqual(76);
+    expect(desktop.avatar.width).toBeLessThanOrEqual(80);
+    expect(desktop.primaryAction.height).toBeGreaterThanOrEqual(59);
+    expect(desktop.primaryAction.width).toBeGreaterThanOrEqual(174);
+    expect(desktop.secondaryAction.height).toBeGreaterThanOrEqual(59);
+    expect(desktop.secondaryAction.width).toBeGreaterThanOrEqual(127);
+    expect(desktop.overflow).toBeLessThanOrEqual(1);
+
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(organizationPickerArtifactDirectory, "after-desktop-2048x1152.png"),
+    });
+
+    await page.setViewportSize({ height: 844, width: 390 });
+    await expect(card).toBeVisible();
+    await expect(card.getByRole("link", { name: "Otwórz panel" })).toBeVisible();
+    await expect(card.getByRole("link", { name: /Procesy|Leady/ })).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+
+    const accessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(accessibility.violations).toEqual([]);
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(organizationPickerArtifactDirectory, "after-mobile-390x844.png"),
+    });
+  });
+
+  test("shared Kwotum sidebar expands, collapses and persists across routes", async ({ page }) => {
     await page.setViewportSize({ height: 1_024, width: 1_536 });
     await page.goto(`/panel/${organizationId}`);
 
     const sidebar = page.locator("#panel-sidebar");
     await expect(sidebar).toHaveAttribute("data-collapsed", "false");
-    await expect(page.getByText("Lorum", { exact: true })).toBeVisible();
+    await expect(page.getByText("Kwotum", { exact: true })).toBeVisible();
     await expect
       .poll(() => sidebar.evaluate((element) => element.getBoundingClientRect().width))
-      .toBeGreaterThanOrEqual(206);
+      .toBeGreaterThanOrEqual(238);
 
     await page.getByRole("button", { name: "Zwiń menu boczne" }).click();
     await expect(sidebar).toHaveAttribute("data-collapsed", "true");
@@ -497,14 +573,14 @@ test.describe("panel reference reconstruction", () => {
       .poll(() =>
         page.locator("#panel-sidebar").evaluate((element) => element.getBoundingClientRect().width),
       )
-      .toBeGreaterThanOrEqual(207);
+      .toBeGreaterThanOrEqual(238);
     await expect
       .poll(() =>
         page
           .locator(".flow-builder__preview")
           .evaluate((element) => element.getBoundingClientRect().width),
       )
-      .toBeGreaterThanOrEqual(559);
+      .toBeGreaterThanOrEqual(527);
 
     const expanded = await page.evaluate(() => {
       const rect = (selector: string) => {
@@ -524,7 +600,7 @@ test.describe("panel reference reconstruction", () => {
     });
 
     expect(expanded.questions.width).toBeGreaterThanOrEqual(319);
-    expect(expanded.preview.width).toBeGreaterThanOrEqual(559);
+    expect(expanded.preview.width).toBeGreaterThanOrEqual(527);
     expect(expanded.inspector.width).toBeGreaterThanOrEqual(359);
     expect(expanded.inspector.right).toBeLessThanOrEqual(1_449);
     expect(expanded.identity.right).toBeLessThanOrEqual(expanded.saveState.left);
@@ -1255,6 +1331,31 @@ test.describe("panel reference reconstruction", () => {
     if (!leadHref) throw new Error("Brak linku do demonstracyjnego leada.");
     await page.goto(leadHref);
     await expect(page.getByRole("heading", { level: 1, name: "Anna Kowalska" })).toBeVisible();
+    const operations = page.getByRole("complementary", { name: "Obsługa leada" });
+    await expect(operations.getByRole("heading", { name: "Obsługa leada" })).toBeVisible();
+    await expect(operations.getByLabel("Status leada")).toBeVisible();
+    await expect(operations.getByLabel("Priorytet leada")).toBeVisible();
+    await expect(operations.getByRole("button", { name: "Zaplanuj kontakt" })).toBeVisible();
+    await expect(operations.getByRole("button", { name: "Utwórz zadanie" })).toBeVisible();
+
+    await operations.getByRole("button", { name: "Zaplanuj kontakt" }).click();
+    const taskDialog = page.getByRole("dialog");
+    await expect(taskDialog.getByRole("heading", { name: "Zaplanuj kontakt" })).toBeVisible();
+    const taskTitle = `Kontakt testowy E2E ${Date.now()}`;
+    await taskDialog.getByLabel("Nazwa").fill(taskTitle);
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const localDateTime = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60_000)
+      .toISOString()
+      .slice(0, 16);
+    await taskDialog.getByLabel("Termin").fill(localDateTime);
+    await taskDialog.getByRole("button", { name: "Zaplanuj kontakt" }).click();
+    await expect(taskDialog).toBeHidden();
+    const createdTask = operations.getByRole("listitem").filter({
+      hasText: taskTitle,
+    });
+    await expect(createdTask).toBeVisible();
+    await createdTask.getByRole("button", { name: "Oznacz działanie jako wykonane" }).click();
+    await expect(createdTask).toBeHidden();
 
     const desktopGeometry = await page.evaluate(() => {
       const workspace = document
@@ -1283,6 +1384,7 @@ test.describe("panel reference reconstruction", () => {
     expect(desktopGeometry.scoreWidth).toBeGreaterThanOrEqual(desktopGeometry.articleWidth * 0.7);
     expect(desktopGeometry.sideWidth).toBeGreaterThanOrEqual(400);
     expect(desktopGeometry.overflow).toBeLessThanOrEqual(1);
+    await page.evaluate(() => window.scrollTo({ top: 0 }));
     await page.screenshot({
       animations: "disabled",
       path: path.join(leadDetailArtifactDirectory, "after-production-1536x1024.png"),
@@ -1635,15 +1737,15 @@ test.describe("panel reference reconstruction", () => {
       };
     });
     expect(shellGeometry.documentOverflow).toBeLessThanOrEqual(1);
-    expect(shellGeometry.railWidth).toBeGreaterThanOrEqual(206);
-    expect(shellGeometry.railWidth).toBeLessThanOrEqual(210);
+    expect(shellGeometry.railWidth).toBeGreaterThanOrEqual(238);
+    expect(shellGeometry.railWidth).toBeLessThanOrEqual(242);
     expect(shellGeometry.topbarHeight).toBeGreaterThanOrEqual(86);
     expect(shellGeometry.topbarHeight).toBeLessThanOrEqual(90);
 
     const sidebar = page.locator("#panel-sidebar");
     const sidebarToggle = page.getByRole("button", { name: "Zwiń menu boczne" });
     await expect(sidebar).toHaveAttribute("data-collapsed", "false");
-    await expect(page.getByText("Lorum", { exact: true })).toBeVisible();
+    await expect(page.getByText("Kwotum", { exact: true })).toBeVisible();
     await sidebarToggle.click();
     await expect(sidebar).toHaveAttribute("data-collapsed", "true");
     await expect(page.getByRole("button", { name: "Rozwiń menu boczne" })).toHaveAttribute(
@@ -1667,7 +1769,7 @@ test.describe("panel reference reconstruction", () => {
     await expect(sidebar).toHaveAttribute("data-collapsed", "false");
     await expect
       .poll(() => sidebar.evaluate((element) => element.getBoundingClientRect().width))
-      .toBeGreaterThanOrEqual(206);
+      .toBeGreaterThanOrEqual(238);
     await expect(page.getByRole("row")).toHaveCount(9);
     await expect(page.getByRole("link", { exact: true, name: "Nowy lead" })).toHaveAttribute(
       "href",

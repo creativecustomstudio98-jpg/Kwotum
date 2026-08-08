@@ -3,11 +3,17 @@ import {
   assertTenantResource,
   AuthorizationError,
   type Json,
+  type LeadActivityKind,
+  type LeadPriority,
   type LeadStatus,
+  type LeadTaskKind,
+  type LeadTaskStatus,
+  type OrganizationMemberRole,
   type TenantContext,
 } from "@wyceno/database";
 
 import { createClient } from "../supabase/server";
+import { deriveLeadOperationProjection } from "./operations";
 
 export type LeadSummary = Readonly<{
   contactEmail: string;
@@ -57,7 +63,13 @@ export type LeadDetail = Readonly<{
   >;
   id: string;
   notes: ReadonlyArray<
-    Readonly<{ body: string; createdAt: string; createdBy: string; id: string }>
+    Readonly<{
+      body: string;
+      createdAt: string;
+      createdBy: string;
+      createdByName: string;
+      id: string;
+    }>
   >;
   notifications: ReadonlyArray<
     Readonly<{
@@ -68,6 +80,28 @@ export type LeadDetail = Readonly<{
       status: "failed" | "pending" | "processing" | "retry" | "sent";
     }>
   >;
+  operation: Readonly<{
+    activities: ReadonlyArray<
+      Readonly<{
+        actorName: string;
+        fromLabel: string | null;
+        id: string;
+        kind: LeadActivityKind;
+        occurredAt: string;
+        taskTitle: string | null;
+        toLabel: string | null;
+      }>
+    >;
+    assignee: Readonly<{ name: string; userId: string }> | null;
+    lastActivityAt: string;
+    members: ReadonlyArray<
+      Readonly<{ name: string; role: OrganizationMemberRole; userId: string }>
+    >;
+    nextContact: LeadOperationTask | null;
+    nextTask: LeadOperationTask | null;
+    priority: LeadPriority;
+    tasks: ReadonlyArray<LeadOperationTask>;
+  }>;
   priceCurrency: string | null;
   priceMaxMinor: number | null;
   priceMinMinor: number | null;
@@ -77,6 +111,21 @@ export type LeadDetail = Readonly<{
   status: LeadStatus;
   submittedAt: string;
   triggeredScoringRules: ReadonlyArray<Readonly<{ id: string; label: string; points: number }>>;
+}>;
+
+export type LeadOperationTask = Readonly<{
+  assignedTo: string | null;
+  assignedToName: string;
+  closedAt: string | null;
+  createdAt: string;
+  createdBy: string;
+  createdByName: string;
+  description: string | null;
+  dueAt: string;
+  id: string;
+  kind: LeadTaskKind;
+  status: LeadTaskStatus;
+  title: string;
 }>;
 
 export async function listLeads(
@@ -170,13 +219,24 @@ export async function getLeadDetail(context: TenantContext, leadId: string): Pro
   assertTenantResource(context, lead.organization_id);
 
   const [
+    activityResult,
     answersResult,
     consentsResult,
     filesResult,
     historyResult,
+    membersResult,
     notesResult,
     notificationsResult,
+    operationResult,
+    tasksResult,
   ] = await Promise.all([
+    supabase
+      .from("lead_activity_events")
+      .select("id, task_id, kind, actor_user_id, from_value, to_value, occurred_at")
+      .eq("organization_id", context.organizationId)
+      .eq("lead_id", leadId)
+      .order("occurred_at", { ascending: false })
+      .limit(100),
     supabase
       .from("lead_answers")
       .select("step_key, question_title, answer")
@@ -203,6 +263,12 @@ export async function getLeadDetail(context: TenantContext, leadId: string): Pro
       .eq("lead_id", leadId)
       .order("changed_at", { ascending: false }),
     supabase
+      .from("organization_members")
+      .select("user_id, role")
+      .eq("organization_id", context.organizationId)
+      .eq("status", "active")
+      .order("created_at"),
+    supabase
       .from("lead_notes")
       .select("id, body, created_by, created_at")
       .eq("organization_id", context.organizationId)
@@ -214,14 +280,34 @@ export async function getLeadDetail(context: TenantContext, leadId: string): Pro
       .eq("organization_id", context.organizationId)
       .eq("lead_id", leadId)
       .order("created_at"),
+    supabase
+      .from("lead_operations")
+      .select("assignee_user_id, priority")
+      .eq("organization_id", context.organizationId)
+      .eq("lead_id", leadId)
+      .maybeSingle(),
+    supabase
+      .from("lead_tasks")
+      .select(
+        "id, kind, title, description, due_at, assigned_to, created_by, status, closed_at, created_at",
+      )
+      .eq("organization_id", context.organizationId)
+      .eq("lead_id", leadId)
+      .order("due_at")
+      .limit(100),
   ]);
   if (
+    activityResult.error ||
     answersResult.error ||
     consentsResult.error ||
     filesResult.error ||
     historyResult.error ||
+    membersResult.error ||
     notesResult.error ||
-    notificationsResult.error
+    notificationsResult.error ||
+    operationResult.error ||
+    !operationResult.data ||
+    tasksResult.error
   ) {
     throw new Error("Nie udało się pobrać szczegółów leada.");
   }
@@ -239,6 +325,51 @@ export async function getLeadDetail(context: TenantContext, leadId: string): Pro
       };
     }),
   );
+  const profileIds = [
+    operationResult.data.assignee_user_id,
+    ...membersResult.data.map((member) => member.user_id),
+    ...notesResult.data.map((note) => note.created_by),
+    ...tasksResult.data.flatMap((task) => [task.assigned_to, task.created_by]),
+    ...activityResult.data.map((activity) => activity.actor_user_id),
+    ...activityResult.data.flatMap((activity) =>
+      activity.kind === "assignee_changed" ? [activity.from_value, activity.to_value] : [],
+    ),
+  ].filter((value): value is string => Boolean(value));
+  const profileNames = new Map<string, string>();
+  if (profileIds.length > 0) {
+    const { data: profiles, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, display_name")
+      .in("id", [...new Set(profileIds)]);
+    if (profilesError) throw new Error("Nie udało się pobrać danych zespołu.");
+    profiles.forEach((profile) => {
+      if (profile.display_name) profileNames.set(profile.id, profile.display_name);
+    });
+  }
+  const displayName = (userId: string | null): string =>
+    (userId ? profileNames.get(userId) : null) ?? "Użytkownik zespołu";
+  const tasks: LeadOperationTask[] = tasksResult.data.map((task) => ({
+    assignedTo: task.assigned_to,
+    assignedToName: task.assigned_to ? displayName(task.assigned_to) : "Nieprzypisany",
+    closedAt: task.closed_at,
+    createdAt: task.created_at,
+    createdBy: task.created_by,
+    createdByName: displayName(task.created_by),
+    description: task.description,
+    dueAt: task.due_at,
+    id: task.id,
+    kind: task.kind,
+    status: task.status,
+    title: task.title,
+  }));
+  const taskById = new Map(tasks.map((task) => [task.id, task]));
+  const projection = deriveLeadOperationProjection({
+    activityOccurredAts: activityResult.data.map((activity) => activity.occurred_at),
+    noteCreatedAts: notesResult.data.map((note) => note.created_at),
+    statusChangedAts: historyResult.data.map((entry) => entry.changed_at),
+    submittedAt: lead.submitted_at,
+    tasks,
+  });
 
   return {
     answers: answersResult.data.map((answer) => ({
@@ -268,6 +399,7 @@ export async function getLeadDetail(context: TenantContext, leadId: string): Pro
       body: note.body,
       createdAt: note.created_at,
       createdBy: note.created_by,
+      createdByName: displayName(note.created_by),
       id: note.id,
     })),
     notifications: notificationsResult.data.map((notification) => ({
@@ -277,6 +409,45 @@ export async function getLeadDetail(context: TenantContext, leadId: string): Pro
       sentAt: notification.sent_at,
       status: notification.status,
     })),
+    operation: {
+      activities: activityResult.data.map((activity) => ({
+        actorName: displayName(activity.actor_user_id),
+        fromLabel:
+          activity.kind === "assignee_changed"
+            ? activity.from_value
+              ? displayName(activity.from_value)
+              : "Bez właściciela"
+            : activity.from_value,
+        id: activity.id,
+        kind: activity.kind,
+        occurredAt: activity.occurred_at,
+        taskTitle: activity.task_id ? (taskById.get(activity.task_id)?.title ?? null) : null,
+        toLabel:
+          activity.kind === "assignee_changed"
+            ? activity.to_value
+              ? displayName(activity.to_value)
+              : "Bez właściciela"
+            : activity.to_value,
+      })),
+      assignee: operationResult.data.assignee_user_id
+        ? {
+            name: displayName(operationResult.data.assignee_user_id),
+            userId: operationResult.data.assignee_user_id,
+          }
+        : null,
+      lastActivityAt: projection.lastActivityAt,
+      members: membersResult.data.map((member) => ({
+        name: displayName(member.user_id),
+        role: member.role,
+        userId: member.user_id,
+      })),
+      nextContact: projection.nextContactTaskId
+        ? (taskById.get(projection.nextContactTaskId) ?? null)
+        : null,
+      nextTask: projection.nextTaskId ? (taskById.get(projection.nextTaskId) ?? null) : null,
+      priority: operationResult.data.priority,
+      tasks,
+    },
     priceCurrency: lead.price_currency,
     priceMaxMinor: lead.price_max_minor,
     priceMinMinor: lead.price_min_minor,
@@ -292,19 +463,24 @@ export async function getLeadDetail(context: TenantContext, leadId: string): Pro
 export async function addLeadNote(
   context: TenantContext,
   input: Readonly<{ body: string; leadId: string }>,
-): Promise<void> {
+): Promise<Readonly<{ createdAt: string; id: string }>> {
   assertCapability(context, "lead:note");
   const body = input.body.trim();
   if (body.length < 1 || body.length > 4000) throw new Error("Notatka ma nieprawidłową długość.");
   await getLeadDetail(context, input.leadId);
   const supabase = await createClient();
-  const { error } = await supabase.from("lead_notes").insert({
-    body,
-    created_by: context.userId,
-    lead_id: input.leadId,
-    organization_id: context.organizationId,
-  });
-  if (error) throw new Error("Nie udało się dodać notatki.");
+  const { data, error } = await supabase
+    .from("lead_notes")
+    .insert({
+      body,
+      created_by: context.userId,
+      lead_id: input.leadId,
+      organization_id: context.organizationId,
+    })
+    .select("created_at, id")
+    .single();
+  if (error || !data) throw new Error("Nie udało się dodać notatki.");
+  return { createdAt: data.created_at, id: data.id };
 }
 
 export async function changeLeadStatus(
@@ -317,6 +493,84 @@ export async function changeLeadStatus(
     target_lead_id: input.leadId,
     target_organization_id: context.organizationId,
     target_status: input.status,
+  });
+  if (error) throw new AuthorizationError("NOT_FOUND", "Resource not found.");
+}
+
+export async function setLeadAssignee(
+  context: TenantContext,
+  input: Readonly<{ assigneeUserId: string | null; leadId: string }>,
+): Promise<void> {
+  assertCapability(context, "lead:assign");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_lead_assignee", {
+    target_assignee_user_id: input.assigneeUserId,
+    target_lead_id: input.leadId,
+    target_organization_id: context.organizationId,
+  });
+  if (error) throw new AuthorizationError("NOT_FOUND", "Resource not found.");
+}
+
+export async function setLeadPriority(
+  context: TenantContext,
+  input: Readonly<{ leadId: string; priority: LeadPriority }>,
+): Promise<void> {
+  assertCapability(context, "lead:operate");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_lead_priority", {
+    target_lead_id: input.leadId,
+    target_organization_id: context.organizationId,
+    target_priority: input.priority,
+  });
+  if (error) throw new AuthorizationError("NOT_FOUND", "Resource not found.");
+}
+
+export async function createLeadTask(
+  context: TenantContext,
+  input: Readonly<{
+    assignedTo: string | null;
+    description: string | null;
+    dueAt: string;
+    kind: LeadTaskKind;
+    leadId: string;
+    requestId: string;
+    title: string;
+  }>,
+): Promise<Readonly<{ createdAt: string; id: string }>> {
+  assertCapability(context, "lead:operate");
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("create_lead_task", {
+    idempotency_key: input.requestId,
+    target_assignee_user_id: input.assignedTo,
+    target_description: input.description,
+    target_due_at: input.dueAt,
+    target_kind: input.kind,
+    target_lead_id: input.leadId,
+    target_organization_id: context.organizationId,
+    target_title: input.title,
+  });
+  if (error) throw new AuthorizationError("NOT_FOUND", "Resource not found.");
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    throw new Error("Nieprawidłowa odpowiedź po utworzeniu działania.");
+  }
+  const id = data.id;
+  const createdAt = data.createdAt;
+  if (typeof id !== "string" || typeof createdAt !== "string") {
+    throw new Error("Nieprawidłowa odpowiedź po utworzeniu działania.");
+  }
+  return { createdAt, id };
+}
+
+export async function closeLeadTask(
+  context: TenantContext,
+  input: Readonly<{ status: "cancelled" | "completed"; taskId: string }>,
+): Promise<void> {
+  assertCapability(context, "lead:operate");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("close_lead_task", {
+    target_organization_id: context.organizationId,
+    target_status: input.status,
+    target_task_id: input.taskId,
   });
   if (error) throw new AuthorizationError("NOT_FOUND", "Resource not found.");
 }
