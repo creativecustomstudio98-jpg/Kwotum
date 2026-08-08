@@ -28,6 +28,15 @@ flow i publiczny manifest o kompatybilny kontrakt v2 z sekcjami i typowanymi
 ograniczeniami odpowiedzi.
 Migracja `20260729000200_stage12v_flow_editor_revision.sql` rozszerza trigger
 rewizji draftu na edytowalną nazwę procesu, bez zmiany tabel lub grantów.
+Migracja `20260803000100_stage12zh_flow_invitations.sql` dodaje tenantowe,
+idempotentne zaproszenia do podglądu opublikowanego procesu, outbox oraz
+wąskie RPC dla panelu i workera.
+Migracja `20260803000200_stage12zi_lead_operations.sql` dodaje tenantowe
+przypisanie, priorytet, kontakty, notatki i zadania leada wraz z audytem oraz
+kontrolą uprawnień Owner/Admin/Sales.
+Migracja `20260803000300_stage13a_runtime_readiness.sql` dodaje bezpieczny,
+anonimowy probe PostgreSQL używany wyłącznie przez ograniczony czasowo
+endpoint readiness.
 
 Pliki wdrożonych migracji są niezmienne. Korekty wykonujemy nową migracją.
 Rollback aplikacji nie cofa automatycznie schematu; przed produkcyjnym
@@ -85,3 +94,20 @@ Rollback Etapu 12V pozostawia rozszerzony trigger rewizji. Starszy klient
 pozostaje zgodny, jeśli po każdym zapisie używa zwróconej rewizji. Ewentualna
 korekta zachowania wymaga nowej migracji zastępującej funkcję triggera; nie
 edytujemy ani nie usuwamy wdrożonego pliku.
+
+Rollback Etapu 12ZH zaczyna się od wyłączenia wysyłki zaproszeń i workera.
+Po przyjęciu ruchu rekordy zaproszeń, outboxu i prób pozostają audytem;
+stosujemy wyłącznie kompatybilną migrację naprawczą. W pustym środowisku nowa
+migracja może cofnąć granty i funkcje, a następnie polityki oraz tabele w
+odwrotnej kolejności zależności.
+
+Rollback Etapu 12ZI zaczyna się od wyłączenia operacji leada w aktualnym
+deploymencie. Po zapisaniu aktywności nie usuwamy historii, notatek ani zadań;
+wdrażamy kompatybilny rollback aplikacji i nową migrację naprawczą. Tylko w
+pustym środowisku można nową migracją cofnąć granty, funkcje, triggery,
+polityki, tabele i typy w odwrotnej kolejności.
+
+Rollback Etapu 13A polega najpierw na przywróceniu readiness do bezpiecznej
+odpowiedzi 503 lub wyłączeniu probe'u w aplikacji. Funkcja nie przechowuje
+danych. Nowa migracja może następnie cofnąć jej grant dla `anon` i usunąć ją;
+nie edytujemy wdrożonego pliku migracji.

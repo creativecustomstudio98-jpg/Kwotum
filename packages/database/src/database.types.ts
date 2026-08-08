@@ -3,8 +3,14 @@ export type Json = boolean | number | string | null | Json[] | { [key: string]: 
 export type OrganizationMemberRole = "owner" | "admin" | "sales";
 export type OrganizationMemberStatus = "invited" | "active" | "suspended";
 export type FlowVersionStatus = "archived" | "published";
+export type FlowInvitationStatus = "failed" | "pending" | "processing" | "retry" | "sent";
 export type WidgetSessionStatus = "active" | "expired";
 export type LeadStatus = "in_progress" | "lost" | "new" | "qualified" | "spam" | "won";
+export type LeadPriority = "high" | "low" | "medium";
+export type LeadTaskKind = "contact" | "task";
+export type LeadTaskStatus = "cancelled" | "completed" | "open";
+export type LeadActivityKind =
+  "assignee_changed" | "priority_changed" | "task_cancelled" | "task_completed" | "task_created";
 export type ConsentRecordType = "marketing_email" | "privacy_notice";
 export type LeadFileStatus = "pending" | "rejected" | "verified";
 export type NotificationKind = "lead_company_alert" | "lead_customer_confirmation";
@@ -331,6 +337,41 @@ export type Database = {
           verified_at?: string | null;
         }
       >;
+      lead_activity_events: Table<
+        {
+          actor_user_id: string | null;
+          from_value: string | null;
+          id: string;
+          kind: LeadActivityKind;
+          lead_id: string;
+          occurred_at: string;
+          organization_id: string;
+          task_id: string | null;
+          to_value: string | null;
+        },
+        {
+          actor_user_id?: string | null;
+          from_value?: string | null;
+          id?: string;
+          kind: LeadActivityKind;
+          lead_id: string;
+          occurred_at?: string;
+          organization_id: string;
+          task_id?: string | null;
+          to_value?: string | null;
+        },
+        {
+          actor_user_id?: string | null;
+          from_value?: string | null;
+          id?: string;
+          kind?: LeadActivityKind;
+          lead_id?: string;
+          occurred_at?: string;
+          organization_id?: string;
+          task_id?: string | null;
+          to_value?: string | null;
+        }
+      >;
       lead_notes: Table<
         {
           body: string;
@@ -380,6 +421,32 @@ export type Database = {
           reason?: string;
         }
       >;
+      lead_operations: Table<
+        {
+          assignee_user_id: string | null;
+          lead_id: string;
+          organization_id: string;
+          priority: LeadPriority;
+          updated_at: string;
+          updated_by: string | null;
+        },
+        {
+          assignee_user_id?: string | null;
+          lead_id: string;
+          organization_id: string;
+          priority?: LeadPriority;
+          updated_at?: string;
+          updated_by?: string | null;
+        },
+        {
+          assignee_user_id?: string | null;
+          lead_id?: string;
+          organization_id?: string;
+          priority?: LeadPriority;
+          updated_at?: string;
+          updated_by?: string | null;
+        }
+      >;
       lead_status_history: Table<
         {
           changed_at: string;
@@ -407,6 +474,59 @@ export type Database = {
           lead_id?: string;
           organization_id?: string;
           to_status?: LeadStatus;
+        }
+      >;
+      lead_tasks: Table<
+        {
+          assigned_to: string | null;
+          closed_at: string | null;
+          closed_by: string | null;
+          created_at: string;
+          created_by: string;
+          description: string | null;
+          due_at: string;
+          id: string;
+          kind: LeadTaskKind;
+          lead_id: string;
+          organization_id: string;
+          request_id: string;
+          status: LeadTaskStatus;
+          title: string;
+          updated_at: string;
+        },
+        {
+          assigned_to?: string | null;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          created_at?: string;
+          created_by: string;
+          description?: string | null;
+          due_at: string;
+          id?: string;
+          kind: LeadTaskKind;
+          lead_id: string;
+          organization_id: string;
+          request_id: string;
+          status?: LeadTaskStatus;
+          title: string;
+          updated_at?: string;
+        },
+        {
+          assigned_to?: string | null;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          created_at?: string;
+          created_by?: string;
+          description?: string | null;
+          due_at?: string;
+          id?: string;
+          kind?: LeadTaskKind;
+          lead_id?: string;
+          organization_id?: string;
+          request_id?: string;
+          status?: LeadTaskStatus;
+          title?: string;
+          updated_at?: string;
         }
       >;
       leads: Table<
@@ -489,6 +609,118 @@ export type Database = {
           status?: LeadStatus;
           submit_mutation_id?: string;
           submitted_at?: string;
+          updated_at?: string;
+        }
+      >;
+      flow_invitation_delivery_attempts: Table<
+        {
+          attempt_number: number;
+          error_code: NotificationErrorCode | null;
+          finished_at: string | null;
+          id: string;
+          invitation_id: string;
+          organization_id: string;
+          outcome: NotificationAttemptOutcome | null;
+          provider: "resend" | "test";
+          provider_message_id: string | null;
+          started_at: string;
+        },
+        {
+          attempt_number: number;
+          error_code?: NotificationErrorCode | null;
+          finished_at?: string | null;
+          id?: string;
+          invitation_id: string;
+          organization_id: string;
+          outcome?: NotificationAttemptOutcome | null;
+          provider: "resend" | "test";
+          provider_message_id?: string | null;
+          started_at?: string;
+        },
+        {
+          attempt_number?: number;
+          error_code?: NotificationErrorCode | null;
+          finished_at?: string | null;
+          id?: string;
+          invitation_id?: string;
+          organization_id?: string;
+          outcome?: NotificationAttemptOutcome | null;
+          provider?: "resend" | "test";
+          provider_message_id?: string | null;
+          started_at?: string;
+        }
+      >;
+      flow_invitations: Table<
+        {
+          attempt_count: number;
+          available_at: string;
+          created_at: string;
+          created_by: string;
+          flow_id: string;
+          flow_version_id: string;
+          id: string;
+          last_error_code: NotificationErrorCode | null;
+          locked_at: string | null;
+          lock_token: string | null;
+          organization_id: string;
+          personal_message: string | null;
+          provider: "resend" | "test" | null;
+          provider_message_id: string | null;
+          public_flow_id: string;
+          recipient_email: string;
+          recipient_name: string | null;
+          request_id: string;
+          sent_at: string | null;
+          status: FlowInvitationStatus;
+          template_version: "flow-invitation-v1";
+          updated_at: string;
+        },
+        {
+          attempt_count?: number;
+          available_at?: string;
+          created_at?: string;
+          created_by: string;
+          flow_id: string;
+          flow_version_id: string;
+          id?: string;
+          last_error_code?: NotificationErrorCode | null;
+          locked_at?: string | null;
+          lock_token?: string | null;
+          organization_id: string;
+          personal_message?: string | null;
+          provider?: "resend" | "test" | null;
+          provider_message_id?: string | null;
+          public_flow_id: string;
+          recipient_email: string;
+          recipient_name?: string | null;
+          request_id: string;
+          sent_at?: string | null;
+          status?: FlowInvitationStatus;
+          template_version?: "flow-invitation-v1";
+          updated_at?: string;
+        },
+        {
+          attempt_count?: number;
+          available_at?: string;
+          created_at?: string;
+          created_by?: string;
+          flow_id?: string;
+          flow_version_id?: string;
+          id?: string;
+          last_error_code?: NotificationErrorCode | null;
+          locked_at?: string | null;
+          lock_token?: string | null;
+          organization_id?: string;
+          personal_message?: string | null;
+          provider?: "resend" | "test" | null;
+          provider_message_id?: string | null;
+          public_flow_id?: string;
+          recipient_email?: string;
+          recipient_name?: string | null;
+          request_id?: string;
+          sent_at?: string | null;
+          status?: FlowInvitationStatus;
+          template_version?: "flow-invitation-v1";
           updated_at?: string;
         }
       >;
@@ -965,6 +1197,14 @@ export type Database = {
         };
         Returns: undefined;
       };
+      close_lead_task: {
+        Args: {
+          target_organization_id: string;
+          target_status: LeadTaskStatus;
+          target_task_id: string;
+        };
+        Returns: undefined;
+      };
       claim_notification_batch: {
         Args: {
           batch_size: number;
@@ -992,6 +1232,36 @@ export type Database = {
           template_version: string;
         }>;
       };
+      claim_flow_invitation_batch: {
+        Args: {
+          batch_size: number;
+          delivery_provider: "resend" | "test";
+          worker_id: string;
+        };
+        Returns: Array<{
+          attempt_number: number;
+          company_name: string;
+          flow_id: string;
+          flow_title: string;
+          invitation_id: string;
+          lock_token: string;
+          organization_id: string;
+          personal_message: string | null;
+          public_flow_id: string;
+          recipient_email: string;
+          recipient_name: string | null;
+          template_version: string;
+        }>;
+      };
+      complete_flow_invitation_delivery: {
+        Args: {
+          delivery_provider: "resend" | "test";
+          target_invitation_id: string;
+          target_lock_token: string;
+          target_provider_message_id: string;
+        };
+        Returns: undefined;
+      };
       complete_notification_delivery: {
         Args: {
           delivery_provider: "resend" | "test";
@@ -1000,6 +1270,30 @@ export type Database = {
           target_provider_message_id: string;
         };
         Returns: undefined;
+      };
+      create_flow_invitation: {
+        Args: {
+          idempotency_key: string;
+          target_flow_id: string;
+          target_organization_id: string;
+          target_personal_message?: string | null;
+          target_recipient_email: string;
+          target_recipient_name?: string | null;
+        };
+        Returns: Json;
+      };
+      create_lead_task: {
+        Args: {
+          idempotency_key: string;
+          target_assignee_user_id: string | null;
+          target_description: string | null;
+          target_due_at: string;
+          target_kind: LeadTaskKind;
+          target_lead_id: string;
+          target_organization_id: string;
+          target_title: string;
+        };
+        Returns: Json;
       };
       create_widget_session: {
         Args: { target_public_id: string };
@@ -1069,6 +1363,16 @@ export type Database = {
         };
         Returns: undefined;
       };
+      fail_flow_invitation_delivery: {
+        Args: {
+          delivery_provider: "resend" | "test";
+          retryable: boolean;
+          target_error_code: NotificationErrorCode;
+          target_invitation_id: string;
+          target_lock_token: string;
+        };
+        Returns: undefined;
+      };
       publish_flow: {
         Args: {
           expected_draft_revision: number;
@@ -1110,6 +1414,10 @@ export type Database = {
         };
         Returns: Json;
       };
+      runtime_readiness_probe: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
       resume_widget_session: {
         Args: { session_token: string };
         Returns: Json;
@@ -1124,6 +1432,22 @@ export type Database = {
       };
       set_lead_legal_hold: {
         Args: { target_lead_id: string; target_organization_id: string; target_reason: string };
+        Returns: undefined;
+      };
+      set_lead_assignee: {
+        Args: {
+          target_assignee_user_id: string | null;
+          target_lead_id: string;
+          target_organization_id: string;
+        };
+        Returns: undefined;
+      };
+      set_lead_priority: {
+        Args: {
+          target_lead_id: string;
+          target_organization_id: string;
+          target_priority: LeadPriority;
+        };
         Returns: undefined;
       };
       set_organization_retention: {
@@ -1185,9 +1509,14 @@ export type Database = {
       analytics_event_name: AnalyticsEventName;
       analytics_source: AnalyticsSource;
       flow_version_status: FlowVersionStatus;
+      flow_invitation_status: FlowInvitationStatus;
       consent_record_type: ConsentRecordType;
       lead_file_status: LeadFileStatus;
+      lead_activity_kind: LeadActivityKind;
+      lead_priority: LeadPriority;
       lead_status: LeadStatus;
+      lead_task_kind: LeadTaskKind;
+      lead_task_status: LeadTaskStatus;
       notification_attempt_outcome: NotificationAttemptOutcome;
       notification_error_code: NotificationErrorCode;
       notification_kind: NotificationKind;

@@ -317,8 +317,17 @@ begin
   ) or exists (
     select 1 from public.widget_sessions
     where id = (select session_id from governance_target)
+  ) or exists (
+    select 1 from public.lead_operations
+    where lead_id = (select lead_id from governance_target)
+  ) or exists (
+    select 1 from public.lead_tasks
+    where lead_id = (select lead_id from governance_target)
+  ) or exists (
+    select 1 from public.lead_activity_events
+    where lead_id = (select lead_id from governance_target)
   ) then
-    raise exception 'retention left lead or session data behind';
+    raise exception 'retention left lead, operation, task, activity or session data behind';
   end if;
   if exists (
     select 1 from public.widget_sessions

@@ -24,7 +24,13 @@ describe("tenant authorization", () => {
     });
 
     expect(hasCapability(activeOwner, "member:manage")).toBe(true);
+    expect(hasCapability(activeOwner, "flow:share")).toBe(true);
+    expect(hasCapability(activeOwner, "lead:assign")).toBe(true);
+    expect(hasCapability(activeOwner, "lead:operate")).toBe(true);
     expect(hasCapability(sales, "member:manage")).toBe(false);
+    expect(hasCapability(sales, "flow:share")).toBe(false);
+    expect(hasCapability(sales, "lead:assign")).toBe(false);
+    expect(hasCapability(sales, "lead:operate")).toBe(true);
     expect(hasCapability(sales, "flow:read")).toBe(false);
     expect(hasCapability(sales, "analytics:summary")).toBe(true);
     expect(hasCapability(sales, "analytics:read")).toBe(false);

@@ -6,8 +6,11 @@ export type Capability =
   | "audit:read"
   | "flow:publish"
   | "flow:read"
+  | "flow:share"
   | "flow:write"
+  | "lead:assign"
   | "lead:note"
+  | "lead:operate"
   | "lead:read"
   | "lead:status"
   | "member:manage"
@@ -52,8 +55,11 @@ const capabilitiesByRole = {
     "audit:read",
     "flow:publish",
     "flow:read",
+    "flow:share",
     "flow:write",
+    "lead:assign",
     "lead:note",
+    "lead:operate",
     "lead:read",
     "lead:status",
     "member:manage",
@@ -72,8 +78,11 @@ const capabilitiesByRole = {
     "audit:read",
     "flow:publish",
     "flow:read",
+    "flow:share",
     "flow:write",
+    "lead:assign",
     "lead:note",
+    "lead:operate",
     "lead:read",
     "lead:status",
     "organization:read",
@@ -85,6 +94,7 @@ const capabilitiesByRole = {
   sales: new Set<Capability>([
     "analytics:summary",
     "lead:note",
+    "lead:operate",
     "lead:read",
     "lead:status",
     "organization:read",
