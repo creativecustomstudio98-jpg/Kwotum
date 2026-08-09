@@ -56,7 +56,7 @@ export default async function LeadsPage({ params, searchParams }: PageProps) {
         lead.contactEmail.toLocaleLowerCase("pl-PL").includes(normalizedSearch) ||
         lead.flowTitle.toLocaleLowerCase("pl-PL").includes(normalizedSearch)),
   );
-  const pageSize = 18;
+  const pageSize = 8;
   const pageCount = Math.max(1, Math.ceil(matchingLeads.length / pageSize));
   const requestedPage = Number(query.page);
   const currentPage =

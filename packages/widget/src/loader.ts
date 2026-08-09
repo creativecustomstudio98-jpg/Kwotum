@@ -7,16 +7,18 @@ function register(): Promise<void> {
   return loading;
 }
 
-if (document.querySelector(elementName)) {
-  void register();
-} else {
-  const observer = new MutationObserver(() => {
-    if (document.querySelector(elementName)) {
-      observer.disconnect();
-      void register();
-    }
-  });
-  observer.observe(document.documentElement, { childList: true, subtree: true });
+if (typeof document !== "undefined") {
+  if (document.querySelector(elementName)) {
+    void register();
+  } else {
+    const observer = new MutationObserver(() => {
+      if (document.querySelector(elementName)) {
+        observer.disconnect();
+        void register();
+      }
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
 }
 
 export { register as registerWycenoWidget };

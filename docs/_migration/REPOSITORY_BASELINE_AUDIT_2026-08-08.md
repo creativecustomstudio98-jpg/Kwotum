@@ -62,13 +62,14 @@ cofać pojedynczej paczki bez zgodnego lockfile'a i patcha.
 
 | Gate                                 | Wynik                                                                |
 | ------------------------------------ | -------------------------------------------------------------------- |
-| format, lint, typecheck, unit, build | PASS; Turbo 32/32, unit 177/177, build 40 tras                       |
+| format, lint, typecheck, unit, build | PASS; Turbo 32/32, unit 178/178, build 40 tras                       |
 | SAST i working-tree secret scan      | PASS                                                                 |
 | dependency audit                     | PASS; zero znanych podatności                                        |
 | PostgreSQL/RLS                       | PASS na odizolowanej lokalnej bazie; baza testowa usunięta po teście |
 | tenant/security negative cases       | PASS, w tym drugi tenant, Sales i zawieszony użytkownik              |
 | WordPress                            | PASS dla 6.9.2 i 7.0.2 na PHP 8.5                                    |
 | Playwright production standalone     | 257 PASS, 17 SKIP, 0 FAIL                                            |
+| Uwierzytelniony panel standalone     | 17 PASS, cleanup organizacja/Auth/Storage `0/0/0`                    |
 | diff whitespace                      | PASS                                                                 |
 
 Szesnaście pominiętych scenariuszy panelu wymaga tymczasowych wartości
@@ -77,16 +78,21 @@ gate pilota. Test auth został oznaczony jako slow, ponieważ wykonuje osiem
 przebiegów ekranów, screenshoty i axe, bez osłabiania asercji. Naprawiono też
 regresję wysokości hero `/branze` w macierzy 320–1536 px bez obniżania CSP.
 
+Ogólny zestaw nadal jawnie pomija testy wymagające lokalnego konta, ale
+oddzielny `pnpm e2e:panel` odtwarza je na jednorazowym, losowym fixture i
+potwierdza cleanup. Nie wymaga stałych `PANEL_E2E_*` ani sekretów CI.
+
 ## Otwarte blokery
 
 1. Podzielić zastany kandydat na kompletne, odtwarzalne logiczne commity;
    końcowy `git status` musi być czysty.
 2. Odtworzyć frozen install, migracje, build i testy z nowego clean checkoutu.
-3. Uruchomić wszystkie scenariusze panelu na tymczasowej organizacji i danych
-   syntetycznych; po teście usunąć konto i dane.
-4. Wypchnąć dokładny SHA i uzyskać zielone CI, CodeQL oraz pełnohistoryczny
-   Gitleaks na tym samym SHA.
-5. Dopiero po 12ZD przejść do otwartych gate'ów 12ZE–13D i checklisty pilota.
+3. Wypchnąć dokładny SHA i uzyskać zielone CI oraz pełnohistoryczny Gitleaks
+   na tym samym SHA.
+4. Włączyć GitHub Code Security albo zatwierdzić zgodny licencyjnie zamiennik
+   CodeQL; nie obchodzić blokady przez wyłączenie uploadu SARIF.
+5. Odtworzyć końcowy SHA z nowego clean checkoutu i potwierdzić ten sam gate.
+6. Dopiero po 12ZD przejść do otwartych gate'ów 12ZE–13D i checklisty pilota.
 
 ## Clean checkout
 
@@ -163,6 +169,31 @@ skipach. Przypięty Linux potwierdza build oraz docelowy zestaw branż 11/11;
 pełny dowód Linux pozostaje wynikiem końcowego Quality Gate na GitHubie.
 Reprezentatywne baseline'y hero, guided flow, design systemu, auth i widgetu
 zostały sprawdzone wizualnie po osadzeniu fontu.
+
+## Uwierzytelniony panel — trzeci pass
+
+Komenda `pnpm e2e:panel` buduje standalone i sama tworzy na lokalnym Supabase
+losowego użytkownika, organizację Ownera oraz wyłącznie syntetyczne dane.
+Końcowy przebieg 2026-08-09 przeszedł **17/17**: 16 scenariuszy panelu i
+bezstanowy podgląd opublikowanego procesu. Po teście zapytanie kontrolne
+potwierdziło `0|0|0` dla organizacji, użytkownika Auth i obiektów Storage.
+
+Przebieg ujawnił i zamknął drift między zaakceptowanymi kontraktami a kodem:
+
+- loader widgetu obsługuje element podglądu utworzony przed rejestracją custom
+  elementu, bez publicznego API, localStorage i wywołań sieciowych;
+- builder zachowuje trzy kolumny przy 1448 px także po rozwinięciu sidebara
+  240 px;
+- reguła pełnej powierzchni Procesów nie obejmuje przypadkowo biblioteki
+  Szablonów, która zachowuje zatwierdzony kontener i geometrię 19/20;
+- lista leadów wraca do udokumentowanej paginacji po osiem rekordów;
+- testy instalacji i Integracji mierzą wypełnienie realnego workspace'u po
+  odjęciu kontrolowanego paddingu, zamiast historycznej liczby sprzed zmiany
+  sidebara.
+
+Harness odrzuca hostowane endpointy i zapisuje screenshoty w katalogu
+tymczasowym. Cleanup działa również po nieudanym teście i jest częścią wyniku,
+nie ręcznym krokiem po fakcie.
 
 ## Kryterium odbioru
 

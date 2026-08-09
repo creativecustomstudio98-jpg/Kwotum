@@ -31,16 +31,16 @@ export function FlowPreview({ manifest }: Readonly<{ manifest: WidgetManifestCon
     };
     script.addEventListener("error", fail, { once: true });
     const timeout = window.setTimeout(fail, 12_000);
+    const widget = document.createElement("wyceno-widget") as PreviewElement;
+    widget.setAttribute("public-id", manifest.publicId);
+    widget.setAttribute("mode", "inline");
+    widget.setAttribute("preview", "");
+    widget.previewManifest = manifest;
+    container.replaceChildren(widget);
     void customElements.whenDefined("wyceno-widget").then(() => {
-      if (cancelled || !host.current) return;
+      if (cancelled) return;
       window.clearTimeout(timeout);
       script?.removeEventListener("error", fail);
-      const widget = document.createElement("wyceno-widget") as PreviewElement;
-      widget.setAttribute("public-id", manifest.publicId);
-      widget.setAttribute("mode", "inline");
-      widget.setAttribute("preview", "");
-      widget.previewManifest = manifest;
-      host.current.replaceChildren(widget);
     });
     return () => {
       cancelled = true;

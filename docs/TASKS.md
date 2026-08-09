@@ -2267,6 +2267,21 @@ Raport:
 `docs/_migration/REPOSITORY_BASELINE_AUDIT_2026-08-08.md`. R7.1 pozostaje
 nieodebrane; naprawa regresji E2E nie zatwierdza tego etapu produktu.
 
+**Status trzeciego passu 2026-08-09 — AUTHENTICATED PANEL PASS, GATE OPEN:**
+`pnpm e2e:panel` buduje produkcyjny standalone, tworzy losowe konto i
+organizację wyłącznie na lokalnym Supabase, ładuje syntetyczny seed i uruchamia
+pakiet jednym workerem. Końcowy przebieg przeszedł 17/17: szesnaście
+scenariuszy panelu oraz bezstanowy podgląd procesu. Cleanup potwierdził
+`0|0|0` pozostałości organizacji, użytkownika Auth i prywatnych obiektów
+Storage, a screenshoty testu nie nadpisują wersjonowanych artefaktów QA.
+Gate wykrył i zamknął drift progu responsive buildera po sidebarze 240 px,
+przypadkowe objęcie Szablonów pełną powierzchnią Procesów, paginację leadów
+18 zamiast udokumentowanych 8 oraz historyczne pomiary workspace'u instalacji.
+Podgląd widgetu rejestruje teraz element utworzony przed definicją bez zapisu i
+bez sieci. Etap nadal pozostaje OPEN do wskazania końcowego SHA, czystego
+checkoutu, zielonych dostępnych kontroli CI/Gitleaks na tym SHA oraz jawnej
+decyzji dla niedostępnego w prywatnym repo uploadu CodeQL.
+
 ## Etap 12ZE — self-service pricing, scoring i wynik
 
 - [ ] Dodać tryby buildera `Wycena`, `Scoring` i `Wynik` bez równoległego

@@ -1280,7 +1280,7 @@
   min-width: 0;
 }
 
-@container (min-width: 77rem) {
+@container (min-width: 75.5rem) {
   .flow-builder__grid {
     grid-template-columns:
       minmax(16.25rem, 20rem)
@@ -1295,7 +1295,7 @@
   }
 }
 
-@container (max-width: 76.99rem) {
+@container (max-width: 75.49rem) {
   .panel-workspace--builder {
     height: auto;
     min-height: 100dvh;
@@ -2384,23 +2384,20 @@
   }
 }
 
-/* Processes and templates — the right workspace is one continuous surface. */
+/* Processes — the right workspace is one continuous surface. */
 
-.processes-panel,
-.templates-panel {
+.processes-panel {
   background: #fff;
 }
 
-.processes-panel .panel-page,
-.templates-panel .panel-page {
+.processes-panel .panel-page {
   max-width: none;
   min-height: 100dvh;
   padding: 0;
   gap: 0;
 }
 
-.process-list-surface,
-.template-library-surface {
+.process-list-surface {
   min-height: 100dvh;
   padding: 30px 36px 20px;
   border: 0;
@@ -2409,8 +2406,7 @@
 }
 
 @media (max-width: 56rem) {
-  .process-list-surface,
-  .template-library-surface {
+  .process-list-surface {
     min-height: calc(100dvh - 4rem - env(safe-area-inset-bottom));
     padding: 18px 12px 12px;
   }

@@ -6,6 +6,13 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Etap 12ZD ma powtarzalny, uwierzytelniony gate `pnpm e2e:panel`: lokalny-only
+  harness buduje standalone, tworzy jednorazowe konto i tenant, uruchamia 17
+  sekwencyjnych scenariuszy oraz potwierdza zero pozostałości w bazie, Auth i
+  Storage. Naprawiono bezstanowy podgląd widgetu, próg buildera po rozwinięciu
+  sidebara 240 px oraz drift Szablonów, paginacji leadów i pomiarów workspace'u
+  względem zaakceptowanej dokumentacji. Screenshoty bieżącego testu trafiają
+  do katalogu tymczasowego i nie nadpisują dowodów Visual QA.
 - Visual regression Etapu 12ZD jest powtarzalny między lokalnym macOS i CI:
   aplikacja osadza Inter 4.1 na licencji OFL 1.1, Playwright rozdziela 12
   aktywnych baseline'ów na Darwin i Linux, a Quality Gate działa w przypiętym

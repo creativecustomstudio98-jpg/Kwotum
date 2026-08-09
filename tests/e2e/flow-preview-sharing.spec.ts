@@ -7,7 +7,10 @@ const organizationId = process.env.PANEL_E2E_ORGANIZATION_ID;
 const panelEmail = process.env.PANEL_E2E_EMAIL;
 const panelPassword = process.env.PANEL_E2E_PASSWORD;
 const flowId = process.env.PANEL_E2E_FLOW_ID;
-const artifactDirectory = path.resolve("artifacts/visual-qa/12zh-flow-preview-sharing");
+const artifactRoot = process.env.PANEL_E2E_ARTIFACT_ROOT
+  ? path.resolve(process.env.PANEL_E2E_ARTIFACT_ROOT)
+  : path.resolve("artifacts/visual-qa");
+const artifactDirectory = path.join(artifactRoot, "12zh-flow-preview-sharing");
 
 async function signIn(page: Page) {
   if (!organizationId || !panelEmail || !panelPassword) {

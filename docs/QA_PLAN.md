@@ -66,3 +66,13 @@ operację przez DnD, `Alt+ArrowUp/Down` i menu dotykowe, sprawdza undo/redo,
 autosave, fokus, `aria-live`, axe, overflow oraz widoki 1448/768/390 px.
 Pełny panel z jednym współdzielonym szkicem jest uruchamiany sekwencyjnie, aby
 testy mutacji nie powodowały sztucznych konfliktów rewizji między workerami.
+
+Etap 12ZD dodaje rootową komendę `pnpm e2e:panel`. Harness dopuszcza wyłącznie
+lokalny projekt Supabase zgodny z `supabase/config.toml`, buduje standalone i
+tworzy jednorazowy tenant z losowym kontem. Pakiet obejmuje 16 scenariuszy
+panelu i jeden scenariusz podglądu bez zapisu: auth, RLS-scoped dane,
+dashboard, leady, builder z konfliktem dwóch kart, szablony, analitykę,
+instalację, ustawienia i responsive. Testy działają jednym workerem, a po
+przebiegu — także po błędzie — usuwane są rekordy tenantowe, konto Auth,
+prywatne obiekty Storage i tymczasowe screenshoty. Zero pozostałości jest
+osobną asercją gate'u.

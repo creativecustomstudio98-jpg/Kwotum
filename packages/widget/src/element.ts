@@ -65,6 +65,14 @@ export class WycenoWidgetElement extends HTMLElement {
 
   constructor() {
     super();
+    const pendingElement = this as unknown as {
+      previewManifest?: WidgetManifest | null;
+    };
+    if (Object.prototype.hasOwnProperty.call(pendingElement, "previewManifest")) {
+      const pendingManifest = pendingElement.previewManifest;
+      delete pendingElement.previewManifest;
+      this.#previewManifest = pendingManifest ? structuredClone(pendingManifest) : null;
+    }
     this.#shadow = this.attachShadow({ mode: "open" });
     const stylesheet = create("link");
     stylesheet.rel = "stylesheet";

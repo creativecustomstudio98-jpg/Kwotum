@@ -20,6 +20,7 @@
     "clean": "turbo run clean && rimraf .turbo",
     "dev": "turbo run dev",
     "e2e": "playwright test",
+    "e2e:panel": "pnpm --filter @wyceno/web e2e:panel",
     "e2e:update": "playwright test --update-snapshots=all",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

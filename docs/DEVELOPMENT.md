@@ -146,6 +146,23 @@ Pierwsze uruchomienie testów przeglądarkowych wymaga
 `pnpm exec playwright install chromium`. `pnpm e2e` porównuje istniejące
 baseline’y; `pnpm e2e:update` wolno wykonać dopiero po świadomym visual review.
 
+Pełny, uwierzytelniony gate panelu uruchamiaj wyłącznie przeciw lokalnemu
+Supabase:
+
+```bash
+pnpm e2e:panel
+```
+
+Komenda sprawdza, czy URL API i bazy są loopbackowe oraz zgodne z portami w
+`supabase/config.toml`, buduje produkcyjny standalone, tworzy losowego
+użytkownika i organizację, ładuje syntetyczny seed i uruchamia sekwencyjnie 16
+scenariuszy panelu oraz bezstanowy podgląd procesu. E-mail i hasło istnieją
+wyłącznie w pamięci procesu. Screenshoty trafiają do katalogu tymczasowego,
+więc nie nadpisują zaakceptowanych artefaktów Visual QA. Blok `finally` usuwa
+dane tenanta, obiekty Storage i konto Auth, a komenda kończy się sukcesem
+wyłącznie po potwierdzeniu zera pozostałości. Nie kieruj tego harnessu do
+stagingu ani produkcji.
+
 `pnpm dev` uruchamia aktywne aplikacje workspace. `apps/web` udostępnia
 `GET /health` oraz wewnętrzny, wyłączony z indeksowania showcase
 `/design-system`. Etap 3 dodaje `/logowanie`, callback PKCE i chroniony

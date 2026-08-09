@@ -8,35 +8,27 @@ const panelEmail = process.env.PANEL_E2E_EMAIL;
 const panelPassword = process.env.PANEL_E2E_PASSWORD;
 const seededFlowId = process.env.PANEL_E2E_FLOW_ID;
 const editorFlowId = process.env.PANEL_E2E_EDITOR_FLOW_ID;
-const artifactDirectory = path.resolve("artifacts/visual-qa/12a-panel-reconstruction/actual");
-const organizationPickerArtifactDirectory = path.resolve(
-  "artifacts/visual-qa/12m-panel-shell/organization-picker-kwotum",
+const artifactRoot = process.env.PANEL_E2E_ARTIFACT_ROOT
+  ? path.resolve(process.env.PANEL_E2E_ARTIFACT_ROOT)
+  : path.resolve("artifacts/visual-qa");
+const artifactDirectory = path.join(artifactRoot, "12a-panel-reconstruction/actual");
+const organizationPickerArtifactDirectory = path.join(
+  artifactRoot,
+  "12m-panel-shell/organization-picker-kwotum",
 );
-const processArtifactDirectory = path.resolve("artifacts/visual-qa/12n-process-list");
-const leadDetailArtifactDirectory = path.resolve("artifacts/visual-qa/12o-lead-detail-responsive");
-const templateArtifactDirectory = path.resolve(
-  "artifacts/visual-qa/12zc-template-library-override",
-);
-const analyticsArtifactDirectory = path.resolve(
-  "artifacts/visual-qa/12r-analytics-dashboard-style",
-);
-const dashboardArtifactDirectory = path.resolve("artifacts/visual-qa/12t-dashboard-reconstruction");
-const mobileNavigationArtifactDirectory = path.resolve("artifacts/visual-qa/12w-mobile-navigation");
-const remainingScreenArtifactDirectory = path.resolve(
-  "artifacts/visual-qa/12s-remaining-screens/after",
-);
-const builderStateArtifactDirectory = path.resolve("artifacts/visual-qa/12v-builder-state/after");
-const builderGeometryArtifactDirectory = path.resolve("artifacts/visual-qa/12w-builder-geometry");
-const builderInteractionArtifactDirectory = path.resolve(
-  "artifacts/visual-qa/12x-builder-interactions",
-);
-const builderToggleArtifactDirectory = path.resolve("artifacts/visual-qa/12y-builder-toggle/after");
-const builderSectionArtifactDirectory = path.resolve(
-  "artifacts/visual-qa/12z-builder-sections/after",
-);
-const builderOptionArtifactDirectory = path.resolve(
-  "artifacts/visual-qa/12za-builder-options/after",
-);
+const processArtifactDirectory = path.join(artifactRoot, "12n-process-list");
+const leadDetailArtifactDirectory = path.join(artifactRoot, "12o-lead-detail-responsive");
+const templateArtifactDirectory = path.join(artifactRoot, "12zc-template-library-override");
+const analyticsArtifactDirectory = path.join(artifactRoot, "12r-analytics-dashboard-style");
+const dashboardArtifactDirectory = path.join(artifactRoot, "12t-dashboard-reconstruction");
+const mobileNavigationArtifactDirectory = path.join(artifactRoot, "12w-mobile-navigation");
+const remainingScreenArtifactDirectory = path.join(artifactRoot, "12s-remaining-screens/after");
+const builderStateArtifactDirectory = path.join(artifactRoot, "12v-builder-state/after");
+const builderGeometryArtifactDirectory = path.join(artifactRoot, "12w-builder-geometry");
+const builderInteractionArtifactDirectory = path.join(artifactRoot, "12x-builder-interactions");
+const builderToggleArtifactDirectory = path.join(artifactRoot, "12y-builder-toggle/after");
+const builderSectionArtifactDirectory = path.join(artifactRoot, "12z-builder-sections/after");
+const builderOptionArtifactDirectory = path.join(artifactRoot, "12za-builder-options/after");
 
 async function signIn(page: Page) {
   if (!organizationId || !panelEmail || !panelPassword) {
@@ -413,9 +405,11 @@ test.describe("panel reference reconstruction", () => {
     test.skip(!editorFlowId, "Test stanu buildera wymaga PANEL_E2E_EDITOR_FLOW_ID.");
     await mkdir(builderStateArtifactDirectory, { recursive: true });
     await page.setViewportSize({ height: 1_086, width: 1_448 });
+    await page.evaluate(() => localStorage.setItem("lorum:panel-sidebar-collapsed", "true"));
     await page.goto(`/panel/${organizationId}/procesy/${editorFlowId}`);
+    await expect(page.locator("#panel-sidebar")).toHaveAttribute("data-collapsed", "true");
 
-    const firstTitle = page.getByLabel("Treść pytania");
+    const firstTitle = page.locator(".flow-builder__preview").getByLabel("Treść pytania");
     const originalTitle = await firstTitle.inputValue();
     const changedTitle = `${originalTitle} — autosave`;
     const staleTitle = `${originalTitle} — druga karta`;
@@ -443,14 +437,17 @@ test.describe("panel reference reconstruction", () => {
         timeout: 15_000,
       });
 
-      await stalePage.getByLabel("Treść pytania").fill(staleTitle);
+      const staleTitleInput = stalePage
+        .locator(".flow-builder__preview")
+        .getByLabel("Treść pytania");
+      await staleTitleInput.fill(staleTitle);
       await expect(stalePage.getByText("Niezapisane zmiany", { exact: true })).toBeVisible();
       await expect(
         stalePage.getByText(/Konflikt wersji — lokalne zmiany nie zostały nadpisane/),
       ).toBeVisible({ timeout: 15_000 });
       await stalePage.getByRole("button", { name: "Wczytaj aktualną wersję" }).click();
       await stalePage.getByRole("button", { name: "Potwierdź" }).click();
-      await expect(stalePage.getByLabel("Treść pytania")).toHaveValue(changedTitle, {
+      await expect(staleTitleInput).toHaveValue(changedTitle, {
         timeout: 15_000,
       });
 
@@ -2072,7 +2069,11 @@ test.describe("panel reference reconstruction", () => {
     const installationWidth = await installationLayout.evaluate(
       (element) => element.getBoundingClientRect().width,
     );
-    expect(installationWidth).toBeGreaterThan(1_250);
+    const panelContentWidth = await page
+      .locator(".panel-app-content")
+      .evaluate((element) => element.getBoundingClientRect().width);
+    expect(installationWidth).toBeGreaterThanOrEqual(panelContentWidth - 49);
+    expect(installationWidth).toBeLessThanOrEqual(panelContentWidth);
 
     await page.getByRole("button", { name: /Popup/ }).press("Enter");
     await expect(page.locator(".installation-code code")).toContainText('mode="popup"');
@@ -2092,7 +2093,8 @@ test.describe("panel reference reconstruction", () => {
         workspaceWidth: grid.parentElement?.getBoundingClientRect().width ?? 0,
       };
     });
-    expect(integrationGeometry.workspaceWidth).toBeGreaterThan(1_250);
+    expect(integrationGeometry.workspaceWidth).toBeGreaterThanOrEqual(panelContentWidth - 49);
+    expect(integrationGeometry.workspaceWidth).toBeLessThanOrEqual(panelContentWidth);
     expect(Math.max(...integrationGeometry.cardHeights)).toBeLessThanOrEqual(310);
 
     await page.setViewportSize({ height: 900, width: 1_440 });
