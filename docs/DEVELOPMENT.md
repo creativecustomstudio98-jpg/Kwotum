@@ -5,6 +5,7 @@
 - Node.js 24.18.0 LTS — wersja z `.node-version` i `.nvmrc`;
 - pnpm 11.17.0 — dokładna wersja z `packageManager`;
 - Git 2.x.
+- Docker Desktop do lokalnego Supabase i izolowanego skanu Semgrep CE.
 - PostgreSQL 17 (`initdb`, `pg_ctl`, `psql`) do lokalnego testu RLS albo pusta
   baza wskazana przez `RLS_TEST_DATABASE_URL`.
 
@@ -183,6 +184,23 @@ Renderer znajduje się w `@wyceno/widget`. Hosted link ma postać
 `docs/WIDGET_IMPLEMENTATION.md`. Testy E2E interceptują wyłącznie publiczne API
 syntetycznym fixture’em; kod produkcyjny nie ma trybu mock.
 
+## Kontrole bezpieczeństwa
+
+```bash
+pnpm security:sast
+pnpm security:secrets
+pnpm security:dependencies
+pnpm security:semgrep
+```
+
+Ostatnia komenda wymaga działającego Dockera i dostępu HTTPS wyłącznie do
+pobrania oficjalnego zestawu OWASP. Skrypt najpierw sprawdza przypięty SHA-256,
+potem odcina sieć kontenera, montuje repo tylko do odczytu, uruchamia 8 testów
+własnych reguł i pełny skan w trybie strict. Kod nie jest wysyłany do Semgrep
+App. Zmiany checksumy lub digestu wymagają review licencji, changelogu, reguł i
+osobnego commita; nie aktualizuj ich „do najnowszej” w celu uzyskania zielonego
+wyniku.
+
 ## Konfiguracja środowiska
 
 `@wyceno/config` rozdziela kontrakty klienta i serwera. Do przeglądarki mogą trafić wyłącznie wartości jawnie wymienione w `clientEnvSchema`; klucz `SUPABASE_SERVICE_ROLE_KEY`, URL bazy, klucze Resend i sekrety podpisujące należą wyłącznie do serwera. Schematy są strict, dlatego przekazuj do parsera jawnie wybrany obiekt, a nie całe `process.env`.
@@ -202,7 +220,13 @@ znajduje się w `docs/NOTIFICATIONS.md`.
 
 ## Polityka zależności
 
-Wersje bezpośrednie są przypięte, lockfile jest obowiązkowy, peer dependencies są rygorystyczne, a wydania młodsze niż 24 godziny są blokowane. Skrypty instalacyjne mogą wykonywać wyłącznie `sharp` i `unrs-resolver`, jawnie wpisane w `allowBuilds`. Nowa zależność z lifecycle script zatrzyma instalację.
+Wersje bezpośrednie są przypięte, lockfile jest obowiązkowy, peer dependencies
+są rygorystyczne, a wydania młodsze niż siedem dni są blokowane. pnpm blokuje
+też regresję pochodzenia publikacji oraz egzotyczne zależności tranzytywne.
+Skrypty instalacyjne mogą wykonywać wyłącznie `sharp` i `unrs-resolver`, jawnie
+wpisane w `allowBuilds`. Nowa zależność z lifecycle script zatrzyma instalację.
+Dokładne, tymczasowe wyjątki i ich uzasadnienia są w
+`docs/DEPENDENCIES.md`; nie rozszerzaj ich wildcardem.
 
 ## Troubleshooting
 
@@ -214,6 +238,11 @@ Wersje bezpośrednie są przypięte, lockfile jest obowiązkowy, peer dependenci
   następnie zrestartuj `pnpm dev`.
 - `ERR_PNPM_IGNORED_BUILDS`: nie włączaj wszystkich skryptów; sprawdź pakiet, a decyzję dodaj do `pnpm-workspace.yaml` i `docs/DEPENDENCIES.md`.
 - peer dependency error: dobierz wspierane wersje; nie wyłączaj `strictPeerDependencies`.
+- błąd `minimumReleaseAge` albo `trustPolicy`: sprawdź pochodzenie i advisory;
+  wyjątek może wskazywać tylko dokładnie zreviewowaną wersję i wymaga wpisu w
+  `docs/DEPENDENCIES.md`.
+- `Semgrep ruleset checksum mismatch`: zatrzymaj gate, pobierz zmianę do
+  osobnego review i nie aktualizuj checksumy bez porównania reguł oraz licencji.
 - wynik Turbo wygląda na nieaktualny: konfiguracje root są w `globalDependencies`; diagnostycznie użyj `pnpm exec turbo run <task> --force`.
 - błąd env: sprawdź nazwę, URL i czy sekret nie został omyłkowo oznaczony `NEXT_PUBLIC_*`.
 - brak `initdb`: zainstaluj PostgreSQL 17 albo ustaw

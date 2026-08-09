@@ -1,6 +1,6 @@
 # Rejestr zależności
 
-**Weryfikacja:** 2026-07-25. Wersje są dokładne w manifestach i lockfile.
+**Weryfikacja:** 2026-08-09. Wersje są dokładne w manifestach i lockfile.
 Główne licencje runtime są MIT; natywny `sharp` oraz Playwright używają
 Apache-2.0, a axe MPL-2.0.
 
@@ -24,6 +24,7 @@ Apache-2.0, a axe MPL-2.0.
 | `@axe-core/playwright` 4.12.1                           | automatyczny audyt WCAG          | MPL-2.0; tylko test i CI                                                                            |
 | `@supabase/supabase-js` 2.110.8                         | Auth, PostgREST i Storage        | MIT; klient panelu, skonfigurowany wyłącznie publishable key i ograniczony przez RLS                |
 | `@supabase/ssr` 0.12.3                                  | cookies i sesja Auth w Next.js   | MIT; mały adapter SSR; API nadal wymaga uwagi przy aktualizacjach                                   |
+| Semgrep CE 1.164.0                                      | blokujący SAST w Dockerze        | LGPL-2.1 engine; przypięty digest, bez wpływu na runtime ani bundle                                 |
 
 `@wyceno/widget` nie dodaje zależności runtime. Używa natywnych Custom
 Elements, Shadow DOM, Fetch i Web Storage. Istniejące `jsdom` oraz Playwright
@@ -60,18 +61,20 @@ zgodny.
 
 ## Security overrides Etapu 12
 
-Audit z 2026-07-25 wykrył high w wersjach przypiętych tranzytywnie przez
-Next.js i tooling. Do czasu aktualizacji zakresów upstream workspace wymusza:
+Ponowny audyt Etapu 12ZD wykrył dziewięć podatności w wersjach przypiętych
+tranzytywnie przez Next.js i tooling. Do czasu aktualizacji zakresów upstream
+workspace wymusza:
 
 - `sharp@0.35.3` zamiast 0.34.5 — poprawka GHSA-f88m-g3jw-g9cj;
-- `postcss@8.5.22` zamiast 8.4.31 — poprawki GHSA-6g55-p6wh-862q oraz
-  GHSA-r28c-9q8g-f849;
-- `brace-expansion@5.0.8` dla wszystkich gałęzi — poprawka
-  GHSA-mh99-v99m-4gvg.
+- `undici@7.29.0`;
+- `brace-expansion@5.0.9`;
+- `js-yaml@4.3.1`;
+- `nanoid@3.3.17`;
+- `postcss@8.5.26`.
 
 Override nie wyłącza audytu ani nie ignoruje advisory. Pełny gate sprawdza
-zgodność API transitive dependency. `brace-expansion@5.0.8` ma dodatkowo wąski
-patch CommonJS: zachowuje bezpieczny algorytm i limit ekspansji z 5.0.8, ale
+zgodność API transitive dependency. `brace-expansion@5.0.9` ma dodatkowo wąski
+patch CommonJS: zachowuje bezpieczny algorytm i limit ekspansji z 5.0.9, ale
 udostępnia jednocześnie historyczny callable export dla `minimatch@3` oraz
 named export `expand` dla `minimatch@10`. Patch należy usunąć, gdy cały łańcuch
 pluginów ESLint przejdzie na zgodne API `minimatch@10`. Przy aktualizacji
@@ -81,6 +84,46 @@ utrzymywać go bezterminowo.
 Ponowny `pnpm security:dependencies` po remediacji zwraca
 `No known vulnerabilities found`.
 
+## Polityka instalacji i kontrolowane wyjątki
+
+pnpm blokuje wydania młodsze niż siedem dni, regresję pochodzenia publikacji,
+egzotyczne źródła zależności tranzytywnych, niezgodne peer dependencies i
+nieallowlistowane lifecycle scripts. Lockfile nie jest automatycznie uznawany
+za zaufany: frozen install ponownie sprawdza 543 wpisy względem polityk.
+
+Dokładne wyjątki z 2026-08-09:
+
+- `minimumReleaseAgeExclude`: `nanoid@3.3.17` i `postcss@8.5.26`, ponieważ są
+  przypiętymi remediacjami znanych podatności nowszymi niż siedem dni;
+- `trustPolicyExclude`: `eslint-import-resolver-typescript@3.10.1` i
+  `semver@6.3.1`, ponieważ istniejący lockfile zawiera te starsze wydania bez
+  poziomu pochodzenia osiągniętego przez wcześniejsze publikacje.
+
+Wyjątki nie używają wildcardów ani samych nazw paczek. Po upływie siedmiu dni
+wyjątki wieku należy usunąć. Wyjątki pochodzenia należy ponownie sprawdzić przy
+każdej zmianie grafu; nie wolno rozszerzać ich na nowsze wersje bez review.
+
+## Semgrep CE i licencje reguł
+
+`pnpm security:semgrep` pobiera oficjalny zestaw OWASP spod
+`https://semgrep.dev/c/p/owasp-top-ten`, wymaga SHA-256
+`4edd262b86fee3840cde879037d52a87299cbb47df55e3e0c049eddd13831024`, a
+następnie skanuje repo w kontenerze
+`semgrep/semgrep@sha256:207983631beecdbe7fa29196c7f4a7a5f29033933cdb76c687ce4a672e07618d`.
+Engine Semgrep CE jest LGPL-2.1. Oficjalne reguły podlegają Semgrep Rules
+License 1.0, są używane wewnętrznie i nie są redystrybuowane w repozytorium.
+Własne reguły z `security/semgrep/kwotum.yml` są kodem tego projektu.
+Fixture `security/semgrep/kwotum.ts` zawiera celowo niebezpieczne przykłady,
+dlatego jest wyłączony wyłącznie z targetów pełnego skanu i legacy skanera
+regex; komenda Semgrep nadal musi zaliczyć wszystkie jego testy 8/8.
+
+Po weryfikacji checksumy kontener działa bez sieci, bez capabilities i z kodem
+tylko do odczytu. Semgrep CE jest kontrolą intrafile/intraprocedural; nie jest
+deklarowany jako zamiennik międzyplikowego dataflow, pentestu ani review.
+
 ## Aktualizacje
 
-Dependabot otwiera cotygodniowe PR-y dla npm i GitHub Actions. Aktualizacja wymaga lockfile, peer check, audytu, pełnego gate’u i przeglądu changelogu/security advisory. Nowy pakiet wymaga wpisu tutaj.
+Dependabot otwiera cotygodniowe PR-y dla npm i GitHub Actions oraz stosuje
+siedmiodniowy cooldown zwykłych aktualizacji. Cooldown nie opóźnia aktualizacji
+bezpieczeństwa. Aktualizacja wymaga lockfile, peer check, audytu, pełnego gate’u
+i przeglądu changelogu/security advisory. Nowy pakiet wymaga wpisu tutaj.

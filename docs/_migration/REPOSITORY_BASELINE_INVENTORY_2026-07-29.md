@@ -1,5 +1,9 @@
 # Inventory baseline'u repozytorium — Etap 12ZD
 
+> Historyczny snapshot pierwszego passu. Aktualny stan i decyzję o Semgrep CE
+> zamiast niedostępnego CodeQL opisują
+> `REPOSITORY_BASELINE_AUDIT_2026-08-08.md`, ADR-038 i `docs/TASKS.md`.
+
 **Data pierwszego snapshotu:** 2026-07-29  
 **Status:** CLEAN CHECKOUT CORE GATE PASS; uwierzytelniony panel, dependency
 audit i zdalne CI oczekują  

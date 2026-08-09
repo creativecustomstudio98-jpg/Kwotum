@@ -2,7 +2,7 @@
 
 **Status:** kanoniczny plan wykonawczy  
 **Wersja:** 1.0  
-**Ostatni przegląd:** 2026-07-29  
+**Ostatni przegląd:** 2026-08-09
 **Zakres:** od lokalnie działającego produktu do kontrolowanego pilota i
 publicznej produkcji
 
@@ -13,12 +13,12 @@ wykonania. Nie zastępuje wymagań produktu, decyzji ADR, polityk bezpieczeństw
 ani checklisty release. Określa:
 
 - co jest już działającą częścią produktu;
-- jakie luki blokują główną obietnicę Lorum;
+- jakie luki blokują główną obietnicę Kwotum;
 - co blokuje użycie prawdziwych danych;
 - w jakiej kolejności domknąć produkt, repozytorium, infrastrukturę, prawo i
   operacje;
 - jakie dowody są wymagane przed pilotem i przed publicznym uruchomieniem;
-- jak wdrażać Lorum w kolejnych firmach bez tworzenia osobnej, niespójnej
+- jak wdrażać Kwotum w kolejnych firmach bez tworzenia osobnej, niespójnej
   wersji produktu dla każdego klienta.
 
 W przypadku konfliktu pierwszeństwo zachowuje kolejność z `INDEX.md`:
@@ -50,7 +50,7 @@ Najważniejsze przyczyny:
 
 ## 3. Kanoniczna obietnica produktu
 
-Lorum prowadzi respondenta przez wersjonowany proces, zbiera zakres, budżet,
+Kwotum prowadzi respondenta przez wersjonowany proces, zbiera zakres, budżet,
 termin, lokalizację i materiały, a następnie:
 
 1. oblicza na serwerze niewiążącą estymację;
@@ -69,7 +69,7 @@ Estymacja może mieć formę:
 
 Silnik wykonuje ograniczone, deklaratywne operacje `add`, `multiply` i
 `add_per_unit`, używa integer minor units, jawnego zaokrąglenia i immutable
-snapshotu. Klient nie przesyła ceny ani score. Lorum nie jest formalnym
+snapshotu. Klient nie przesyła ceny ani score. Kwotum nie jest formalnym
 kosztorysem, CPQ, ofertą, umową ani fakturą.
 
 ## 4. Stan funkcjonalny
@@ -184,7 +184,7 @@ wyłącznie lokalnie; każdy blocker ma etap, ownera typu roli i dowód odbioru.
 - raport inventory;
 - `format:check`, lint, typecheck, unit, PostgreSQL/RLS, WordPress, E2E, SAST,
   secret scan, dependency audit i build;
-- CodeQL i pełnohistoryczny Gitleaks;
+- Semgrep CE i pełnohistoryczny Gitleaks;
 - artefakty CI przypięte do SHA.
 
 **Gate:** nie ma niejawnych plików lokalnych, wszystkie zmiany są zreviewowane,
@@ -353,7 +353,7 @@ kopiowanej między tenantami.
 - rozproszony rate limit per IP/origin i adaptacyjny Turnstile;
 - produkcyjny test ClamAV fail-closed;
 - log redaction i test braku PII;
-- CodeQL, Gitleaks, dependency audit i staging DAST;
+- Semgrep CE, Gitleaks, dependency audit i staging DAST;
 - zatwierdzone DPA, SCC/TIA, subprocesorzy i regiony;
 - finalny regulamin, privacy, cookies i treści informacji w widgetach;
 - okresy retencji leadów, plików, sesji, consentu, audytu, logów i backupu;
@@ -395,7 +395,7 @@ datę i referencję do artefaktu.
 
 ## 7. Architektura wdrażania w firmach
 
-Lorum jest multi-tenant SaaS. Domyślnie nie wdraża się osobnej kopii aplikacji
+Kwotum jest multi-tenant SaaS. Domyślnie nie wdraża się osobnej kopii aplikacji
 dla każdej firmy. Jedna platforma produkcyjna utrzymuje oddzielne organizacje,
 role, procesy, leady i storage chronione przez tenant scope i RLS.
 

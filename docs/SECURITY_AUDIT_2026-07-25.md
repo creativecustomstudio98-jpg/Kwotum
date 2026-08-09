@@ -1,5 +1,10 @@
 # Audyt bezpieczeństwa — 2026-07-25
 
+> To jest historyczny snapshot Etapu 12. Aktualny gate SAST i decyzję o
+> zastąpieniu niedostępnego CodeQL przez Semgrep CE opisują ADR-038,
+> `docs/SECURITY.md` i raport baseline'u z 2026-08-08. Liczby i wersje poniżej
+> nie są bieżącym dowodem release.
+
 ## Status
 
 Audyt techniczny Etapu 12 został wykonany na bieżącym working tree. Nie jest
@@ -54,8 +59,9 @@ termin oraz bramkę produkcyjną.
 
 ## Ograniczenia
 
-- Skan lokalny nie zastępuje CodeQL, pełnohistorycznego Gitleaks ani
-  zewnętrznego pentestu.
+- Skan lokalny z tego historycznego przebiegu nie zastępował zdalnego gate'u,
+  pełnohistorycznego Gitleaks ani zewnętrznego pentestu. Aktualny Semgrep CE
+  również nie zastępuje review ani pentestu.
 - Test DAST działa na lokalnym produkcyjnym buildzie, bez rzeczywistej warstwy
   CDN/WAF/TLS.
 - Nie przeprowadzono review prawnego. Rejestr w

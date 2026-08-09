@@ -1,15 +1,15 @@
-# Start sprzedaży — pierwszych pięciu klientów Lorum
+# Start sprzedaży — pierwszych pięciu klientów Kwotum
 
 **Status:** plan operacyjny, wdrożenie zablokowane przez P0  
-**Ostatni przegląd:** 2026-07-31
+**Ostatni przegląd:** 2026-08-09
 
 ## Model pierwszego etapu
 
-Lorum jest usługą wdrażaną przez właściciela, nie pustym self-service. Klient
+Kwotum jest usługą wdrażaną przez właściciela, nie pustym self-service. Klient
 otrzymuje wspólnie skonfigurowany proces kwalifikacji, gotowy embed/hosted link,
 panel leadów i pierwszą optymalizację. Początkowy segment to firmy wykonujące
 drogie, niestandardowe usługi — przede wszystkim meble, kuchnie i zabudowy na
-wymiar. Lorum pozostaje CRM-light i nie zastępuje pełnego CRM.
+wymiar. Kwotum pozostaje CRM-light i nie zastępuje pełnego CRM.
 
 Prawdziwe dane wolno przyjąć dopiero po zamknięciu P0 w
 `PRODUCTION_READINESS.md`, podpisanym UAT i decyzji GO dla jednej organizacji.
@@ -85,7 +85,7 @@ to cel operacyjny, nie obietnica marketingowa.
 
 ## Checklista przed każdym uruchomieniem
 
-- [ ] immutable SHA i zielone CI/CodeQL/Gitleaks;
+- [ ] immutable SHA i zielone CI/Semgrep CE/Gitleaks;
 - [ ] staging smoke oraz aktualne migracje;
 - [ ] tenant, role, RLS i test drugiej organizacji;
 - [ ] zatwierdzony flow, wersja, pricing/scoring i disclaimer;

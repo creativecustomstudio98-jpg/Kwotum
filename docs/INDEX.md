@@ -1,7 +1,7 @@
 # Indeks dokumentacji Kwotum
 
 **Status:** kanoniczny  
-**Ostatni przegląd:** 2026-08-08
+**Ostatni przegląd:** 2026-08-09
 
 Ten plik wskazuje jedno aktywne źródło prawdy dla każdego obszaru. Materiały
 referencyjne i raporty historyczne nie zastępują wymagań produktu, decyzji ADR

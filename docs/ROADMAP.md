@@ -28,7 +28,7 @@ i produkcji opisuje `PRODUCTION_READINESS_PLAN.md`.
 | Etap | Status        | Wynik                                              | Gate                                                        |
 | ---- | ------------- | -------------------------------------------------- | ----------------------------------------------------------- |
 | 12ZC | ukończony     | kanoniczny program domknięcia produktu i produkcji | spójny plan, blocker → etap → dowód                         |
-| 12ZD | nierozpoczęty | czysty, audytowalny baseline repozytorium          | immutable SHA, czysty checkout, zielone CI                  |
+| 12ZD | w toku        | czysty, audytowalny baseline repozytorium          | immutable SHA, czysty checkout, zielone CI/Semgrep/Gitleaks |
 | 12ZE | nierozpoczęty | self-service pricing, scoring i wynik w builderze  | konfiguracja → publikacja → widget → lead                   |
 | 12ZF | nierozpoczęty | webhook v1 albo formalna redukcja MVP              | brak konfliktu wymagania–kod                                |
 | 12ZG | nierozpoczęty | reguły i UAT 1–3 firm pilotażowych                 | osobne zatwierdzone przypadki i go/no-go                    |

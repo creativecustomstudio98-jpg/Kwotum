@@ -27,6 +27,7 @@
     "lint": "turbo run lint",
     "security:dependencies": "bash scripts/security/dependency-scan.sh",
     "security:sast": "bash scripts/security/static-scan.sh",
+    "security:semgrep": "bash scripts/security/semgrep-scan.sh",
     "security:secrets": "bash scripts/security/secret-scan.sh",
     "security:scan": "pnpm security:sast && pnpm security:secrets",
     "smoke:runtime": "node scripts/smoke-runtime.mjs",

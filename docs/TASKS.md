@@ -1619,7 +1619,7 @@ semantykę i kontrast analityki oraz wymusił standalone zamiast zastanego
       oraz zaktualizować dokumenty opisujące starszy stan funkcji.
 - [~] Uruchomić pełny gate z czystego checkoutu na przypiętym Node/pnpm.
 - [~] Utworzyć logiczne commity, wypchnąć branch i uzyskać zielone CI,
-  CodeQL oraz pełnohistoryczny Gitleaks.
+  Semgrep CE oraz pełnohistoryczny Gitleaks.
 
 **Status lokalny 2026-07-29:** inventory i dwa passy retencji są zakończone.
 Do odzyskiwalnego Kosza trafiło archiwum starego kodu, 116 obrazów
@@ -1656,7 +1656,7 @@ Audyt i plan pierwszych pięciu klientów utrzymują trzy dokumenty wykonawcze:
 `PRODUCTION_READINESS.md`, `SECURITY_AND_DATA.md` oraz
 `LAUNCH_FIRST_5_CLIENTS.md`. Decyzja pozostaje NO-GO z powodu otwartych P0:
 braku rozproszonego rate limit/Turnstile, produkcyjnego ClamAV, backup/restore
-i monitoringu oraz zielonego CI/CodeQL/pełnohistorycznego Gitleaks na jednym
+i monitoringu oraz zielonego CI/Semgrep CE/pełnohistorycznego Gitleaks na jednym
 SHA. Piętnaście panelowych E2E wymaga ponowienia z jednorazowym kontem w clean
 checkout. Równoległy `artifacts/promo/lorum-launch-v1/` pozostał nietknięty.
 Odczyt GitHub potwierdził, że remote nadal wskazuje `3193262`, aktualnego
@@ -2279,8 +2279,29 @@ przypadkowe objęcie Szablonów pełną powierzchnią Procesów, paginację lead
 18 zamiast udokumentowanych 8 oraz historyczne pomiary workspace'u instalacji.
 Podgląd widgetu rejestruje teraz element utworzony przed definicją bez zapisu i
 bez sieci. Etap nadal pozostaje OPEN do wskazania końcowego SHA, czystego
-checkoutu, zielonych dostępnych kontroli CI/Gitleaks na tym SHA oraz jawnej
-decyzji dla niedostępnego w prywatnym repo uploadu CodeQL.
+checkoutu i zielonych dostępnych kontroli CI/Gitleaks/Semgrep CE na tym SHA.
+Właściciel jawnie zaakceptował zastąpienie niedostępnego uploadu CodeQL przez
+Semgrep CE; decyzję i ograniczenia zapisuje ADR-038.
+
+**Status czwartego passu 2026-08-09 — SEMGREP LOCAL PASS, GATE OPEN:** usunięto
+workflow CodeQL, którego publikacja SARIF wymaga płatnego GitHub Code Security,
+i dodano blokujący Semgrep CE. Obraz 1.164.0 oraz wszystkie zewnętrzne GitHub
+Actions są przypięte do commitów/digestów. Oficjalny zestaw OWASP jest
+pobierany z przypiętą checksumą, a analiza działa bez sieci, capabilities i
+zapisu do repo. Osiem własnych reguł ma testy 8/8; pełny skan wykonał 288 reguł
+na 662 śledzonych plikach z 0 ustaleń i 100% parsowania. Supply chain pnpm ma
+teraz siedmiodniowy release age, no-downgrade provenance, blokadę egzotycznych
+zależności tranzytywnych i wyłącznie cztery dokładnie wersjonowane wyjątki.
+Lockfile przeszedł kontrolę 543/543 wpisów, a Dependabot ma siedmiodniowy
+cooldown zwykłych aktualizacji. Gate pozostaje OPEN do pushu i zielonych
+Quality/Gitleaks/Semgrep/WordPress na jednym końcowym SHA. Pełne lokalne
+powtórzenie zakończyło się PASS: format, lint, typecheck, 178 testów
+jednostkowych, build 40 tras, RLS, WordPress, secret scan,
+SAST, dependency audit, Semgrep, Playwright 257 PASS / 17 SKIP oraz panel 17/17
+z cleanupem 0. Gate oczekuje już na push i zdalne kontrole. Obecny prywatny
+plan nie udostępnia branch protection (GitHub API
+HTTP 403, wymagany GitHub Pro), dlatego do upgrade'u właściciel musi ręcznie
+zablokować merge przy czerwonym albo niepełnym przebiegu.
 
 ## Etap 12ZE — self-service pricing, scoring i wynik
 

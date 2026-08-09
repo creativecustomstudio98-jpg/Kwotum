@@ -6,6 +6,16 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Etap 12ZD zastępuje niedostępny dla prywatnego repozytorium upload CodeQL
+  blokującym Semgrep CE 1.164.0. Obraz i GitHub Actions są przypięte do
+  digestów/commit SHA, oficjalny zestaw OWASP jest weryfikowany checksumą i
+  uruchamiany offline, a 8 własnych reguł ma 8/8 testów. Lokalny skan wykonał
+  288 reguł na 662 plikach z 0 ustaleń i 100% parsowania. Supply chain pnpm ma
+  siedmiodniowy release age, no-downgrade provenance, blokadę egzotycznych
+  zależności tranzytywnych i tylko cztery dokładnie wersjonowane wyjątki;
+  Dependabot stosuje siedmiodniowy cooldown zwykłych aktualizacji. Legacy SAST
+  zachowuje wyłączenia po globie języków i pomija tylko celowo niebezpieczny
+  fixture testów Semgrep.
 - Etap 12ZD ma powtarzalny, uwierzytelniony gate `pnpm e2e:panel`: lokalny-only
   harness buduje standalone, tworzy jednorazowe konto i tenant, uruchamia 17
   sekwencyjnych scenariuszy oraz potwierdza zero pozostałości w bazie, Auth i
@@ -29,8 +39,8 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
   i `postcss`; finalny audyt raportuje zero znanych podatności. Lokalny katalog
   źródeł i renderów promocyjnych pozostaje poza Git bez kasowania danych.
   Produkcyjna regresja standalone przechodzi 257 testów przy 17 jawnych
-  skipach; pełny gate pozostaje otwarty do clean SHA, testów panelu i zdalnego
-  CI/CodeQL/Gitleaks.
+  skipach; pełny gate pozostaje otwarty do clean SHA oraz zdalnego
+  CI/Semgrep/Gitleaks po zaliczonych testach panelu.
 - R5.4 zastępuje pusty legacy’owy akapit o Shadow DOM na `/dla-agencji`
   osobnym, ciemnozielonym proofem technicznym. Widok zestawia agresywny CSS
   strony hosta z pełnym interfejsem widgetu wewnątrz rzeczywistej granicy

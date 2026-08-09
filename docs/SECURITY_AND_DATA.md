@@ -1,7 +1,7 @@
-# Bezpieczeństwo i dane Lorum
+# Bezpieczeństwo i dane Kwotum
 
 **Status:** kanoniczna checklista wykonawcza  
-**Ostatni przegląd:** 2026-07-31
+**Ostatni przegląd:** 2026-08-09
 
 Szczegóły modelu zagrożeń i kontraktów pozostają w `SECURITY.md`,
 `AUTHORIZATION.md`, `DATABASE.md`, `PRIVACY.md` i `THREAT_MODEL.md`. Ten
@@ -59,8 +59,8 @@ test drugiego tenanta i uzasadnienie, dlaczego RLS użytkownika nie wystarcza.
 ## Sekrety i rotacja
 
 `.env.example` zawiera wyłącznie nazwy i placeholdery, a `.env*` poza przykładem
-jest ignorowane. Jeżeli working-tree scan, Gitleaks, CodeQL lub review historii
-wskaże potencjalny sekret:
+jest ignorowane. Jeżeli working-tree scan, Gitleaks lub review historii wskaże
+potencjalny sekret:
 
 1. nie wypisywać wartości w logu ani zgłoszeniu;
 2. zablokować release i sklasyfikować incydent jako P0;

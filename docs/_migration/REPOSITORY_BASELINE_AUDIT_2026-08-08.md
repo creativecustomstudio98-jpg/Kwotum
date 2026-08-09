@@ -87,10 +87,10 @@ potwierdza cleanup. Nie wymaga stałych `PANEL_E2E_*` ani sekretów CI.
 1. Podzielić zastany kandydat na kompletne, odtwarzalne logiczne commity;
    końcowy `git status` musi być czysty.
 2. Odtworzyć frozen install, migracje, build i testy z nowego clean checkoutu.
-3. Wypchnąć dokładny SHA i uzyskać zielone CI oraz pełnohistoryczny Gitleaks
-   na tym samym SHA.
-4. Włączyć GitHub Code Security albo zatwierdzić zgodny licencyjnie zamiennik
-   CodeQL; nie obchodzić blokady przez wyłączenie uploadu SARIF.
+3. Wypchnąć dokładny SHA i uzyskać zielone CI, Semgrep CE oraz
+   pełnohistoryczny Gitleaks na tym samym SHA.
+4. Zatwierdzony zamiennik CodeQL uruchomić z przypiętym obrazem i regułami;
+   nie obchodzić blokady przez wyłączenie uploadu SARIF.
 5. Odtworzyć końcowy SHA z nowego clean checkoutu i potwierdzić ten sam gate.
 6. Dopiero po 12ZD przejść do otwartych gate'ów 12ZE–13D i checklisty pilota.
 
@@ -128,10 +128,25 @@ normalny `require` bez usuwania strict types.
 CodeQL przeanalizował 297/297 plików TypeScript, 32/32 JavaScript i oba
 workflow, lecz GitHub odrzucił publikację SARIF: prywatne repozytorium konta
 osobistego nie ma włączonego GitHub Code Security. Nie obchodzimy ograniczenia
-licencyjnego przez wyłączenie uploadu. Gate wymaga włączenia płatnego Code
-Security lub osobno zaakceptowanego, zgodnego licencyjnie zamiennika SAST.
-Odbiór nadal wymaga zielonego ponownego przebiegu dostępnych kontroli na
-końcowym SHA oraz jawnej decyzji dla CodeQL.
+licencyjnego przez wyłączenie uploadu. Właściciel 2026-08-09 zaakceptował
+zgodny licencyjnie Semgrep CE zamiast zakupu Code Security. Odbiór nadal
+wymaga zielonego ponownego przebiegu dostępnych kontroli na końcowym SHA.
+
+## Semgrep CE i zaostrzenie supply chain — czwarty pass
+
+Workflow CodeQL zastąpiono blokującym Semgrep CE opisanym w ADR-038. Obraz
+1.164.0 jest przypięty digestem, oficjalne reguły OWASP są pobierane z
+przypiętym SHA-256 i nie są redystrybuowane, a sama analiza działa offline z
+kodem tylko do odczytu. Własne osiem reguł Kwotum przeszło 8/8 testów.
+Końcowy lokalny skan wykonał 288 reguł na 662 plikach: 0 ustaleń, 100%
+parsowania, kod wyjścia 0 w trybie strict.
+
+Wszystkie zewnętrzne GitHub Actions przypięto do pełnych commit SHA. pnpm
+blokuje wersje młodsze niż siedem dni, regresję pochodzenia i egzotyczne
+zależności tranzytywne; cztery wyjątki wskazują wyłącznie dokładne, zreviewowane
+wersje. Frozen install ponownie zweryfikował 543/543 wpisy lockfile. Dependabot
+ma siedmiodniowy cooldown zwykłych aktualizacji, bez opóźniania security
+updates. Zdalny gate pozostaje wymagany na końcowym SHA.
 
 ## Powtarzalny visual regression w CI
 

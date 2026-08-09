@@ -10,13 +10,14 @@ if ! command -v rg >/dev/null 2>&1; then
 fi
 
 scan_globs=(
+  --glob '*.{cjs,js,jsx,mjs,ts,tsx}'
   --glob '!node_modules/**'
   --glob '!.git/**'
   --glob '!.next/**'
   --glob '!coverage/**'
   --glob '!scripts/security/**'
+  --glob '!security/semgrep/kwotum.ts'
   --glob '!pnpm-lock.yaml'
-  --glob '*.{cjs,js,jsx,mjs,ts,tsx}'
 )
 
 fail_on_pattern() {

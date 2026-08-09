@@ -77,9 +77,21 @@ drill; nie jest domyślną reakcją na błąd konfiguracji.
 
 ## ADR-009: Rygorystyczny supply chain pnpm
 
-**Status:** accepted
-**Decyzja:** exact versions, frozen lockfile, 24-godzinny `minimumReleaseAge`, strict peers i jawna allowlista lifecycle scripts. Dopuszczone są tylko `sharp` i `unrs-resolver`.
-**Konsekwencje:** nowy lifecycle script celowo zatrzymuje instalację. Dependabot i CI pilnują aktualizacji; nie używamy `dangerouslyAllowAllBuilds`.
+**Status:** accepted; zaostrzona w Etapie 12ZD 2026-08-09
+**Decyzja:** exact versions, frozen lockfile, siedmiodniowy
+`minimumReleaseAge`, `trustPolicy: no-downgrade`, blokada egzotycznych zależności
+tranzytywnych, strict peers i jawna allowlista lifecycle scripts. Dopuszczone
+są tylko `sharp` i `unrs-resolver`. Wyjątki od wieku wydania są ograniczone do
+zweryfikowanych poprawek bezpieczeństwa `nanoid@3.3.17` i `postcss@8.5.26`.
+Wyjątki od polityki pochodzenia są ograniczone do istniejących wersji
+`eslint-import-resolver-typescript@3.10.1` i `semver@6.3.1`; nie obejmują
+przyszłych wersji tych paczek.
+**Konsekwencje:** nowy lifecycle script, młoda wersja, regresja pochodzenia albo
+egzotyczna paczka tranzytywna celowo zatrzymuje instalację. Każdy wyjątek
+wymaga dokładnej wersji, przeglądu i wpisu w `docs/DEPENDENCIES.md`. Dependabot
+ma siedmiodniowy cooldown zwykłych aktualizacji; aktualizacje bezpieczeństwa
+nie są przez niego opóźniane. Nie używamy `dangerouslyAllowAllBuilds` ani
+`trustLockfile: true`.
 
 ## ADR-010: Typed Routes odroczone
 
@@ -1001,3 +1013,45 @@ mechanizmu diagnostycznego ujawniającego infrastrukturę.
 funkcję, a rollback aplikacji nie wymaga cofania schematu. Readiness nie
 potwierdza działania e-maila, ClamAV, schedulerów, backupu ani monitoringu;
 pozostają osobnymi bramkami Etapów 13A–13C.
+
+## ADR-038: Semgrep CE jako dostępny SAST prywatnego repozytorium
+
+**Status:** accepted dla Etapu 12ZD na podstawie jawnej decyzji właściciela
+produktu z 2026-08-09
+
+**Decyzja:** niedostępny upload CodeQL dla prywatnego repozytorium konta
+osobistego zastępujemy blokującym Semgrep CE. CI i komenda
+`pnpm security:semgrep` używają obrazu Semgrep 1.164.0 przypiętego do
+niezmiennego digestu. Oficjalny zestaw OWASP jest pobierany po HTTPS, sprawdzany
+przypiętym SHA-256 i dopiero potem uruchamiany offline. Reguły oficjalne nie są
+kopiowane do repozytorium; obowiązuje Semgrep Rules License 1.0 i wyłącznie
+wewnętrzne użycie biznesowe. Własne reguły Kwotum są wersjonowane w repo,
+mają fixture'y pozytywne i negatywne oraz blokują między innymi dynamiczny kod,
+raw HTML, shell, słabe hashe, nieuprawnione użycie service role, wyciek błędu
+API, wyłączenie TLS i serwerowe `Math.random()`.
+
+Kontener nie ma sieci, capabilities ani zapisywalnego root filesystemu. Kod
+jest montowany tylko do odczytu, metryki i sprawdzanie wersji są wyłączone, a
+wynik w trybie `--strict --error` blokuje PR. Wszystkie zewnętrzne GitHub
+Actions są przypięte do pełnych commit SHA. Gitleaks pełnej historii,
+dependency audit, lokalny SAST, testy RLS i review nadal pozostają osobnymi,
+obowiązkowymi kontrolami.
+
+**Dlaczego:** CodeQL wykonał analizę, ale GitHub odrzuca publikację SARIF bez
+płatnego GitHub Code Security dla tego prywatnego repozytorium. Wyłączenie
+uploadu nie dawałoby egzekwowalnego gate'u, a komercyjne użycie samego CodeQL
+CLI nie jest przyjmowane jako obejście licencji. Semgrep CE jest dostępny bez
+zakupu planu i pozwala utrzymać powtarzalny, blokujący SAST bez wysyłania kodu
+do usługi zewnętrznej.
+
+**Konsekwencje:** Semgrep CE analizuje głównie pojedynczy plik i procedurę; nie
+zastępuje międzyplikowego dataflow CodeQL, pentestu ani review człowieka.
+Zmiana upstreamowego zestawu OWASP powoduje fail-closed na checksumie i wymaga
+review oraz osobnego commita aktualizującego pin. Powrót do CodeQL jest możliwy
+po zakupie odpowiedniego planu, ale nie usuwa Semgrep bez osobnej decyzji i
+porównania pokrycia.
+
+Obecny plan prywatnego repozytorium nie udostępnia branch protection, więc
+GitHub nie wymusza statusów przed merge. Do czasu GitHub Pro zielone Quality
+Gate, Gitleaks, Semgrep i WordPress na jednym SHA są ręczną, obowiązkową bramką
+właściciela; nie wolno merge'ować czerwonego lub niepełnego przebiegu.

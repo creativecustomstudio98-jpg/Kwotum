@@ -1,7 +1,7 @@
 # Release checklist
 
 **Status:** blokująca checklista produkcyjna
-**Ostatni przegląd:** 2026-07-29
+**Ostatni przegląd:** 2026-08-09
 
 Każde `[x]` wymaga dowodu przypiętego do tego samego immutable commit SHA
 i artefaktu release. Wynik lokalny, deklaracja bez dowodu albo test na innym
@@ -31,8 +31,8 @@ w `PRODUCTION_READINESS_PLAN.md`.
       przypięte.
 - [ ] `format:check`, lint, typecheck, unit, integration, PostgreSQL/RLS,
       WordPress, E2E i build są zielone na SHA.
-- [ ] SAST, working-tree secret scan, pełnohistoryczny Gitleaks, CodeQL
-      i dependency audit są zielone na SHA.
+- [ ] SAST, working-tree secret scan, pełnohistoryczny Gitleaks, Semgrep CE
+      (OWASP + reguły Kwotum) i dependency audit są zielone na SHA.
 - [ ] Nie ma commitowanych sekretów, dumpów, credentiali, danych klientów ani
       lokalnych plików środowiska.
 - [ ] Artefakt jest immutable, identyfikowalny i możliwy do ponownego wdrożenia.
@@ -125,7 +125,7 @@ w `PRODUCTION_READINESS_PLAN.md`.
 - [ ] Finalny regulamin, privacy, cookies, informacje widgetu i podstawy prawne
       zatwierdziła uprawniona osoba.
 - [ ] Dane operatora, kontakty privacy/support i procedura DSAR są publiczne.
-- [ ] Nazwa Lorum oraz domeny są prawnie i operacyjnie zatwierdzone.
+- [ ] Nazwa Kwotum oraz domeny są prawnie i operacyjnie zatwierdzone.
 - [ ] Canonical, sitemap, robots, noindex, schema, 404/500 i link check
       przechodzą na produkcyjnej domenie.
 - [ ] Nie ma fikcyjnych opinii, wyników, klientów, review schema ani

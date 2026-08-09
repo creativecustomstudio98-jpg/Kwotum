@@ -1,9 +1,10 @@
-# Model zagrożeń Lorum
+# Model zagrożeń Kwotum
 
 ## Zakres i granice zaufania
 
-Przegląd wykonano 2026-07-25 dla aplikacji Next.js, widgetu, PostgreSQL/RLS,
-Storage, workera powiadomień, workera retencji i konektora WordPress. Chronione
+Przegląd wykonano 2026-07-25 i zaktualizowano 2026-08-09 dla aplikacji Next.js,
+widgetu, PostgreSQL/RLS, Storage, workera powiadomień, workera retencji i
+konektora WordPress. Chronione
 aktywa to PII i pliki leadów, odpowiedzi, zgody, reguły ceny i score, sesje,
 członkostwa, credentiale integracji oraz dowody audytowe.
 
@@ -33,7 +34,7 @@ ale nie tworzy granicy bezpieczeństwa originu.
 | XSS                    | Odpowiedź lub nazwa procesu trafia do HTML/e-maila          | React escaping, jawne HTML escaping, JSON-LD z escapowaniem `<`, CSP, zakaz dynamicznego kodu | test szablonów, E2E i SAST                           |
 | Złośliwy upload        | polyglot, fałszywe MIME, SVG/script albo malware            | limit body, allowlista, basename, MIME + magic bytes, prywatny bucket, ClamAV fail-closed     | `file-validation.test.ts`, `malware-scanner.test.ts` |
 | Replay                 | ponowienie submitu, zapisu, bootstrapu lub dostawy          | mutation UUID, unique constraints, single-use token, idempotency key dostawcy                 | testy widgetu, leadów, WordPress i e-mail            |
-| Supply chain           | podatna paczka lub sekret w repo                            | exact versions, lockfile, Dependabot, Gitleaks, CodeQL, lokalny SAST i audit zależności w CI  | workflowy oraz skrypty `security:*`                  |
+| Supply chain           | podatna paczka, złośliwa aktualizacja lub sekret w repo     | exact versions, 7 dni release age, provenance, Gitleaks, Semgrep CE, SAST i audit w CI        | workflowy, testy reguł i skrypty `security:*`        |
 
 ## Najważniejsze decyzje
 

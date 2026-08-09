@@ -9,6 +9,8 @@ updates:
       time: "06:00"
       timezone: Europe/Warsaw
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     groups:
       development-tooling:
         dependency-type: development
@@ -24,3 +26,5 @@ updates:
       time: "06:30"
       timezone: Europe/Warsaw
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
