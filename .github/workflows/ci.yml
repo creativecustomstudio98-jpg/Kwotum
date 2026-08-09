@@ -69,4 +69,4 @@ jobs:
           fetch-depth: 0
 
       - name: Scan committed content
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
