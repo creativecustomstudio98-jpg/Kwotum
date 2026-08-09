@@ -115,7 +115,7 @@ Remediacja deklaruje zależność runnera, dodaje fail-fast do skryptów lokalny
 przekazuje token przy minimalnych uprawnieniach oraz migruje Gitleaks z v2 na
 v3 (Node 24), aby uniknąć zapowiedzianego wyłączenia v2 we wrześniu 2026.
 Drugi przebieg potwierdził Gitleaks PASS oraz Quality Gate PASS od formatu do
-produkcjnego builda, włącznie z pełnym RLS. Ujawnił też niekompatybilność
+produkcyjnego builda, włącznie z pełnym RLS. Ujawnił też niekompatybilność
 `wp eval-file` ze `strict_types` na PHP 8.3/8.4; harness zostaje zmieniony na
 normalny `require` bez usuwania strict types.
 
