@@ -82,11 +82,12 @@ jeszcze serwerowo wymuszonym warunkiem merge.
 6. Staging i production wymagają HTTPS i hosta nie-loopback, a wewnętrzny
    `/design-system` zwraca tam 404. Smoke profilu local i production sprawdza
    readiness, nagłówki, CORS, cache, cookies i robots.
-7. Niedostępny CodeQL zastępuje Semgrep CE 1.164.0: przypięty obraz, sprawdzany
-   checksumą zestaw OWASP, osiem testowanych reguł projektu i skan offline z
-   kodem tylko do odczytu. Wszystkie użycia GitHub Actions są przypięte do
-   commit SHA, a pnpm egzekwuje siedem dni release age, no-downgrade provenance
-   i blokadę egzotycznych zależności tranzytywnych.
+7. Niedostępny CodeQL zastępuje Semgrep CE 1.164.0: przypięty obraz, oficjalne
+   reguły z niezmiennego commita i wersjonowanego manifestu OWASP, osiem
+   testowanych reguł projektu oraz skan offline z kodem tylko do odczytu.
+   Wszystkie użycia GitHub Actions są przypięte do commit SHA, a pnpm egzekwuje
+   siedem dni release age, no-downgrade provenance i blokadę egzotycznych
+   zależności tranzytywnych.
 
 Ryzyko regresji tych zmian jest niskie: istniejące zmienne procesu mają
 pierwszeństwo nad `.env.local`, a walidacja produkcyjna nie zmienia local,

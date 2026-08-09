@@ -105,21 +105,26 @@ każdej zmianie grafu; nie wolno rozszerzać ich na nowsze wersje bez review.
 
 ## Semgrep CE i licencje reguł
 
-`pnpm security:semgrep` pobiera oficjalny zestaw OWASP spod
-`https://semgrep.dev/c/p/owasp-top-ten`, wymaga SHA-256
-`4edd262b86fee3840cde879037d52a87299cbb47df55e3e0c049eddd13831024`, a
-następnie skanuje repo w kontenerze
+`pnpm security:semgrep` pobiera oficjalne repozytorium reguł spod
+`https://github.com/semgrep/semgrep-rules.git` i wymaga dokładnego commita
+`40b8c63f75dc7c22c8a77482d73bfb864b146f7e`. Wersjonowany manifest
+`security/semgrep/upstream-owasp-rules.txt` wskazuje 551 plików źródłowych
+odpowiadających zestawowi OWASP Top Ten o SHA-256
+`4edd262b86fee3840cde879037d52a87299cbb47df55e3e0c049eddd13831024`.
+Następnie skan działa w kontenerze
 `semgrep/semgrep@sha256:207983631beecdbe7fa29196c7f4a7a5f29033933cdb76c687ce4a672e07618d`.
 Engine Semgrep CE jest LGPL-2.1. Oficjalne reguły podlegają Semgrep Rules
-License 1.0, są używane wewnętrznie i nie są redystrybuowane w repozytorium.
-Własne reguły z `security/semgrep/kwotum.yml` są kodem tego projektu.
+License 1.0, są używane wewnętrznie i nie są redystrybuowane w repozytorium;
+manifest zawiera wyłącznie ich ścieżki. Własne reguły z
+`security/semgrep/kwotum.yml` są kodem tego projektu.
 Fixture `security/semgrep/kwotum.ts` zawiera celowo niebezpieczne przykłady,
 dlatego jest wyłączony wyłącznie z targetów pełnego skanu i legacy skanera
 regex; komenda Semgrep nadal musi zaliczyć wszystkie jego testy 8/8.
 
-Po weryfikacji checksumy kontener działa bez sieci, bez capabilities i z kodem
-tylko do odczytu. Semgrep CE jest kontrolą intrafile/intraprocedural; nie jest
-deklarowany jako zamiennik międzyplikowego dataflow, pentestu ani review.
+Po weryfikacji commita i kompletności manifestu kontener działa bez sieci, bez
+capabilities i z kodem tylko do odczytu. Semgrep CE jest kontrolą
+intrafile/intraprocedural; nie jest deklarowany jako zamiennik międzyplikowego
+dataflow, pentestu ani review.
 
 ## Aktualizacje
 

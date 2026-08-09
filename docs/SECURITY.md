@@ -103,9 +103,10 @@ Klasyfikacja, ograniczenie skutków, zachowanie dowodów, rotacja, ocena obowią
 - working-tree secret scan nie wypisuje znalezionej treści, a CI utrzymuje
   pełnohistoryczny Gitleaks, blokujący dependency audit i Semgrep CE z
   oficjalnymi regułami OWASP oraz testowanymi regułami Kwotum;
-- Semgrep działa offline po weryfikacji checksumy reguł, bez capabilities, z
-  kodem tylko do odczytu i z przypiętym digestem obrazu; jest kontrolą
-  intrafile i nie zastępuje review, RLS, DAST ani pentestu;
+- Semgrep działa offline po weryfikacji dokładnego commita reguł i kompletności
+  wersjonowanego manifestu OWASP, bez capabilities, z kodem tylko do odczytu i
+  z przypiętym digestem obrazu; jest kontrolą intrafile i nie zastępuje review,
+  RLS, DAST ani pentestu;
 - upload poza loopback wymaga prywatnego ClamAV i przy błędzie, timeout albo
   nieznaną odpowiedź odrzuca plik przed rezerwacją Storage;
 - eksport, legal hold, retencja i usunięcie są owner-only, audytowane i

@@ -2303,6 +2303,19 @@ plan nie udostępnia branch protection (GitHub API
 HTTP 403, wymagany GitHub Pro), dlatego do upgrade'u właściciel musi ręcznie
 zablokować merge przy czerwonym albo niepełnym przebiegu.
 
+**Status piątego passu 2026-08-09 — IMMUTABLE RULES LOCAL PASS, GATE OPEN:**
+pierwszy zdalny Semgrep na SHA `3ef107f` wykrył, że endpoint registry zwraca na
+runnerze inną serializację niż lokalnie i poprawnie zatrzymał gate na
+checksumie. Dynamiczne źródło zastąpiono oficjalnym repozytorium reguł
+przypiętym do commita `40b8c63f75dc7c22c8a77482d73bfb864b146f7e` oraz
+wersjonowanym manifestem 551 plików odwzorowujących reviewowany pakiet OWASP.
+Treść licencjonowanych reguł nie jest redystrybuowana. Kontener nadal analizuje
+bez sieci, capabilities i zapisu do kodu. Lokalnie commit i wszystkie ścieżki
+zostały zweryfikowane, własne reguły przeszły 8/8, a pełny skan uruchomił 291
+reguł na 663 śledzonych plikach z 0 ustaleń i 100% parsowania. Gate pozostaje
+OPEN do pushu poprawki i zielonych Quality/Gitleaks/Semgrep/WordPress na jednym
+końcowym SHA.
+
 ## Etap 12ZE — self-service pricing, scoring i wynik
 
 - [ ] Dodać tryby buildera `Wycena`, `Scoring` i `Wynik` bez równoległego

@@ -193,13 +193,13 @@ pnpm security:dependencies
 pnpm security:semgrep
 ```
 
-Ostatnia komenda wymaga działającego Dockera i dostępu HTTPS wyłącznie do
-pobrania oficjalnego zestawu OWASP. Skrypt najpierw sprawdza przypięty SHA-256,
-potem odcina sieć kontenera, montuje repo tylko do odczytu, uruchamia 8 testów
-własnych reguł i pełny skan w trybie strict. Kod nie jest wysyłany do Semgrep
-App. Zmiany checksumy lub digestu wymagają review licencji, changelogu, reguł i
-osobnego commita; nie aktualizuj ich „do najnowszej” w celu uzyskania zielonego
-wyniku.
+Ostatnia komenda wymaga działającego Dockera, `git` i dostępu HTTPS wyłącznie do
+pobrania dokładnego commita oficjalnych reguł. Skrypt sprawdza SHA commita,
+kompletność 551 ścieżek w wersjonowanym manifeście, potem odcina sieć kontenera,
+montuje repo tylko do odczytu, uruchamia 8 testów własnych reguł i pełny skan w
+trybie strict. Kod nie jest wysyłany do Semgrep App. Zmiany commita, manifestu
+lub digestu wymagają review licencji, changelogu, składu reguł i osobnego
+commita; nie aktualizuj ich „do najnowszej” w celu uzyskania zielonego wyniku.
 
 ## Konfiguracja środowiska
 
@@ -241,8 +241,9 @@ Dokładne, tymczasowe wyjątki i ich uzasadnienia są w
 - błąd `minimumReleaseAge` albo `trustPolicy`: sprawdź pochodzenie i advisory;
   wyjątek może wskazywać tylko dokładnie zreviewowaną wersję i wymaga wpisu w
   `docs/DEPENDENCIES.md`.
-- `Semgrep ruleset checksum mismatch`: zatrzymaj gate, pobierz zmianę do
-  osobnego review i nie aktualizuj checksumy bez porównania reguł oraz licencji.
+- `Semgrep rules commit mismatch`, brak pliku albo niewłaściwa liczba wpisów:
+  zatrzymaj gate; zaktualizuj commit i manifest tylko po porównaniu składu reguł
+  oraz licencji.
 - wynik Turbo wygląda na nieaktualny: konfiguracje root są w `globalDependencies`; diagnostycznie użyj `pnpm exec turbo run <task> --force`.
 - błąd env: sprawdź nazwę, URL i czy sekret nie został omyłkowo oznaczony `NEXT_PUBLIC_*`.
 - brak `initdb`: zainstaluj PostgreSQL 17 albo ustaw

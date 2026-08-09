@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   analyze:
-    name: OWASP and Kwotum rules
+    name: Pinned upstream and Kwotum rules
     runs-on: ubuntu-latest
     timeout-minutes: 15
 

@@ -1023,9 +1023,11 @@ produktu z 2026-08-09
 osobistego zastępujemy blokującym Semgrep CE. CI i komenda
 `pnpm security:semgrep` używają obrazu Semgrep 1.164.0 przypiętego do
 niezmiennego digestu. Oficjalny zestaw OWASP jest pobierany po HTTPS, sprawdzany
-przypiętym SHA-256 i dopiero potem uruchamiany offline. Reguły oficjalne nie są
-kopiowane do repozytorium; obowiązuje Semgrep Rules License 1.0 i wyłącznie
-wewnętrzne użycie biznesowe. Własne reguły Kwotum są wersjonowane w repo,
+przez dokładny commit oficjalnego repozytorium oraz wersjonowany manifest 551
+plików i dopiero potem uruchamiany offline. Manifest odwzorowuje reviewowany
+snapshot pakietu OWASP, ale nie kopiuje treści reguł do repozytorium; obowiązuje
+Semgrep Rules License 1.0 i wyłącznie wewnętrzne użycie biznesowe. Własne
+reguły Kwotum są wersjonowane w repo,
 mają fixture'y pozytywne i negatywne oraz blokują między innymi dynamiczny kod,
 raw HTML, shell, słabe hashe, nieuprawnione użycie service role, wyciek błędu
 API, wyłączenie TLS i serwerowe `Math.random()`.
@@ -1046,10 +1048,11 @@ do usługi zewnętrznej.
 
 **Konsekwencje:** Semgrep CE analizuje głównie pojedynczy plik i procedurę; nie
 zastępuje międzyplikowego dataflow CodeQL, pentestu ani review człowieka.
-Zmiana upstreamowego zestawu OWASP powoduje fail-closed na checksumie i wymaga
-review oraz osobnego commita aktualizującego pin. Powrót do CodeQL jest możliwy
-po zakupie odpowiedniego planu, ale nie usuwa Semgrep bez osobnej decyzji i
-porównania pokrycia.
+Zmiana upstreamowych reguł wymaga jawnej aktualizacji commita i manifestu,
+porównania składu, licencji oraz osobnego commita; brak pliku, inna liczba albo
+inny commit powodują fail-closed. Powrót do CodeQL jest możliwy po zakupie
+odpowiedniego planu, ale nie usuwa Semgrep bez osobnej decyzji i porównania
+pokrycia.
 
 Obecny plan prywatnego repozytorium nie udostępnia branch protection, więc
 GitHub nie wymusza statusów przed merge. Do czasu GitHub Pro zielone Quality
