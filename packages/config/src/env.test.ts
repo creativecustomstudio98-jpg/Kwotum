@@ -41,6 +41,12 @@ describe("environment validation", () => {
         NOTIFICATION_WORKER_SECRET: "too-short",
       }),
     ).toThrow();
+    expect(() =>
+      parseServerEnv({
+        APP_URL: "https://app.wyceno.test",
+        WEBHOOK_SIGNING_SECRET: "too-short",
+      }),
+    ).toThrow();
     expect(
       parseServerEnv({
         APP_URL: "https://app.wyceno.test",
@@ -48,11 +54,14 @@ describe("environment validation", () => {
         CLAMAV_PORT: "3310",
         MALWARE_SCAN_MODE: "clamav",
         RETENTION_WORKER_SECRET: "r".repeat(32),
+        WEBHOOK_SIGNING_SECRET: "s".repeat(32),
+        WEBHOOK_WORKER_SECRET: "w".repeat(32),
       }),
     ).toMatchObject({
       CLAMAV_HOST: "clamav.internal",
       CLAMAV_PORT: 3310,
       MALWARE_SCAN_MODE: "clamav",
+      WEBHOOK_WORKER_SECRET: "w".repeat(32),
     });
     expect(() =>
       parseServerEnv({

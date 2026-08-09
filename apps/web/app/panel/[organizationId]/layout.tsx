@@ -56,10 +56,12 @@ export default async function OrganizationPanelLayout({
       label: "Analityka",
       mobilePlacement: "primary" as const,
     },
-    ...(hasCapability(context, "wordpress:manage")
+    ...(hasCapability(context, "webhook:manage") || hasCapability(context, "wordpress:manage")
       ? [
           {
-            href: `/panel/${organizationId}/integracje/wordpress`,
+            href: hasCapability(context, "webhook:manage")
+              ? `/panel/${organizationId}/integracje/webhooki`
+              : `/panel/${organizationId}/integracje/wordpress`,
             icon: "integration" as const,
             label: "Integracje",
             mobilePlacement: "secondary" as const,

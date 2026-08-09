@@ -25,6 +25,27 @@ export type NotificationErrorCode =
   | "provider_invalid_response"
   | "recipient_unavailable"
   | "worker_timeout";
+export type WebhookEndpointStatus = "disabled" | "enabled";
+export type WebhookDeliveryStatus =
+  "dead_letter" | "delivered" | "pending" | "processing" | "retry";
+export type WebhookAttemptOutcome = "dead_letter" | "delivered" | "retry";
+export type WebhookErrorCode =
+  | "configuration"
+  | "dns_resolution"
+  | "endpoint_disabled"
+  | "http_408"
+  | "http_425"
+  | "http_429"
+  | "http_4xx"
+  | "http_5xx"
+  | "invalid_response"
+  | "network"
+  | "redirect"
+  | "secret_rotated"
+  | "timeout"
+  | "tls"
+  | "unsafe_target"
+  | "worker_timeout";
 export type AnalyticsConsentState = "denied" | "granted";
 export type AnalyticsDevice = "desktop" | "mobile" | "other" | "tablet";
 export type AnalyticsSource =
@@ -1030,6 +1051,162 @@ export type Database = {
           step_key?: string | null;
         }
       >;
+      webhook_delivery_attempts: Table<
+        {
+          delivery_id: string;
+          error_code: WebhookErrorCode | null;
+          finished_at: string | null;
+          id: string;
+          organization_id: string;
+          outcome: WebhookAttemptOutcome | null;
+          response_status: number | null;
+          started_at: string;
+          attempt_number: number;
+        },
+        {
+          attempt_number: number;
+          delivery_id: string;
+          error_code?: WebhookErrorCode | null;
+          finished_at?: string | null;
+          id?: string;
+          organization_id: string;
+          outcome?: WebhookAttemptOutcome | null;
+          response_status?: number | null;
+          started_at?: string;
+        },
+        {
+          attempt_number?: number;
+          delivery_id?: string;
+          error_code?: WebhookErrorCode | null;
+          finished_at?: string | null;
+          id?: string;
+          organization_id?: string;
+          outcome?: WebhookAttemptOutcome | null;
+          response_status?: number | null;
+          started_at?: string;
+        }
+      >;
+      webhook_deliveries: Table<
+        {
+          attempt_count: number;
+          available_at: string;
+          created_at: string;
+          delivered_at: string | null;
+          endpoint_id: string;
+          event_id: string;
+          event_type: string;
+          id: string;
+          is_test: boolean;
+          last_error_code: WebhookErrorCode | null;
+          lead_id: string | null;
+          locked_at: string | null;
+          lock_token: string | null;
+          occurred_at: string;
+          organization_id: string;
+          response_status: number | null;
+          status: WebhookDeliveryStatus;
+          updated_at: string;
+        },
+        {
+          attempt_count?: number;
+          available_at?: string;
+          created_at?: string;
+          delivered_at?: string | null;
+          endpoint_id: string;
+          event_id?: string;
+          event_type?: string;
+          id?: string;
+          is_test?: boolean;
+          last_error_code?: WebhookErrorCode | null;
+          lead_id?: string | null;
+          locked_at?: string | null;
+          lock_token?: string | null;
+          occurred_at?: string;
+          organization_id: string;
+          response_status?: number | null;
+          status?: WebhookDeliveryStatus;
+          updated_at?: string;
+        },
+        {
+          attempt_count?: number;
+          available_at?: string;
+          created_at?: string;
+          delivered_at?: string | null;
+          endpoint_id?: string;
+          event_id?: string;
+          event_type?: string;
+          id?: string;
+          is_test?: boolean;
+          last_error_code?: WebhookErrorCode | null;
+          lead_id?: string | null;
+          locked_at?: string | null;
+          lock_token?: string | null;
+          occurred_at?: string;
+          organization_id?: string;
+          response_status?: number | null;
+          status?: WebhookDeliveryStatus;
+          updated_at?: string;
+        }
+      >;
+      webhook_endpoints: Table<
+        {
+          created_at: string;
+          created_by: string;
+          disabled_at: string | null;
+          disabled_by: string | null;
+          event_type: string;
+          id: string;
+          last_delivered_at: string | null;
+          last_rotation_request_id: string | null;
+          last_tested_at: string | null;
+          organization_id: string;
+          request_id: string;
+          rotated_at: string | null;
+          rotated_by: string | null;
+          secret_version: number;
+          status: WebhookEndpointStatus;
+          updated_at: string;
+          url: string;
+        },
+        {
+          created_at?: string;
+          created_by: string;
+          disabled_at?: string | null;
+          disabled_by?: string | null;
+          event_type?: string;
+          id?: string;
+          last_delivered_at?: string | null;
+          last_rotation_request_id?: string | null;
+          last_tested_at?: string | null;
+          organization_id: string;
+          request_id: string;
+          rotated_at?: string | null;
+          rotated_by?: string | null;
+          secret_version?: number;
+          status?: WebhookEndpointStatus;
+          updated_at?: string;
+          url: string;
+        },
+        {
+          created_at?: string;
+          created_by?: string;
+          disabled_at?: string | null;
+          disabled_by?: string | null;
+          event_type?: string;
+          id?: string;
+          last_delivered_at?: string | null;
+          last_rotation_request_id?: string | null;
+          last_tested_at?: string | null;
+          organization_id?: string;
+          request_id?: string;
+          rotated_at?: string | null;
+          rotated_by?: string | null;
+          secret_version?: number;
+          status?: WebhookEndpointStatus;
+          updated_at?: string;
+          url?: string;
+        }
+      >;
       widget_session_mutations: Table<
         {
           created_at: string;
@@ -1185,6 +1362,10 @@ export type Database = {
         Args: { organization_name: string; organization_slug: string };
         Returns: Array<{ id: string; name: string; slug: string }>;
       };
+      create_webhook_endpoint: {
+        Args: { idempotency_key: string; target_organization_id: string; target_url: string };
+        Returns: Json;
+      };
       create_wordpress_install_token: {
         Args: { target_organization_id: string; target_site_origin: string };
         Returns: Json;
@@ -1232,6 +1413,32 @@ export type Database = {
           template_version: string;
         }>;
       };
+      claim_webhook_delivery_batch: {
+        Args: { batch_size: number; worker_id: string };
+        Returns: Array<{
+          attempt_number: number;
+          contact_email: string | null;
+          contact_name: string | null;
+          contact_phone: string | null;
+          delivery_id: string;
+          endpoint_id: string;
+          endpoint_url: string;
+          event_id: string;
+          event_type: string;
+          flow_title: string | null;
+          is_test: boolean;
+          lead_public_id: string | null;
+          lock_token: string;
+          occurred_at: string;
+          organization_id: string;
+          price_currency: string | null;
+          price_max_minor: number | null;
+          price_min_minor: number | null;
+          price_presentation: string | null;
+          secret_version: number;
+          submitted_at: string | null;
+        }>;
+      };
       claim_flow_invitation_batch: {
         Args: {
           batch_size: number;
@@ -1271,6 +1478,14 @@ export type Database = {
         };
         Returns: undefined;
       };
+      complete_webhook_delivery: {
+        Args: {
+          target_delivery_id: string;
+          target_lock_token: string;
+          target_response_status: number;
+        };
+        Returns: undefined;
+      };
       create_flow_invitation: {
         Args: {
           idempotency_key: string;
@@ -1302,6 +1517,18 @@ export type Database = {
       disconnect_wordpress: {
         Args: { connector_credential: string };
         Returns: boolean;
+      };
+      disable_webhook_endpoint: {
+        Args: { target_endpoint_id: string; target_organization_id: string };
+        Returns: boolean;
+      };
+      enqueue_webhook_test: {
+        Args: {
+          request_id: string;
+          target_endpoint_id: string;
+          target_organization_id: string;
+        };
+        Returns: Json;
       };
       exchange_wordpress_install_token: {
         Args: {
@@ -1363,6 +1590,16 @@ export type Database = {
         };
         Returns: undefined;
       };
+      fail_webhook_delivery: {
+        Args: {
+          retryable: boolean;
+          target_delivery_id: string;
+          target_error_code: WebhookErrorCode;
+          target_lock_token: string;
+          target_response_status?: number | null;
+        };
+        Returns: undefined;
+      };
       fail_flow_invitation_delivery: {
         Args: {
           delivery_provider: "resend" | "test";
@@ -1420,6 +1657,14 @@ export type Database = {
       };
       resume_widget_session: {
         Args: { session_token: string };
+        Returns: Json;
+      };
+      rotate_webhook_endpoint_secret: {
+        Args: {
+          idempotency_key: string;
+          target_endpoint_id: string;
+          target_organization_id: string;
+        };
         Returns: Json;
       };
       revoke_wordpress_connection: {
@@ -1523,6 +1768,10 @@ export type Database = {
       notification_status: NotificationStatus;
       organization_member_role: OrganizationMemberRole;
       organization_member_status: OrganizationMemberStatus;
+      webhook_attempt_outcome: WebhookAttemptOutcome;
+      webhook_delivery_status: WebhookDeliveryStatus;
+      webhook_endpoint_status: WebhookEndpointStatus;
+      webhook_error_code: WebhookErrorCode;
       widget_session_status: WidgetSessionStatus;
     };
     CompositeTypes: Record<string, never>;

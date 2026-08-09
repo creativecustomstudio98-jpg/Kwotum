@@ -84,6 +84,7 @@ semantycznego React/Next.js i wspólnych tokenów `packages/ui`.
 | X     | sidebar panelu Kwotum               | znak bez płytki, ikony bez kafelków i szerokość 240 px; funkcje, rail 78 px i mobile bez zmiany                        |
 | Y     | wybór organizacji Kwotum            | szeroki header, oś 1260 px i pozioma karta z realnym podsumowaniem; mobile zachowuje jedną kolumnę                     |
 | Z     | operacyjna obsługa leada            | zwarta prawa kolumna: status, właściciel, priorytet, kontakt, notatki i zadania; wyłącznie z prawdziwym zapisem        |
+| AA    | webhook v1 w panelu                 | dziedziczy wyłącznie anatomię Integracji 12S; treść, stany i bezpieczeństwo określają ADR-034 oraz `WEBHOOKS.md`       |
 
 Oryginały panelowe A/C/F są dostępne w `apps/web/public/panel/`, a D w
 `references/product-app-board.png`; zostały zablokowane 2026-07-27:
@@ -283,6 +284,18 @@ kolejność DOM, składa kartę do jednej kolumny i nie przewija się poziomo.
 | Plik                                                                                     | Rozmiar     | SHA-256                                                            |
 | ---------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------ |
 | `artifacts/visual-qa/12m-panel-shell/organization-picker-kwotum/reference-2872x1608.png` | 2872 × 1608 | `783b30ceadefada2a5841af73c1b5334cb672f10723e555a53309d929975f133` |
+
+Decyzja AA dotyczy wyłącznie trasy
+`/panel/[organizationId]/integracje/webhooki`. Ponieważ nie dostarczono
+osobnego obrazu webhooka, ekran dziedziczy shell, oś treści, hierarchię kart,
+gęstość i responsywną transformację z zaakceptowanego ekranu Integracji 12S:
+`artifacts/visual-qa/12s-remaining-screens/after/integrations-1536x1024.png`,
+SHA-256
+`208f8d84508909fee0c5baed36c6ce773b8fee4d64dd0d1e406a14754c8c8296`.
+Nie dziedziczy treści WordPressa, statystyk ani kontrolek. Dane, role, stany,
+one-time secret, retry i dead letter wynikają wyłącznie z ADR-034 i
+`WEBHOOKS.md`. Finalne viewporty, overlay i różnice zapisuje
+`artifacts/visual-qa/12zf-webhook-v1/diff.md`.
 
 Pełny audyt, pomiary, luki i klasyfikację cleanupu zawierają
 `landing-desktop-v7/REFERENCE_AUDIT.md` oraz `MEASUREMENTS.md`. W D0 nie

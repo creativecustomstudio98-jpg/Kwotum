@@ -2383,22 +2383,46 @@ scan oraz przypięty Semgrep — 291 reguł na 666 śledzonych plikach, 0 ustale
 budżecie 90 KiB. Nie dodano zależności, migracji ani ADR, ponieważ model danych,
 granice zaufania i architektura nie uległy zmianie.
 
-## Etap 12ZF — webhook v1 albo formalna redukcja MVP
+## Etap 12ZF — webhook v1 utrzymany w MVP
 
-- [ ] Zapisać ADR-034 utrzymujący webhook w MVP albo usuwający go spójnie
+- [x] Zapisać ADR-034 utrzymujący webhook w MVP albo usuwający go spójnie
       z wymagań, scope, API, QA, marketingu i release.
-- [ ] Przy utrzymaniu: wdrożyć tenantowe endpointy, sekret, HMAC-SHA256,
+- [x] Przy utrzymaniu: wdrożyć tenantowe endpointy, sekret, HMAC-SHA256,
       wersjonowany envelope i minimalny event `lead.created`.
-- [ ] Dodać SSRF protection, dokładny HTTPS origin, zakaz redirectów,
+- [x] Dodać SSRF protection, dokładny URL HTTPS, zakaz redirectów,
       prywatnych adresów, credentiali w URL i niebezpiecznych portów.
-- [ ] Dodać idempotencję, retry/backoff, historię bez PII, dead-letter state,
+- [x] Dodać idempotencję, retry/backoff, historię bez PII, dead-letter state,
       rotację, wyłączenie i syntetyczny test.
-- [ ] Dodać worker, scheduler, alerty, role/RLS oraz testy podpisu, replay,
+- [x] Dodać worker z osobnym sekretem, chroniony route, role/RLS oraz testy
+      podpisu, replay,
       timeoutu, DNS/IP, drugiego tenanta i redakcji.
+- [ ] W Etapie 13A podłączyć produkcyjny scheduler, metryki wieku kolejki oraz
+      alerty braku wywołań i dead-letter.
 
 **Gate:** release checklist nie wskazuje nieistniejącej funkcji. Utrzymany
 webhook jest bezpieczny, obserwowalny i odporny na retry; usunięty webhook jest
 usunięty ze wszystkich kontraktów w tym samym etapie.
+
+**Status implementacji 2026-08-09 — LOCAL COMPLETE, PRODUCTION GATE OPEN:**
+ADR-034 utrzymuje wyłącznie `lead.created`. Tenantowe tabele, forced RLS,
+kontrolowane RPC, transakcyjny trigger, lock recovery, retry i historia prób
+nie przechowują sekretu, payloadu ani response body. Owner/Admin zarządza
+endpointami w panelu; Sales, anon i drugi tenant są blokowani. Transport
+sprawdza publiczny HTTPS/443, wszystkie odpowiedzi DNS oraz prywatne/specjalne
+IPv4 i IPv6, przypina połączenie TLS do sprawdzonego IP i nie śledzi redirectów.
+DNS ma osobny timeout 2 s, a transakcyjny limit 10 aktywnych endpointów blokuje
+równoległe ominięcie limitu fan-out. Rotacja i wyłączenie mają jawne
+potwierdzenie skutków.
+Envelope jest minimalny i podpisany HMAC raw body z timestampem. Worker ma
+osobny sekret, całkowity timeout i ograniczoną równoległość.
+
+Lokalny gate obejmuje 139 testów web / 211 unit łącznie, pełny PostgreSQL/RLS,
+WordPress 6.9.2/7.0.2 i produkcyjny standalone E2E 19/19 z axe, 1448/390/320
+px, forced colors, cleanupem 0 oraz buildem 41 tras. SAST, secret scan,
+dependency audit i przypięty Semgrep (291 reguł, 692 pliki, 0 ustaleń) są
+zielone. Visual QA ma 19/20 i komplet overlay/difference. Szczegółowy kontrakt,
+runbook oraz forward-only rollback są w `WEBHOOKS.md`. Prawdziwe dane pilota
+pozostają zablokowane do schedulera, alertów i stagingowego UAT z Etapu 13A.
 
 ## Etap 12ZG — kalibracja i pakiet pilotażowy
 

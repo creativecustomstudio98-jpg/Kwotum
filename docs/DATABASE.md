@@ -100,7 +100,12 @@ przypięty do tej samej wersji. Szczegóły: `docs/ESTIMATION_ENGINE.md`.
   przypięty do immutable wersji, autora i idempotency key;
 - `flow_invitation_delivery_attempts` — historia prób zaproszenia bez treści
   wiadomości i bez PII w audit logu;
-- `webhook_endpoints` i `webhook_deliveries` powstaną w kolejnych etapach.
+- `webhook_endpoints` — tenantowy URL, stan i wersja pochodnego sekretu bez
+  plaintextu;
+- `webhook_deliveries` — transakcyjny outbox `lead.created` i testów
+  syntetycznych;
+- `webhook_delivery_attempts` — historia techniczna bez payloadu, response body
+  i PII.
 
 ## Kluczowe więzy
 
@@ -235,7 +240,22 @@ odpowiedzi manifestu v2.
 
 ## Indeksy początkowe
 
-`organization_members(user_id, organization_id)`, `flows(organization_id, updated_at)`, `leads(organization_id, submitted_at desc)`, `leads(organization_id, status, submitted_at desc)`, `notifications(status, available_at, created_at)`, `session_events(flow_version_id, occurred_at)`, `webhook_deliveries(status, next_attempt_at)`.
+`organization_members(user_id, organization_id)`, `flows(organization_id, updated_at)`, `leads(organization_id, submitted_at desc)`, `leads(organization_id, status, submitted_at desc)`, `notifications(status, available_at, created_at)`, `session_events(flow_version_id, occurred_at)`, `webhook_deliveries(status, available_at, created_at)`.
+
+### Stan wdrożenia Etapu 12ZF
+
+Migracja `20260809000100_stage12zf_webhooks.sql` dodaje trzy tenantowe tabele,
+wymuszone RLS Owner/Admin i brak bezpośrednich zapisów użytkownika. Trigger
+leada tworzy rekord dla każdego aktywnego endpointu w tej samej transakcji.
+Service role ma wyłącznie wąskie RPC claim/complete/fail; claim używa
+`FOR UPDATE SKIP LOCKED`, lock tokenu i odzyskuje zawieszone próby po 15
+minutach. Stan końcowy to `delivered` albo `dead_letter`, a retry używa
+`available_at` i maksymalnie pięciu prób.
+
+Utworzenie, rotacja, test i wyłączenie są kontrolowanymi RPC z capability oraz
+audytowane bez URL-u i PII. Sekret nie ma kolumny — aplikacja wyprowadza go z
+master secretu, tenant UUID, endpoint UUID i `secret_version`. Migracja jest
+forward-only; rollback pozostawia kolejkę w bazie zgodnie z `WEBHOOKS.md`.
 
 ## Retencja
 

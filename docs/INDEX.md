@@ -50,6 +50,7 @@ zatwierdza funkcji spoza `SCOPE.md`.
 | Widget                          | `WIDGET_ARCHITECTURE.md`                                | `WIDGET_IMPLEMENTATION.md`, `WORDPRESS_PLUGIN.md`                                                        |
 | Podgląd i udostępnianie procesu | `FLOW_PREVIEW_AND_SHARING_IMPLEMENTATION_2026-08-03.md` | `WIDGET_ARCHITECTURE.md`, `NOTIFICATIONS.md`, ADR-035                                                    |
 | Operacyjna obsługa leada        | `LEAD_OPERATIONS_IMPLEMENTATION_2026-08-03.md`          | `LEAD_PIPELINE.md`, `AUTHORIZATION.md`, ADR-036                                                          |
+| Webhook `lead.created`          | `WEBHOOKS.md`                                           | `API_CONTRACTS.md`, `SECURITY.md`, ADR-034                                                               |
 | Runtime liveness i readiness    | `RUNTIME_READINESS_IMPLEMENTATION_2026-08-03.md`        | `DEPLOYMENT.md`, `OBSERVABILITY.md`, ADR-037                                                             |
 | Estymacja                       | `ESTIMATION_ENGINE.md`                                  | `PRODUCT_REQUIREMENTS.md`, ADR-016                                                                       |
 | Analityka                       | `ANALYTICS_PLAN.md`                                     | `ANALYTICS_IMPLEMENTATION.md`, ADR-019                                                                   |

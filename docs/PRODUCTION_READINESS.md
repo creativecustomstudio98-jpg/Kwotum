@@ -13,7 +13,7 @@ immutable SHA.
 ## Zakres audytu
 
 Sprawdzono monorepo pnpm/Turborepo, dziewięć projektów workspace, lockfile,
-konfigurację środowiska, 16 Route Handlerów, Auth SSR, Storage, wszystkie
+konfigurację środowiska, 24 Route Handlery, Auth SSR, Storage, wszystkie
 migracje i testy PostgreSQL, użycia service role, nagłówki, SEO, testy,
 pipeline GitHub Actions oraz dokumentację wdrożenia. Audyt opiera się na kodzie
 i uruchomionych testach, nie na samych statusach historycznych.
@@ -24,18 +24,19 @@ Na Node 24.18.0 i pnpm 11.17.0 przeszły:
 
 - frozen/offline install;
 - format, lint, typecheck, SAST i working-tree secret scan;
-- Semgrep CE: 8/8 testów własnych reguł, 288 reguł na 662 plikach, zero
+- Semgrep CE: 8/8 testów własnych reguł, 291 reguł na 692 plikach, zero
   ustaleń i 100% parsowania;
-- 178 testów jednostkowych;
+- 211 testów jednostkowych;
 - pełny zestaw PostgreSQL/RLS dla dwóch tenantów;
 - WordPress 6.9.2 i 7.0.2 na PHP 8.5;
-- build 40 tras i widget 19 016 B gzip;
+- build 41 tras i widget 19 016 B gzip;
 - Playwright 257 dostępnych scenariuszy, w tym auth, axe, klawiatura,
   responsive, SEO, CSP i widget.
 
 Ogólny pakiet jawnie pomija 17 scenariuszy wymagających fixture'u. Oddzielny,
 uwierzytelniony `pnpm e2e:panel` przeszedł 17/17 i potwierdził cleanup
-organizacji, konta Auth oraz Storage `0/0/0`. Aktualny audyt zależności nie
+organizacji, konta Auth oraz Storage `0/0/0`. Po dodaniu 12ZF ten sam harness
+przeszedł 19/19 i potwierdził 0 pozostałości. Aktualny audyt zależności nie
 znalazł znanych podatności.
 
 ## Ustalenia blokujące
@@ -49,7 +50,7 @@ znalazł znanych podatności.
 | PR-05 | P1                 | Upload buforuje multipart i plik w pamięci requestu, a produkcyjna kwarantanna nie jest wdrożona jako osobny stan Storage. Przy równoległych plikach rośnie ryzyko pamięci i awarii.       | `apps/web/app/api/v1/public/sessions/current/files/route.ts`                                       | Etap 13B: kontrolowana sesja, prywatna kwarantanna, streaming/skan, finalizacja i testy limitów oraz awarii.                     |
 | PR-06 | P1                 | MFA Ownerów, SMTP Auth, limity logowania, SSL enforcement i network restrictions wymagają konfiguracji i dowodu z Supabase Dashboard.                                                      | `docs/SECURITY.md`, `docs/RELEASE_CHECKLIST.md`                                                    | Wykonać checklistę z `SECURITY_AND_DATA.md`, zapisać screenshot/eksport ustawień bez sekretów i test konta administracyjnego.    |
 | PR-07 | P1                 | Provider e-mail, domena nadawcy, alerty kolejki i realny test dostawy nie są zatwierdzone. Submit może działać, ale firma nie dostać leada.                                                | `apps/web/lib/notifications/worker.ts`, `docs/NOTIFICATIONS.md`                                    | Wybrać provider, DPA, SPF/DKIM/DMARC, scheduler, alert wieku kolejki i test HTML/text w realnych klientach.                      |
-| PR-08 | P1                 | Webhook jest wymaganiem MVP, ale nie ma implementacji. Marketing lub onboarding nie mogą go obiecywać.                                                                                     | `docs/PRODUCT_REQUIREMENTS.md`, `docs/TASKS.md` 12ZF                                               | ADR-033: bezpieczny webhook v1 albo spójne usunięcie z MVP przed ofertą.                                                         |
+| PR-08 | P1                 | Webhook v1 jest gotowy aplikacyjnie, ale bez produkcyjnego schedulera, alertów i stagingowego UAT dostawa może nie ruszyć albo utknąć bez reakcji.                                         | `docs/WEBHOOKS.md`, `docs/TASKS.md` 12ZF                                                           | Etap 13A: scheduler co minutę, alert wieku kolejki/dead-letter, syntetyczny probe i UAT odbiorcy przed prawdziwymi danymi.       |
 | PR-09 | P1                 | Nowa oferta pierwszych pięciu klientów (599/999 zł, miesiąc gratis) nie jest jeszcze wdrożona w landingu, CTA ani formularzu Founding Client.                                              | `apps/web/app/(marketing)`, `tests/e2e/marketing.spec.ts`                                          | Osobny etap P1 po 12ZD: działające CTA, kwalifikacja, dostawa zgłoszenia i analityka bez PII.                                    |
 | PR-10 | P1                 | Brak aktywnego error trackingu, uptime i alertów submit/upload/integracji.                                                                                                                 | `docs/OBSERVABILITY.md`; brak zatwierdzonego adaptera runtime                                      | Etap 13A: provider, redakcja PII, request ID, syntetyczny submit i przetestowane alerty.                                         |
 | PR-11 | zamknięte lokalnie | `/design-system` ma runtime 404 w staging/production i pozostaje dostępny wyłącznie w local/preview; docelowy hosting nadal wymaga powtórzenia smoke.                                      | `apps/web/app/design-system/availability.ts`, `scripts/smoke-runtime.mjs`                          | Powtórzyć profil production na stagingu i przypiąć wynik do immutable SHA.                                                       |
@@ -101,7 +102,7 @@ pełny E2E auth.
 | Reprodukowalność      | lokalnie PASS             | clean checkout i zdalne CI na SHA nadal wymagane                      |
 | Sekrety/env           | lokalnie PASS             | pełnohistoryczny Gitleaks i ewentualna rotacja                        |
 | RLS/tenant scope      | PASS lokalny              | 30/30 tabel publicznych ma ENABLE + FORCE RLS; potrzebny staging      |
-| Service role          | ograniczony               | trzy serwerowe przepływy: upload, notifications, retention            |
+| Service role          | ograniczony               | cztery przepływy: upload, notifications, retention, webhook worker    |
 | Auth/sesje            | kod PASS                  | MFA, SMTP i provider rate limits ręcznie                              |
 | Public API/widget     | częściowo                 | brak rozproszonego rate limit/Turnstile                               |
 | Upload/Storage        | częściowo                 | prywatny bucket i walidacja PASS; ClamAV/kwarantanna produkcyjna OPEN |

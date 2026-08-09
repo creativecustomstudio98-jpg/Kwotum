@@ -269,7 +269,7 @@ try {
     throw new Error("Seed nie zwrócił obu wymaganych procesów.");
   }
 
-  console.log("[panel-e2e] Uruchamiam 17 scenariuszy panelu i bezstanowy podgląd...");
+  console.log("[panel-e2e] Uruchamiam 18 scenariuszy panelu i bezstanowy podgląd...");
   run(
     "pnpm",
     [
@@ -289,6 +289,10 @@ try {
         PANEL_E2E_PASSWORD: password,
         PANEL_E2E_ARTIFACT_ROOT: artifactRoot,
         PLAYWRIGHT_REUSE_EXISTING_SERVER: "false",
+        WEBHOOK_SIGNING_SECRET:
+          process.env.WEBHOOK_SIGNING_SECRET || "panel-e2e-webhook-signing-secret-32-characters",
+        WEBHOOK_WORKER_SECRET:
+          process.env.WEBHOOK_WORKER_SECRET || "panel-e2e-webhook-worker-secret-32-characters",
       },
     },
   );
@@ -305,14 +309,15 @@ try {
   }
   if (!primaryError && process.env.PANEL_E2E_RETAIN_STAGE_ARTIFACTS === "1") {
     try {
-      const stageArtifactSource = path.join(artifactRoot, "12ze-self-service-estimation");
-      const stageArtifactTarget = path.join(
-        repositoryRoot,
-        "artifacts/visual-qa/12ze-self-service-estimation",
-      );
-      if (!existsSync(stageArtifactSource)) throw new Error("Brak artefaktów 12ZE po teście E2E.");
-      cpSync(stageArtifactSource, stageArtifactTarget, { force: true, recursive: true });
-      console.log(`[panel-e2e] Zachowano artefakty 12ZE w ${stageArtifactTarget}.`);
+      for (const stage of ["12ze-self-service-estimation", "12zf-webhook-v1"]) {
+        const stageArtifactSource = path.join(artifactRoot, stage);
+        const stageArtifactTarget = path.join(repositoryRoot, "artifacts/visual-qa", stage);
+        if (!existsSync(stageArtifactSource)) {
+          throw new Error(`Brak artefaktów ${stage} po teście E2E.`);
+        }
+        cpSync(stageArtifactSource, stageArtifactTarget, { force: true, recursive: true });
+        console.log(`[panel-e2e] Zachowano artefakty ${stage} w ${stageArtifactTarget}.`);
+      }
     } catch (artifactError) {
       primaryError = artifactError;
     }

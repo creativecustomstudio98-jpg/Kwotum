@@ -28,7 +28,8 @@ Prawdziwe dane wolno przyjąć dopiero po zamknięciu P0 w
 - do trzech procesów;
 - zaawansowana logika i upload plików;
 - rozbudowany scoring;
-- webhook lub jedna integracja dopiero po zamknięciu ADR-033/Etapu 12ZF;
+- webhook lub jedna integracja dopiero po ADR-034, schedulerze, alertach i UAT
+  odbiorcy z Etapów 12ZF/13A;
 - analityka procesu, regularna optymalizacja i priorytetowe wsparcie.
 
 Warunki programu: pierwszy miesiąc abonamentu gratis, osobna opłata
@@ -73,11 +74,13 @@ Minimalne eventy sprzedażowe: `marketing_page_view`, `primary_cta_click`,
 13. Sprawdzić role Owner/Admin/Sales i odmowę drugiej organizacji.
 14. Wysłać syntetyczny lead testowy i zmienić jego status.
 15. Potwierdzić analitykę bez PII.
-16. Wykonać backup point i potwierdzić możliwość rollbacku.
-17. Podpisać UAT oraz protokół GO/NO-GO.
-18. Opublikować z możliwością natychmiastowego wyłączenia embedu.
-19. Monitorować pierwszy tydzień w trybie hypercare.
-20. Po pierwszych danych przeprowadzić wspólną optymalizację.
+16. Jeżeli plan obejmuje webhook: obrócić sekret, wysłać test syntetyczny i
+    potwierdzić idempotentny odbiór oraz alert dead-letter.
+17. Wykonać backup point i potwierdzić możliwość rollbacku.
+18. Podpisać UAT oraz protokół GO/NO-GO.
+19. Opublikować z możliwością natychmiastowego wyłączenia embedu.
+20. Monitorować pierwszy tydzień w trybie hypercare.
+21. Po pierwszych danych przeprowadzić wspólną optymalizację.
 
 Docelowy czas standardowego wdrożenia to jeden dzień roboczy po otrzymaniu
 kompletnych, zatwierdzonych informacji. Do czasu pomiaru pierwszych wdrożeń jest

@@ -30,6 +30,7 @@ const builderToggleArtifactDirectory = path.join(artifactRoot, "12y-builder-togg
 const builderSectionArtifactDirectory = path.join(artifactRoot, "12z-builder-sections/after");
 const builderOptionArtifactDirectory = path.join(artifactRoot, "12za-builder-options/after");
 const builderEstimationArtifactDirectory = path.join(artifactRoot, "12ze-self-service-estimation");
+const webhookArtifactDirectory = path.join(artifactRoot, "12zf-webhook-v1");
 
 async function signIn(page: Page) {
   if (!organizationId || !panelEmail || !panelPassword) {
@@ -203,10 +204,13 @@ test.describe("panel reference reconstruction", () => {
       "aria-current",
       "page",
     );
-    const mobileOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(mobileOverflow).toBeLessThanOrEqual(1);
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        ),
+      )
+      .toBeLessThanOrEqual(1);
   });
 
   test("dashboard reproduces the complete operational reference with real data", async ({
@@ -2318,6 +2322,93 @@ test.describe("panel reference reconstruction", () => {
       expect(accessibility.violations, `${screen.name} accessibility`).toEqual([]);
     }
 
+    expect(errors).toEqual([]);
+  });
+
+  test("owner manages the webhook and reviews PII-free delivery states", async ({ page }) => {
+    await Promise.all([
+      mkdir(path.join(webhookArtifactDirectory, "desktop"), { recursive: true }),
+      mkdir(path.join(webhookArtifactDirectory, "mobile"), { recursive: true }),
+    ]);
+    const errors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") errors.push(message.text());
+    });
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("response", (response) => {
+      if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`);
+    });
+
+    const webhookUrl = `/panel/${organizationId}/integracje/webhooki`;
+    await page.setViewportSize({ height: 1_086, width: 1_448 });
+    await page.goto(webhookUrl);
+    await expect(page.getByRole("heading", { level: 1, name: "Webhooki" })).toBeVisible();
+    await expect(page.getByText("https://hooks.partner.pl/kwotum/leads")).toBeVisible();
+    await expect(page.getByText("Dostarczono", { exact: true })).toBeVisible();
+    await expect(page.getByText("Ponowienie", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Historia dostaw" }).getByText("Wymaga uwagi", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(webhookArtifactDirectory, "desktop", "webhook-1448x-full.png"),
+    });
+
+    const rotate = page.getByRole("button", { exact: true, name: "Obróć sekret" });
+    page.once("dialog", (dialog) => {
+      expect(dialog.message()).toContain("Odbiorca musi zacząć używać nowego sekretu");
+      void dialog.accept();
+    });
+    await rotate.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByText("Nowy sekret v2 — skopiuj teraz")).toBeVisible();
+    await expect(page.locator(".webhook-secret-result code")).toContainText(/^whsec_/);
+    const desktopAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(desktopAccessibility.violations).toEqual([]);
+
+    await page.setViewportSize({ height: 844, width: 390 });
+    await expect(page.getByRole("button", { name: /menu boczne/ })).toBeHidden();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+    const mobileControls = await page
+      .locator(".webhook-endpoint-controls .wy-button")
+      .evaluateAll((buttons) => buttons.map((button) => button.getBoundingClientRect().height));
+    expect(mobileControls.every((height) => height >= 44)).toBe(true);
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(webhookArtifactDirectory, "mobile", "webhook-390x-full.png"),
+    });
+    const mobileAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(mobileAccessibility.violations).toEqual([]);
+
+    await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
+    await page.setViewportSize({ height: 800, width: 320 });
+    await expect(page.locator(".webhook-endpoint-list")).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+    const forcedColorsAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(forcedColorsAccessibility.violations).toEqual([]);
     expect(errors).toEqual([]);
   });
 });

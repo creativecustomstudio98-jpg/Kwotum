@@ -10,6 +10,7 @@ import { requireTenantContext } from "../../../lib/auth/tenant-context";
 import { listFlowDrafts } from "../../../lib/flows/service";
 import { listLeads, type LeadSummary } from "../../../lib/leads/service";
 import { getNotificationActivity } from "../../../lib/notifications/activity";
+import { getWebhookIntegration } from "../../../lib/webhooks/service";
 import { getWordPressIntegration } from "../../../lib/wordpress/service";
 import {
   buildDashboardDailySeries,
@@ -55,20 +56,25 @@ export default async function OrganizationDashboard({
   const { organizationId } = await params;
   const context = await requireTenantContext(organizationId);
   const canReadFlows = hasCapability(context, "flow:read");
+  const canManageWebhooks = hasCapability(context, "webhook:manage");
   const canManageWordPress = hasCapability(context, "wordpress:manage");
   const canManageSettings = hasCapability(context, "privacy:manage");
   const currentPeriodEnd = new Date();
   const currentPeriodStart = new Date(currentPeriodEnd.getTime() - 30 * 24 * 60 * 60 * 1_000);
-  const [leads, analytics, previousAnalytics, flows, notifications, wordpress] = await Promise.all([
-    listLeads(context),
-    getAnalyticsOverview(organizationId, 30, currentPeriodEnd),
-    getAnalyticsOverview(organizationId, 30, currentPeriodStart),
-    canReadFlows ? listFlowDrafts(context) : Promise.resolve([]),
-    getNotificationActivity(context),
-    canManageWordPress
-      ? getWordPressIntegration(organizationId)
-      : Promise.resolve({ connections: [], organizationName: "" }),
-  ]);
+  const [leads, analytics, previousAnalytics, flows, notifications, webhooks, wordpress] =
+    await Promise.all([
+      listLeads(context),
+      getAnalyticsOverview(organizationId, 30, currentPeriodEnd),
+      getAnalyticsOverview(organizationId, 30, currentPeriodStart),
+      canReadFlows ? listFlowDrafts(context) : Promise.resolve([]),
+      getNotificationActivity(context),
+      canManageWebhooks
+        ? getWebhookIntegration(organizationId)
+        : Promise.resolve({ deliveries: [], endpoints: [], organizationName: "" }),
+      canManageWordPress
+        ? getWordPressIntegration(organizationId)
+        : Promise.resolve({ connections: [], organizationName: "" }),
+    ]);
 
   const currentLeads = leadsInPeriod(leads, analytics.overview.period);
   const previousLeads = leadsInPeriod(leads, previousAnalytics.overview.period);
@@ -95,6 +101,12 @@ export default async function OrganizationDashboard({
   const attentionLeads = operationalLeads.filter((lead) => isAttentionLead(lead)).slice(0, 3);
   const latestLeads = operationalLeads.slice(0, 5);
   const publishedFlows = flows.filter((flow) => flow.status === "published");
+  const activeWebhookCount = webhooks.endpoints.filter(
+    (endpoint) => endpoint.status === "enabled",
+  ).length;
+  const failedWebhookCount = webhooks.deliveries.filter(
+    (delivery) => delivery.status === "dead_letter",
+  ).length;
   const currentSparkline = dailySeries.slice(-12).map((point) => point.leads);
   const estimateSparkline = dailySeries.slice(-12).map((point) => point.estimateMinor);
   const dateRange = formatDateRange(analytics.overview.period);
@@ -461,6 +473,13 @@ export default async function OrganizationDashboard({
                   label="WordPress"
                 />
               ) : null}
+              {canManageWebhooks ? (
+                <QuickAction
+                  href={`/panel/${organizationId}/integracje/webhooki`}
+                  icon="external"
+                  label="Webhooki"
+                />
+              ) : null}
             </nav>
           </DashboardCard>
 
@@ -489,6 +508,29 @@ export default async function OrganizationDashboard({
                   label="Integracja WordPress"
                   meta={wordpress.connections.length > 0 ? "Połączono" : "Nie połączono"}
                   tone={wordpress.connections.length > 0 ? "success" : "neutral"}
+                />
+              ) : null}
+              {canManageWebhooks ? (
+                <SystemStatus
+                  href={`/panel/${organizationId}/integracje/webhooki`}
+                  icon="external"
+                  label="Webhook lead.created"
+                  meta={
+                    failedWebhookCount > 0
+                      ? `${failedWebhookCount} dostaw wymaga uwagi`
+                      : activeWebhookCount === 1
+                        ? "1 aktywny endpoint"
+                        : activeWebhookCount > 1
+                          ? `${activeWebhookCount} aktywne endpointy`
+                          : "Nie skonfigurowano"
+                  }
+                  tone={
+                    webhooks.deliveries.some((delivery) => delivery.status === "dead_letter")
+                      ? "warning"
+                      : webhooks.endpoints.some((endpoint) => endpoint.status === "enabled")
+                        ? "success"
+                        : "neutral"
+                  }
                 />
               ) : null}
               {canManageSettings ? (

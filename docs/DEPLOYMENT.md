@@ -19,6 +19,12 @@ Każda ma forward plan, kompatybilność z poprzednią wersją aplikacji, backup
 
 Rollback aplikacji przez poprzedni artefakt; rollback danych preferuje migrację naprawczą. Feature flags nie mogą omijać autoryzacji. Produkcja wymaga checklisty z `RELEASE_CHECKLIST.md`.
 
+Webhook wymaga osobnych `WEBHOOK_SIGNING_SECRET` i `WEBHOOK_WORKER_SECRET`.
+Scheduler ma wywoływać chroniony route co minutę, bez umieszczania sekretu w
+URL. Najpierw wdrażamy migrację, potem aplikację, konfigurację endpointu i test
+syntetyczny, a dopiero na końcu scheduler. Rollback zatrzymuje scheduler przed
+cofnięciem aplikacji i zachowuje kolejkę; pełna procedura jest w `WEBHOOKS.md`.
+
 ## Liveness, readiness i smoke
 
 - `GET /health` sprawdza wyłącznie żywotność procesu; nie zależy od bazy i

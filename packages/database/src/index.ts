@@ -20,6 +20,10 @@ export type {
   NotificationStatus,
   OrganizationMemberRole,
   OrganizationMemberStatus,
+  WebhookAttemptOutcome,
+  WebhookDeliveryStatus,
+  WebhookEndpointStatus,
+  WebhookErrorCode,
   WidgetSessionStatus,
 } from "./database.types";
 export {

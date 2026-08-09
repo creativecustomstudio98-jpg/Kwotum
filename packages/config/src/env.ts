@@ -34,7 +34,8 @@ export const serverEnvSchema = z
     SENTRY_DSN: z.url().optional(),
     SUPABASE_SERVICE_ROLE_KEY: nonEmptySecret.optional(),
     TURNSTILE_SECRET_KEY: nonEmptySecret.optional(),
-    WEBHOOK_SIGNING_SECRET: nonEmptySecret.optional(),
+    WEBHOOK_SIGNING_SECRET: workerSecret.optional(),
+    WEBHOOK_WORKER_SECRET: workerSecret.optional(),
   })
   .strict();
 

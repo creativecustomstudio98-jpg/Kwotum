@@ -21,6 +21,7 @@ export type Capability =
   | "storage:delete"
   | "storage:read"
   | "storage:write"
+  | "webhook:manage"
   | "wordpress:manage";
 
 export type TenantContext = Readonly<{
@@ -70,6 +71,7 @@ const capabilitiesByRole = {
     "storage:delete",
     "storage:read",
     "storage:write",
+    "webhook:manage",
     "wordpress:manage",
   ]),
   admin: new Set<Capability>([
@@ -89,6 +91,7 @@ const capabilitiesByRole = {
     "storage:delete",
     "storage:read",
     "storage:write",
+    "webhook:manage",
     "wordpress:manage",
   ]),
   sales: new Set<Capability>([

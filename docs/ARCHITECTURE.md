@@ -50,6 +50,13 @@ prób. Tryb testowy i adapter dostawcy używają tego samego kontraktu; różni�
 wyłącznie transportem. Wewnętrzny Route Handler jest chroniony osobnym sekretem
 i zwraca tylko zagregowane liczniki.
 
+Etap 12ZF dodaje osobny outbox webhooków `lead.created`, aby awaria odbiorcy
+nie blokowała submitu i nie mieszała retencji z e-mailem. Owner/Admin zarządza
+endpointem przez tenant context i RLS. Worker service-role pobiera ograniczony
+batch, buduje minimalną projekcję, wyprowadza per-endpoint secret i wykonuje
+przypięte po DNS połączenie HTTPS bez redirectów. Oddzielny sekret chroni
+wewnętrzny route schedulera. Kontrakt i granice sieciowe opisuje `WEBHOOKS.md`.
+
 Etap 9 dodaje first-party analytics. Widget buforuje zamknięte eventy wyłącznie
 w pamięci do jawnej decyzji consentu; odmowa nie blokuje procesu. PostgreSQL
 przypina event do tenantowej sesji i immutable wersji flow, a panel pobiera
