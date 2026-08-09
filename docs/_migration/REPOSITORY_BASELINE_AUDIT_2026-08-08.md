@@ -145,6 +145,8 @@ Remediacja nie zwiększa tolerancji `maxDiffPixelRatio` i nie usuwa asercji:
   `mcr.microsoft.com/playwright:v1.61.0-noble`, zgodnym z wersją Playwright w
   lockfile, oraz wieloplatformowym digestem
   `sha256:57b65fdc9ceabe0ef613124c7bbe2babcf9362c4d85e382fe3b03604e84b428a`;
+- job jawnie instaluje `ripgrep` i klienta PostgreSQL; obraz przeglądarkowy nie
+  jest traktowany jako nieudokumentowane źródło narzędzi RLS;
 - `snapshotPathTemplate` rozdziela zaakceptowane baseline'y `darwin` i
   `linux`; oba katalogi zawierają po 12 aktywnych obrazów używanych przez
   testy;

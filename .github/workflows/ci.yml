@@ -56,8 +56,10 @@ jobs:
           cache: pnpm
           package-manager-cache: false
 
-      - name: Install security scan dependency
-        run: apt-get update && apt-get install --yes --no-install-recommends ripgrep
+      - name: Install runner dependencies
+        run: >-
+          apt-get update && apt-get install --yes --no-install-recommends
+          postgresql-client ripgrep
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
