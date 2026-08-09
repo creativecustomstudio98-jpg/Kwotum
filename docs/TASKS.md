@@ -2348,6 +2348,15 @@ do bazy. Widget pokazuje wyłącznie bezpieczny wynik, submit liczy go ponownie,
 Sales nie widzi draftu, a niepoprawna konfiguracja nie zapisuje się ani nie
 publikuje.
 
+**Status pierwszego slice'u 2026-08-09 — MODEL PASS, ETAP OPEN:** dodano
+niemutujący model wykrywania zależności pytania lub opcji od warunków ceny,
+źródła ilości `add_per_unit` i prywatnego scoringu. Atomowe operacje czyszczenia
+zachowują niezależne reguły oraz zwracają pełną listę skutków do przyszłego,
+jawnego potwierdzenia w UI. Sześć testów obejmuje wszystkie trzy typy referencji,
+usuwanie pytania i opcji, brak konfiguracji oraz zgodność oczyszczonego dokumentu
+ze schematem. Nie podłączono jeszcze destrukcyjnych operacji do buildera, więc
+żadna reguła nie jest kasowana po cichu; checklist i gate 12ZE pozostają otwarte.
+
 ## Etap 12ZF — webhook v1 albo formalna redukcja MVP
 
 - [ ] Zapisać ADR-034 utrzymujący webhook w MVP albo usuwający go spójnie
