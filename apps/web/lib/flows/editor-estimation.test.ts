@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 import {
   listEstimationReferencesForOption,
   listEstimationReferencesForStep,
+  removeEstimationQuantityReferencesForStep,
   removeEstimationReferencesForOption,
   removeEstimationReferencesForStep,
 } from "./editor-estimation";
@@ -131,6 +132,30 @@ describe("estimation references in the flow editor", () => {
       "cena_niezalezna",
     ]);
     expect(result.document.estimation!.scoring.rules).toEqual(source.estimation!.scoring.rules);
+  });
+
+  it("removes only quantity dependencies when a numeric question changes type", () => {
+    const source = documentWithEstimation();
+    const quantityStep = source.steps.find((step) => step.type === "number")!;
+    source.estimation!.scoring.rules.push({
+      id: "punkty_za_wymiar",
+      label: "Punkty za podany wymiar",
+      points: 3,
+      when: { operator: "answered", stepKey: quantityStep.key },
+    });
+
+    const result = removeEstimationQuantityReferencesForStep(source, quantityStep.key);
+
+    expect(result.removedReferences).toEqual([
+      { kind: "pricing_quantity", ruleId: "cena_za_wymiar", ruleLabel: "Stawka za wymiar" },
+    ]);
+    expect(result.document.estimation!.pricing.rules.map((rule) => rule.id)).toEqual([
+      "cena_rodzaj",
+      "cena_niezalezna",
+    ]);
+    expect(result.document.estimation!.scoring.rules.map((rule) => rule.id)).toContain(
+      "punkty_za_wymiar",
+    );
   });
 
   it("lists and removes only rules that reference the selected option", () => {

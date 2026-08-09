@@ -31,6 +31,14 @@ import {
   type FlowEditorSnapshot,
 } from "../../../../../lib/flows/editor-history";
 import {
+  listEstimationReferencesForOption,
+  listEstimationReferencesForStep,
+  removeEstimationQuantityReferencesForStep,
+  removeEstimationReferencesForOption,
+  removeEstimationReferencesForStep,
+  type EstimationReference,
+} from "../../../../../lib/flows/editor-estimation";
+import {
   reorderFlowOption,
   type FlowOptionDropEdge,
 } from "../../../../../lib/flows/editor-options";
@@ -56,6 +64,11 @@ import {
   publishFlowDraftRequestAction,
   saveFlowDraftRequestAction,
 } from "../actions";
+import {
+  EstimationEditorWorkspace,
+  FlowBuilderAreaTabs,
+  type FlowBuilderArea,
+} from "./estimation-editor";
 
 type BuilderMode = "inspector" | "preview" | "questions";
 type BuilderSaveStatus =
@@ -66,6 +79,28 @@ type FlowSavePayload = Readonly<{
   name: string;
   signature: string;
 }>;
+
+type PendingEstimationImpact =
+  | Readonly<{
+      action: "change_type";
+      nextType: FlowStep["type"];
+      references: readonly EstimationReference[];
+      stepKey: string;
+      targetLabel: string;
+    }>
+  | Readonly<{
+      action: "remove_option";
+      optionKey: string;
+      references: readonly EstimationReference[];
+      stepKey: string;
+      targetLabel: string;
+    }>
+  | Readonly<{
+      action: "remove_question";
+      references: readonly EstimationReference[];
+      stepKey: string;
+      targetLabel: string;
+    }>;
 
 export function FlowBuilder({
   canPublish,
@@ -93,6 +128,7 @@ export function FlowBuilder({
   );
   const [history, setHistory] = useState(() => createFlowEditorHistory(initialSnapshot));
   const [activeStepKey, setActiveStepKey] = useState(initialDocument.entryStepKey);
+  const [builderArea, setBuilderArea] = useState<FlowBuilderArea>("form");
   const [mode, setMode] = useState<BuilderMode>("questions");
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [revision, setRevision] = useState(initialRevision);
@@ -116,6 +152,8 @@ export function FlowBuilder({
   const [editingSectionKey, setEditingSectionKey] = useState<string | null>(null);
   const [editingSectionTitle, setEditingSectionTitle] = useState("");
   const [pendingSectionDeletion, setPendingSectionDeletion] = useState<string | null>(null);
+  const [pendingEstimationImpact, setPendingEstimationImpact] =
+    useState<PendingEstimationImpact | null>(null);
   const [sectionDeleteTarget, setSectionDeleteTarget] = useState("");
   const allowUnloadRef = useRef(false);
   const sectionTitleInputRef = useRef<HTMLInputElement>(null);
@@ -479,9 +517,18 @@ export function FlowBuilder({
         </div>
       </header>
 
+      <FlowBuilderAreaTabs
+        area={builderArea}
+        className="flow-builder__area-tabs--mobile"
+        onChange={selectBuilderArea}
+      />
+
       <div aria-label="Widok edytora" className="flow-builder__mobile-tabs" role="tablist">
         {[
-          ["questions", "Pytania"],
+          [
+            "questions",
+            builderArea === "form" ? "Pytania" : builderArea === "result" ? "Elementy" : "Reguły",
+          ],
           ["preview", "Podgląd"],
           ["inspector", "Ustawienia"],
         ].map(([value, label]) => (
@@ -516,7 +563,9 @@ export function FlowBuilder({
           aria-label="Sekcje i pytania"
           className={`flow-builder__questions ${mode === "questions" ? "is-mobile-active" : ""}`}
           data-layout-region="builder-questions"
+          hidden={builderArea !== "form"}
         >
+          <FlowBuilderAreaTabs area={builderArea} onChange={selectBuilderArea} />
           <div className="flow-builder__panel-heading">
             <div>
               <h2>Sekcje i pytania</h2>
@@ -822,6 +871,7 @@ export function FlowBuilder({
           aria-label="Podgląd formularza"
           className={`flow-builder__preview ${mode === "preview" ? "is-mobile-active" : ""}`}
           data-layout-region="builder-preview"
+          hidden={builderArea !== "form"}
         >
           <div className="flow-builder__panel-heading">
             <div>
@@ -921,7 +971,7 @@ export function FlowBuilder({
           </div>
         </section>
 
-        {inspectorOpen ? (
+        {builderArea === "form" && inspectorOpen ? (
           <aside
             aria-label="Ustawienia pytania"
             className={`flow-builder__inspector ${mode === "inspector" ? "is-mobile-active" : ""}`}
@@ -971,17 +1021,7 @@ export function FlowBuilder({
                 <select
                   onChange={(event) => {
                     const type = event.currentTarget.value as FlowStep["type"];
-                    updateActiveStep({
-                      allowUnknown: activeStep.allowUnknown,
-                      ...(activeStep.description ? { description: activeStep.description } : {}),
-                      key: activeStep.key,
-                      nextStepKey: activeStep.nextStepKey,
-                      options: isChoiceType(type) ? activeStep.options : [],
-                      required: activeStep.required,
-                      sectionKey: activeStep.sectionKey,
-                      title: activeStep.title,
-                      type,
-                    });
+                    requestQuestionTypeChange(type);
                   }}
                   value={activeStep.type}
                 >
@@ -1308,7 +1348,49 @@ export function FlowBuilder({
             </div>
           </aside>
         ) : null}
+        {builderArea !== "form" ? (
+          <EstimationEditorWorkspace
+            area={builderArea}
+            document={document}
+            mobilePane={mode}
+            onAreaChange={selectBuilderArea}
+            onDocumentChange={setDocument}
+          />
+        ) : null}
       </div>
+      <Dialog
+        actions={
+          <>
+            <Button onClick={() => setPendingEstimationImpact(null)} variant="secondary">
+              Anuluj
+            </Button>
+            <Button onClick={confirmEstimationImpact} variant="danger">
+              Potwierdź i usuń reguły
+            </Button>
+          </>
+        }
+        description="Ta operacja zmienia pytanie używane przez aktywną wycenę. Powiązane reguły muszą zostać usunięte atomowo, aby szkic pozostał poprawny."
+        onClose={() => setPendingEstimationImpact(null)}
+        open={Boolean(pendingEstimationImpact)}
+        title={
+          pendingEstimationImpact
+            ? `Zmień „${pendingEstimationImpact.targetLabel}”?`
+            : "Zmienić konfigurację?"
+        }
+      >
+        <div className="estimation-impact-dialog">
+          <p>Usunięte zostaną następujące zależności:</p>
+          <ul>
+            {pendingEstimationImpact?.references.map((reference, index) => (
+              <li key={`${reference.kind}:${reference.ruleId}:${index}`}>
+                <strong>{reference.ruleLabel}</strong>
+                <span>{estimationReferenceLabel(reference.kind)}</span>
+              </li>
+            ))}
+          </ul>
+          <p>Zmianę będzie można cofnąć przyciskiem „Cofnij”.</p>
+        </div>
+      </Dialog>
       <Dialog
         actions={
           <>
@@ -1474,6 +1556,11 @@ export function FlowBuilder({
     });
   }
 
+  function selectBuilderArea(nextArea: FlowBuilderArea) {
+    setBuilderArea(nextArea);
+    setInspectorOpen(true);
+  }
+
   function selectQuestion(index: number) {
     const step = document.steps[index];
     if (step) setActiveStepKey(step.key);
@@ -1547,33 +1634,52 @@ export function FlowBuilder({
 
   function removeActiveQuestion() {
     if (document.steps.length <= 1) return;
+    const references = listEstimationReferencesForStep(document, activeStep.key);
+    if (references.length > 0) {
+      setPendingEstimationImpact({
+        action: "remove_question",
+        references,
+        stepKey: activeStep.key,
+        targetLabel: activeStep.title,
+      });
+      return;
+    }
+    removeQuestionNow(activeStep.key, false);
+  }
+
+  function removeQuestionNow(stepKey: string, cleanEstimation: boolean) {
+    if (document.steps.length <= 1) return;
+    const source = cleanEstimation
+      ? removeEstimationReferencesForStep(document, stepKey).document
+      : document;
+    const stepIndex = source.steps.findIndex((step) => step.key === stepKey);
+    const step = source.steps[stepIndex];
+    if (!step) return;
     const fallback =
-      activeStep.nextStepKey ??
-      document.steps[activeIndex + 1]?.key ??
-      document.steps[activeIndex - 1]?.key ??
+      step.nextStepKey ??
+      source.steps[stepIndex + 1]?.key ??
+      source.steps[stepIndex - 1]?.key ??
       null;
-    const remaining = document.steps.filter((step) => step.key !== activeStep.key);
-    setDocument((current) => ({
-      ...current,
+    const remaining = source.steps.filter((candidate) => candidate.key !== stepKey);
+    setDocument({
+      ...source,
       entryStepKey:
-        current.entryStepKey === activeStep.key
-          ? (fallback ?? remaining[0]!.key)
-          : current.entryStepKey,
-      rules: current.rules
-        .filter((rule) => rule.when.stepKey !== activeStep.key)
+        source.entryStepKey === stepKey ? (fallback ?? remaining[0]!.key) : source.entryStepKey,
+      rules: source.rules
+        .filter((rule) => rule.when.stepKey !== stepKey)
         .map((rule) =>
-          rule.then.stepKey === activeStep.key
+          rule.then.stepKey === stepKey
             ? { ...rule, then: { action: "go_to" as const, stepKey: fallback } }
             : rule,
         ),
-      steps: remaining.map((step) => ({
-        ...step,
-        nextStepKey: step.nextStepKey === activeStep.key ? fallback : step.nextStepKey,
-        options: step.options.map((option) =>
-          option.nextStepKey === activeStep.key ? { ...option, nextStepKey: fallback } : option,
+      steps: remaining.map((candidate) => ({
+        ...candidate,
+        nextStepKey: candidate.nextStepKey === stepKey ? fallback : candidate.nextStepKey,
+        options: candidate.options.map((option) =>
+          option.nextStepKey === stepKey ? { ...option, nextStepKey: fallback } : option,
         ),
       })),
-    }));
+    });
     setActiveStepKey(fallback ?? remaining[0]!.key);
   }
 
@@ -1926,25 +2032,145 @@ export function FlowBuilder({
   function removeOption(index: number) {
     const option = activeStep.options[index];
     if (!option || activeStep.options.length <= 2) return;
-    setDocument((current) => ({
-      ...current,
-      rules: current.rules.filter(
+    const references = listEstimationReferencesForOption(document, activeStep.key, option.key);
+    if (references.length > 0) {
+      setPendingEstimationImpact({
+        action: "remove_option",
+        optionKey: option.key,
+        references,
+        stepKey: activeStep.key,
+        targetLabel: option.label,
+      });
+      return;
+    }
+    removeOptionNow(activeStep.key, option.key, false);
+  }
+
+  function removeOptionNow(stepKey: string, optionKey: string, cleanEstimation: boolean) {
+    const source = cleanEstimation
+      ? removeEstimationReferencesForOption(document, stepKey, optionKey).document
+      : document;
+    const step = source.steps.find((candidate) => candidate.key === stepKey);
+    if (
+      !step ||
+      step.options.length <= 2 ||
+      !step.options.some((option) => option.key === optionKey)
+    ) {
+      return;
+    }
+    setDocument({
+      ...source,
+      rules: source.rules.filter(
         (rule) =>
-          !(
-            rule.when.stepKey === activeStep.key &&
-            "value" in rule.when &&
-            rule.when.value === option.key
-          ),
+          !(rule.when.stepKey === stepKey && "value" in rule.when && rule.when.value === optionKey),
       ),
-      steps: current.steps.map((step) =>
-        step.key === activeStep.key
+      steps: source.steps.map((candidate) =>
+        candidate.key === stepKey
           ? {
-              ...step,
-              options: step.options.filter((_, optionIndex) => optionIndex !== index),
+              ...candidate,
+              options: candidate.options.filter((option) => option.key !== optionKey),
+            }
+          : candidate,
+      ),
+    });
+  }
+
+  function requestQuestionTypeChange(nextType: FlowStep["type"]) {
+    if (nextType === activeStep.type) return;
+    const references: EstimationReference[] = [];
+    if (isChoiceType(activeStep.type) && !isChoiceType(nextType)) {
+      for (const option of activeStep.options) {
+        references.push(...listEstimationReferencesForOption(document, activeStep.key, option.key));
+      }
+    }
+    if (activeStep.type === "number" && nextType !== "number") {
+      references.push(
+        ...listEstimationReferencesForStep(document, activeStep.key).filter(
+          (reference) => reference.kind === "pricing_quantity",
+        ),
+      );
+    }
+    const uniqueReferences = uniqueEstimationReferences(references);
+    if (uniqueReferences.length > 0) {
+      setPendingEstimationImpact({
+        action: "change_type",
+        nextType,
+        references: uniqueReferences,
+        stepKey: activeStep.key,
+        targetLabel: activeStep.title,
+      });
+      return;
+    }
+    changeQuestionTypeNow(activeStep.key, nextType, false);
+  }
+
+  function changeQuestionTypeNow(
+    stepKey: string,
+    nextType: FlowStep["type"],
+    cleanEstimation: boolean,
+  ) {
+    let source = document;
+    const original = source.steps.find((step) => step.key === stepKey);
+    if (!original || original.type === nextType) return;
+    if (cleanEstimation && isChoiceType(original.type) && !isChoiceType(nextType)) {
+      for (const option of original.options) {
+        source = removeEstimationReferencesForOption(source, stepKey, option.key).document;
+      }
+    }
+    if (cleanEstimation && original.type === "number" && nextType !== "number") {
+      source = removeEstimationQuantityReferencesForStep(source, stepKey).document;
+    }
+    const optionKeys = new Set(original.options.map((option) => option.key));
+    const options = isChoiceType(nextType)
+      ? isChoiceType(original.type)
+        ? original.options
+        : [
+            { key: "opcja_1", label: "Opcja 1" },
+            { key: "opcja_2", label: "Opcja 2" },
+          ]
+      : [];
+    setDocument({
+      ...source,
+      rules:
+        isChoiceType(original.type) && !isChoiceType(nextType)
+          ? source.rules.filter(
+              (rule) =>
+                !(
+                  rule.when.stepKey === stepKey &&
+                  typeof rule.when.value === "string" &&
+                  optionKeys.has(rule.when.value)
+                ),
+            )
+          : source.rules,
+      steps: source.steps.map((step) =>
+        step.key === stepKey
+          ? {
+              allowUnknown: step.allowUnknown,
+              ...(step.description ? { description: step.description } : {}),
+              key: step.key,
+              nextStepKey: step.nextStepKey,
+              options,
+              required: step.required,
+              sectionKey: step.sectionKey,
+              title: step.title,
+              type: nextType,
             }
           : step,
       ),
-    }));
+    });
+  }
+
+  function confirmEstimationImpact() {
+    const pending = pendingEstimationImpact;
+    if (!pending) return;
+    setPendingEstimationImpact(null);
+    if (pending.action === "remove_question") {
+      removeQuestionNow(pending.stepKey, true);
+    } else if (pending.action === "remove_option") {
+      removeOptionNow(pending.stepKey, pending.optionKey, true);
+    } else {
+      changeQuestionTypeNow(pending.stepKey, pending.nextType, true);
+    }
   }
 
   function setDescription(value: string, group?: string) {
@@ -2250,6 +2476,24 @@ function polishQuestionCountLabel(count: number): string {
   if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return "pytań";
   const lastDigit = count % 10;
   return lastDigit >= 2 && lastDigit <= 4 ? "pytania" : "pytań";
+}
+
+function uniqueEstimationReferences(
+  references: readonly EstimationReference[],
+): EstimationReference[] {
+  const seen = new Set<string>();
+  return references.filter((reference) => {
+    const signature = `${reference.kind}:${reference.ruleId}`;
+    if (seen.has(signature)) return false;
+    seen.add(signature);
+    return true;
+  });
+}
+
+function estimationReferenceLabel(kind: EstimationReference["kind"]): string {
+  if (kind === "pricing_condition") return "warunek ceny";
+  if (kind === "pricing_quantity") return "źródło ilości dla stawki jednostkowej";
+  return "prywatna reguła scoringu";
 }
 
 function documentQuerySelector<ElementType extends Element>(selector: string): ElementType | null {

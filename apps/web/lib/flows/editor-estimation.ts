@@ -134,6 +134,38 @@ export function removeEstimationReferencesForOption(
   };
 }
 
+export function removeEstimationQuantityReferencesForStep(
+  document: FlowDocument,
+  stepKey: string,
+): EstimationReferenceRemovalResult {
+  const estimation = document.estimation;
+  if (!estimation) return unchanged(document);
+  const removedReferences = listEstimationReferencesForStep(document, stepKey).filter(
+    (reference) => reference.kind === "pricing_quantity",
+  );
+  if (removedReferences.length === 0) return unchanged(document);
+
+  return {
+    changed: true,
+    document: {
+      ...document,
+      estimation: {
+        ...estimation,
+        pricing: {
+          ...estimation.pricing,
+          rules: estimation.pricing.rules.filter(
+            (rule) =>
+              !(
+                rule.operation.type === "add_per_unit" && rule.operation.quantityStepKey === stepKey
+              ),
+          ),
+        },
+      },
+    },
+    removedReferences,
+  };
+}
+
 function conditionReferencesOption(
   condition: EstimationCondition,
   stepKey: string,

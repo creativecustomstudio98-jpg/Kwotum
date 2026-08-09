@@ -29,6 +29,7 @@ const builderInteractionArtifactDirectory = path.join(artifactRoot, "12x-builder
 const builderToggleArtifactDirectory = path.join(artifactRoot, "12y-builder-toggle/after");
 const builderSectionArtifactDirectory = path.join(artifactRoot, "12z-builder-sections/after");
 const builderOptionArtifactDirectory = path.join(artifactRoot, "12za-builder-options/after");
+const builderEstimationArtifactDirectory = path.join(artifactRoot, "12ze-self-service-estimation");
 
 async function signIn(page: Page) {
   if (!organizationId || !panelEmail || !panelPassword) {
@@ -1174,6 +1175,155 @@ test.describe("panel reference reconstruction", () => {
     }
   });
 
+  test("owner configures, previews and publishes pricing, scoring and result safely", async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    test.skip(!editorFlowId, "Test estymacji buildera wymaga PANEL_E2E_EDITOR_FLOW_ID.");
+    const runtimeErrors: string[] = [];
+    page.on("pageerror", (error) => runtimeErrors.push(error.message));
+    await Promise.all([
+      mkdir(path.join(builderEstimationArtifactDirectory, "desktop"), { recursive: true }),
+      mkdir(path.join(builderEstimationArtifactDirectory, "mobile"), { recursive: true }),
+    ]);
+
+    const builderUrl = `/panel/${organizationId}/procesy/${editorFlowId}`;
+    await page.setViewportSize({ height: 1_086, width: 1_448 });
+    await page.evaluate(() => localStorage.setItem("lorum:panel-sidebar-collapsed", "true"));
+    await page.goto(builderUrl);
+    await expect(page.locator(".flow-builder__grid")).toBeVisible();
+
+    const areaTabs = page.locator(".flow-builder__questions .flow-builder__area-tabs");
+    const undo = page.getByRole("button", { exact: true, name: "Cofnij" });
+    await areaTabs.getByRole("tab", { exact: true, name: "Wycena" }).click();
+    const setup = page.locator(".estimation-setup");
+    await expect(setup).toBeVisible();
+    await setup.locator("label").filter({ hasText: "Minimum" }).locator("input").fill("10000");
+    await setup.locator("label").filter({ hasText: "Maksimum" }).locator("input").fill("15000");
+    await setup.getByRole("button", { name: "Włącz wycenę i scoring" }).click();
+
+    await expect(page.locator(".estimation-result-preview__price")).toContainText(
+      /10.?000.*15.?000/,
+    );
+    await page.getByRole("button", { name: "Dodaj regułę ceny" }).click();
+    await page.getByLabel("Nazwa wewnętrzna").fill("Dopłata za pierwszy wybór");
+    await page.locator(".estimation-condition").getByLabel("Warunek").selectOption("equals");
+    await page.getByLabel("Operacja").selectOption("multiply");
+    await page.getByLabel("Mnożnik w procentach").fill("120");
+    await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
+      timeout: 15_000,
+    });
+
+    await areaTabs.getByRole("tab", { exact: true, name: "Formularz" }).click();
+    await page.locator(".question-options__remove").first().click();
+    const impactDialog = page.getByRole("dialog", { name: /Zmień/ });
+    await expect(impactDialog).toContainText("Dopłata za pierwszy wybór");
+    await expect(impactDialog).toContainText("warunek ceny");
+    await impactDialog.getByRole("button", { name: "Anuluj" }).click();
+    await expect(impactDialog).toBeHidden();
+
+    const formAreaTabs = page.locator(".flow-builder__questions .flow-builder__area-tabs");
+    await formAreaTabs.getByRole("tab", { exact: true, name: "Scoring" }).click();
+    await page.getByRole("button", { name: "Dodaj kategorię" }).click();
+    await page.getByLabel("Nazwa kategorii 2").fill("Priorytet");
+    expect(runtimeErrors).toEqual([]);
+    await page.getByRole("button", { name: "Dodaj regułę scoringu" }).click();
+    await page.getByLabel("Nazwa wewnętrzna").fill("Punkty za kompletną odpowiedź");
+    await page.getByLabel("Punkty").fill("25");
+
+    const scoringAreaTabs = page.locator(".flow-builder__questions .flow-builder__area-tabs");
+    await scoringAreaTabs.getByRole("tab", { exact: true, name: "Wynik" }).click();
+    await page.getByLabel("Nagłówek wyniku").fill("Orientacyjna wycena jest gotowa");
+    await page.getByLabel("Następny krok").fill("Przekaż dane do bezpłatnej konsultacji");
+    await expect(page.locator(".estimation-result-preview")).toContainText(
+      "Orientacyjna wycena jest gotowa",
+    );
+    await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
+      timeout: 15_000,
+    });
+
+    await page.getByRole("button", { name: "Opublikuj proces" }).click();
+    await expect(
+      page.getByText("Zapisano i opublikowano nową wersję.", { exact: true }),
+    ).toBeVisible({
+      timeout: 20_000,
+    });
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(builderEstimationArtifactDirectory, "desktop", "result-1448x1086.png"),
+    });
+    const desktopAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(desktopAccessibility.violations).toEqual([]);
+
+    await page.setViewportSize({ height: 844, width: 390 });
+    const mobileAreaTabs = page.locator(".flow-builder__area-tabs--mobile");
+    await expect(mobileAreaTabs).toBeVisible();
+    await mobileAreaTabs.getByRole("tab", { exact: true, name: "Scoring" }).click();
+    await page.getByRole("tab", { exact: true, name: "Ustawienia" }).click();
+    await expect(page.locator(".estimation-builder__inspector")).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+    const mobileTabHeights = await page
+      .locator(".flow-builder__area-tabs--mobile button, .flow-builder__mobile-tabs button")
+      .evaluateAll((buttons) => buttons.map((button) => button.getBoundingClientRect().height));
+    expect(mobileTabHeights.every((height) => height >= 44)).toBe(true);
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(builderEstimationArtifactDirectory, "mobile", "scoring-390x844.png"),
+    });
+    const mobileAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(mobileAccessibility.violations).toEqual([]);
+
+    const resultAreaTab = mobileAreaTabs.getByRole("tab", { exact: true, name: "Wynik" });
+    await resultAreaTab.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("heading", { name: "Ustawienia · Wynik" })).toBeVisible();
+    const scoringAreaTab = mobileAreaTabs.getByRole("tab", { exact: true, name: "Scoring" });
+    await scoringAreaTab.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("heading", { name: "Ustawienia · Scoring" })).toBeVisible();
+
+    await page.setViewportSize({ height: 800, width: 320 });
+    await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
+    await expect(page.locator(".estimation-builder__inspector")).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+    const forcedColorsAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(forcedColorsAccessibility.violations).toEqual([]);
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(builderEstimationArtifactDirectory, "mobile", "forced-colors-320x800.png"),
+    });
+    expect(runtimeErrors).toEqual([]);
+
+    await page.emulateMedia({ forcedColors: "none", reducedMotion: "reduce" });
+    await page.setViewportSize({ height: 1_086, width: 1_448 });
+    await page
+      .locator(".flow-builder__questions .flow-builder__area-tabs")
+      .getByRole("tab", { name: "Wycena" })
+      .click();
+    for (let index = 0; index < 30 && (await setup.count()) === 0; index += 1) {
+      if (!(await undo.isEnabled())) break;
+      await undo.click();
+    }
+    await expect(setup).toBeVisible();
+    await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
+      timeout: 15_000,
+    });
+  });
+
   test("builder and privacy switches keep pill geometry and native keyboard behavior", async ({
     page,
   }) => {
@@ -2044,7 +2194,7 @@ test.describe("panel reference reconstruction", () => {
         path: `/panel/${organizationId}/start`,
       },
       {
-        heading: "Instalacja procesu",
+        heading: "Podgląd i udostępnianie",
         name: "installation",
         path: `/panel/${organizationId}/procesy/${seededFlowId}/instalacja`,
       },

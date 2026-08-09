@@ -390,3 +390,23 @@ i `difference-x3.png` obejmują pełny desktop. Różnice treści i części iko
 wynikają z realnego zakresu produktu, dlatego transformacja mobile pozostaje
 na 3/4 bez osobnej referencji telefonu. Pełny E2E ma 47/49: test tego ekranu
 przechodzi, a dwa niezależne niepowodzenia pozostają w builderze i analityce.
+
+## Etap 12ZE — self-service pricing, scoring i wynik
+
+- zakres: trzy nowe obszary istniejącego buildera procesu;
+- referencja geometrii: builder 1448 × 1086 z 12W, SHA-256
+  `918e0d8edfdb02d899310e61b36bcf25618bd1a761bf62809fb9927d4a68a526`;
+- artefakty: `artifacts/visual-qa/12ze-self-service-estimation/`;
+- wynik: **PASS, 19/20**; kompletność 4, geometria 4, typografia 4, gęstość 4,
+  transformacja mobile 3;
+- desktop zachowuje shell i trzy kolumny 12W, a mobile używa osobnych zakładek
+  obszaru oraz `Reguły / Podgląd / Ustawienia`;
+- prywatny scoring nie jest pokazany w publicznym preview, a włączenie wyceny
+  wymaga jawnych kwot zamiast syntetycznej rekomendacji biznesowej.
+
+Playwright publikuje działającą konfigurację, sprawdza dialog zależności,
+autosave, undo, klawiaturę, cele 44 px, axe, overflow, 1448 × 1086,
+390 × 844, reflow i forced colors przy 320 × 800. Pełny produkcyjny zestaw
+przechodzi 18/18 z cleanupem syntetycznego tenanta 0. Brak osobnej referencji
+mobile pozostawia transformację na 3/4; overlay desktop ocenia shell i osie,
+ponieważ źródło nie zawierało edytora estymacji.
