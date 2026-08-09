@@ -101,6 +101,21 @@ SAST, secret scan i dependency audit. Tymczasowa baza została usunięta po
 teście. Sam pozornie zielony kod wyjścia nie jest uznawany za dowód; log został
 sprawdzony pod kątem poprawnej kolejności typegen → build.
 
+## Zdalne CI — pierwsza próba
+
+Draft PR [#10](https://github.com/creativecustomstudio98-jpg/Kwotum/pull/10)
+uruchomił CI, CodeQL i Gitleaks na SHA `e5ed147`. Pierwsza próba ujawniła
+wyłącznie luki konfiguracji runnera: brak jawnego `GITHUB_TOKEN` dla Gitleaks,
+brak deklarowanej zależności `ripgrep` w jobach Quality Gate i WordPress oraz
+brak uprawnienia `actions: read` dla CodeQL. Testy PHP WordPress przechodziły
+przed fałszywym alarmem wywołanym brakiem `rg`, a CodeQL przeanalizował 297/297
+plików TypeScript przed odrzuceniem zapisu wyniku.
+
+Remediacja deklaruje zależność runnera, dodaje fail-fast do skryptów lokalnych,
+przekazuje token przy minimalnych uprawnieniach oraz migruje Gitleaks z v2 na
+v3 (Node 24), aby uniknąć zapowiedzianego wyłączenia v2 we wrześniu 2026.
+Odbiór nadal wymaga zielonego ponownego przebiegu na końcowym SHA.
+
 ## Kryterium odbioru
 
 Ten raport dokumentuje lokalny postęp, ale nie zamyka Etapu 12ZD. Jedynym

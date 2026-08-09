@@ -2,6 +2,12 @@
 set -euo pipefail
 
 plugin_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if ! command -v rg >/dev/null 2>&1; then
+  echo "WordPress connector checks require ripgrep (rg)." >&2
+  exit 127
+fi
+
 php_minor="$(php -r 'echo PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION;')"
 
 find "${plugin_root}" -type f -name '*.php' -print0 |

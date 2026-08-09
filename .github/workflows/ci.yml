@@ -54,6 +54,9 @@ jobs:
           cache: pnpm
           package-manager-cache: false
 
+      - name: Install security scan dependency
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends ripgrep
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -88,6 +91,9 @@ jobs:
     name: Secret scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
 
     steps:
       - name: Check out full history
@@ -96,7 +102,9 @@ jobs:
           fetch-depth: 0
 
       - name: Scan committed content
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   wordpress:
     name: WordPress ${{ matrix.wordpress }} / PHP ${{ matrix.php }}
@@ -147,6 +155,9 @@ jobs:
         with:
           coverage: none
           php-version: ${{ matrix.php }}
+
+      - name: Install connector test dependency
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends ripgrep
 
       - name: Run isolated connector tests
         run: bash apps/wordpress-plugin/tests/run.sh

@@ -2249,7 +2249,10 @@ odpowiadającymi zmianami. Usunięto dziewięć znanych podatności zależności
 worktree na logiczne commity, uruchomić 16 scenariuszy panelu z tymczasowym
 kontem i uzyskać zielone CI/CodeQL/Gitleaks na tym samym SHA. Clean checkout
 został odtworzony na `517d80a`: frozen install, Turbo 32/32, pełne RLS,
-WordPress i audyt zależności PASS. Raport:
+WordPress i audyt zależności PASS. Draft PR #10 uruchomił pierwszy zdalny
+przebieg na `e5ed147`; wykryte braki dotyczyły konfiguracji runnera
+(Gitleaks token, `ripgrep`, CodeQL `actions: read`) i zostały objęte
+remediacją wymagającą zielonego rerunu. Raport:
 `docs/_migration/REPOSITORY_BASELINE_AUDIT_2026-08-08.md`. R7.1 pozostaje
 nieodebrane; naprawa regresji E2E nie zatwierdza tego etapu produktu.
 

@@ -4,6 +4,11 @@ set -euo pipefail
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${repository_root}"
 
+if ! command -v rg >/dev/null 2>&1; then
+  echo "Static security checks require ripgrep (rg)." >&2
+  exit 127
+fi
+
 scan_globs=(
   --glob '!node_modules/**'
   --glob '!.git/**'
