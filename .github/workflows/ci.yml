@@ -18,6 +18,8 @@ jobs:
     name: Quality gate
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.0-noble@sha256:57b65fdc9ceabe0ef613124c7bbe2babcf9362c4d85e382fe3b03604e84b428a
     services:
       postgres:
         image: postgres:17-alpine
@@ -38,7 +40,7 @@ jobs:
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-public-key
       NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
       NEXT_PUBLIC_WIDGET_ORIGIN: http://127.0.0.1:3100
-      RLS_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/wyceno_rls
+      RLS_TEST_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/wyceno_rls
 
     steps:
       - name: Check out repository
@@ -55,7 +57,7 @@ jobs:
           package-manager-cache: false
 
       - name: Install security scan dependency
-        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends ripgrep
+        run: apt-get update && apt-get install --yes --no-install-recommends ripgrep
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -81,11 +83,19 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Install Chromium for browser checks
-        run: pnpm exec playwright install --with-deps chromium
-
       - name: Accessibility, keyboard and visual checks
         run: pnpm e2e
+
+      - name: Upload browser failure artifacts
+        if: ${{ failure() && !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          if-no-files-found: ignore
+          name: playwright-failure-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
 
   secrets:
     name: Secret scan

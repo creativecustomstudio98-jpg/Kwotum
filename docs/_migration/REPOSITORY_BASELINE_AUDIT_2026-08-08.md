@@ -127,6 +127,40 @@ Security lub osobno zaakceptowanego, zgodnego licencyjnie zamiennika SAST.
 Odbiór nadal wymaga zielonego ponownego przebiegu dostępnych kontroli na
 końcowym SHA oraz jawnej decyzji dla CodeQL.
 
+## Powtarzalny visual regression w CI
+
+Pierwszy pełny Quality Gate na Linuxie potwierdził format, lint, SAST, audyt
+zależności, typecheck, 177 testów jednostkowych, pełne RLS i build, ale ujawnił
+14 różnic snapshotów oraz kontraktów geometrii. Przyczyną nie była zmiana
+funkcjonalna: stare obrazy powstały na macOS z fontem systemowym, podczas gdy
+runner używał Linuxa i innego zestawu fontów.
+
+Remediacja nie zwiększa tolerancji `maxDiffPixelRatio` i nie usuwa asercji:
+
+- Inter 4.1 jest dostarczany lokalnie jako variable WOFF2 wraz z licencją SIL
+  Open Font License 1.1, więc render nie zależy od sieci ani fontów runnera;
+  SHA-256 fontu to
+  `693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3`;
+- Quality Gate działa w przypiętym obrazie
+  `mcr.microsoft.com/playwright:v1.61.0-noble`, zgodnym z wersją Playwright w
+  lockfile, oraz wieloplatformowym digestem
+  `sha256:57b65fdc9ceabe0ef613124c7bbe2babcf9362c4d85e382fe3b03604e84b428a`;
+- `snapshotPathTemplate` rozdziela zaakceptowane baseline'y `darwin` i
+  `linux`; oba katalogi zawierają po 12 aktywnych obrazów używanych przez
+  testy;
+- 14 nieużywanych, historycznych snapshotów usunięto po sprawdzeniu wszystkich
+  wywołań `toHaveScreenshot`;
+- błędy geometrii naprawiono w CSS dla agency method, sekcji integracji,
+  product map, home key information oraz hero branż, bez osłabiania limitów;
+- raport i trace Playwright są przechowywane przez 14 dni wyłącznie przy
+  niepowodzeniu joba.
+
+Pełny produkcyjny Playwright na macOS przechodzi 257 testów przy 17 jawnych
+skipach. Przypięty Linux potwierdza build oraz docelowy zestaw branż 11/11;
+pełny dowód Linux pozostaje wynikiem końcowego Quality Gate na GitHubie.
+Reprezentatywne baseline'y hero, guided flow, design systemu, auth i widgetu
+zostały sprawdzone wizualnie po osadzeniu fontu.
+
 ## Kryterium odbioru
 
 Ten raport dokumentuje lokalny postęp, ale nie zamyka Etapu 12ZD. Jedynym

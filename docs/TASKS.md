@@ -2256,6 +2256,13 @@ remediacją. Drugi przebieg potwierdził Gitleaks oraz Quality Gate od formatu
 do builda, ale publikacja wyników CodeQL jest niedostępna dla prywatnego repo
 konta osobistego bez płatnego GitHub Code Security. Wymagana jest decyzja:
 włączyć Code Security albo zaakceptować zgodny licencyjnie zamiennik SAST.
+Różnice visual regression zostały usunięte u źródła: aplikacja dostarcza Inter
+4.1 lokalnie, CI używa przypiętego obrazu Playwright 1.61.0 Noble, a 12
+aktywnych baseline'ów ma osobne warianty Darwin i Linux. Tolerancja testów nie
+została zwiększona. Pełny macOS Playwright przechodzi 257 testów przy 17
+jawnych skipach, a docelowy kontrakt branż przechodzi na macOS i Linuxie
+11/11. Końcowy push nadal musi potwierdzić pełny Quality Gate Linux na tym
+samym SHA.
 Raport:
 `docs/_migration/REPOSITORY_BASELINE_AUDIT_2026-08-08.md`. R7.1 pozostaje
 nieodebrane; naprawa regresji E2E nie zatwierdza tego etapu produktu.

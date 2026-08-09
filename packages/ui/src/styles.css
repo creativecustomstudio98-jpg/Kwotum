@@ -33,7 +33,9 @@
   --wy-color-accent-subtle: var(--wy-color-brand-soft);
   --wy-color-error: var(--wy-color-danger);
   --wy-color-error-soft: var(--wy-color-danger-soft);
-  --wy-font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --wy-font-sans:
+    var(--wy-font-inter, "Inter"), ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   --wy-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --wy-font-weight-regular: 400;
   --wy-font-weight-medium: 500;

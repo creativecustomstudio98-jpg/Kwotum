@@ -78,6 +78,23 @@ Wyjątek wymaga wpisania w `diff.md`, jaką decyzję dokumentuje dodatkowy plik.
 Snapshoty Playwright pozostają w `tests/e2e/__screenshots__/`; outputy skryptów
 `artifacts/redesign/` są odtwarzalne i celowo niewersjonowane.
 
+### Powtarzalność snapshotów między platformami
+
+- aplikacja dostarcza własny Inter variable; test wizualny nie może zależeć od
+  fontu z CDN ani od fontów systemowych runnera;
+- Playwright zapisuje aktywne baseline'y w
+  `tests/e2e/__screenshots__/{platform}/`, obecnie `darwin` i `linux`;
+- baseline aktualizuje się na tej samej platformie, na której ma być
+  zatwierdzony; obrazu z innego systemu nie kopiuje się jako zamiennika;
+- kanoniczny Linux CI to przypięty obraz
+  `mcr.microsoft.com/playwright:v1.61.0-noble`; zmiana obrazu albo wersji
+  Playwright lub jego zapisanego w workflow digestu wymaga osobnego visual
+  review;
+- różnic rasteryzacji nie naprawia się zwiększeniem tolerancji. Najpierw należy
+  potwierdzić font, viewport, wersję przeglądarki i rzeczywistą geometrię;
+- przy niepowodzeniu CI należy przejrzeć dołączony `playwright-report` i trace,
+  a nowy baseline zaakceptować dopiero po side-by-side review.
+
 ## Ostatni wynik — Etap 12F, landing board 2
 
 - zakres: wyłącznie `/`, sekcje `client-demo` i `process-fit`;

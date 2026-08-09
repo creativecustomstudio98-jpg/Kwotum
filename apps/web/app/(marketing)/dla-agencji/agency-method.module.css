@@ -312,7 +312,7 @@
 
 @media (max-width: 40rem) {
   .section {
-    padding-block: 4rem;
+    padding-block: 3.5rem;
     scroll-margin-top: 4.5rem;
   }
 
@@ -328,7 +328,7 @@
   }
 
   .board {
-    margin-top: 2.5rem;
+    margin-top: 2.25rem;
     border-radius: 0.8rem;
   }
 

@@ -5,7 +5,7 @@
 
 .shell {
   min-width: 0;
-  margin: clamp(2rem, 3.5vw, 2.5rem) 0 0;
+  margin: clamp(2rem, 3.5vw, 2.25rem) 0 0;
   border: 1px solid var(--wy-color-border);
   border-radius: var(--wy-radius-lg);
   overflow: hidden;

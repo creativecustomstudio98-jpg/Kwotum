@@ -6,6 +6,13 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Visual regression Etapu 12ZD jest powtarzalny między lokalnym macOS i CI:
+  aplikacja osadza Inter 4.1 na licencji OFL 1.1, Playwright rozdziela 12
+  aktywnych baseline'ów na Darwin i Linux, a Quality Gate działa w przypiętym
+  obrazie `mcr.microsoft.com/playwright:v1.61.0-noble`. Usunięto 14
+  nieużywanych snapshotów i skorygowano rzeczywistą geometrię kilku sekcji bez
+  zwiększania tolerancji testów. Raport oraz trace z błędnego przebiegu są
+  zachowywane przez 14 dni.
 - Build każdego workspace'u czeka teraz na jego własny typecheck. Usuwa to
   wyścig czystego checkoutu, w którym równoległe `next typegen` i `next build`
   modyfikowały `.next/types` oraz mogły zalogować `ENOENT` mimo kodu wyjścia 0

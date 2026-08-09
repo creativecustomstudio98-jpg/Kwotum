@@ -2458,6 +2458,10 @@
 }
 
 @media (max-width: 75rem) {
+  .marketing-section.product-map-section {
+    padding-block: 4.75rem;
+  }
+
   .product-map__heading {
     grid-template-columns: minmax(25rem, 0.85fr) minmax(18rem, 0.45fr);
     gap: 3rem;
@@ -2485,6 +2489,16 @@
   .product-system-map svg {
     width: 2.35rem;
     height: 2.35rem;
+  }
+}
+
+@media (min-width: 60.0625rem) and (max-width: 75rem) {
+  .product-system-map > figcaption {
+    min-height: 5.4rem;
+  }
+
+  .product-system-map__body {
+    padding-block: 0.75rem;
   }
 }
 
@@ -10739,7 +10753,7 @@
 
 .integrations-reference-section__heading {
   max-width: 72rem;
-  margin: clamp(3rem, 4.5vw, 4.5rem) auto 0;
+  margin: clamp(3rem, 4vw, 3.25rem) auto 0;
   text-align: center;
 }
 
@@ -10776,7 +10790,7 @@
 
 .integrations-reference-scene {
   min-width: 0;
-  margin-top: clamp(2.75rem, 4vw, 4rem);
+  margin-top: clamp(2.75rem, 3.25vw, 3.25rem);
   position: relative;
   display: grid;
   grid-template-areas: "left lead right";
@@ -11010,7 +11024,7 @@
 }
 
 .integrations-reference-rail {
-  margin: clamp(2rem, 3vw, 3rem) 0 0;
+  margin: clamp(2rem, 2.25vw, 2.25rem) 0 0;
   padding: 0;
   border: 1px solid var(--wy-color-border);
   border-radius: var(--wy-radius-lg);
@@ -11241,8 +11255,8 @@
 }
 
 .industries-page-hero__heading {
-  max-width: 62rem;
-  margin: clamp(2.5rem, 4vw, 3.5rem) auto 0;
+  max-width: 72rem;
+  margin: clamp(2.5rem, 4vw, 3.25rem) auto 0;
   text-align: center;
 }
 

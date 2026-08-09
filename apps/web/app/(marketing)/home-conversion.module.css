@@ -198,7 +198,7 @@
 
 .demoSection,
 .fitSection {
-  font-family: Inter, Arial, sans-serif;
+  font-family: var(--wy-font-sans);
 }
 
 .demoSection .sectionInner,
