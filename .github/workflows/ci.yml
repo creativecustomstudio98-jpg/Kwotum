@@ -59,7 +59,7 @@ jobs:
       - name: Install runner dependencies
         run: >-
           apt-get update && apt-get install --yes --no-install-recommends
-          postgresql-client ripgrep
+          php-cli postgresql-client ripgrep
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
