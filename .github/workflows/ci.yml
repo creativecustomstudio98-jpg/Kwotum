@@ -185,6 +185,6 @@ jobs:
         run: |
           cp -R apps/wordpress-plugin /tmp/wordpress/wp-content/plugins/wyceno-connector
           /tmp/wp plugin activate wyceno-connector --path=/tmp/wordpress
-          /tmp/wp eval-file \
-            /tmp/wordpress/wp-content/plugins/wyceno-connector/tests/integration.php \
+          /tmp/wp eval \
+            'require WP_PLUGIN_DIR . "/wyceno-connector/tests/integration.php";' \
             --path=/tmp/wordpress

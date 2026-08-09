@@ -114,7 +114,18 @@ plików TypeScript przed odrzuceniem zapisu wyniku.
 Remediacja deklaruje zależność runnera, dodaje fail-fast do skryptów lokalnych,
 przekazuje token przy minimalnych uprawnieniach oraz migruje Gitleaks z v2 na
 v3 (Node 24), aby uniknąć zapowiedzianego wyłączenia v2 we wrześniu 2026.
-Odbiór nadal wymaga zielonego ponownego przebiegu na końcowym SHA.
+Drugi przebieg potwierdził Gitleaks PASS oraz Quality Gate PASS od formatu do
+produkcjnego builda, włącznie z pełnym RLS. Ujawnił też niekompatybilność
+`wp eval-file` ze `strict_types` na PHP 8.3/8.4; harness zostaje zmieniony na
+normalny `require` bez usuwania strict types.
+
+CodeQL przeanalizował 297/297 plików TypeScript, 32/32 JavaScript i oba
+workflow, lecz GitHub odrzucił publikację SARIF: prywatne repozytorium konta
+osobistego nie ma włączonego GitHub Code Security. Nie obchodzimy ograniczenia
+licencyjnego przez wyłączenie uploadu. Gate wymaga włączenia płatnego Code
+Security lub osobno zaakceptowanego, zgodnego licencyjnie zamiennika SAST.
+Odbiór nadal wymaga zielonego ponownego przebiegu dostępnych kontroli na
+końcowym SHA oraz jawnej decyzji dla CodeQL.
 
 ## Kryterium odbioru
 

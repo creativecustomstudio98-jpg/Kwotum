@@ -2252,7 +2252,11 @@ został odtworzony na `517d80a`: frozen install, Turbo 32/32, pełne RLS,
 WordPress i audyt zależności PASS. Draft PR #10 uruchomił pierwszy zdalny
 przebieg na `e5ed147`; wykryte braki dotyczyły konfiguracji runnera
 (Gitleaks token, `ripgrep`, CodeQL `actions: read`) i zostały objęte
-remediacją wymagającą zielonego rerunu. Raport:
+remediacją. Drugi przebieg potwierdził Gitleaks oraz Quality Gate od formatu
+do builda, ale publikacja wyników CodeQL jest niedostępna dla prywatnego repo
+konta osobistego bez płatnego GitHub Code Security. Wymagana jest decyzja:
+włączyć Code Security albo zaakceptować zgodny licencyjnie zamiennik SAST.
+Raport:
 `docs/_migration/REPOSITORY_BASELINE_AUDIT_2026-08-08.md`. R7.1 pozostaje
 nieodebrane; naprawa regresji E2E nie zatwierdza tego etapu produktu.
 
