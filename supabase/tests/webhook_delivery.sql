@@ -195,7 +195,7 @@ select
   session.flow_id,
   session.flow_version_id,
   session.public_flow_id,
-  digest('stage12zf-production-session', 'sha256'),
+  extensions.digest('stage12zf-production-session', 'sha256'),
   session.status,
   session.revision,
   session.step_history,
