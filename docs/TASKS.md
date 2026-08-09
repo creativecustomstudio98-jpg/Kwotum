@@ -1617,9 +1617,9 @@ semantykę i kontrast analityki oraz wymusił standalone zamiast zastanego
       lokalnych danych, sekretów i plików niedozwolonych w repozytorium.
 - [x] Zamknąć lub jawnie zastąpić historyczne, niedokończone statusy 12F/12K
       oraz zaktualizować dokumenty opisujące starszy stan funkcji.
-- [~] Uruchomić pełny gate z czystego checkoutu na przypiętym Node/pnpm.
-- [~] Utworzyć logiczne commity, wypchnąć branch i uzyskać zielone CI,
-  Semgrep CE oraz pełnohistoryczny Gitleaks.
+- [x] Uruchomić pełny gate z czystego checkoutu na przypiętym Node/pnpm.
+- [x] Utworzyć logiczne commity, wypchnąć branch i uzyskać zielone CI,
+      Semgrep CE oraz pełnohistoryczny Gitleaks.
 
 **Status lokalny 2026-07-29:** inventory i dwa passy retencji są zakończone.
 Do odzyskiwalnego Kosza trafiło archiwum starego kodu, 116 obrazów
@@ -2219,7 +2219,7 @@ RLS i WordPress PASS, a lint/typecheck/build po 8/8. R5.5 i R7 pozostają
 zamrożone do jawnej decyzji właściciela. Raport:
 `docs/ui/marketing-subpages-v1/R5_4_AGENCY_ISOLATION_REPORT.md`.
 
-- [ ] Wskazać immutable commit SHA i wyniki jako bazę Etapu 12ZE.
+- [x] Wskazać immutable commit SHA i wyniki jako bazę Etapu 12ZE.
 
 **Gate:** `git status` jest czysty, checkout od zera odtwarza build i pełne
 testy, nie ma sekretów ani danych klientów, a zdalne CI jest zielone dokładnie
@@ -2315,6 +2315,17 @@ zostały zweryfikowane, własne reguły przeszły 8/8, a pełny skan uruchomił 
 reguł na 663 śledzonych plikach z 0 ustaleń i 100% parsowania. Gate pozostaje
 OPEN do pushu poprawki i zielonych Quality/Gitleaks/Semgrep/WordPress na jednym
 końcowym SHA.
+
+**Status szóstego passu 2026-08-09 — COMPLETE:** immutable baza Etapu 12ZE to
+`2bc7db8d2357d2e97fc93d6d06d49804f8a90813`. GitHub Actions potwierdził na tym
+dokładnym head SHA: Quality Gate PASS w 8 min 36 s, pełnohistoryczny Secret
+scan PASS w 17 s, przypięty Semgrep PASS w 2 min 35 s oraz osiem wariantów
+WordPress 6.8.3/6.9.2/7.0.2 na PHP 8.3/8.4/8.5 PASS. Quality Gate wykonał na
+świeżym checkoutcie frozen install, format, lint, SAST, audit zależności,
+typecheck, testy, build i testy dostępności, klawiatury oraz visual QA.
+Lokalny pełny gate i authenticated panel pozostają udokumentowane powyżej.
+Etap 12ZD jest zamknięty; żadnego czerwonego ani pominiętego obowiązkowego
+statusu nie uznano za dowód.
 
 ## Etap 12ZE — self-service pricing, scoring i wynik
 
