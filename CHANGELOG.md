@@ -6,6 +6,17 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Dodano wersjonowane, polskie szablony wszystkich sześciu przepływów
+  Supabase Auth oraz testy pilnujące wymaganych zmiennych, braku aktywnej
+  treści i domyślnego brandingu Supabase. Kontrakt produkcyjny wybiera osobną
+  domenę `mail.kwotum.pl`, niezależne credentiale Auth/outboxu i dokumentuje
+  DNS, testy klientów pocztowych oraz rollback. `EMAIL_FROM` akceptuje teraz
+  bezpieczny format `Kwotum <adres>`, nadal blokując iniekcję nagłówków.
+  Domena została zweryfikowana w Resend, custom SMTP podłączono do Supabase, a
+  syntetyczny test potwierdził dostawę wyłącznie nowego szablonu Kwotum.
+- Udokumentowano działające wdrożenie produkcyjne Vercel/Supabase,
+  `app.kwotum.pl`, świadome użycie kompatybilnego rekordu A w home.pl oraz
+  blokady, które nadal chronią pilota przed przyjmowaniem prawdziwych danych.
 - Produkcyjny build Vercela w monorepo otrzymuje teraz przez jawną allowlistę
   Turborepo wyłącznie kontrakt deploymentu i publiczne zmienne kompilacji.
   Usuwa to fałszywy fallback `APP_URL` do localhosta, zachowując klucz
