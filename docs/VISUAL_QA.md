@@ -410,3 +410,22 @@ autosave, undo, klawiaturę, cele 44 px, axe, overflow, 1448 × 1086,
 przechodzi 18/18 z cleanupem syntetycznego tenanta 0. Brak osobnej referencji
 mobile pozostawia transformację na 3/4; overlay desktop ocenia shell i osie,
 ponieważ źródło nie zawierało edytora estymacji.
+
+## Etap 12ZF — webhook v1
+
+- zakres: `/panel/[organizationId]/integracje/webhooki`;
+- źródło anatomii: ekran Integracji 12S 1536 × 1024, SHA-256
+  `208f8d84508909fee0c5baed36c6ce773b8fee4d64dd0d1e406a14754c8c8296`;
+- artefakty: `artifacts/visual-qa/12zf-webhook-v1/`;
+- wynik: **PASS, 19/20**; kompletność 4, geometria 4, typografia 4, gęstość 4,
+  transformacja mobile 3;
+- desktop 1448 × 1086 pokazuje realną konfigurację, one-time secret i stany
+  delivered/retry/dead-letter, bez payloadu, response body ani PII;
+- mobile 390 × 844 i reflow 320 × 800 nie mają overflow, kontrolki mają minimum
+  44 px, a rotacja i wyłączenie wymagają potwierdzenia.
+
+Playwright przechodzi 19/19 na produkcyjnym standalone, axe nie zgłasza
+naruszeń desktop/mobile, a cleanup pozostawia 0 rekordów syntetycznego tenanta.
+Overlay 50% oraz difference ×3 obejmują pełny desktop. Źródło 12S określa
+anatomię integracji, nie treść webhooka; brak osobnej referencji mobile
+pozostawia transformację na 3/4. Szczegółową listę różnic zapisuje `diff.md`.

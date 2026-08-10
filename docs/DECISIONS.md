@@ -900,6 +900,65 @@ zerwaniu sesji, osadzeń, lokalnych preferencji i integracji.
 decyzji. Nie wolno przedstawiać dostępności domeny ani ochrony znaku jako
 potwierdzonej bez profesjonalnego badania.
 
+## ADR-034: tenantowy webhook `lead.created` z osobnym outboxem i pochodnym sekretem
+
+**Status:** accepted dla Etapu 12ZF na podstawie domyślnej decyzji programu
+gotowości produkcyjnej z 2026-08-09
+
+**Decyzja:** webhook pozostaje częścią MVP, lecz v1 udostępnia wyłącznie
+wersjonowany event `lead.created`. Każdy endpoint należy do jednego tenanta i
+jest zarządzany przez Ownera lub Admina. Sales nie odczytuje konfiguracji,
+sekretu ani historii dostaw. Endpoint ma dokładny URL HTTPS, tylko port 443,
+bez credentiali, fragmentu i redirectów. Zarówno konfiguracja/test, jak i
+każda rzeczywista dostawa ponownie sprawdzają DNS oraz wszystkie rozstrzygnięte
+adresy. Połączenie jest przypinane do publicznego adresu użytego do walidacji,
+co zamyka okno DNS rebinding. Loopback, adresy prywatne, link-local, multicast,
+unspecified, documentation ranges oraz metadata endpoints są zabronione dla
+IPv4 i IPv6.
+
+Konfiguracja i dostawy mają osobne tabele od e-maili. Trigger dopisuje dostawy
+aktywnych endpointów w tej samej transakcji, w której powstaje lead. Worker
+pobiera ograniczony batch przez `FOR UPDATE SKIP LOCKED`, losowy lock token i
+15-minutowe odzyskiwanie prób. Dostawa jest co najmniej jednokrotna, używa
+stabilnego `delivery_id`, maksymalnie pięciu prób z backoffem 1 min, 5 min,
+30 min i 2 h oraz jawnego stanu `dead_letter`. HTTP 408, 425, 429 i 5xx oraz
+błędy sieciowe są retryable; redirect, niebezpieczny adres, niepoprawny TLS i
+pozostałe 4xx kończą dostawę bez ponowienia. Historia zapisuje tylko status
+HTTP, zamknięty kod techniczny i czasy — nigdy response body ani payload.
+
+Sekret endpointu nie jest przechowywany w PostgreSQL. Aplikacja wyprowadza
+32-bajtowy sekret z server-side `WEBHOOK_SIGNING_SECRET`, UUID organizacji,
+UUID endpointu i numeru wersji przez HMAC-SHA256. Jest pokazywany tylko po
+utworzeniu lub rotacji. Baza przechowuje wyłącznie numer wersji; kompromitacja
+samego dumpa nie ujawnia sekretów. Rotacja podnosi wersję, unieważnia locki
+oczekujących prób i jest audytowana. Osobny `WEBHOOK_WORKER_SECRET` chroni
+wewnętrzny endpoint schedulera.
+
+Envelope zawiera `version`, `event_id`, `delivery_id`, `type`, `occurred_at`,
+`organization_id` i allowlistowane `data`. Produkcyjny event zawiera publiczny
+identyfikator leada, nazwę procesu, czas submitu, kontakt oraz bezpieczną
+projekcję estymacji. Nie zawiera plików, odpowiedzi, notatek, score, kategorii
+ani uruchomionych reguł. Syntetyczny test jest jawnie oznaczony i nie używa PII.
+Worker podpisuje `timestamp + "." + raw_body` przez HMAC-SHA256 i wysyła wersję
+podpisu, timestamp, event ID oraz delivery ID w stałych nagłówkach. Odbiorca ma
+sprawdzić podpis stałoczasowo, maksymalnie pięciominutowe okno replay i
+deduplikować `delivery_id`.
+
+**Dlaczego:** firmy i agencje pilotażowe potrzebują przenieść uporządkowany lead
+do istniejącego systemu bez natywnej integracji CRM. Bez transakcyjnego outboxu
+submit mógłby zatwierdzić lead i zgubić dostawę. Przechowywanie plaintextowego
+sekretu lub zwykły `fetch` do URL użytkownika tworzyłyby odpowiednio ryzyko
+wycieku całego dumpa oraz SSRF/DNS rebinding.
+
+**Konsekwencje:** `WEBHOOK_SIGNING_SECRET` musi być stabilnym, losowym sekretem
+co najmniej 32-znakowym i podlegać kontrolowanej rotacji całego środowiska;
+utrata go wymaga rotacji wszystkich endpointów. Scheduler, alert wieku kolejki
+i syntetyczny probe powstają w Etapie 13A, ale worker, endpoint wewnętrzny i
+bezpieczny test tenantowy są częścią 12ZF. Migracja jest forward-only. Rollback
+aplikacji wyłącza route workera i zarządzanie endpointami, pozostawiając kolejkę
+bezpiecznie w bazie; usunięcie tabel lub danych wymaga osobnej migracji
+naprawczej po sprawdzeniu retencji i aktywnych dostaw.
+
 ## ADR-035: pamięciowy preview runtime i osobny outbox zaproszeń procesu
 
 **Status:** accepted dla Etapu 12ZH na podstawie decyzji właściciela produktu z

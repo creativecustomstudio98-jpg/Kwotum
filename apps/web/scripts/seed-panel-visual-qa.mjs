@@ -1030,6 +1030,109 @@ if (supabaseUrl && serviceRoleKey) {
   }
 }
 
+const webhookEndpointId = stableUuid(`${organizationId}:panel-visual-qa:webhook-endpoint`);
+const webhookRequestId = stableUuid(`${organizationId}:panel-visual-qa:webhook-request`);
+const webhookDeliveredId = stableUuid(`${organizationId}:panel-visual-qa:webhook-delivered`);
+const webhookRetryId = stableUuid(`${organizationId}:panel-visual-qa:webhook-retry`);
+const webhookDeadLetterId = stableUuid(`${organizationId}:panel-visual-qa:webhook-dead-letter`);
+query(`
+  begin;
+
+  insert into public.webhook_endpoints (
+    id, organization_id, url, request_id, created_by,
+    last_tested_at, last_delivered_at
+  ) values (
+    ${sqlLiteral(webhookEndpointId)}::uuid,
+    ${sqlLiteral(organizationId)}::uuid,
+    'https://hooks.partner.pl/kwotum/leads',
+    ${sqlLiteral(webhookRequestId)}::uuid,
+    ${sqlLiteral(userId)}::uuid,
+    now() - interval '2 minutes',
+    now() - interval '4 minutes'
+  )
+  on conflict (id) do nothing;
+
+  insert into public.webhook_deliveries (
+    id, organization_id, endpoint_id, event_id, is_test, status,
+    attempt_count, delivered_at, response_status, last_error_code, created_at
+  ) values
+  (
+    ${sqlLiteral(webhookDeliveredId)}::uuid,
+    ${sqlLiteral(organizationId)}::uuid,
+    ${sqlLiteral(webhookEndpointId)}::uuid,
+    ${sqlLiteral(stableUuid(`${organizationId}:webhook-event:delivered`))}::uuid,
+    true,
+    'delivered',
+    1,
+    now() - interval '4 minutes',
+    204,
+    null,
+    now() - interval '5 minutes'
+  ),
+  (
+    ${sqlLiteral(webhookRetryId)}::uuid,
+    ${sqlLiteral(organizationId)}::uuid,
+    ${sqlLiteral(webhookEndpointId)}::uuid,
+    ${sqlLiteral(stableUuid(`${organizationId}:webhook-event:retry`))}::uuid,
+    true,
+    'retry',
+    2,
+    null,
+    503,
+    'http_5xx',
+    now() - interval '3 minutes'
+  ),
+  (
+    ${sqlLiteral(webhookDeadLetterId)}::uuid,
+    ${sqlLiteral(organizationId)}::uuid,
+    ${sqlLiteral(webhookEndpointId)}::uuid,
+    ${sqlLiteral(stableUuid(`${organizationId}:webhook-event:dead-letter`))}::uuid,
+    true,
+    'dead_letter',
+    5,
+    null,
+    null,
+    'tls',
+    now() - interval '1 minute'
+  )
+  on conflict (id) do nothing;
+
+  insert into public.webhook_delivery_attempts (
+    organization_id, delivery_id, attempt_number, finished_at,
+    outcome, error_code, response_status
+  ) values
+  (
+    ${sqlLiteral(organizationId)}::uuid,
+    ${sqlLiteral(webhookDeliveredId)}::uuid,
+    1,
+    now() - interval '4 minutes',
+    'delivered',
+    null,
+    204
+  ),
+  (
+    ${sqlLiteral(organizationId)}::uuid,
+    ${sqlLiteral(webhookRetryId)}::uuid,
+    2,
+    now() - interval '2 minutes',
+    'retry',
+    'http_5xx',
+    503
+  ),
+  (
+    ${sqlLiteral(organizationId)}::uuid,
+    ${sqlLiteral(webhookDeadLetterId)}::uuid,
+    5,
+    now() - interval '30 seconds',
+    'dead_letter',
+    'tls',
+    null
+  )
+  on conflict (delivery_id, attempt_number) do nothing;
+
+  commit;
+`);
+
 console.log(
   JSON.stringify({
     demoEmail: "visualqa-20260727@wyceno.local",
@@ -1039,5 +1142,6 @@ console.log(
     publicId,
     seededAttachment,
     seededLeads,
+    webhookEndpointId,
   }),
 );

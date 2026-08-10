@@ -721,7 +721,7 @@
     display: block;
   }
 
-  .form-preview__question-title input {
+  .form-preview__question-title textarea {
     width: 100%;
     margin: 0;
     padding: 0;
@@ -1176,7 +1176,7 @@
     padding: 8px;
   }
 
-  .form-preview__question-title input {
+  .form-preview__question-title textarea {
     width: 100%;
     padding: 0;
     border: 0;
@@ -5783,6 +5783,184 @@
   border-radius: var(--wy-radius-pill);
 }
 
+.webhook-panel .panel-status {
+  border-radius: var(--wy-radius-pill);
+}
+
+.webhook-panel .integration-row h2 code {
+  font: inherit;
+}
+
+.integrations-primary-grid .webhook-card {
+  padding-bottom: 16px;
+}
+
+.integrations-primary-grid .webhook-card .panel-card__header {
+  min-height: 82px;
+  padding: 16px 20px;
+}
+
+.webhook-endpoint-form {
+  display: grid;
+  gap: 12px;
+  padding: 16px 20px 0;
+}
+
+.webhook-endpoint-form label {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.webhook-endpoint-form label > span {
+  color: var(--wy-color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.webhook-endpoint-form input {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid var(--wy-color-border-strong);
+  border-radius: 3px;
+  background: var(--wy-color-surface);
+  color: var(--wy-color-text);
+}
+
+.webhook-endpoint-form > .wy-button {
+  width: fit-content;
+  justify-self: end;
+}
+
+.webhook-secret-result {
+  display: grid;
+  gap: 7px;
+  margin: 14px 20px 0;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--wy-color-success) 35%, var(--wy-color-border));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--wy-color-success) 7%, var(--wy-color-surface));
+}
+
+.webhook-secret-result code,
+.webhook-action-status code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.webhook-secret-result span,
+.webhook-action-status {
+  color: var(--wy-color-text-muted);
+  font-size: 12px;
+}
+
+.webhook-summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--wy-color-border);
+}
+
+.webhook-summary-metrics div {
+  display: grid;
+  gap: 3px;
+  padding: 14px 20px;
+}
+
+.webhook-summary-metrics div + div {
+  border-left: 1px solid var(--wy-color-border);
+}
+
+.webhook-summary-metrics dt {
+  color: var(--wy-color-text-muted);
+  font-size: 12px;
+}
+
+.webhook-summary-metrics dd {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.webhook-endpoint-list,
+.webhook-delivery-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.webhook-endpoint-list > li,
+.webhook-delivery-list > li {
+  border-top: 1px solid var(--wy-color-border);
+}
+
+.webhook-endpoint-main {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 0;
+}
+
+.webhook-endpoint-main > span:nth-child(2),
+.webhook-delivery-list > li > span:first-child {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.webhook-endpoint-main strong,
+.webhook-endpoint-main small,
+.webhook-delivery-list small {
+  overflow-wrap: anywhere;
+}
+
+.webhook-endpoint-main small,
+.webhook-delivery-list small,
+.webhook-delivery-list > li > span:nth-child(2) {
+  color: var(--wy-color-text-muted);
+  font-size: 12px;
+}
+
+.webhook-endpoint-controls,
+.webhook-endpoint-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  padding-bottom: 14px;
+}
+
+.webhook-endpoint-actions {
+  padding-bottom: 0;
+}
+
+.webhook-endpoint-actions > .lead-action-error,
+.webhook-endpoint-actions > .webhook-action-status,
+.webhook-endpoint-actions > .webhook-secret-result {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.webhook-delivery-list > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 14px 0;
+}
+
+.webhook-panel .panel-status--warning {
+  border-color: color-mix(in srgb, var(--wy-color-warning) 40%, var(--wy-color-border));
+  background: color-mix(in srgb, var(--wy-color-warning) 12%, var(--wy-color-surface));
+  color: var(--wy-color-text);
+}
+
 .installation-layout {
   min-width: 0;
   display: grid;
@@ -6632,7 +6810,9 @@
 
   .integrations-primary-grid .integration-row,
   .integrations-primary-grid .wordpress-card .panel-card__header,
-  .integrations-primary-grid .wordpress-token-form {
+  .integrations-primary-grid .wordpress-token-form,
+  .integrations-primary-grid .webhook-card .panel-card__header,
+  .webhook-endpoint-form {
     padding-inline: 14px;
   }
 
@@ -6652,6 +6832,56 @@
   .integration-connections .connection-list form,
   .integration-connections .connection-list > li > .panel-status {
     grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+
+  .webhook-endpoint-main {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .webhook-endpoint-main > .panel-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .webhook-endpoint-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .webhook-endpoint-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .webhook-endpoint-actions form,
+  .webhook-endpoint-actions .wy-button,
+  .webhook-endpoint-controls > form,
+  .webhook-endpoint-controls > form .wy-button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .webhook-endpoint-form input {
+    min-height: 44px;
+  }
+
+  .webhook-endpoint-actions > .lead-action-error,
+  .webhook-endpoint-actions > .webhook-action-status,
+  .webhook-endpoint-actions > .webhook-secret-result {
+    grid-column: 1 / -1;
+  }
+
+  .webhook-delivery-list > li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .webhook-delivery-list > li > span:nth-child(2) {
+    grid-column: 1;
+  }
+
+  .webhook-delivery-list > li > .panel-status {
+    grid-column: 2;
     grid-row: 1 / span 2;
   }
 

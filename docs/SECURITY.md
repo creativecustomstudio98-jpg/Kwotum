@@ -122,6 +122,28 @@ Klasyfikacja, ograniczenie skutków, zachowanie dowodów, rotacja, ocena obowią
   serwera, a dane wejściowe bez poprawnego UUID, rewizji, nazwy i dokumentu są
   odrzucane przed wywołaniem usługi;
 
+## Kontrole webhooka Etapu 12ZF
+
+- tylko Owner/Admin widzi i mutuje tenantowy endpoint, dostawy i próby; Sales,
+  anon i drugi tenant są blokowani przez capability, RPC oraz forced RLS;
+- URL akceptuje wyłącznie publiczny DNS, HTTPS/443 i brak credentiali, query
+  oraz fragmentu; redirecty są trwałym błędem;
+- konfiguracja i każda dostawa sprawdzają wszystkie odpowiedzi DNS, blokują
+  prywatne/specjalne IPv4 i IPv6 oraz przypinają połączenie do sprawdzonego IP
+  przy zachowaniu TLS hostname verification;
+- sekret nie jest przechowywany w bazie, a jego wersjonowane wyprowadzenie i
+  rotacja są audytowane; osobny sekret chroni worker;
+- HMAC obejmuje timestamp i dokładne raw body, a kontrakt odbiorcy wymaga
+  stałoczasowego porównania, pięciominutowego replay window i deduplikacji;
+- historia techniczna nie zapisuje payloadu, response body ani PII; envelope
+  nie zawiera odpowiedzi, plików, score, kategorii i reguł;
+- maksymalnie pięć prób, ograniczony backoff, całkowity timeout, lock recovery i
+  jawny dead-letter ograniczają zawieszenie oraz niekontrolowane retry.
+
+Pozostałe ryzyko: produkcyjny scheduler, alert wieku kolejki/dead-letter i
+procedura operacyjna powstają w Etapie 13A. Do ich odbioru webhook nie może
+obsługiwać prawdziwych danych pilota.
+
 Pełna macierz ataków, ustalenia i zaakceptowane ryzyka znajdują się w
 `docs/THREAT_MODEL.md` oraz `docs/SECURITY_AUDIT_2026-07-25.md`.
 

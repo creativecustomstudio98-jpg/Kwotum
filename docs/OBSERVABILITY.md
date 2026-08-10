@@ -41,3 +41,12 @@ liczbę zaakceptowanych/odrzuconych eventów, błędy walidacji, czas agregacji,
 wiek najstarszego wygasłego rekordu i wynik purge, ale nie treść, token ani
 identyfikatory sesji. Alert braku purge i regresji czasu agregacji powstaje w
 Etapie 13.
+
+## Webhooki
+
+Dozwolone sygnały to zagregowane `claimed`, `delivered`, `retrying`,
+`deadLettered`, czas batcha, wiek najstarszego `pending/retry`, liczba prób i
+zamknięty kod błędu. Zabronione są URL endpointu, payload, response body,
+kontakt oraz dane estymacji. Przed pilotem wymagane są alerty braku schedulera,
+kolejki starszej niż 10 minut i każdego nowego dead-letter, z właścicielem i
+runbookiem z `WEBHOOKS.md`.

@@ -6,6 +6,21 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Podgląd pytania w builderze zawija teraz pełny tytuł i automatycznie dopasowuje
+  wysokość także po zmianie szerokości kolumny. Jednoliniowy edytor zastąpiła
+  dostępna klawiaturowo kontrolka wielowierszowa, która nie zapisuje znaków
+  nowej linii; test regresji pilnuje braku pionowego i poziomego ucięcia.
+- Etap 12ZF utrzymuje webhook w MVP przez ADR-034 i dodaje tenantowy
+  `lead.created` v1: Owner/Admin zarządza publicznymi endpointami HTTPS,
+  jednorazowo widocznym pochodnym sekretem, rotacją, testem i wyłączeniem.
+  Osobny outbox ma HMAC raw body, replay window, idempotency, pięć prób,
+  dead-letter i historię bez payloadu/response body. Transport blokuje SSRF,
+  prywatne IPv4/IPv6, DNS rebinding, redirecty i błędny TLS przez all-answer
+  validation oraz pinned connection. Worker ma oddzielny sekret i zwraca tylko
+  liczniki. Limit 10 aktywnych endpointów jest serializowany per tenant, DNS ma
+  osobny timeout, a rotacja i wyłączenie wymagają potwierdzenia. Produkcyjny
+  standalone przechodzi 19/19 z axe i cleanupem 0; scheduler i alerty pozostają
+  bramką Etapu 13A.
 - Etap 12ZD zastępuje niedostępny dla prywatnego repozytorium upload CodeQL
   blokującym Semgrep CE 1.164.0. Obraz i GitHub Actions są przypięte do
   digestów/commit SHA, oficjalny zestaw OWASP jest weryfikowany checksumą i

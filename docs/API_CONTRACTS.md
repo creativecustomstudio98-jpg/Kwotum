@@ -24,7 +24,10 @@ Przykład błędu:
 - `POST /flows/:id/validate`, `POST /flows/:id/publish`;
 - `GET /leads`, `GET/PATCH /leads/:id`, `POST /leads/:id/notes`;
 - `GET /analytics/overview`;
-- `POST/DELETE /webhooks`, `POST /webhooks/:id/test`.
+- `GET/POST /organizations/:organizationId/webhooks`;
+- `DELETE /organizations/:organizationId/webhooks/:endpointId`;
+- `POST /organizations/:organizationId/webhooks/:endpointId/rotate`;
+- `POST /organizations/:organizationId/webhooks/:endpointId/test`.
 
 ## Publiczne
 
@@ -39,11 +42,23 @@ Przykład błędu:
 
 Odpowiedź submit zawiera wynik do pokazania, nigdy reguły wewnętrzne. Serwer przelicza wynik na snapshotcie wersji.
 
-## Webhook
+## Webhook `lead.created` v1
 
-Envelope: `id`, `type`, `occurred_at`, `organization_id`, `data`. Nagłówki: identyfikator dostawy, timestamp i podpis HMAC. Odbiorca ma tolerować duplikaty.
+Tenantowe operacje są dostępne tylko Ownerowi/Adminowi. Utworzenie, rotacja i
+test wymagają UUID `Idempotency-Key`; body utworzenia to strict JSON z jednym
+publicznym URL-em HTTPS. Sekret jest zwracany tylko po utworzeniu lub rotacji.
 
-Szczegółowe OpenAPI i wersjonowanie kompatybilności powstaną w etapach domenowych, zanim endpointy zostaną wdrożone.
+Envelope wersji `2026-08-09` zawiera `version`, `event_id`, `delivery_id`,
+`type`, `occurred_at`, `organization_id` i allowlistowane `data`. Nagłówki
+zawierają stabilny idempotency key, identyfikatory eventu/dostawy, timestamp i
+HMAC-SHA256 dla `timestamp + "." + raw_body`. Odbiorca stosuje pięciominutowe
+okno replay i deduplikuje `delivery_id`. Szczegółowy payload, retry, SSRF,
+rotację, worker i rollback definiuje `docs/WEBHOOKS.md`.
+
+`POST /api/v1/internal/webhooks/process` wymaga
+`Authorization: Bearer <WEBHOOK_WORKER_SECRET>` i zwraca wyłącznie liczniki
+`claimed`, `delivered`, `retrying`, `deadLettered`. Brak dostępu to 401, a błąd
+batcha generyczne 503; odpowiedzi mają `private, no-store`.
 
 ## Wewnętrzny worker powiadomień
 

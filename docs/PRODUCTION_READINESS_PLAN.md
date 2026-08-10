@@ -110,14 +110,10 @@ self-service.
 #### Webhooki
 
 `PRODUCT_REQUIREMENTS.md`, `SCOPE.md`, `API_CONTRACTS.md` i release checklist
-wymagają webhooka HMAC. Brak implementacji jest konfliktem między wymaganiem a
-kodem. Etap 12ZF musi zacząć się od ADR-033:
-
-- wdrożyć webhook v1 w MVP; albo
-- jawnie usunąć go z MVP i zaktualizować wymagania, scope, API, QA i release.
-
-Domyślnym planem jest wdrożenie, ponieważ webhook pozwala firmom i agencjom
-przekazywać leady do istniejących systemów bez natywnego CRM.
+wymagają webhooka HMAC. ADR-034 utrzymuje go w MVP, ponieważ pozwala firmom i
+agencjom przekazywać leady do istniejących systemów bez natywnego CRM. Etap
+12ZF wdraża bezpieczny kontrakt aplikacyjny; produkcyjny scheduler, alerty i UAT
+pozostają częścią bramki 13A.
 
 #### Logika warunkowa
 
@@ -254,10 +250,10 @@ draftu ani konfiguracji. Publiczny klient nie otrzymuje score ani reguł.
 
 **Cel:** usunąć konflikt między wymaganiami a implementacją.
 
-Jeżeli ADR-033 utrzyma webhook w MVP, zakres obejmuje:
+ADR-034 utrzymuje webhook w MVP. Zakres obejmuje:
 
 - tenantowe endpointy dostępne Owner/Admin;
-- dokładny HTTPS origin i zakaz credentiali w URL;
+- dokładny URL HTTPS i zakaz credentiali w URL;
 - ochronę SSRF: prywatne adresy, loopback, metadata endpoints, DNS rebinding,
   redirecty i niedozwolone porty;
 - sekret pokazywany raz i bezpieczna strategia przechowywania/derywacji;
@@ -525,11 +521,11 @@ credentiali ani pełnych payloadów leadów.
 
 ## 14. Najbliższa kolejność
 
-1. Ukończyć Etap 12ZD i zamrozić repozytorium.
-2. Wykonać Etap 12ZE — edytor estymacji.
-3. Wykonać ADR-033 i Etap 12ZF.
+1. Utrzymywać zamrożony, zielony baseline Etapu 12ZD.
+2. Utrzymywać pełną ścieżkę edytora estymacji z Etapu 12ZE.
+3. Zamknąć lokalny gate ADR-034 i webhooka z Etapu 12ZF.
 4. Wybrać firmy i wykonać 12ZG.
-5. Dopiero potem rozpocząć Etap 13A.
+5. Dopiero potem rozpocząć Etap 13A ze schedulerem i alertami webhooka.
 
 Żadna kolejna przebudowa wizualna nie ma pierwszeństwa przed tym ciągiem, chyba
 że naprawia regresję blokującą główną ścieżkę, dostępność lub bezpieczeństwo.
