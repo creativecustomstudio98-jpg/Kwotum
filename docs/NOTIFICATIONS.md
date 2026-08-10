@@ -1,5 +1,9 @@
 # Powiadomienia transakcyjne
 
+Wiadomości konta wysyłane przez Supabase Auth mają osobny kontrakt i
+wersjonowane szablony w `AUTH_EMAILS.md`. Oba kanały używają zatwierdzonej
+domeny dostawcy, ale osobnych credentiali i różnych adresów From.
+
 ## Zakres Etapu 8
 
 Po atomowym utworzeniu leada system dopisuje w tej samej transakcji dwa
@@ -73,6 +77,11 @@ Opcjonalny tryb dostawcy wymaga dodatkowo:
 EMAIL_DELIVERY_MODE=resend
 RESEND_API_KEY=...
 ```
+
+Produkcyjny nadawca może zawierać bezpieczną nazwę prezentacyjną, np.
+`EMAIL_FROM=Kwotum <powiadomienia@mail.kwotum.pl>`. Walidacja odrzuca znaki
+nowej linii i niepoprawny adres, aby nagłówek nie mógł zostać rozszerzony przez
+iniekcję.
 
 Scheduler wywołuje:
 

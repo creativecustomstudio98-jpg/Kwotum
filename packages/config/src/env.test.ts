@@ -71,6 +71,33 @@ describe("environment validation", () => {
     ).toThrow();
   });
 
+  it("accepts a branded email sender without allowing header injection", () => {
+    expect(
+      parseServerEnv({
+        APP_URL: "https://app.kwotum.pl",
+        EMAIL_FROM: "Kwotum <powiadomienia@mail.kwotum.pl>",
+      }).EMAIL_FROM,
+    ).toBe("Kwotum <powiadomienia@mail.kwotum.pl>");
+    expect(() =>
+      parseServerEnv({
+        APP_URL: "https://app.kwotum.pl",
+        EMAIL_FROM: "Kwotum\r\nBcc: attacker@example.com <powiadomienia@mail.kwotum.pl>",
+      }),
+    ).toThrow();
+    expect(() =>
+      parseServerEnv({
+        APP_URL: "https://app.kwotum.pl",
+        EMAIL_FROM: "Kwotum <not-an-email>",
+      }),
+    ).toThrow();
+    expect(() =>
+      parseServerEnv({
+        APP_URL: "https://app.kwotum.pl",
+        EMAIL_FROM: "Kwotum, attacker@example.com <powiadomienia@mail.kwotum.pl>",
+      }),
+    ).toThrow();
+  });
+
   it("rejects localhost and insecure APP_URL for staging and production", () => {
     expect(() =>
       parseDeploymentEnv({

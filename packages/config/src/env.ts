@@ -2,6 +2,15 @@ import { z } from "zod";
 
 const nonEmptySecret = z.string().trim().min(1);
 const workerSecret = z.string().min(32);
+const emailFrom = z
+  .string()
+  .trim()
+  .max(320)
+  .refine((value) => {
+    if (z.email().safeParse(value).success) return true;
+    const brandedAddress = /^([\p{L}\p{N}][\p{L}\p{N} .&'_-]{0,63}) <([^<>\r\n]+)>$/u.exec(value);
+    return brandedAddress ? z.email().safeParse(brandedAddress[2]).success : false;
+  }, "Expected an email or a branded sender in the form: Name <email@example.com>.");
 
 export const clientEnvSchema = z
   .object({
@@ -24,7 +33,7 @@ export const serverEnvSchema = z
       .optional(),
     CLAMAV_PORT: z.coerce.number().int().min(1).max(65_535).optional(),
     DATABASE_URL: nonEmptySecret.optional(),
-    EMAIL_FROM: z.email().optional(),
+    EMAIL_FROM: emailFrom.optional(),
     EMAIL_DELIVERY_MODE: z.enum(["resend", "test"]).optional(),
     MALWARE_SCAN_MODE: z.enum(["clamav", "disabled"]).optional(),
     NOTIFICATION_WORKER_SECRET: workerSecret.optional(),
