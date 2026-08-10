@@ -2329,24 +2329,59 @@ statusu nie uznano za dowód.
 
 ## Etap 12ZE — self-service pricing, scoring i wynik
 
-- [ ] Dodać tryby buildera `Wycena`, `Scoring` i `Wynik` bez równoległego
+- [x] Dodać tryby buildera `Wycena`, `Scoring` i `Wynik` bez równoległego
       modelu danych i bez zmiany opublikowanych snapshotów.
-- [ ] Udostępnić bazę min/max, walutę, exact/range/from, zaokrąglenie oraz
+- [x] Udostępnić bazę min/max, walutę, exact/range/from, zaokrąglenie oraz
       uporządkowane reguły add/multiply/add_per_unit.
-- [ ] Udostępnić punkty początkowe, rosnące kategorie i prywatne reguły
+- [x] Udostępnić punkty początkowe, rosnące kategorie i prywatne reguły
       scoringu bez ujawnienia ich respondentowi.
-- [ ] Dodać headline, disclaimer, następny krok, consultation/no_price
+- [x] Dodać headline, disclaimer, następny krok, consultation/no_price
       i live preview publicznego wyniku.
-- [ ] Zintegrować edytory z historią, undo/redo, autosave, konfliktem rewizji,
+- [x] Zintegrować edytory z historią, undo/redo, autosave, konfliktem rewizji,
       walidacją i publikacją.
-- [ ] Bezpiecznie obsłużyć usuwanie lub zmianę pytania/opcji użytych w regułach.
-- [ ] Dodać unit, PostgreSQL/RLS, E2E pełnej ścieżki, manipulację klienta,
+- [x] Bezpiecznie obsłużyć usuwanie lub zmianę pytania/opcji użytych w regułach.
+- [x] Dodać unit, PostgreSQL/RLS, E2E pełnej ścieżki, manipulację klienta,
       mobile, klawiaturę, axe, forced colors i reflow.
 
 **Gate:** Owner/Admin konfiguruje i publikuje działającą estymację bez dostępu
 do bazy. Widget pokazuje wyłącznie bezpieczny wynik, submit liczy go ponownie,
 Sales nie widzi draftu, a niepoprawna konfiguracja nie zapisuje się ani nie
 publikuje.
+
+**Status pierwszego slice'u 2026-08-09 — MODEL PASS, ETAP OPEN:** dodano
+niemutujący model wykrywania zależności pytania lub opcji od warunków ceny,
+źródła ilości `add_per_unit` i prywatnego scoringu. Atomowe operacje czyszczenia
+zachowują niezależne reguły oraz zwracają pełną listę skutków do przyszłego,
+jawnego potwierdzenia w UI. Sześć testów obejmuje wszystkie trzy typy referencji,
+usuwanie pytania i opcji, brak konfiguracji oraz zgodność oczyszczonego dokumentu
+ze schematem. Nie podłączono jeszcze destrukcyjnych operacji do buildera, więc
+żadna reguła nie jest kasowana po cichu; checklist i gate 12ZE pozostają otwarte.
+
+**Status końcowy 2026-08-09 — COMPLETE, visual QA 19/20:** builder udostępnia
+cztery obszary `Formularz / Wycena / Scoring / Wynik` na jednym
+`FlowDocument`. Włączenie estymacji wymaga jawnego zakresu zamiast fikcyjnych
+stawek. Baza, waluta, prezentacja, zaokrąglenie, trzy typy operacji, warunki,
+kolejność, scoring 0–100, rosnące kategorie i publiczne zakończenie zapisują się
+przez istniejącą historię, autosave, rewizję oraz immutable publish. Live
+preview używa referencyjnego kalkulatora, ale PostgreSQL nadal stanowi granicę
+zaufania i usuwa prywatny scoring z wyniku respondenta.
+
+Usunięcie pytania lub opcji oraz niezgodna zmiana typu pokazują nazwane
+zależności ceny, ilości i scoringu. Operacja wymaga potwierdzenia, czyści tylko
+konieczne referencje, jest atomowa i możliwa do cofnięcia. Pełny Playwright
+przeszedł 18/18 na produkcyjnym standalone buildzie; obejmuje publikację,
+anulowanie destrukcyjnej zmiany, desktop 1448 px, mobile 390 px, reflow 320 px,
+klawiaturę, cele 44 px, axe, forced colors, brak błędów runtime i zero overflow.
+Syntetyczny tenant został usunięty bez pozostałości. Artefakty znajdują się w
+`artifacts/visual-qa/12ze-self-service-estimation/`.
+
+Pełny gate ma zielone: format, lint 8/8, typecheck 8/8, 185 testów unit,
+PostgreSQL/RLS z niezależnym przeliczeniem estymacji i negatywnymi przypadkami
+ról/tenantów, lokalny WordPress, dependency audit, SAST, working-tree secret
+scan oraz przypięty Semgrep — 291 reguł na 666 śledzonych plikach, 0 ustaleń i
+100% parsowania. Build wygenerował 40 tras, a widget ma 19 016 B gzip przy
+budżecie 90 KiB. Nie dodano zależności, migracji ani ADR, ponieważ model danych,
+granice zaufania i architektura nie uległy zmianie.
 
 ## Etap 12ZF — webhook v1 albo formalna redukcja MVP
 

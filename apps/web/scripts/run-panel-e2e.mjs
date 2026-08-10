@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import process from "node:process";
@@ -269,7 +269,7 @@ try {
     throw new Error("Seed nie zwrócił obu wymaganych procesów.");
   }
 
-  console.log("[panel-e2e] Uruchamiam 16 scenariuszy panelu i bezstanowy podgląd...");
+  console.log("[panel-e2e] Uruchamiam 17 scenariuszy panelu i bezstanowy podgląd...");
   run(
     "pnpm",
     [
@@ -302,6 +302,20 @@ try {
     primaryError = primaryError
       ? new AggregateError([primaryError, cleanupError], "Test i cleanup zakończyły się błędem.")
       : cleanupError;
+  }
+  if (!primaryError && process.env.PANEL_E2E_RETAIN_STAGE_ARTIFACTS === "1") {
+    try {
+      const stageArtifactSource = path.join(artifactRoot, "12ze-self-service-estimation");
+      const stageArtifactTarget = path.join(
+        repositoryRoot,
+        "artifacts/visual-qa/12ze-self-service-estimation",
+      );
+      if (!existsSync(stageArtifactSource)) throw new Error("Brak artefaktów 12ZE po teście E2E.");
+      cpSync(stageArtifactSource, stageArtifactTarget, { force: true, recursive: true });
+      console.log(`[panel-e2e] Zachowano artefakty 12ZE w ${stageArtifactTarget}.`);
+    } catch (artifactError) {
+      primaryError = artifactError;
+    }
   }
   rmSync(artifactRoot, { force: true, recursive: true });
 }

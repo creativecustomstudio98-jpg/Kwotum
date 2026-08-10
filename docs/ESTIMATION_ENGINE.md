@@ -1,10 +1,11 @@
 # Silnik pricingu i scoringu
 
-## Zakres Etapu 6
+## Zakres Etapów 6 i 12ZE
 
-Etap dostarcza wersjonowany kontrakt estymacji, referencyjny silnik TypeScript,
-niezależną implementację PostgreSQL oraz publiczną prezentację wyniku. Nie
-wprowadza edytora reguł, kontaktu ani utworzenia leada. Stawki w testach są
+Etap 6 dostarczył wersjonowany kontrakt estymacji, referencyjny silnik TypeScript,
+niezależną implementację PostgreSQL oraz publiczną prezentację wyniku. Etap 6
+nie wprowadzał edytora reguł; Etap 12ZE dodał self-service UI na istniejącym
+kontrakcie, bez równoległego modelu danych ani migracji. Stawki w testach są
 fixture'ami technicznymi, nie rekomendacją rynkową.
 
 ## Kontrakt `estimationSchemaVersion: 1`
@@ -37,6 +38,26 @@ kategorię oraz uporządkowaną listę uruchomionych reguł z etykietą i zmian�
 Warunki pricingu i scoringu używają tego samego zamkniętego AST co nawigacja:
 `answered`, `equals`, `not_equals` i `includes`. Nie ma `eval`, skryptów,
 wyrażeń tekstowych ani odwołań do danych poza odpowiedziami bieżącej sesji.
+
+## Edytor self-service
+
+Owner i Admin z capability zapisu procesu konfigurują estymację w obszarach
+`Wycena`, `Scoring` i `Wynik` tego samego buildera. Pierwsze włączenie wymaga
+jawnego podania ceny minimalnej i maksymalnej; produkt nie podpowiada fikcyjnej
+stawki biznesowej. Edytor udostępnia bazę, walutę, sposób prezentacji,
+zaokrąglenie, uporządkowane reguły ceny, scoring oraz publiczne zakończenie.
+
+Każda zmiana przechodzi przez istniejącą historię, undo/redo, autosave,
+kontrolę rewizji i publikację. Usunięcie pytania lub opcji wykorzystywanej w
+regule pokazuje nazwane zależności i wymaga jawnego potwierdzenia. Zmiana typu
+pytania usuwa wyłącznie zależności, które po zmianie byłyby niepoprawne, a cała
+operacja pozostaje atomowa i możliwa do cofnięcia.
+
+Podgląd w builderze używa tego samego deterministycznego kalkulatora TypeScript,
+ale nie jest granicą zaufania. Zapis i publikacja ponownie walidują dokument, a
+wynik sesji oraz submit są liczone po stronie PostgreSQL. Scoring, kategoria i
+explainability pozostają prywatne; respondent otrzymuje wyłącznie allowlistowaną
+projekcję publicznego wyniku.
 
 ## Arytmetyka i deterministyczność
 
