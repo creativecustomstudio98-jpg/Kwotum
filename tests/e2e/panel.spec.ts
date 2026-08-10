@@ -416,7 +416,8 @@ test.describe("panel reference reconstruction", () => {
 
     const firstTitle = page.locator(".flow-builder__preview").getByLabel("Treść pytania");
     const originalTitle = await firstTitle.inputValue();
-    const changedTitle = `${originalTitle} — autosave`;
+    const changedTitle =
+      "Jaka jest przybliżona długość zabudowy oraz szerokość całego pomieszczenia w centymetrach? — autosave";
     const staleTitle = `${originalTitle} — druga karta`;
     const stalePage = await context.newPage();
     await stalePage.setViewportSize({ height: 1_086, width: 1_448 });
@@ -428,6 +429,31 @@ test.describe("panel reference reconstruction", () => {
       await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
         timeout: 15_000,
       });
+      await expect
+        .poll(async () =>
+          firstTitle.evaluate(
+            (element) => element.scrollHeight - (element as HTMLTextAreaElement).clientHeight,
+          ),
+        )
+        .toBeLessThanOrEqual(1);
+      const titleGeometry = await firstTitle.evaluate((element) => {
+        const textarea = element as HTMLTextAreaElement;
+        const style = getComputedStyle(textarea);
+        return {
+          clientHeight: textarea.clientHeight,
+          clientWidth: textarea.clientWidth,
+          lineHeight: Number.parseFloat(style.lineHeight),
+          scrollHeight: textarea.scrollHeight,
+          scrollWidth: textarea.scrollWidth,
+          tagName: textarea.tagName,
+          whiteSpace: style.whiteSpace,
+        };
+      });
+      expect(titleGeometry.tagName).toBe("TEXTAREA");
+      expect(titleGeometry.whiteSpace).not.toBe("nowrap");
+      expect(titleGeometry.scrollHeight).toBeLessThanOrEqual(titleGeometry.clientHeight + 1);
+      expect(titleGeometry.scrollWidth).toBeLessThanOrEqual(titleGeometry.clientWidth + 1);
+      expect(titleGeometry.clientHeight).toBeGreaterThan(titleGeometry.lineHeight * 2);
 
       await page.getByRole("button", { exact: true, name: "Cofnij" }).click();
       await expect(firstTitle).toHaveValue(originalTitle);

@@ -2383,6 +2383,12 @@ scan oraz przypięty Semgrep — 291 reguł na 666 śledzonych plikach, 0 ustale
 budżecie 90 KiB. Nie dodano zależności, migracji ani ADR, ponieważ model danych,
 granice zaufania i architektura nie uległy zmianie.
 
+**Korekta regresji Safari 2026-08-10:** edytowalny tytuł w centralnym
+podglądzie formularza zawija pełne 240 znaków i dopasowuje wysokość po zmianie
+szerokości kolumny. Zachowano autosave, historię i semantykę etykiety, a test
+Playwright sprawdza brak pionowego oraz poziomego ucięcia długiego polskiego
+tytułu. Zmiana nie dotyka modelu danych, tenant scope ani publikacji.
+
 ## Etap 12ZF — webhook v1 utrzymany w MVP
 
 - [x] Zapisać ADR-034 utrzymujący webhook w MVP albo usuwający go spójnie

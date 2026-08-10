@@ -6,6 +6,10 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Podgląd pytania w builderze zawija teraz pełny tytuł i automatycznie dopasowuje
+  wysokość także po zmianie szerokości kolumny. Jednoliniowy edytor zastąpiła
+  dostępna klawiaturowo kontrolka wielowierszowa, która nie zapisuje znaków
+  nowej linii; test regresji pilnuje braku pionowego i poziomego ucięcia.
 - Etap 12ZF utrzymuje webhook w MVP przez ADR-034 i dodaje tenantowy
   `lead.created` v1: Owner/Admin zarządza publicznymi endpointami HTTPS,
   jednorazowo widocznym pochodnym sekretem, rotacją, testem i wyłączeniem.

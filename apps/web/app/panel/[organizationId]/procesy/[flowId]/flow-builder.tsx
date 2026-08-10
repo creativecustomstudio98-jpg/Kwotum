@@ -908,7 +908,7 @@ export function FlowBuilder({
               <div>
                 <label className="form-preview__question-title">
                   <span className="wy-sr-only">Treść pytania</span>
-                  <input
+                  <AutoSizeQuestionTitle
                     aria-describedby={
                       activeStepIssues.some((issue) => issue.field === "title")
                         ? "active-question-title-error"
@@ -919,9 +919,9 @@ export function FlowBuilder({
                     }
                     data-editor-field="title"
                     maxLength={240}
-                    onChange={(event) =>
+                    onValueChange={(value) =>
                       updateActiveStep(
-                        { ...activeStep, title: event.currentTarget.value },
+                        { ...activeStep, title: value },
                         `step-title:${activeStep.key}`,
                       )
                     }
@@ -2578,6 +2578,61 @@ function QuestionTypeIcon({ type }: Readonly<{ type: FlowStep["type"] }>) {
             ? "⌖"
             : "≡";
   return <span className="question-list__type">{symbol}</span>;
+}
+
+function AutoSizeQuestionTitle({
+  "aria-describedby": ariaDescribedBy,
+  "aria-invalid": ariaInvalid,
+  "data-editor-field": dataEditorField,
+  maxLength,
+  onValueChange,
+  value,
+}: Readonly<{
+  "aria-describedby": string | undefined;
+  "aria-invalid": boolean | undefined;
+  "data-editor-field": string;
+  maxLength: number;
+  onValueChange: (value: string) => void;
+  value: string;
+}>) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    let previousWidth = -1;
+    const fitToContent = () => {
+      const width = textarea.getBoundingClientRect().width;
+      if (Math.abs(width - previousWidth) < 0.5 && textarea.style.height) return;
+      previousWidth = width;
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    };
+
+    fitToContent();
+    if (typeof ResizeObserver === "undefined") return;
+
+    const resizeObserver = new ResizeObserver(fitToContent);
+    resizeObserver.observe(textarea);
+    return () => resizeObserver.disconnect();
+  }, [value]);
+
+  return (
+    <textarea
+      aria-describedby={ariaDescribedBy}
+      aria-invalid={ariaInvalid}
+      data-editor-field={dataEditorField}
+      maxLength={maxLength}
+      onChange={(event) => onValueChange(event.currentTarget.value.replace(/[\r\n]+/g, " "))}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && !event.nativeEvent.isComposing) event.preventDefault();
+      }}
+      ref={textareaRef}
+      rows={1}
+      value={value}
+    />
+  );
 }
 
 function PreviewControl({ step }: Readonly<{ step: FlowStep }>) {

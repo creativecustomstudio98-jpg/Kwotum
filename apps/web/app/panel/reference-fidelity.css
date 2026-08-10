@@ -721,7 +721,7 @@
     display: block;
   }
 
-  .form-preview__question-title input {
+  .form-preview__question-title textarea {
     width: 100%;
     margin: 0;
     padding: 0;
@@ -1176,7 +1176,7 @@
     padding: 8px;
   }
 
-  .form-preview__question-title input {
+  .form-preview__question-title textarea {
     width: 100%;
     padding: 0;
     border: 0;
