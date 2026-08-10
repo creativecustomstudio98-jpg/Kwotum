@@ -62,6 +62,29 @@ function apiFixture(overrides: Partial<WidgetApi> = {}): WidgetApi {
 }
 
 describe("WidgetSessionController", () => {
+  it("publishes analytics refusal before the API response without a delayed success render", async () => {
+    let resolveConsent!: () => void;
+    const consentRequest = new Promise<void>((resolve) => {
+      resolveConsent = resolve;
+    });
+    const api = apiFixture({
+      setAnalyticsConsent: vi.fn(() => consentRequest),
+    });
+    const controller = new WidgetSessionController(api, new MemoryWidgetStorage());
+    await controller.initialize(testPublicId);
+
+    const states: Array<boolean | null> = [];
+    controller.subscribe((state) => states.push(state.analyticsConsent));
+    const pending = controller.setAnalyticsConsent(false);
+
+    expect(controller.state.analyticsConsent).toBe(false);
+    expect(states).toEqual([null, false]);
+
+    resolveConsent();
+    expect(await pending).toBe(true);
+    expect(states).toEqual([null, false]);
+  });
+
   it("queues PII-free events until consent and deletes the queue after refusal", async () => {
     const api = apiFixture();
     const controller = new WidgetSessionController(api, new MemoryWidgetStorage());
@@ -158,19 +181,24 @@ describe("WidgetSessionController", () => {
     controller.answer("Gdańsk");
     await controller.flush();
 
-    const submitted = await controller.submitLead({
-      email: "klient@example.test",
-      files: [new File(["%PDF-test"], "projekt.pdf", { type: "application/pdf" })],
-      marketingEmailAccepted: true,
-      name: "Jan Kowalski",
-      privacyAccepted: true,
-    });
+    const challenge = vi.fn(async () => "fresh-challenge-token");
+    const submitted = await controller.submitLead(
+      {
+        email: "klient@example.test",
+        files: [new File(["%PDF-test"], "projekt.pdf", { type: "application/pdf" })],
+        marketingEmailAccepted: true,
+        name: "Jan Kowalski",
+        privacyAccepted: true,
+      },
+      challenge,
+    );
 
     expect(submitted).toBe(true);
     expect(controller.state.status).toBe("submitted");
     expect(controller.state.uploadedFiles).toHaveLength(1);
     expect(api.submitLead).toHaveBeenCalledWith(
       expect.objectContaining({
+        challengeToken: "fresh-challenge-token",
         marketingEmailConsent: expect.objectContaining({
           textHash: "c".repeat(64),
           version: "marketing-v1",
@@ -180,6 +208,50 @@ describe("WidgetSessionController", () => {
           version: "privacy-v1",
         }),
       }),
+    );
+    expect(challenge).toHaveBeenCalledOnce();
+  });
+
+  it("submits a phone-first lead without inventing an e-mail address", async () => {
+    if (!testManifest.leadCapture) throw new Error("Missing lead capture fixture.");
+    const phoneManifest = {
+      ...testManifest,
+      leadCapture: {
+        ...testManifest.leadCapture,
+        contactPolicy: "phone_required" as const,
+        marketingEmailConsent: null,
+      },
+    };
+    const api = apiFixture({
+      createSession: vi.fn(async () => ({
+        currentStepKey: phoneManifest.entryStepKey,
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        manifest: phoneManifest,
+        revision: 0,
+        token: "b".repeat(64),
+      })),
+    });
+    const controller = new WidgetSessionController(api, new MemoryWidgetStorage());
+    await controller.initialize(testPublicId);
+    controller.answer("standard");
+    await controller.flush();
+    controller.answer("Gdańsk");
+    await controller.flush();
+
+    expect(
+      await controller.submitLead(
+        {
+          email: "",
+          files: [],
+          marketingEmailAccepted: false,
+          phone: "+48 500 600 700",
+          privacyAccepted: true,
+        },
+        async () => "fresh-phone-challenge",
+      ),
+    ).toBe(true);
+    expect(api.submitLead).toHaveBeenCalledWith(
+      expect.objectContaining({ contact: { phone: "+48 500 600 700" } }),
     );
   });
 
@@ -216,13 +288,49 @@ describe("WidgetSessionController", () => {
       privacyAccepted: true,
     };
 
-    expect(await controller.submitLead(draft)).toBe(false);
+    const challenge = vi.fn(async () => "fresh-challenge-token");
+    expect(await controller.submitLead(draft, challenge)).toBe(false);
+    expect(challenge).not.toHaveBeenCalled();
     expect(controller.state.uploadedFiles).toHaveLength(1);
-    expect(await controller.submitLead(draft)).toBe(true);
+    expect(await controller.submitLead(draft, challenge)).toBe(true);
+    expect(challenge).toHaveBeenCalledOnce();
     expect(uploadFile).toHaveBeenCalledTimes(3);
     expect(api.submitLead).toHaveBeenCalledWith(
       expect.objectContaining({ fileIds: expect.arrayContaining([expect.any(String)]) }),
     );
     expect(controller.state.uploadedFiles).toHaveLength(2);
+  });
+
+  it("requests a fresh challenge after a rejected submit", async () => {
+    const submitLead = vi
+      .fn<WidgetApi["submitLead"]>()
+      .mockRejectedValueOnce(new WidgetApiError("CHALLENGE", "Potwierdzenie wygasło."))
+      .mockResolvedValueOnce({
+        leadPublicId: "e0000000-0000-4000-8000-000000000001",
+        submittedAt: "2026-08-10T12:00:00.000Z",
+      });
+    const api = apiFixture({ submitLead });
+    const controller = new WidgetSessionController(api, new MemoryWidgetStorage());
+    await controller.initialize(testPublicId);
+    controller.answer("standard");
+    await controller.flush();
+    controller.answer("Gdańsk");
+    await controller.flush();
+    const challenge = vi
+      .fn<() => Promise<string>>()
+      .mockResolvedValueOnce("first-single-use-token")
+      .mockResolvedValueOnce("second-single-use-token");
+    const draft = {
+      email: "klient@example.test",
+      files: [],
+      marketingEmailAccepted: false,
+      privacyAccepted: true,
+    };
+
+    expect(await controller.submitLead(draft, challenge)).toBe(false);
+    expect(await controller.submitLead(draft, challenge)).toBe(true);
+    expect(challenge).toHaveBeenCalledTimes(2);
+    expect(submitLead.mock.calls[0]?.[0].challengeToken).toBe("first-single-use-token");
+    expect(submitLead.mock.calls[1]?.[0].challengeToken).toBe("second-single-use-token");
   });
 });

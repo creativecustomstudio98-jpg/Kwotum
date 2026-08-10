@@ -23,6 +23,7 @@ const analyticsArtifactDirectory = path.join(artifactRoot, "12r-analytics-dashbo
 const dashboardArtifactDirectory = path.join(artifactRoot, "12t-dashboard-reconstruction");
 const mobileNavigationArtifactDirectory = path.join(artifactRoot, "12w-mobile-navigation");
 const remainingScreenArtifactDirectory = path.join(artifactRoot, "12s-remaining-screens/after");
+const contactDeliveryArtifactDirectory = path.join(artifactRoot, "12zk-contact-delivery-settings");
 const builderStateArtifactDirectory = path.join(artifactRoot, "12v-builder-state/after");
 const builderGeometryArtifactDirectory = path.join(artifactRoot, "12w-builder-geometry");
 const builderInteractionArtifactDirectory = path.join(artifactRoot, "12x-builder-interactions");
@@ -2187,7 +2188,9 @@ test.describe("panel reference reconstruction", () => {
   test("remaining operational screens are complete, responsive and use real actions", async ({
     page,
   }) => {
+    test.setTimeout(60_000);
     await mkdir(remainingScreenArtifactDirectory, { recursive: true });
+    await mkdir(contactDeliveryArtifactDirectory, { recursive: true });
     const errors: string[] = [];
     page.on("console", (message) => {
       if (message.type() === "error") errors.push(message.text());
@@ -2242,6 +2245,13 @@ test.describe("panel reference reconstruction", () => {
         animations: "disabled",
         path: path.join(remainingScreenArtifactDirectory, `${screen.name}-1536x1024.png`),
       });
+      if (screen.name === "organization-settings") {
+        await expect(page.getByRole("heading", { name: "Dostawa nowych leadów" })).toBeVisible();
+        await page.screenshot({
+          animations: "disabled",
+          path: path.join(contactDeliveryArtifactDirectory, "after-1536x1024.png"),
+        });
+      }
     }
 
     const installationLayout = page.locator(".installation-layout").last();
@@ -2307,6 +2317,22 @@ test.describe("panel reference reconstruction", () => {
         });
       }
     }
+
+    await page.setViewportSize({ height: 844, width: 390 });
+    await page.goto(`/panel/${organizationId}/ustawienia`);
+    const contactDeliveryCard = page
+      .locator(".panel-card")
+      .filter({ has: page.getByRole("heading", { name: "Dostawa nowych leadów" }) });
+    await expect(contactDeliveryCard).toBeVisible();
+    const contactDeliveryOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(contactDeliveryOverflow, "contact delivery mobile overflow").toBeLessThanOrEqual(1);
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(contactDeliveryArtifactDirectory, "after-390x844.png"),
+    });
 
     await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
     await page.setViewportSize({ height: 800, width: 320 });
@@ -2395,7 +2421,7 @@ test.describe("panel reference reconstruction", () => {
     });
     await rotate.focus();
     await page.keyboard.press("Enter");
-    await expect(page.getByText("Nowy sekret v2 — skopiuj teraz")).toBeVisible();
+    await expect(page.getByText("Nowy sekret v2 — skopiuj teraz")).toBeVisible({ timeout: 15_000 });
     await expect(page.locator(".webhook-secret-result code")).toContainText(/^whsec_/);
     const desktopAccessibility = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])

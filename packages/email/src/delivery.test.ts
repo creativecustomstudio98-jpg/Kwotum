@@ -4,10 +4,12 @@ import { ResendEmailDeliveryAdapter, TestEmailDeliveryAdapter } from "./delivery
 import { renderNotificationEmail } from "./templates";
 
 const message = renderNotificationEmail({
+  answers: [],
   appUrl: "https://app.wyceno.test",
   companyName: "Studio Mebli",
   contactEmail: "klient@example.test",
   contactName: null,
+  contactPhone: "+48 500 600 700",
   flowTitle: "Kuchnia",
   kind: "lead_customer_confirmation",
   leadId: "e0000000-0000-4000-8000-000000000001",

@@ -3,11 +3,13 @@ import type { WidgetManifest } from "./contracts.js";
 export const testPublicId = "f0000000-0000-4000-8000-000000000001";
 
 export const testManifest: WidgetManifest = {
+  challenge: null,
   entryStepKey: "service",
   intro: "Odpowiedz na kilka pytań.",
   leadCapture: {
+    contactPolicy: "email_required",
     filesEnabled: true,
-    leadCaptureSchemaVersion: 1,
+    leadCaptureSchemaVersion: 2,
     marketingEmailConsent: {
       label: "Chcę otrzymywać informacje marketingowe pocztą elektroniczną.",
       textHash: "c".repeat(64),

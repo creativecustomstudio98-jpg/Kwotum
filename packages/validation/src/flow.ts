@@ -24,18 +24,29 @@ const consentContentSchema = z
   })
   .strict();
 
-export const leadCaptureSchema = z
-  .object({
-    filesEnabled: z.boolean(),
-    leadCaptureSchemaVersion: z.literal(1),
-    marketingEmailConsent: consentContentSchema.optional(),
-    privacyNotice: consentContentSchema
-      .extend({
-        policyUrl: httpsUrlSchema.optional(),
-      })
-      .strict(),
-  })
-  .strict();
+const leadCaptureBaseSchema = z.object({
+  filesEnabled: z.boolean(),
+  marketingEmailConsent: consentContentSchema.optional(),
+  privacyNotice: consentContentSchema
+    .extend({
+      policyUrl: httpsUrlSchema.optional(),
+    })
+    .strict(),
+});
+
+export const leadCaptureSchema = z.discriminatedUnion("leadCaptureSchemaVersion", [
+  leadCaptureBaseSchema
+    .extend({
+      leadCaptureSchemaVersion: z.literal(1),
+    })
+    .strict(),
+  leadCaptureBaseSchema
+    .extend({
+      contactPolicy: z.enum(["email_required", "phone_required"]),
+      leadCaptureSchemaVersion: z.literal(2),
+    })
+    .strict(),
+]);
 
 export const flowDraftMetadataSchema = z
   .object({

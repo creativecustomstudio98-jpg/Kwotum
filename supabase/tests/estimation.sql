@@ -208,7 +208,7 @@ end;
 $$;
 
 reset role;
-set role anon;
+set role service_role;
 
 do $$
 declare

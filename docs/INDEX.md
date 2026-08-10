@@ -68,6 +68,7 @@ zatwierdza funkcji spoza `SCOPE.md`.
 | Gotowość produkcyjna            | `PRODUCTION_READINESS.md`                               | `PRODUCTION_READINESS_PLAN.md`, `RELEASE_CHECKLIST.md`, `DEPLOYMENT.md`                                  |
 | Bezpieczeństwo startu           | `SECURITY_AND_DATA.md`                                  | `SECURITY.md`, `DATABASE.md`, `AUTHORIZATION.md`, `BACKUP_AND_RECOVERY.md`                               |
 | Pierwszych 5 klientów           | `LAUNCH_FIRST_5_CLIENTS.md`                             | `ROADMAP.md`, `ANALYTICS_PLAN.md`, `CRO_PLAN.md`                                                         |
+| Pilotaż Fortez                  | `pilots/FORTEZ_PILOT_DISCOVERY_2026-08-10.md`           | `LAUNCH_FIRST_5_CLIENTS.md`, `PRODUCTION_READINESS.md`, `RELEASE_CHECKLIST.md`                           |
 
 ## Kontrakt wykonawczy V7 i pakiety źródłowe V6
 

@@ -40,12 +40,18 @@ Allowlista obejmuje:
 - opcje i wyłącznie reguły nawigacji potrzebne rendererowi;
 - bezpieczny wynik konsultacyjny.
 - bezpieczną konfigurację formularza kontaktowego: etykiety, wersje, hashe,
-  opcjonalny URL polityki i informację o dostępności plików.
+  opcjonalny URL polityki, informację o dostępności plików i politykę kontaktu.
 
 Manifest v2 dodaje wyłącznie allowlistowane `validation` kroku:
 `text_length`, `number_range` albo `date_range`. Brak ograniczenia jest
 normalizowany do `null`. Sekcje, `sectionKey` i pozostałe metadane buildera nie
 wchodzą do publicznej projekcji. Runtime nadal czyta manifest v1.
+
+`leadCaptureSchemaVersion: 2` dodaje `contactPolicy`: `email_required` albo
+`phone_required`. Snapshoty lead capture v1 są interpretowane jako
+`email_required`. Widget pokazuje właściwe wymaganie, a API i PostgreSQL
+niezależnie walidują co najmniej jeden kanał oraz politykę wersji. Zgoda
+marketingowa e-mail wymaga podania e-maila.
 
 Nie zawiera `organization_id`, nazw wewnętrznych, pricingu, scoringu,
 integracji, danych sesji ani danych innego respondenta. Pola tekstowe są
@@ -111,11 +117,18 @@ od nowa po wygaśnięciu oraz status zapisu przez `aria-live`.
 - `POST /api/v1/public/sessions/current/submit` — atomowe utworzenie leada.
 
 Endpointy mają walidację Zod, limit 8 KiB mutacji, stabilne kody błędów,
-`request_id`, CORS bez credentials i `no-store` dla sesji. Manifest może być
-krótko cache’owany, ale rozpoczęcie sesji nie polega na cache’u manifestu.
-Istnieje zgrubny limit 120 nowych sesji na wersję na minutę i limit mutacji.
-Docelowe rozproszone limity per IP/origin oraz adaptacyjny Turnstile pozostają
-kontrolą przed publiczną produkcją.
+`request_id`, exact CORS bez credentials i `no-store` dla sesji. Manifest może
+być krótko cache’owany z `Vary: Origin`, ale rozpoczęcie sesji nie polega na
+cache’u manifestu. FTZ-03A dodaje wspólny limiter PostgreSQL per
+HMAC(IP)/origin/flow/session/organizacja i operacja, `Retry-After`, tenantową
+konfigurację maksymalnie 10 originów oraz odbiera anonimowy dostęp do RPC
+domenowych. FTZ-03B dodaje do runtime manifestu wyłącznie publiczny site key,
+akcję `kwotum_lead_submit` i `appearance: interaction-only`. Dynamiczny widget
+ładuje oficjalny skrypt i renderuje challenge dopiero po kliknięciu finalnego
+submitu oraz po uploadzie. Serwer wykonuje obowiązkowe
+Siteverify przed RPC leada, sprawdza host/akcję/świeżość i fail-closed odrzuca
+replay, timeout, błąd providera albo brak konfiguracji poza local. Podgląd
+panelu pozostaje bezsieciowy i nie tworzy leada.
 
 ## Komunikacja z hostem
 
@@ -136,9 +149,10 @@ Pokrycie:
   XSS jako tekst i uszkodzony storage;
 - PostgreSQL: anonimowy manifest, hash tokenu, IDOR, expiry, idempotencja,
   rewizje, walidacja odpowiedzi, próba obejścia trasy, estymacja na snapshotcie,
-  blokada niepełnej sesji i brak wycieku scoringu;
+  blokada niepełnej sesji, phone-first bez e-maila i brak wycieku scoringu;
 - Playwright: hosted flow, mobile, utrata sieci, axe WCAG A/AA, popup, focus
-  return, agresywny CSS hosta oraz kontakt/upload/submit.
+  return, agresywny CSS hosta, kontakt/upload/submit oraz wygaśnięty token
+  Turnstile, brak wywołania API przed tokenem i retry ze świeżym tokenem.
 
 Ręczny VoiceOver/NVDA, realne CSP kilku hostów i macierz starszych przeglądarek
 pozostają obowiązkowe przed produkcją.

@@ -53,6 +53,7 @@ describe("environment validation", () => {
         CLAMAV_HOST: "clamav.internal",
         CLAMAV_PORT: "3310",
         MALWARE_SCAN_MODE: "clamav",
+        PUBLIC_RATE_LIMIT_SECRET: "p".repeat(32),
         RETENTION_WORKER_SECRET: "r".repeat(32),
         WEBHOOK_SIGNING_SECRET: "s".repeat(32),
         WEBHOOK_WORKER_SECRET: "w".repeat(32),
@@ -61,6 +62,7 @@ describe("environment validation", () => {
       CLAMAV_HOST: "clamav.internal",
       CLAMAV_PORT: 3310,
       MALWARE_SCAN_MODE: "clamav",
+      PUBLIC_RATE_LIMIT_SECRET: "p".repeat(32),
       WEBHOOK_WORKER_SECRET: "w".repeat(32),
     });
     expect(() =>
@@ -69,6 +71,27 @@ describe("environment validation", () => {
         CLAMAV_HOST: "clamav/internal",
       }),
     ).toThrow();
+  });
+
+  it("validates bounded Turnstile keys without treating the site key as a secret", () => {
+    expect(
+      parseClientEnv({
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: "1x00000000000000000000AA",
+        NEXT_PUBLIC_WIDGET_ORIGIN: "https://widget.wyceno.test",
+      }).NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+    ).toBe("1x00000000000000000000AA");
+    expect(() =>
+      parseClientEnv({
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: "x".repeat(33),
+        NEXT_PUBLIC_WIDGET_ORIGIN: "https://widget.wyceno.test",
+      }),
+    ).toThrow();
+    expect(
+      parseServerEnv({
+        APP_URL: "https://app.wyceno.test",
+        TURNSTILE_SECRET_KEY: "1x0000000000000000000000000000000AA",
+      }).TURNSTILE_SECRET_KEY,
+    ).toBe("1x0000000000000000000000000000000AA");
   });
 
   it("accepts a branded email sender without allowing header injection", () => {

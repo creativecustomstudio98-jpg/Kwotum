@@ -2449,6 +2449,42 @@ pozostają zablokowane do schedulera, alertów i stagingowego UAT z Etapu 13A.
 regresyjne, UAT i protokół go/no-go. Żadne ceny fixture'ów ani reguły innego
 tenanta nie stają się niejawnie rekomendacją produkcyjną.
 
+**Stan częściowy 2026-08-10 — FORTEZ DISCOVERY COMPLETE, PILOT NO-GO:**
+wybrano Fortez jako pierwszego kandydata i wykonano aktualny audyt publicznej
+strony, mobile, kart produktów, formularza, analityki, CSP, sitemap oraz
+lokalnego źródła. Kontrakt w
+`pilots/FORTEZ_PILOT_DISCOVERY_2026-08-10.md` zachowuje obecny formularz,
+telefon i WhatsApp jako równoległy fallback oraz ogranicza pierwszy embed do
+osobnego popupu dla użytkowników, którzy nie znają modelu. Discovery wykryło
+dwie blokujące luki domenowe: telefon przy opcjonalnym e-mailu oraz niezależny
+od konta adres alertów. ADR-039 i lokalny Etap 12ZK zamykają obie luki w kodzie:
+schema v2, phone-first, tenantowa konfiguracja, forced RLS, alert z telefonem i
+testy negatywne. Pilot nadal pozostaje NO-GO do wdrożenia migracji, schedulera i
+alertów, warsztatu, DPA, UAT oraz podpisanego GO.
+
+## Etap 12ZK — polityka kontaktu i dostawa alertów pilota
+
+- [x] Zapisać ADR-039 z kompatybilnością snapshotów v1.
+- [x] Dodać `email_required` / `phone_required` i serwerową walidację
+      immutable snapshotu.
+- [x] Pozwolić na lead bez e-maila przy wymaganym telefonie, bez tworzenia
+      marketing consent ani potwierdzenia klienta.
+- [x] Dodać tenantowy adres alertów, audit bez PII, capability Owner/Admin i
+      forced RLS blokujące Sales, suspended i drugi tenant.
+- [x] Dodać telefon do e-maila firmy, webhooka, panelu i bezpiecznych fallbacków
+      prezentacyjnych.
+- [x] Uruchomić unit, typecheck oraz pełny `pnpm test:rls` na czystej bazie.
+- [ ] Zastosować migrację na staging/produkcji i wykonać syntetyczny UAT
+      rzeczywistej dostawy przed pierwszym prawdziwym leadem.
+
+**Gate lokalny 2026-08-10:** pełna historia migracji i RLS przechodzi, w tym
+phone-only submit, brak potwierdzenia klienta bez e-maila, adres snapshotowany w
+outboxie oraz odmowy Sales/suspended/drugiego tenanta. Format, lint, typecheck,
+unit/RLS/WordPress, build i izolowany E2E ustawień 1536/390 px są zielone;
+artefakty 19/20 zapisano w `artifacts/visual-qa/12zk-contact-delivery-settings/`.
+Gate produkcyjny jest otwarty do wdrożenia, schedulera, monitoringu i
+syntetycznej dostawy.
+
 ## Etap 12ZH — bezpieczny podgląd i wysłanie procesu
 
 - [x] Zapisać prompt wykonawczy i ADR-035 oddzielający bezstanowy preview od
@@ -2532,8 +2568,9 @@ Syntetyczne potwierdzenie rejestracji zostało dostarczone z poprawnym nadawcą 
 bez domyślnej treści Supabase; dowód i rollback opisuje `AUTH_EMAILS.md`.
 Prawne zatwierdzenie dostawcy, testy w rzeczywistych klientach pocztowych oraz
 outbox aplikacji nadal pozostają otwarte. Pozycje poniżej pozostają otwarte,
-ponieważ nie skonfigurowano jeszcze prywatnego skanera malware, Turnstile,
-monitoringu i schedulerów, nie wykonano też restore/rollback drill.
+ponieważ nie wdrożono jeszcze release'u z Turnstile i limiterem, prywatnego
+skanera malware, monitoringu ani schedulerów; nie wykonano też smoke, restore
+ani rollback drill.
 
 - [ ] Wybrać hosting, region Supabase, provider e-mail, domeny, prywatny ClamAV,
       CDN/WAF, Turnstile i monitoring.
@@ -2553,6 +2590,43 @@ monitoringu i schedulerów, nie wykonano też restore/rollback drill.
       runbooki.
 - [ ] Wykonać log-redaction, zdalne skany, staging DAST, ręczny VoiceOver/NVDA,
       realne klienty e-mail i reprezentatywne hosty WordPress.
+
+#### Podetap FTZ-03A — origin allowlist i rozproszony limiter
+
+**Stan lokalny 2026-08-10:** podetap ukończony w kodzie i testach. Nie zamyka
+łącznej pozycji 13B; FTZ-03B jest już lokalnie zamknięte, lecz produkcyjny
+ClamAV pozostaje otwarty. Przed ruchem rzeczywistym migracja, sekret limitera,
+release aplikacji i smoke nadal wymagają wdrożenia na docelowym środowisku.
+
+- [x] Zapisać ADR-040 i rollback dla serwerowej bramy publicznego API.
+- [x] Zastąpić wildcard dokładnym tenantowym CORS z `Vary: Origin`.
+- [x] Dodać atomowy limiter PostgreSQL per IP/origin/flow/session/org oraz
+      operację, bez surowego IP i z `Retry-After`.
+- [x] Odebrać `anon`/`authenticated` bezpośrednie RPC formularza i dopuścić
+      wyłącznie serwerową ścieżkę po pozytywnym guardzie.
+- [x] Dodać panel Owner/Admin do konfiguracji maksymalnie 10 originów procesu,
+      tenant scope, RLS i audyt.
+- [x] Pokryć SQL/TypeScript testami obcy origin, role, bypass RPC, 429,
+      niezależny fingerprint, fail-closed IP i brak wildcardu.
+- [x] FTZ-03B: wdrożyć adaptacyjny Turnstile i test retry/bypass.
+
+#### Podetap FTZ-03B — adaptacyjny Turnstile
+
+**Stan 2026-08-10:** implementacja i gate lokalny ukończone. Managed widget
+Cloudflare obejmuje dokładne hosty `app.kwotum.pl`, `fortez-przyczepy.pl` i
+`www.fortez-przyczepy.pl`, a site key i sekret mają w Vercel zakres wyłącznie
+Production. Nie oznacza to produkcyjnego GO: nadal brakuje wdrożenia release'u,
+CSP Fortez, prawnego zatwierdzenia dostawcy i smoke na rzeczywistym embedzie.
+
+- [x] Zapisać ADR-041 z fail-closed, rollbackiem i fallbackiem starego kanału.
+- [x] Dodać publiczny runtime config bez zapisu site key w snapshotcie procesu.
+- [x] Wykonać explicit/adaptive challenge dopiero przy finalnym submit po uploadzie.
+- [x] Wymusić Siteverify przed RPC oraz sprawdzić action, hostname i świeżość.
+- [x] Dodać timeout, bounded retry, idempotency key i brak logowania tokenu/IP.
+- [x] Pokryć brak tokenu, replay, host/action mismatch, expiry, outage i retry.
+- [x] Przejść Playwright mobile/desktop, axe, overflow i świeży token po retry.
+- [x] Skonfigurować managed widget Cloudflare i klucze Vercel Production only.
+- [ ] Wdrożyć release, zaktualizować CSP Fortez i wykonać produkcyjny smoke.
 
 ### Etap 13C — rehearsal i release candidate
 

@@ -45,7 +45,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
   }
 
   const legalHold = context.role === "owner" ? await getLeadLegalHold(context, leadId) : null;
-  const contactLabel = lead.contactName ?? lead.contactEmail;
+  const contactLabel = lead.contactName ?? lead.contactEmail ?? lead.contactPhone ?? "Klient";
   const location = findAnswer(lead.answers, ["gdzie", "lokaliz"]);
   const timing = findAnswer(lead.answers, ["kiedy", "termin", "data"]);
   const materialsLabel =
@@ -188,6 +188,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
             canAssign={hasCapability(context, "lead:assign")}
             canManageAllTasks={context.role === "owner" || context.role === "admin"}
             contactEmail={lead.contactEmail}
+            contactPhone={lead.contactPhone}
             currentUserId={context.userId}
             leadId={lead.id}
             notes={lead.notes}

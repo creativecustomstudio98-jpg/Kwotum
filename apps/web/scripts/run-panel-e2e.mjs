@@ -270,32 +270,33 @@ try {
   }
 
   console.log("[panel-e2e] Uruchamiam 18 scenariuszy panelu i bezstanowy podgląd...");
-  run(
-    "pnpm",
-    [
-      "exec",
-      "playwright",
-      "test",
-      "tests/e2e/panel.spec.ts",
-      "tests/e2e/flow-preview-sharing.spec.ts",
-      "--workers=1",
-    ],
-    {
-      env: {
-        PANEL_E2E_EDITOR_FLOW_ID: fixture.editorFlowId,
-        PANEL_E2E_EMAIL: email,
-        PANEL_E2E_FLOW_ID: fixture.flowId,
-        PANEL_E2E_ORGANIZATION_ID: organizationId,
-        PANEL_E2E_PASSWORD: password,
-        PANEL_E2E_ARTIFACT_ROOT: artifactRoot,
-        PLAYWRIGHT_REUSE_EXISTING_SERVER: "false",
-        WEBHOOK_SIGNING_SECRET:
-          process.env.WEBHOOK_SIGNING_SECRET || "panel-e2e-webhook-signing-secret-32-characters",
-        WEBHOOK_WORKER_SECRET:
-          process.env.WEBHOOK_WORKER_SECRET || "panel-e2e-webhook-worker-secret-32-characters",
-      },
+  const playwrightArguments = [
+    "exec",
+    "playwright",
+    "test",
+    "tests/e2e/panel.spec.ts",
+    "tests/e2e/flow-preview-sharing.spec.ts",
+    "tests/e2e/public-request-guard.spec.ts",
+    "--workers=1",
+  ];
+  if (process.env.PANEL_E2E_GREP) {
+    playwrightArguments.push("--grep", process.env.PANEL_E2E_GREP);
+  }
+  run("pnpm", playwrightArguments, {
+    env: {
+      PANEL_E2E_EDITOR_FLOW_ID: fixture.editorFlowId,
+      PANEL_E2E_EMAIL: email,
+      PANEL_E2E_FLOW_ID: fixture.flowId,
+      PANEL_E2E_ORGANIZATION_ID: organizationId,
+      PANEL_E2E_PASSWORD: password,
+      PANEL_E2E_ARTIFACT_ROOT: artifactRoot,
+      PLAYWRIGHT_REUSE_EXISTING_SERVER: "false",
+      WEBHOOK_SIGNING_SECRET:
+        process.env.WEBHOOK_SIGNING_SECRET || "panel-e2e-webhook-signing-secret-32-characters",
+      WEBHOOK_WORKER_SECRET:
+        process.env.WEBHOOK_WORKER_SECRET || "panel-e2e-webhook-worker-secret-32-characters",
     },
-  );
+  });
 } catch (error) {
   primaryError = error;
 } finally {
@@ -309,7 +310,12 @@ try {
   }
   if (!primaryError && process.env.PANEL_E2E_RETAIN_STAGE_ARTIFACTS === "1") {
     try {
-      for (const stage of ["12ze-self-service-estimation", "12zf-webhook-v1"]) {
+      const retainedStages = process.env.PANEL_E2E_RETAIN_STAGES
+        ? process.env.PANEL_E2E_RETAIN_STAGES.split(",")
+            .map((stage) => stage.trim())
+            .filter(Boolean)
+        : ["12ze-self-service-estimation", "12zf-webhook-v1", "12zk-contact-delivery-settings"];
+      for (const stage of retainedStages) {
         const stageArtifactSource = path.join(artifactRoot, stage);
         const stageArtifactTarget = path.join(repositoryRoot, "artifacts/visual-qa", stage);
         if (!existsSync(stageArtifactSource)) {

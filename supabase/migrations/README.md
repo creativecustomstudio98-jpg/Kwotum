@@ -37,6 +37,11 @@ kontrolą uprawnień Owner/Admin/Sales.
 Migracja `20260803000300_stage13a_runtime_readiness.sql` dodaje bezpieczny,
 anonimowy probe PostgreSQL używany wyłącznie przez ograniczony czasowo
 endpoint readiness.
+Migracja `20260810000200_stage13b_public_request_guard.sql` dodaje tenantową
+allowlistę originów, prywatne rozproszone kubełki limitera, audytowany zapis
+Owner/Admin oraz serwerowy guard. Odbiera `anon` i `authenticated` bezpośrednie
+wykonywanie RPC formularza; Route Handlery wykonują je jako service role
+wyłącznie po pozytywnym guardzie.
 
 Pliki wdrożonych migracji są niezmienne. Korekty wykonujemy nową migracją.
 Rollback aplikacji nie cofa automatycznie schematu; przed produkcyjnym
@@ -111,3 +116,12 @@ Rollback Etapu 13A polega najpierw na przywróceniu readiness do bezpiecznej
 odpowiedzi 503 lub wyłączeniu probe'u w aplikacji. Funkcja nie przechowuje
 danych. Nowa migracja może następnie cofnąć jej grant dla `anon` i usunąć ją;
 nie edytujemy wdrożonego pliku migracji.
+
+Rollback FTZ-03A zaczyna się od wyłączenia embedu albo zwracania bezpiecznego
+503 z publicznych Route Handlerów. Nie wolno wdrożyć starszej aplikacji, gdy
+operacyjne RPC nadal nie mają grantów `anon`. Jeżeli rollback aplikacji jest
+konieczny, nowa migracja naprawcza czasowo przywraca dokładne granty starego
+kontraktu; preferowany jest jednak rollback do wersji obsługującej guard.
+Konfiguracja `public_flow_origins` pozostaje jako audyt, a wygasłe rekordy
+`app_private.public_request_buckets` mogą zostać usunięte bez utraty danych
+biznesowych. Wdrożonego pliku migracji nie edytujemy ani nie cofamy.

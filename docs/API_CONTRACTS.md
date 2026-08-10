@@ -42,6 +42,22 @@ Przykład błędu:
 
 Odpowiedź submit zawiera wynik do pokazania, nigdy reguły wewnętrzne. Serwer przelicza wynik na snapshotcie wersji.
 
+Publiczne endpointy formularza nie udostępniają wildcard CORS. Dla żądania z
+`Origin` odpowiedź zawiera `Access-Control-Allow-Origin` wyłącznie po dokładnym
+dopasowaniu do originu skonfigurowanego przy danym procesie albo do `APP_URL`
+hosted linku, zawsze z `Vary: Origin`. Origin obcej witryny zwraca
+`ORIGIN_NOT_ALLOWED`/403 bez nagłówka dopuszczającego CORS. Każde żądanie,
+łącznie z preflightem, przechodzi przez rozproszony limiter PostgreSQL. Limit
+zwraca `RATE_LIMITED`/429 oraz całkowitoliczbowy `Retry-After` w sekundach.
+Adres klienta jest HMAC-owany na serwerze i nie trafia w surowej postaci do
+bazy ani logów.
+
+Operacyjne RPC manifestu, sesji, odpowiedzi, wyniku, submitu, plików i
+analityki nie mają grantu `anon` ani `authenticated`. Wykonuje je wyłącznie
+Route Handler po pozytywnym wyniku bramy origin/rate limit. Panel pobiera
+manifest instalacyjny osobnym tenantowym RPC Owner/Admin. Szczegóły decyzji:
+ADR-040.
+
 ## Webhook `lead.created` v1
 
 Tenantowe operacje są dostępne tylko Ownerowi/Adminowi. Utworzenie, rotacja i
@@ -112,7 +128,9 @@ przyjmuje `mutationId`, `expectedRevision`, `answer` oraz wyliczony przez klient
 
 Stabilne błędy: `FLOW_NOT_FOUND`, `SESSION_NOT_FOUND`, `SESSION_EXPIRED`,
 `SESSION_CONFLICT`, `INVALID_REQUEST`, `INVALID_ANSWER`, `RATE_LIMITED` i
-`UNAVAILABLE`. Każda odpowiedź ma `X-Request-Id`; sesje mają `no-store`.
+`UNAVAILABLE`; brama może dodatkowo zwrócić `ORIGIN_NOT_ALLOWED`,
+`CHALLENGE_FAILED` albo `CHALLENGE_UNAVAILABLE`. Każda
+odpowiedź ma `X-Request-Id`; sesje mają `no-store`.
 Szczegóły: `docs/WIDGET_IMPLEMENTATION.md`.
 
 `GET .../result` działa wyłącznie dla ukończonej, niewygasłej sesji. Zwraca
@@ -126,12 +144,16 @@ token sesji w nagłówku. Zwraca wyłącznie `fileId`, nazwę, MIME i rozmiar; n
 ujawnia ścieżki Storage ani tenant ID. Stabilny błąd `INVALID_FILE` obejmuje
 limit, typ, rozszerzenie i sygnaturę. Maksimum to 5 plików po 25 MiB.
 
-`POST .../submit` przyjmuje `mutationId`, kontakt, wymagany dowód potwierdzenia
-informacji prywatności, opcjonalną zgodę marketingową i maksymalnie 5 `fileIds`.
-Serwer nie przyjmuje ceny, score ani odpowiedzi — kopiuje je z ukończonej sesji
-i ponownie liczy estymację. Odpowiedź `{leadPublicId, submittedAt}` jest
-bezpieczna dla retry; nie zawiera PII ani prywatnego wyniku. Szczegóły:
-`docs/LEAD_PIPELINE.md`.
+`POST .../submit` przyjmuje `mutationId`, jednorazowy `challengeToken` do 2048
+znaków, kontakt, wymagany dowód potwierdzenia informacji prywatności, opcjonalną
+zgodę marketingową i maksymalnie 5 `fileIds`. Po bramie origin/rate i walidacji
+payloadu serwer obowiązkowo wykonuje Cloudflare Siteverify oraz sprawdza
+`success`, akcję `kwotum_lead_submit`, host i świeżość. Nieprawidłowy, wygasły
+albo powtórzony token nie uruchamia RPC leada; retry użytkownika wymaga nowego
+tokenu. Serwer nie przyjmuje ceny, score ani odpowiedzi — kopiuje je z
+ukończonej sesji i ponownie liczy estymację. Odpowiedź
+`{leadPublicId, submittedAt}` nie zawiera PII ani prywatnego wyniku. Szczegóły:
+`docs/LEAD_PIPELINE.md` i ADR-041.
 
 `POST .../sessions/current/analytics-consent` przyjmuje `mutationId`,
 `consentVersion: "analytics-v1"` i `granted`. Odmowa/wycofanie usuwa eventy

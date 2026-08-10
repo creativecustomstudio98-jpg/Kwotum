@@ -148,7 +148,7 @@ export function buildWebhookEnvelope(claim: ClaimedWebhookDelivery): WebhookEnve
     };
   }
   if (
-    claim.contact_email === null ||
+    (claim.contact_email === null && claim.contact_phone === null) ||
     claim.flow_title === null ||
     claim.lead_public_id === null ||
     claim.submitted_at === null

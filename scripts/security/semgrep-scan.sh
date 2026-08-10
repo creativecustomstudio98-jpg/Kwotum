@@ -120,6 +120,8 @@ run_semgrep scan \
   "${semgrep_config_arguments[@]}" \
   --disable-version-check \
   --error \
+  --no-git-ignore \
+  --exclude .git \
   --exclude .next \
   --exclude artifacts \
   --exclude coverage \

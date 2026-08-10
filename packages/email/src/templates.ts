@@ -1,10 +1,12 @@
 export type NotificationKind = "lead_company_alert" | "lead_customer_confirmation";
 
 export type NotificationTemplateInput = Readonly<{
+  answers: ReadonlyArray<Readonly<{ question: string; value: string }>>;
   appUrl: string;
   companyName: string;
-  contactEmail: string;
+  contactEmail: string | null;
   contactName: string | null;
+  contactPhone: string | null;
   flowTitle: string;
   kind: NotificationKind;
   leadId: string;
@@ -106,8 +108,9 @@ Wiadomość transakcyjna wygenerowana przez Kwotum.`,
 function companyTemplate(input: NotificationTemplateInput): RenderedEmail {
   const company = safeLine(input.companyName);
   const flow = safeLine(input.flowTitle);
-  const contactEmail = safeLine(input.contactEmail);
+  const contactEmail = input.contactEmail ? safeLine(input.contactEmail) : "Nie podano";
   const contactName = input.contactName ? safeLine(input.contactName) : "Nie podano";
+  const contactPhone = input.contactPhone ? safeLine(input.contactPhone) : "Nie podano";
   const appUrl = new URL(input.appUrl);
   appUrl.pathname = `/panel/${encodeURIComponent(input.organizationId)}/leady/${encodeURIComponent(input.leadId)}`;
   appUrl.search = "";
@@ -116,6 +119,23 @@ function companyTemplate(input: NotificationTemplateInput): RenderedEmail {
   const subject = safeHeader(`Nowy lead — ${flow}`);
   const scoreLine = input.score === null ? "Nie obliczono" : `${input.score}/100`;
   const priceLine = input.price ? safeLine(input.price) : "Nie obliczono";
+  const answers = input.answers.slice(0, 40).map((answer) => ({
+    question: safeLine(answer.question).slice(0, 240),
+    value: safeLine(answer.value).slice(0, 2000),
+  }));
+  const answersHtml =
+    answers.length === 0
+      ? "<p>Brak zapisanych odpowiedzi.</p>"
+      : `<dl>${answers
+          .map(
+            (answer) =>
+              `<dt style="font-weight:bold">${escapeHtml(answer.question)}</dt><dd style="margin:0 0 12px">${escapeHtml(answer.value)}</dd>`,
+          )
+          .join("")}</dl>`;
+  const answersText =
+    answers.length === 0
+      ? "Brak zapisanych odpowiedzi."
+      : answers.map((answer) => `${answer.question}: ${answer.value}`).join("\n");
   return {
     html: document(
       subject,
@@ -123,10 +143,13 @@ function companyTemplate(input: NotificationTemplateInput): RenderedEmail {
     <p>Klient ukończył proces „${escapeHtml(flow)}”.</p>
     <dl>
       <dt style="font-weight:bold">Imię</dt><dd style="margin:0 0 12px">${escapeHtml(contactName)}</dd>
+      <dt style="font-weight:bold">Telefon</dt><dd style="margin:0 0 12px">${escapeHtml(contactPhone)}</dd>
       <dt style="font-weight:bold">E-mail</dt><dd style="margin:0 0 12px">${escapeHtml(contactEmail)}</dd>
       <dt style="font-weight:bold">Orientacyjny wynik</dt><dd style="margin:0 0 12px">${escapeHtml(priceLine)}</dd>
       <dt style="font-weight:bold">Score</dt><dd style="margin:0 0 12px">${escapeHtml(scoreLine)}</dd>
     </dl>
+    <h2 style="margin:24px 0 12px;font-size:20px">Odpowiedzi klienta</h2>
+    ${answersHtml}
     <p><a href="${escapeHtml(detailsUrl)}" style="color:#0d5c43;font-weight:bold">Otwórz szczegóły leada w panelu</a></p>`,
     ),
     subject,
@@ -136,9 +159,13 @@ function companyTemplate(input: NotificationTemplateInput): RenderedEmail {
 Klient ukończył proces „${flow}”.
 
 Imię: ${contactName}
+Telefon: ${contactPhone}
 E-mail: ${contactEmail}
 Orientacyjny wynik: ${priceLine}
 Score: ${scoreLine}
+
+Odpowiedzi klienta:
+${answersText}
 
 Otwórz szczegóły leada w panelu:
 ${detailsUrl}

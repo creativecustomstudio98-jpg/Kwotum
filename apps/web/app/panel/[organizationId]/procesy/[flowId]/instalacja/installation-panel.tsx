@@ -4,12 +4,14 @@ import { Button, LinkButton } from "@wyceno/ui";
 import type { WidgetManifestContract } from "@wyceno/validation";
 import { useMemo, useState } from "react";
 
+import { AllowedOriginsForm } from "./allowed-origins-form";
 import { FlowPreview } from "./flow-preview";
 import { InvitationForm } from "./invitation-form";
 
 type InstallationMode = "fullscreen" | "hosted" | "inline" | "popup";
 
 export function InstallationPanel({
+  allowedOrigins,
   appOrigin,
   currentVersion,
   flowId,
@@ -22,6 +24,7 @@ export function InstallationPanel({
   publishedAt,
   wordpressConnection,
 }: Readonly<{
+  allowedOrigins: ReadonlyArray<string>;
   appOrigin: string;
   currentVersion: number;
   flowId: string;
@@ -199,6 +202,12 @@ export function InstallationPanel({
               ))}
             </div>
           </section>
+
+          <AllowedOriginsForm
+            flowId={flowId}
+            organizationId={organizationId}
+            origins={allowedOrigins}
+          />
 
           <section
             className="panel-card installation-code"

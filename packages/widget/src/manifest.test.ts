@@ -11,6 +11,25 @@ describe("widget manifest", () => {
     );
   });
 
+  it("accepts only the runtime Turnstile contract", () => {
+    const configured = {
+      ...testManifest,
+      challenge: {
+        action: "kwotum_lead_submit" as const,
+        appearance: "interaction-only" as const,
+        provider: "turnstile" as const,
+        siteKey: "1x00000000000000000000AA",
+      },
+    };
+    expect(parseWidgetManifest(configured).challenge).toEqual(configured.challenge);
+    expect(() =>
+      parseWidgetManifest({
+        ...configured,
+        challenge: { ...configured.challenge, action: "untrusted_action" },
+      }),
+    ).toThrow("Nieprawidłowa konfiguracja zabezpieczenia formularza");
+  });
+
   it("uses rule order before option and step fallbacks", () => {
     expect(resolveNextStep(testManifest, "service", { service: "premium" })).toBe("details");
     expect(resolveNextStep(testManifest, "service", { service: "standard" })).toBe("location");

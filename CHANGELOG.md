@@ -6,6 +6,28 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Etap 12ZK dodaje wersjonowaną politykę kontaktu `email_required` /
+  `phone_required`, tenantowy adres alertów zarządzany przez Ownera/Admina,
+  phone-first submit bez fałszywego potwierdzenia e-mail oraz kompletny brief z
+  telefonem i odpowiedziami w alercie firmy. Migracja zachowuje kompatybilność
+  snapshotów v1, forced RLS i audit bez kopiowania adresu odbiorcy.
+- FTZ-03B dodaje adaptacyjny Cloudflare Turnstile do finalnego submitu leada:
+  explicit render z `interaction-only`, token pobierany po uploadzie,
+  obowiązkowe serwerowe Siteverify z action/hostname/freshness oraz fail-closed
+  dla replay, timeoutu, awarii providera i brakującej konfiguracji poza local.
+  Site key trafia tylko do runtime manifestu, sekret pozostaje na serwerze, a
+  token i surowy IP nie są utrwalane. Unit/route/Playwright potwierdzają brak
+  zapisu przed weryfikacją i świeży token po retry. Managed widget i klucze
+  Vercel Production only są skonfigurowane; wdrożenie, CSP Fortez, legal review
+  i produkcyjny smoke nadal blokują pilot.
+- FTZ-03A zastępuje wildcard CORS dokładną tenantową allowlistą originów,
+  odcina bezpośredni dostęp `anon` i `authenticated` do RPC publicznego
+  formularza oraz dodaje serwerową bramę z atomowym limiterem PostgreSQL per
+  IP/origin/proces/sesję/organizację i operację. Surowe IP nie jest utrwalane,
+  odpowiedź `429` zawiera `Retry-After`, a panel Owner/Admin pozwala zapisać
+  maksymalnie 10 originów procesu. Migracja, rollback, RLS i testy negatywne
+  są gotowe lokalnie; wdrożenie sekretu, produkcyjny smoke i adaptacyjny
+  Turnstile pozostają blokadami rzeczywistego ruchu pilota.
 - Dodano wersjonowane, polskie szablony wszystkich sześciu przepływów
   Supabase Auth oraz testy pilnujące wymaganych zmiennych, braku aktywnej
   treści i domyślnego brandingu Supabase. Kontrakt produkcyjny wybiera osobną

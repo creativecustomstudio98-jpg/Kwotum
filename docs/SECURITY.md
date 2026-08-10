@@ -68,8 +68,9 @@ Manipulacja ceną: serwer odtwarza kalkulację na opublikowanej wersji. IDOR: za
 Pozostałe ryzyko: Web Component działa w originie strony gospodarza, więc
 Shadow DOM nie chroni storage przed jej JavaScriptem. Integrator musi ograniczać
 third-party scripts i CSP, a token pozostaje celowo wąski i krótkotrwały.
-Rozproszone rate limits per IP/origin oraz adaptacyjny Turnstile są wymagane
-przed publiczną produkcją.
+Rozproszone rate limits per IP/origin zostały wdrożone w FTZ-03A. Adaptacyjny
+Turnstile został wdrożony lokalnie w FTZ-03B; produkcja nadal wymaga osobnych
+kluczy, hostów Cloudflare, testu na rzeczywistym embedzie i akceptacji prawnej.
 
 ## Kontrole wdrożone w Etapie 6
 
@@ -121,6 +122,48 @@ Klasyfikacja, ograniczenie skutków, zachowanie dowodów, rotacja, ocena obowią
 - zapis i publikacja nadal odtwarzają tenant context i capability po stronie
   serwera, a dane wejściowe bez poprawnego UUID, rewizji, nazwy i dokumentu są
   odrzucane przed wywołaniem usługi;
+
+## Kontrole wdrożone w podetapie 13B / FTZ-03A
+
+- dokładna tenantowa allowlista originów zastąpiła wildcard CORS; hosted link
+  ufa wyłącznie originowi `APP_URL`, a odpowiedzi dodają `Vary: Origin`;
+- obcy origin jest odrzucany przed manifestem, utworzeniem sesji i każdą
+  mutacją; preflight nie zastępuje ponownej kontroli właściwego żądania;
+- bezstanowe instancje aplikacji korzystają ze wspólnych atomowych kubełków
+  PostgreSQL dla IP/originu/procesu/sesji/organizacji i rodzaju operacji;
+- surowy IP jest HMAC-owany server-side osobnym sekretem i nie jest utrwalany;
+  poza local brak zaufanego `x-vercel-forwarded-for` powoduje fail-closed;
+- publiczne RPC domenowe nie są wykonywalne przez `anon` ani
+  `authenticated`, więc bezpośrednie REST Supabase nie omija bramy;
+- Owner/Admin zarządza maksymalnie 10 dokładnymi originami na proces, zapis
+  podlega tenant scope, RLS i audit log; Sales oraz obcy tenant są odrzucani;
+- 429 zawiera `Retry-After`; negatywne testy obejmują bypass bezpośredniego
+  RPC, obcy origin, role, brak zaufanego IP i niezależne budżety klientów.
+
+## Kontrole wdrożone w podetapie 13B / FTZ-03B
+
+- każdy finalny submit poza local wymaga tokenu Turnstile do 2048 znaków;
+  brak tokenu jest odrzucany przed kontaktem z providerem i bazą;
+- dynamiczny widget używa oficjalnego skryptu, explicit render,
+  `execution: execute` i `appearance: interaction-only`; challenge powstaje po
+  uploadzie, aby ograniczyć ryzyko wygaśnięcia tokenu;
+- serwerowe Siteverify jest przed RPC tworzącym lead i wymaga zgodnej akcji,
+  dokładnego hosta, świeżego wyniku i `success`; token nie trafia do logów,
+  bazy, analytics ani eventów hosta;
+- trusted client IP jest wysyłany providerowi jako `remoteip`, lecz surowa
+  wartość nadal nie jest utrwalana; request do providera ma timeout i jedno
+  bounded retry z tym samym `idempotency_key`;
+- replay `timeout-or-duplicate`, błędny host/akcja, timeout i niedostępność
+  providera są fail-closed; retry UI pobiera nowy token;
+- local bez obu kluczy ma jawny tryb disabled, ale częściowa konfiguracja oraz
+  brak kluczy w preview/staging/production blokują publiczny formularz;
+- CSP aplikacji dopuszcza `challenges.cloudflare.com` wyłącznie dla skryptu i
+  ramki; host pilota wymaga tej samej jawnej konfiguracji bez wildcardów.
+
+Pozostałe ryzyko FTZ-03: managed widget, dokładne hostname'y i klucze Vercel
+Production only są skonfigurowane, lecz release nie został jeszcze wdrożony,
+nie wykonano smoke na rzeczywistej domenie Fortez, a Cloudflare wymaga
+zatwierdzenia jako dostawca. To nadal blokuje produkcyjny GO.
 
 ## Kontrole webhooka Etapu 12ZF
 

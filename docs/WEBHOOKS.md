@@ -103,6 +103,9 @@ Przykładowy produkcyjny payload:
 
 `estimate` może być `null`. Test zachowuje ten sam schemat, ma `data.test=true`,
 `estimate=null` i adres z zarezerwowanej domeny `.invalid`.
+W produkcyjnym leadzie `contact.email` może być `null` dla procesu
+`phone_required`; wtedy `contact.phone` musi zawierać numer. Co najmniej jeden
+z tych kanałów jest zawsze obecny dzięki więzowi bazy i walidacji snapshotu.
 
 Worker wysyła:
 

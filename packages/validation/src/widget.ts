@@ -17,6 +17,19 @@ const storedAnswerSchema = z.union([
 ]);
 const answerSchema = z.union([storedAnswerSchema, z.null()]);
 
+const widgetChallengeSchema = z
+  .object({
+    action: z.literal("kwotum_lead_submit"),
+    appearance: z.literal("interaction-only"),
+    provider: z.literal("turnstile"),
+    siteKey: z
+      .string()
+      .min(3)
+      .max(32)
+      .regex(/^[A-Za-z0-9_-]+$/),
+  })
+  .strict();
+
 const widgetOptionSchema = z
   .object({
     key: widgetStepKeySchema,
@@ -77,23 +90,37 @@ const widgetConsentContentSchema = z
   })
   .strict();
 
+const widgetLeadCaptureBaseSchema = z.object({
+  filesEnabled: z.boolean(),
+  marketingEmailConsent: widgetConsentContentSchema.nullable(),
+  privacyNotice: widgetConsentContentSchema
+    .extend({
+      policyUrl: z.url().max(500).nullable(),
+    })
+    .strict(),
+});
+
+const widgetLeadCaptureSchema = z.discriminatedUnion("leadCaptureSchemaVersion", [
+  widgetLeadCaptureBaseSchema
+    .extend({
+      leadCaptureSchemaVersion: z.literal(1),
+    })
+    .strict()
+    .transform((capture) => ({ ...capture, contactPolicy: "email_required" as const })),
+  widgetLeadCaptureBaseSchema
+    .extend({
+      contactPolicy: z.enum(["email_required", "phone_required"]),
+      leadCaptureSchemaVersion: z.literal(2),
+    })
+    .strict(),
+]);
+
 export const widgetManifestSchema = z
   .object({
+    challenge: widgetChallengeSchema.nullable().optional().default(null),
     entryStepKey: widgetStepKeySchema,
     intro: z.string().min(1).max(800),
-    leadCapture: z
-      .object({
-        filesEnabled: z.boolean(),
-        leadCaptureSchemaVersion: z.literal(1),
-        marketingEmailConsent: widgetConsentContentSchema.nullable(),
-        privacyNotice: widgetConsentContentSchema
-          .extend({
-            policyUrl: z.url().max(500).nullable(),
-          })
-          .strict(),
-      })
-      .strict()
-      .nullable(),
+    leadCapture: widgetLeadCaptureSchema.nullable(),
     manifestVersion: z.union([z.literal(1), z.literal(2)]),
     publicId: publicIdSchema,
     publishedAt: z.iso.datetime({ offset: true }),

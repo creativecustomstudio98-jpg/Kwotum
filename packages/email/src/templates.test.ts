@@ -3,10 +3,15 @@ import { describe, expect, it } from "vitest";
 import { renderFlowInvitationEmail, renderNotificationEmail } from "./templates";
 
 const baseInput = {
+  answers: [
+    { question: "Rodzaj przyczepy", value: "Laweta <lekka>" },
+    { question: "DMC", value: "do 2700 kg" },
+  ],
   appUrl: "https://app.wyceno.test",
   companyName: "Studio <Mebli>",
   contactEmail: "klient@example.test",
   contactName: "Jan & Anna",
+  contactPhone: "+48 500 600 700",
   flowTitle: "Kuchnia <script>alert(1)</script>",
   leadId: "e0000000-0000-4000-8000-000000000001",
   organizationId: "a0000000-0000-4000-8000-000000000001",
@@ -40,6 +45,14 @@ describe("notification templates", () => {
     expect(message.text).not.toContain("80/100");
     expect(message.text).not.toContain("/panel/");
     expect(message.text).not.toContain(baseInput.contactEmail);
+  });
+
+  it("includes an escaped, self-contained brief in the company alert", () => {
+    const message = renderNotificationEmail({ ...baseInput, kind: "lead_company_alert" });
+
+    expect(message.html).toContain("Odpowiedzi klienta");
+    expect(message.html).toContain("Laweta &lt;lekka&gt;");
+    expect(message.text).toContain("Rodzaj przyczepy: Laweta <lekka>");
   });
 
   it("renders a flow invitation without recipient data or tracking in the URL", () => {

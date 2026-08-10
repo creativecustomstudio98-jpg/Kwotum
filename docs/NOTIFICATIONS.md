@@ -6,11 +6,16 @@ domeny dostawcy, ale osobnych credentiali i różnych adresów From.
 
 ## Zakres Etapu 8
 
-Po atomowym utworzeniu leada system dopisuje w tej samej transakcji dwa
-powiadomienia:
+Po atomowym utworzeniu leada system dopisuje w tej samej transakcji:
 
-- `lead_customer_confirmation` — potwierdzenie dla klienta;
-- `lead_company_alert` — alert dla najstarszego aktywnego Ownera organizacji.
+- `lead_customer_confirmation` — potwierdzenie dla klienta, tylko gdy lead
+  podał e-mail;
+- `lead_company_alert` — alert na skonfigurowany tenantowy adres dostawy.
+
+Owner/Admin ustawia adres alertów niezależnie od kont użytkowników panelu.
+Adres może przekazywać pocztę do innej skrzynki. Dla starszych organizacji bez
+konfiguracji pozostaje przejściowy fallback do najstarszego aktywnego Ownera.
+Sales nie odczytuje ani nie zmienia konfiguracji.
 
 Adres odbiorcy jest snapshotem zdarzenia. Unikalność `(lead_id, kind)` sprawia,
 że ponowiony submit nie tworzy kolejnych wiadomości. Etap nie obejmuje
@@ -46,7 +51,9 @@ Każdy render zwraca temat, pełny HTML i odpowiednik tekstowy. HTML ma język
 polski, tytuł, jeden główny region i nagłówek pierwszego poziomu; treść pozostaje
 czytelna bez CSS. Dane dynamiczne są escapowane, a temat usuwa znaki sterujące.
 Wiadomość klienta nie zawiera prywatnego score ani linku do panelu. Wiadomość
-firmy prowadzi do tenantowego szczegółu leada.
+firmy jest samodzielnym briefem: zawiera dostępne dane kontaktowe, w tym telefon
+leada phone-first, oraz zapisane odpowiedzi. Link do tenantowego szczegółu
+pozostaje dodatkową akcją, nie warunkiem obsługi leada.
 
 `flow-invitation-v1` służy do wysłania klientowi aktualnego hosted flow przed
 powstaniem leada. Zawiera nazwę firmy i procesu, opcjonalne imię oraz osobistą
@@ -119,7 +126,8 @@ gdy region wysyłkowy jest ustawiony na UE.
   danych klienta;
 - test adaptera sprawdza idempotency key i klasyfikację 4xx/429/5xx;
 - test workera sprawdza wysyłkę bez sieci, retry i brak PII w logach;
-- `pnpm test:rls` sprawdza enqueue w transakcji submitu, izolację tenantów,
+- `pnpm test:rls` sprawdza enqueue w transakcji submitu, politykę phone-first,
+  uprawnienia konfiguracji odbiorcy, izolację tenantów,
   minimalne granty, retry oraz historię prób;
 - statusy są widoczne w tenantowym szczególe leada;
 - `flow-invitation-v1` ma testy HTML/text, escapowania i braku trackingu;

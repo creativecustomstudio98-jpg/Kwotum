@@ -5,33 +5,57 @@ import {
   errorResponse,
   jsonResponse,
   mapDatabaseError,
-  optionsResponse,
   readSmallJson,
   requestId,
 } from "../../../../../lib/public-api/http";
-import { createPublicClient } from "../../../../../lib/supabase/public";
+import {
+  guardPublicOptions,
+  guardPublicRequest,
+} from "../../../../../lib/public-api/request-guard";
+import { createServiceClient } from "../../../../../lib/supabase/service";
 
-export function OPTIONS(): Response {
-  return optionsResponse();
+export async function OPTIONS(request: Request): Promise<Response> {
+  return guardPublicOptions(request);
 }
 
 export async function POST(request: Request): Promise<Response> {
   const id = requestId(request);
-  const token = widgetSessionTokenSchema.safeParse(request.headers.get("x-wyceno-session"));
+  const rawToken = request.headers.get("x-wyceno-session");
+  const guard = await guardPublicRequest(
+    request,
+    "event",
+    { sessionToken: rawToken ?? undefined },
+    id,
+  );
+  if (!guard.allowed) return guard.response;
+  const { corsOrigin } = guard.context;
+  const token = widgetSessionTokenSchema.safeParse(rawToken);
   if (!token.success) {
-    return errorResponse("SESSION_NOT_FOUND", "Nie znaleziono sesji.", 404, id);
+    return errorResponse("SESSION_NOT_FOUND", "Nie znaleziono sesji.", 404, id, corsOrigin);
   }
   let body: unknown;
   try {
     body = await readSmallJson(request);
   } catch {
-    return errorResponse("INVALID_REQUEST", "Nieprawidłowy event analityczny.", 422, id);
+    return errorResponse(
+      "INVALID_REQUEST",
+      "Nieprawidłowy event analityczny.",
+      422,
+      id,
+      corsOrigin,
+    );
   }
   const parsed = analyticsEventRequestSchema.safeParse(body);
   if (!parsed.success) {
-    return errorResponse("INVALID_REQUEST", "Nieprawidłowy event analityczny.", 422, id);
+    return errorResponse(
+      "INVALID_REQUEST",
+      "Nieprawidłowy event analityczny.",
+      422,
+      id,
+      corsOrigin,
+    );
   }
-  const { data, error } = await createPublicClient().rpc("record_widget_event", {
+  const { data, error } = await createServiceClient().rpc("record_widget_event", {
     event_device: parsed.data.device,
     event_id: parsed.data.eventId,
     event_name: parsed.data.name,
@@ -42,11 +66,23 @@ export async function POST(request: Request): Promise<Response> {
     session_token: token.data,
   });
   if (error?.code === "42501") {
-    return errorResponse("ANALYTICS_CONSENT_REQUIRED", "Analityka wymaga aktywnej zgody.", 403, id);
+    return errorResponse(
+      "ANALYTICS_CONSENT_REQUIRED",
+      "Analityka wymaga aktywnej zgody.",
+      403,
+      id,
+      corsOrigin,
+    );
   }
   if (error?.code === "22023") {
-    return errorResponse("INVALID_REQUEST", "Nieprawidłowy event analityczny.", 422, id);
+    return errorResponse(
+      "INVALID_REQUEST",
+      "Nieprawidłowy event analityczny.",
+      422,
+      id,
+      corsOrigin,
+    );
   }
-  if (error) return mapDatabaseError(error, "session", id);
-  return jsonResponse(data, { requestId: id, status: 202 });
+  if (error) return mapDatabaseError(error, "session", id, corsOrigin);
+  return jsonResponse(data, { corsOrigin, requestId: id, status: 202 });
 }

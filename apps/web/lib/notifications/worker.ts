@@ -1,5 +1,5 @@
 import { parseServerEnv } from "@wyceno/config/env";
-import type { Database, NotificationErrorCode, NotificationKind } from "@wyceno/database";
+import type { Database, Json, NotificationErrorCode, NotificationKind } from "@wyceno/database";
 import {
   renderNotificationEmail,
   ResendEmailDeliveryAdapter,
@@ -56,6 +56,34 @@ function expectedTemplate(kind: NotificationKind): string {
   return kind === "lead_company_alert" ? "lead-company-v1" : "lead-customer-v1";
 }
 
+function answerText(answer: Json): string | null {
+  if (typeof answer === "string") return answer;
+  if (typeof answer === "number") return new Intl.NumberFormat("pl-PL").format(answer);
+  if (typeof answer === "boolean") return answer ? "Tak" : "Nie";
+  if (Array.isArray(answer) && answer.every((item) => typeof item === "string")) {
+    return answer.join(", ");
+  }
+  return null;
+}
+
+function notificationAnswers(
+  answers: Json,
+): ReadonlyArray<Readonly<{ question: string; value: string }>> {
+  if (!Array.isArray(answers)) return [];
+  return answers.slice(0, 40).flatMap((item) => {
+    if (
+      !item ||
+      Array.isArray(item) ||
+      typeof item !== "object" ||
+      typeof item.question !== "string"
+    ) {
+      return [];
+    }
+    const value = answerText(item.answer ?? null);
+    return value === null ? [] : [{ question: item.question, value }];
+  });
+}
+
 export async function processNotificationBatch(
   input: Readonly<{
     adapter: EmailDeliveryAdapter;
@@ -88,10 +116,12 @@ export async function processNotificationBatch(
     let message;
     try {
       message = renderNotificationEmail({
+        answers: notificationAnswers(claim.answers),
         appUrl: input.appUrl,
         companyName: claim.company_name,
         contactEmail: claim.contact_email,
         contactName: claim.contact_name,
+        contactPhone: claim.contact_phone,
         flowTitle: claim.flow_title,
         kind: claim.kind,
         leadId: claim.lead_id,

@@ -20,15 +20,15 @@ select set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003
 
 do $$
 begin
-  if (select count(*) from public.notifications) <> 2 then
-    raise exception 'lead submit did not enqueue exactly two notifications';
+  if (select count(*) from public.notifications) <> 3 then
+    raise exception 'lead submits did not enqueue exactly three notifications';
   end if;
   if (
     select count(*)
     from public.notifications
     where status = 'pending'
       and recipient_email is not null
-  ) <> 2 then
+  ) <> 3 then
     raise exception 'notification recipients or initial state are invalid';
   end if;
   begin
@@ -66,19 +66,28 @@ do $$
 declare
   company_claim record;
   customer_claim record;
+  phone_claim record;
 begin
-  if (select count(*) from claimed_notifications) <> 2 then
-    raise exception 'worker did not claim two notifications';
+  if (select count(*) from claimed_notifications) <> 3 then
+    raise exception 'worker did not claim three notifications';
   end if;
   select * into company_claim
   from claimed_notifications
-  where kind = 'lead_company_alert';
+  where kind = 'lead_company_alert'
+    and contact_email = 'klient@example.test';
   select * into customer_claim
   from claimed_notifications
   where kind = 'lead_customer_confirmation';
-  if company_claim.recipient_email <> 'owner-a@example.test'
+  select * into phone_claim
+  from claimed_notifications
+  where kind = 'lead_company_alert'
+    and contact_email is null;
+  if company_claim.recipient_email <> 'lead-delivery@example.test'
     or customer_claim.recipient_email <> 'klient@example.test'
     or company_claim.contact_email <> 'klient@example.test'
+    or phone_claim.recipient_email <> 'lead-delivery@example.test'
+    or phone_claim.contact_phone <> '+48 500 600 700'
+    or jsonb_array_length(phone_claim.answers) <> 3
     or company_claim.company_name <> 'Tenant A'
   then
     raise exception 'claimed delivery data is incomplete or incorrectly scoped';
@@ -89,6 +98,12 @@ begin
     customer_claim.lock_token,
     'test',
     concat('test_', customer_claim.notification_id)
+  );
+  perform public.complete_notification_delivery(
+    phone_claim.notification_id,
+    phone_claim.lock_token,
+    'test',
+    concat('test_', phone_claim.notification_id)
   );
   perform public.fail_notification_delivery(
     company_claim.notification_id,
@@ -141,13 +156,13 @@ begin
     where status = 'sent'
       and provider = 'test'
       and sent_at is not null
-  ) <> 2 then
-    raise exception 'test delivery did not mark both notifications sent';
+  ) <> 3 then
+    raise exception 'test delivery did not mark all notifications sent';
   end if;
   if (
     select count(*)
     from public.notification_delivery_attempts
-  ) <> 3 then
+  ) <> 4 then
     raise exception 'delivery attempt history is incomplete';
   end if;
   if (

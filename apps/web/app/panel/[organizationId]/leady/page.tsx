@@ -53,7 +53,8 @@ export default async function LeadsPage({ params, searchParams }: PageProps) {
       matchesLeadFilter(lead.status, status) &&
       (!normalizedSearch ||
         lead.contactName?.toLocaleLowerCase("pl-PL").includes(normalizedSearch) ||
-        lead.contactEmail.toLocaleLowerCase("pl-PL").includes(normalizedSearch) ||
+        lead.contactEmail?.toLocaleLowerCase("pl-PL").includes(normalizedSearch) ||
+        lead.contactPhone?.toLocaleLowerCase("pl-PL").includes(normalizedSearch) ||
         lead.flowTitle.toLocaleLowerCase("pl-PL").includes(normalizedSearch)),
   );
   const pageSize = 8;
@@ -154,6 +155,8 @@ export default async function LeadsPage({ params, searchParams }: PageProps) {
               <tbody>
                 {leads.map((lead) => {
                   const href = `/panel/${organizationId}/leady/${lead.id}`;
+                  const contactLabel =
+                    lead.contactName ?? lead.contactEmail ?? lead.contactPhone ?? "Klient";
                   return (
                     <tr key={lead.id}>
                       <th data-label="Klient" scope="row">
@@ -169,10 +172,10 @@ export default async function LeadsPage({ params, searchParams }: PageProps) {
                             />
                           ) : (
                             <span className="panel-avatar" aria-hidden="true">
-                              {initials(lead.contactName ?? lead.contactEmail)}
+                              {initials(contactLabel)}
                             </span>
                           )}
-                          <Link href={href}>{lead.contactName ?? lead.contactEmail}</Link>
+                          <Link href={href}>{contactLabel}</Link>
                         </span>
                       </th>
                       <td data-label="Usługa">{lead.flowTitle}</td>
