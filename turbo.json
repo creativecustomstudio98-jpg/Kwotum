@@ -8,6 +8,17 @@
     "pnpm-workspace.yaml",
     "tsconfig.base.json"
   ],
+  "globalEnv": [
+    "APP_URL",
+    "DEPLOYMENT_ENV",
+    "NEXT_PUBLIC_POSTHOG_KEY",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
+    "NEXT_PUBLIC_WIDGET_ORIGIN",
+    "VERCEL_ENV"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build", "typecheck"],

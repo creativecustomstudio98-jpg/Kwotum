@@ -7,6 +7,13 @@ production. Osobne projekty bazy, storage, klucze i dostawcy. Preview nie łącz
 się z produkcją. `APP_URL` dla staging i production musi używać HTTPS oraz
 hosta niebędącego loopbackiem; build odrzuca błędny kontrakt.
 
+Turborepo działa z jawną allowlistą zmiennych potrzebnych w czasie builda.
+`APP_URL`, `DEPLOYMENT_ENV`, `VERCEL_ENV` i publiczne `NEXT_PUBLIC_*` muszą być
+przekazane przez `globalEnv`, ponieważ konfiguracja Next.js oraz bundle klienta
+korzystają z nich podczas kompilacji. Sekrety runtime, w tym klucz serwisowy i
+sekrety workerów, nie należą do allowlisty builda i są wstrzykiwane dopiero do
+funkcji środowiska docelowego.
+
 ## Pipeline
 
 Install z frozen lockfile → lint → typecheck → unit/integration → build → security checks → artefakt immutable → migracja expand → deploy → smoke test → obserwacja → contract/cleanup w późniejszym release.

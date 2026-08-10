@@ -6,6 +6,10 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Produkcyjny build Vercela w monorepo otrzymuje teraz przez jawną allowlistę
+  Turborepo wyłącznie kontrakt deploymentu i publiczne zmienne kompilacji.
+  Usuwa to fałszywy fallback `APP_URL` do localhosta, zachowując klucz
+  serwisowy Supabase i sekrety workerów poza środowiskiem builda.
 - Podgląd pytania w builderze zawija teraz pełny tytuł i automatycznie dopasowuje
   wysokość także po zmianie szerokości kolumny. Jednoliniowy edytor zastąpiła
   dostępna klawiaturowo kontrolka wielowierszowa, która nie zapisuje znaków
