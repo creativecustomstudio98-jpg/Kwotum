@@ -14,6 +14,27 @@ korzystają z nich podczas kompilacji. Sekrety runtime, w tym klucz serwisowy i
 sekrety workerów, nie należą do allowlisty builda i są wstrzykiwane dopiero do
 funkcji środowiska docelowego.
 
+## Aktualna produkcja pilotowa
+
+Stan na 2026-08-10:
+
+- aplikacja `kwotum-web` działa w Vercel Production, a produkcyjna baza Supabase
+  znajduje się w regionie `eu-north-1`;
+- publicznym hostem aplikacji jest `https://app.kwotum.pl`;
+- home.pl utrzymuje `app.kwotum.pl` jako osobną strefę z istniejącymi rekordami
+  pocztowymi. Dodanie zalecanego CNAME Vercela wymagałoby usunięcia kolidujących
+  rekordów strefy, dlatego bezpieczny wariant pilota zachowuje te rekordy i
+  kieruje istniejący rekord A na wspierany przez Vercel adres `76.76.21.21`;
+- przez użycie kompatybilnego rekordu A Vercel może pokazywać status
+  `DNS Change Recommended`, mimo że DNS, TLS i routing są aktywne;
+- `GET /health` i `GET /ready` zwracają `200` przez docelową domenę, a readiness
+  potwierdza połączenie z produkcyjnym Supabase.
+
+Ten stan nie jest zgodą na przyjmowanie prawdziwych leadów. Wysyłka e-mail
+pozostaje w trybie testowym, a uploady są zablokowane fail-closed do czasu
+podłączenia skanera malware. Przed otwarciem pilota trzeba również zamknąć
+pozycje bezpieczeństwa i operacji z Etapu 13.
+
 ## Pipeline
 
 Install z frozen lockfile → lint → typecheck → unit/integration → build → security checks → artefakt immutable → migracja expand → deploy → smoke test → obserwacja → contract/cleanup w późniejszym release.

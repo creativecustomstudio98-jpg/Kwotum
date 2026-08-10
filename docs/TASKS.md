@@ -2523,6 +2523,13 @@ utworzenia stagingu ani nie zamyka żadnej zewnętrznej pozycji 13A; wejście do
 
 ### Etap 13A — staging i infrastruktura
 
+**Stan częściowy 2026-08-10:** wybrano Vercel Production i Supabase
+`eu-north-1`, zastosowano komplet migracji, uruchomiono wdrożenie z immutable
+SHA oraz podłączono `app.kwotum.pl`. Publiczne `health`, `ready`, DNS i TLS są
+zielone. Pozycje poniżej pozostają otwarte, ponieważ nie wybrano jeszcze
+produkcyjnego providera e-mail, prywatnego skanera malware, Turnstile,
+monitoringu i schedulerów, nie wykonano też restore/rollback drill.
+
 - [ ] Wybrać hosting, region Supabase, provider e-mail, domeny, prywatny ClamAV,
       CDN/WAF, Turnstile i monitoring.
 - [ ] Utworzyć odseparowane local/preview/staging/production z osobnymi

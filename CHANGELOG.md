@@ -6,6 +6,9 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Udokumentowano działające wdrożenie produkcyjne Vercel/Supabase,
+  `app.kwotum.pl`, świadome użycie kompatybilnego rekordu A w home.pl oraz
+  blokady, które nadal chronią pilota przed przyjmowaniem prawdziwych danych.
 - Produkcyjny build Vercela w monorepo otrzymuje teraz przez jawną allowlistę
   Turborepo wyłącznie kontrakt deploymentu i publiczne zmienne kompilacji.
   Usuwa to fałszywy fallback `APP_URL` do localhosta, zachowując klucz
