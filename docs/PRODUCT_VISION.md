@@ -6,7 +6,10 @@ Firmy usługowe otrzymują krótkie zapytania bez zakresu, budżetu, terminu, lo
 
 ## Wizja
 
-Wyceno zamienia nieuporządkowane zapytanie w ustrukturyzowany brief i czytelny następny krok. Firma konfiguruje pytania, warunki, przedział ceny i deterministyczny scoring; klient końcowy przechodzi krótki, mobilny proces bez konta; handlowiec otrzymuje lead wraz z wyjaśnieniem wyniku.
+Lorum zamienia nieuporządkowane zapytanie w ustrukturyzowany brief i czytelny
+następny krok. Firma konfiguruje pytania, warunki, przedział ceny i
+deterministyczny scoring; klient końcowy przechodzi krótki, mobilny proces bez
+konta; handlowiec otrzymuje lead wraz z wyjaśnieniem wyniku.
 
 ## Odbiorcy
 

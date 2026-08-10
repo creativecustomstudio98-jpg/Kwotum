@@ -6,31 +6,101 @@ UUID/ULID jako identyfikatory, `organization_id` na każdym rekordzie biznesowym
 
 ## Tożsamość i tenancy
 
-- `users` — profil powiązany z dostawcą Auth;
-- `organizations`, `organization_settings`;
-- `organization_members` — `role`, status, zaproszenie;
+- `auth.users` — tożsamość zarządzana przez Supabase Auth;
+- `profiles` — minimalny profil tworzony triggerem po rejestracji;
+- `organizations` — tenant z unikalnym slugiem i twórcą;
+- `organization_members` — role `owner`, `admin`, `sales` oraz status
+  `invited`, `active`, `suspended`;
+- `audit_logs` — bazowe zmiany organizacji i członkostw bez pełnego obrazu
+  rekordów i bez kopiowania PII;
+- `organization_settings`;
 - `sites` — dozwolone domeny, ustawienia embed;
 - `api_keys`, `integrations`, `subscriptions`, `usage_records`.
 
 ## Flow
 
-- `flows` — stabilna tożsamość i bieżący draft;
-- `flow_versions` — immutable snapshot ze statusem draft/published/archived;
-- `flow_steps`, `flow_options`, `conditional_rules`;
-- `pricing_rules`, `scoring_rules`, `result_variants`, `themes`;
-- `published_flows` — publiczny identyfikator → konkretna wersja;
+- `flows` — stabilna tożsamość i bieżący draft JSONB z rewizją;
+- `flow_versions` — immutable snapshot ze statusem published/archived i
+  SHA-256;
+- sekcje v2, kroki, opcje, reguły, typowane ograniczenia odpowiedzi i wynik są
+  ograniczonym agregatem wewnątrz draftu; snapshoty v1 pozostają obsługiwane;
+- pricing, scoring i wariant wyniku Etapu 6 są małym, wersjonowanym agregatem
+  `estimation` w draftcie/snapshotcie; motywy pozostają późniejszą domeną;
+- `published_flows` — nieprzewidywalny publiczny identyfikator → jedna konkretna
+  wersja;
 - `email_templates`.
 
 Draft może być znormalizowany dla edycji, ale publikacja tworzy walidowany, kanoniczny snapshot z hashem. Historycznego snapshotu nie edytujemy.
 
+### Stan wdrożenia Etapu 4
+
+Migracja `20260724000200_stage4_flow_domain.sql` wdraża tabele flow, RLS,
+walidator PostgreSQL i funkcje `validate_flow`, `publish_flow` oraz
+`archive_flow_version`. Publikacja blokuje draft, sprawdza oczekiwaną rewizję i
+atomowo przełącza alias. Identyczny snapshot jest idempotentny, a zmieniony
+otrzymuje kolejny numer. Szczegółowy kontrakt znajduje się w
+`docs/FLOW_DOMAIN.md`.
+
+### Stan wdrożenia Etapu 12U
+
+Migracja `20260729000100_stage12u_flow_document_v2.sql` dodaje walidację sekcji
+i typowanych ograniczeń bez zmiany tabel ani przepisywania snapshotów.
+Walidator PostgreSQL deleguje dokument v1 do dotychczasowego łańcucha, a v2
+waliduje po bezstratnej projekcji wspólnego kontraktu oraz sprawdza nowe pola.
+Publiczny manifest v2 ujawnia tylko allowlistowane ograniczenie kroku; sekcje i
+`sectionKey` pozostają prywatnymi metadanymi edytora. Serwer zapisujący
+odpowiedź ponownie egzekwuje te same domknięte zakresy tekstu, liczby i daty.
+
+Migracja jest forward-only. Rollback aplikacji musi zachować parser i runtime
+v2, może jedynie wyłączyć zapis nowych pól. Funkcji nie wolno usuwać, dopóki w
+bazie istnieje draft, wersja lub aktywna sesja przypięta do snapshotu v2.
+
+### Stan wdrożenia Etapu 12V
+
+Migracja `20260729000200_stage12v_flow_editor_revision.sql` rozszerza istniejący
+trigger `prepare_flow_update`: `draft_revision` rośnie po zmianie `draft` albo
+`name`. Nie dodaje tabel, kolumn ani grantów. Dzięki temu autosave używa jednego
+znacznika optimistic concurrency dla całego agregatu edytowanego przez
+builder.
+
+Test PostgreSQL potwierdza osobny wzrost rewizji po zmianie nazwy, kolejny
+wzrost po zmianie dokumentu oraz odrzucenie starej rewizji przez publikację.
+Migracja jest forward-only; rollback UI zachowuje nowe zachowanie triggera,
+ponieważ częściej rosnąca rewizja pozostaje zgodna ze starszym klientem
+odczytującym wartość zwróconą po zapisie.
+
+### Stan wdrożenia Etapu 6
+
+Migracja `20260725000100_stage6_estimation.sql` rozszerza walidację publikacji
+o konfigurację estymacji, dodaje prywatny kalkulator pricingu/scoringu i wąskie
+RPC publicznego wyniku. Nie dodaje zmiennych tabel reguł: sesja wskazuje
+immutable snapshot, więc komplet reguł historycznych pozostaje atomowo
+przypięty do tej samej wersji. Szczegóły: `docs/ESTIMATION_ENGINE.md`.
+
 ## Sesje i leady
 
-- `widget_sessions` — publiczny losowy token, flow version, expiry, źródło i zgrubne dane urządzenia;
-- `session_answers`, `session_events`;
+- `widget_sessions` — hash publicznego tokenu, przypięta flow version, public ID,
+  rewizja, historia przejścia, expiry i ostatnia aktywność;
+- `session_answers` — jedna aktualna, typowana odpowiedź na krok;
+- `widget_session_mutations` — idempotency key i wynik rewizji odpowiedzi;
+- `session_events` — first-party eventy v1 bez PII z 90-dniowym expiry;
+- `analytics_consent_records` — wersjonowana historia decyzji sesji;
 - `leads` — organizacja, wersja, status, score, przedział, kontakt;
 - `lead_answers`, `lead_files`, `lead_status_history`, `lead_notes`;
+- `lead_operations` — jeden stan właściciela i priorytetu na lead;
+- `lead_tasks` — planowane kontakty i zadania z terminem, odpowiedzialnym,
+  idempotencją i cyklem otwarte/wykonane/anulowane;
+- `lead_activity_events` — techniczna historia operacji bez kopiowania treści
+  zadania, notatki i kontaktu;
 - `consent_records` — typ, treść/hash wersji, timestamp i źródło;
-- `notifications`, `webhook_endpoints`, `webhook_deliveries`, `audit_logs`.
+- `notifications` — tenantowy outbox ze snapshotem odbiorcy, wersją szablonu,
+  statusem, blokadą i terminem retry;
+- `notification_delivery_attempts` — historia prób bez treści wiadomości;
+- `flow_invitations` — tenantowy outbox wysłania aktualnego hosted flow,
+  przypięty do immutable wersji, autora i idempotency key;
+- `flow_invitation_delivery_attempts` — historia prób zaproszenia bez treści
+  wiadomości i bez PII w audit logu;
+- `webhook_endpoints` i `webhook_deliveries` powstaną w kolejnych etapach.
 
 ## Kluczowe więzy
 
@@ -42,10 +112,182 @@ Draft może być znormalizowany dla edycji, ale publikacja tworzy walidowany, ka
 - eventy i submit przyjmują idempotency key;
 - pliki wskazują prywatny bucket i tenant path.
 
+### Stan wdrożenia Etapu 7
+
+Migracja `20260725000200_stage7_lead_pipeline.sql` dodaje tenantowe `leads`,
+`lead_answers`, `consent_records`, `lead_files`, `lead_notes` i
+`lead_status_history`. Lead zachowuje snapshot nazw procesu, kontaktu i
+serwerowego wyniku; odpowiedzi zachowują tytuły pytań z wersji. Jedna sesja ma
+co najwyżej jeden lead, a jej odpowiedzi stają się niezmienne po submit.
+
+Publiczne funkcje mają wyłącznie wąski zakres rezerwacji/potwierdzenia pliku i
+atomowego submitu. Bezpośrednie tabele nie mają grantów anonimowych. Członkowie
+czytają dane przez wymuszone RLS; bezpośredni update leada jest zabroniony, a
+status zmienia kontrolowana funkcja z historią i audit logiem. Szczegóły:
+`docs/LEAD_PIPELINE.md`.
+
+### Stan wdrożenia Etapu 8
+
+Migracja `20260725000300_stage8_notifications.sql` opakowuje RPC submitu tak,
+aby w tej samej transakcji dopisać dokładnie dwa rekordy outboxu. Unikalność
+`(lead_id, kind)` chroni retry przed duplikacją. Odbiorcą alertu v1 jest
+najstarszy aktywny Owner; brak odbiorcy tworzy jawny stan `failed`, zamiast
+gubić zdarzenie.
+
+Tabele mają wymuszone RLS. Aktywny członek widzi statusy wyłącznie swojego
+tenanta, ale nie ma bezpośredniego zapisu. Rola workera może wywołać tylko
+funkcje claim/complete/fail; claim stosuje `SKIP LOCKED`, lock token i odzyskuje
+próby zawieszone dłużej niż 15 minut. Każda próba trafia do osobnego rekordu.
+Szczegóły: `docs/NOTIFICATIONS.md`.
+
+### Stan wdrożenia Etapu 12ZH
+
+Migracja `20260803000100_stage12zh_flow_invitations.sql` dodaje osobny outbox
+zaproszeń procesu, ponieważ istniejące powiadomienia są nieusuwalnie przypięte
+do leada. Złożone FK wymuszają zgodność organizacji, flow, immutable wersji i
+aktywnego publicznego aliasu. Unikalność `(organization_id, request_id)` daje
+idempotencję, a constraint stanu pilnuje locka, daty wysłania, providera i
+wyniku próby.
+
+Owner/Admin tworzą zaproszenie wyłącznie przez wąskie RPC; bezpośredni zapis
+tabel nie jest przyznany klientowi. Worker claimuje rekordy przez
+`FOR UPDATE SKIP LOCKED`, odzyskuje zawieszone próby i zapisuje outcome w
+osobnej tabeli. Migracja jest forward-only: rollback aplikacji pozostawia
+nieprzetworzone rekordy bezpiecznie w kolejce, której starszy worker nie zna.
+
+### Stan wdrożenia Etapu 12ZI
+
+Migracja `20260803000200_stage12zi_lead_operations.sql` dodaje osobny agregat
+operacyjny, nie zmieniając immutable briefu klienta w `leads`. Trigger tworzy
+domyślny `lead_operations` dla nowych leadów, a migracja uzupełnia istniejące.
+Najbliższe otwarte zadanie jest źródłem „następnego kroku”, najbliższy otwarty
+kontakt źródłem „zaplanowanego kontaktu”, a ostatnia aktywność jest projekcją
+submitu, statusów, notatek i zdarzeń operacyjnych.
+
+Owner/Admin przypisują właściciela przez `set_lead_assignee`; wszystkie aktywne
+role zmieniają priorytet i pracują na zadaniach przez kontrolowane RPC. Sales
+zamyka tylko własne/przypisane zadania. Klient ma wyłącznie SELECT przez forced
+RLS, a audit zapisuje identyfikatory, enumy i terminy bez tytułu, opisu,
+notatki lub e-maila. Złożone tenantowe FK oraz `ON DELETE CASCADE` włączają
+zadania do legal hold, retencji i usunięcia wraz z leadem; eksport DSAR zawiera
+treść zadań. Migracja jest forward-only, a rollback UI nie usuwa danych.
+
+### Stan wdrożenia Etapu 9
+
+Migracja `20260725000400_stage9_analytics.sql` dodaje consent i eventy
+przypięte złożonymi FK do organizacji, sesji, flow i wersji. Event ID jest
+idempotentny, step key musi istnieć w snapshotcie, a bezpośredni zapis tabel
+jest zabroniony. Owner/Admin czytają surowe rekordy przez RLS; Sales otrzymuje
+wyłącznie agregat.
+
+`get_analytics_overview` liczy różne sesje, konwersję, medianę czasu, drop-off,
+źródła, urządzenia, wersje i kategorie jakości. Próg 5 działa dla całego wyniku
+i każdej grupy. `purge_expired_analytics` usuwa batchami rekordy po 90 dniach i
+ma grant tylko dla service role. Szczegóły:
+`docs/ANALYTICS_IMPLEMENTATION.md`.
+
+## Stan wdrożenia Etapu 3
+
+Migracja `supabase/migrations/20260724000100_stage3_identity_and_tenancy.sql`
+tworzy profile, organizacje, członkostwa i audit log. Utworzenie organizacji
+automatycznie dodaje jej twórcę jako aktywnego Ownera. Trigger blokuje usunięcie,
+zawieszenie lub degradację ostatniego aktywnego Ownera.
+
+Usunięcie organizacji jest logiczne przez `deleted_at`. Bezpośredni `DELETE` nie
+jest przyznany klientowi, dzięki czemu audit log i relacje pozostają zachowane.
+Po oznaczeniu `deleted_at` Admin i Sales tracą odczyt organizacji, a wszyscy
+członkowie tracą dostęp do jej plików. Owner widzi rekord wyłącznie na potrzeby
+kontrolowanego przywrócenia; aktywne listy zawsze filtrują `deleted_at is null`.
+
+RLS jest włączone i wymuszone dla wszystkich tabel publicznych Etapu 3.
+Funkcje pomocnicze `security definer` mają pusty `search_path`, w pełni
+kwalifikowane nazwy i minimalne granty. Zwykły klient `authenticated` nie może
+zapisywać audit logu.
+
+Bucket `tenant-private` jest niepubliczny, ma limit 25 MiB i allowlistę JPEG,
+PNG, WebP oraz PDF. Pierwszy segment ścieżki obiektu musi być UUID organizacji:
+`<organization_id>/<domena>/<losowa-nazwa>`. Nieprawidłowy lub obcy segment
+kończy się odmową RLS. Właściciel obiektu Storage nie zastępuje członkostwa.
+
+Typy tabel oraz jawny `TenantContext` znajdują się w `@wyceno/database`.
+Każda kolejna tabela biznesowa musi mieć `organization_id`, indeks tenantowy i
+test pozytywny oraz negatywny RLS w tej samej migracji.
+
+## Test integracyjny
+
+`pnpm test:rls` tworzy jednorazowy lokalny klaster PostgreSQL, ładuje minimalny
+kontrakt `auth`/`storage`, migrację i syntetyczny seed dwóch tenantów. Jeżeli
+ustawiono `RLS_TEST_DATABASE_URL`, używa wskazanej pustej bazy — tak działa
+serwis PostgreSQL w CI. Test obejmuje obcy odczyt, obcy zapis, pliki, zawieszone
+członkostwo, samodzielną eskalację Admina i ostatniego Ownera.
+
+## Stan wdrożenia Etapu 5
+
+Migracja `20260724000300_stage5_widget_sessions.sql` dodaje sesje, odpowiedzi i
+rejestr idempotentnych mutacji. Publiczne RPC zwracają wyłącznie allowlistowany
+manifest, tworzą sesję, wznawiają ją i zapisują odpowiedź. Tabele nie mają
+anonimowych grantów ani polityk bezpośredniego dostępu; `security definer`
+sprawdza token przez SHA-256. Odpowiedź, oczekiwana rewizja, aktualny krok i cel
+przejścia są walidowane na przypiętym immutable snapshotcie. Test
+`widget_sessions.sql` obejmuje token plaintext, bezpośredni odczyt, expiry,
+retry, konflikt, błędną opcję, próbę przeskoczenia trasy oraz ograniczenia
+odpowiedzi manifestu v2.
+
 ## Indeksy początkowe
 
-`organization_members(user_id, organization_id)`, `flows(organization_id, updated_at)`, `leads(organization_id, created_at desc)`, `leads(organization_id, status, score)`, `session_events(flow_version_id, occurred_at)`, `webhook_deliveries(status, next_attempt_at)`.
+`organization_members(user_id, organization_id)`, `flows(organization_id, updated_at)`, `leads(organization_id, submitted_at desc)`, `leads(organization_id, status, submitted_at desc)`, `notifications(status, available_at, created_at)`, `session_events(flow_version_id, occurred_at)`, `webhook_deliveries(status, next_attempt_at)`.
 
 ## Retencja
 
-Sesje niedokończone, eventy surowe, leady i audyt mają osobne polityki. Domyślne okresy zostaną zatwierdzone z właścicielem danych; job usuwa/anonymizuje partiami i zapisuje raport bez PII.
+Migracja `20260725000600_stage12_data_governance.sql` dodaje owner-only
+`organization_data_policies`, `lead_legal_holds` i
+`data_erasure_events`. Okres leadów jest domyślnie wyłączony i po zatwierdzeniu
+może wynosić 30–3650 dni. Legal hold blokuje ręczne i automatyczne usunięcie.
+Eksport jest allowlistowanym JSON v1.
+
+Przy ręcznym usunięciu RPC przygotowujące ścieżki ustawia na zablokowanym
+rekordzie `erasure_pending_at/by`. Od tej chwili nie można dodać legal hold, a
+retencja pomija rekord. Eliminuje to wyścig pomiędzy usunięciem Storage i
+finalizacją transakcji w bazie; retry Ownera może bezpiecznie dokończyć purge.
+
+Service role może tylko pobrać ograniczony batch kandydatów i wywołać purge.
+Purge ponownie sprawdza termin i blokadę. Worker usuwa pliki przed rekordami;
+awaria Storage pozostawia bazę jako odzyskiwalne źródło prawdy. Niedokończone
+sesje kwalifikują się dzień po `expires_at`. Surowe eventy nadal mają odrębną
+90-dniową politykę.
+
+Usunięcie kasuje lead, odpowiedzi, zgody, pliki, notatki, historię, outbox,
+próby dostawy, eventy i sesję. Pozostaje wyłącznie tenantowy
+`data_erasure_event` z przyczyną i licznikami bez identyfikatora leada. Audit i
+backup mają osobne okresy do zatwierdzenia.
+
+Rollback przed wdrożeniem: wyłączyć route workera i UI DSAR, odwołać scheduler,
+usunąć granty/policies/funkcje od zewnętrznych do prywatnych, trigger, a potem
+tabele `data_erasure_events`, `lead_legal_holds`,
+`organization_data_policies` i enum. Po wdrożeniu migracja jest niezmienna;
+rollback danych odbywa się nową migracją, a usuniętych danych osobowych nie
+odtwarza się bez jawnej podstawy i decyzji administratora.
+
+## WordPress connector
+
+`wordpress_install_tokens` przechowuje organizację, dokładny origin HTTPS,
+SHA-256 tokenu, twórcę, 10-minutowe expiry i `used_at`. Token plaintext istnieje
+wyłącznie w wyniku kontrolowanego RPC Owner/Admin. Maksymalnie pięć aktywnych
+tokenów użytkownika ogranicza nadużycia panelu.
+
+`wordpress_connections` przechowuje origin, SHA-256 credentialu, wersje
+wtyczki/WP/PHP, `connected_at`, `last_seen_at` i `revoked_at`. Aktywne
+połączenie jest unikalne dla pary organizacja/origin. Tabele mają forced RLS;
+Owner/Admin widzi metadane, Sales i inne tenanty nie widzą rekordów, a anon nie
+ma bezpośrednich grantów.
+
+Security-definer RPC mają pusty `search_path` i jawne granty:
+`create_wordpress_install_token` dla authenticated Owner/Admin oraz
+`exchange_wordpress_install_token`, `get_wordpress_flows`,
+`get_wordpress_diagnostics`, `disconnect_wordpress` dla anonowego klienta API.
+Te ostatnie autoryzują wyłącznie przez hashowany, aktywny credential.
+`revoke_wordpress_connection` jest tenantowym RPC Owner/Admin do awaryjnej
+revocation bez dostępu do sekretu. Migracja Etapu 11 ma rollback przed
+wdrożeniem: wyłączyć trasy konektora, unieważnić aktywne credentiale, usunąć
+funkcje/policies, a następnie tabele w kolejności connections → install_tokens.
+Po wdrożeniu plik migracji jest niezmienny.

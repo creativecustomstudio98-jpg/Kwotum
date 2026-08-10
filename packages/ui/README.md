@@ -1,6 +1,6 @@
 # @wyceno/ui
 
-Centralna biblioteka dostępnych komponentów i tokenów Wyceno. Komponenty nie
+Centralna biblioteka dostępnych komponentów i tokenów Kwotum. Komponenty nie
 zawierają logiki domenowej, danych tenantów ani zależności od auth.
 
 ## Użycie
@@ -17,6 +17,13 @@ import "@wyceno/ui/styles.css";
 Kolorów, spacingu, promieni i czasów animacji nie definiujemy lokalnie. Nowy
 token wymaga zmiany `src/tokens.ts`, odpowiadającej zmiennej w `src/styles.css`,
 testu kontrastu, visual review i ADR, jeśli zmienia kierunek wizualny.
+
+Nowy kod używa semantycznych ról `textPrimary`, `textSecondary`, `textMuted`,
+`brand`, `brandSoft`, `success` i `danger`. Aliasów `text`, `accent` i `error`
+nie używamy poza utrzymaniem istniejącego kontraktu. Dostępne utilities
+typograficzne i powierzchniowe to `wy-display`, `wy-heading-*`, `wy-body*`,
+`wy-label`, `wy-description`, `wy-kicker`, `wy-card`, `wy-data-surface` oraz
+`wy-icon`.
 
 ## Kontrakty komponentów
 

@@ -21,3 +21,20 @@ Organization, SoftwareApplication, BreadcrumbList i Article tylko zgodnie z wido
 ## Jakość
 
 Brak programatycznych thin pages. Każda strona branżowa ma specyficzny problem, pytania, działające demo, przykładowy lead, FAQ, wdrożenie i unikalną treść.
+
+## Implementacja Etapu 10
+
+Allowlista 18 publicznych adresów ma unikalne title, description, canonical i
+SSR/SSG. `sitemap.xml` zawiera wyłącznie marketing, a `robots.txt` blokuje API,
+panel, logowanie, design system i hosted flows. Te powierzchnie mają również
+`noindex`; robots nie jest traktowany jako kontrola dostępu.
+
+Organization, SoftwareApplication i BreadcrumbList opisują wyłącznie treści
+widoczne na stronie. Nie wdrożono Review, AggregateRating, Offer ani FAQPage.
+Pięć stron branżowych ma unikalne pytania, demo bez persystencji, syntetyczny
+brief i FAQ. Automatyczny crawl sprawdza statusy, linki, canonical, duplikaty,
+sitemap, robots i strony błędów.
+
+Strony bloga, porównań i bazy wiedzy z pierwotnej architektury treści nie są
+generowane jako puste placeholdery. Powstaną dopiero wraz z prawdziwym,
+źródłowym materiałem i procesem aktualizacji.

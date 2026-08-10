@@ -1,0 +1,99 @@
+rules:
+  - id: kwotum.dynamic-code-execution
+    message: Dynamic code execution is forbidden in application and tooling code.
+    languages: [javascript, typescript]
+    severity: ERROR
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+
+  - id: kwotum.dom-html-injection
+    message: Use DOM text APIs or reviewed framework escaping instead of raw HTML injection.
+    languages: [javascript, typescript]
+    severity: ERROR
+    pattern-either:
+      - pattern: document.write(...)
+      - pattern: $ELEMENT.innerHTML = $VALUE
+      - pattern: $ELEMENT.outerHTML = $VALUE
+      - pattern: $ELEMENT.insertAdjacentHTML(...)
+
+  - id: kwotum.child-process-shell
+    message: Use child_process spawn/execFile with a fixed executable and argument array.
+    languages: [javascript, typescript]
+    severity: ERROR
+    pattern-either:
+      - patterns:
+          - pattern-inside: |
+              import { exec, ... } from "node:child_process";
+              ...
+          - pattern: exec(...)
+      - patterns:
+          - pattern-inside: |
+              import { execSync, ... } from "node:child_process";
+              ...
+          - pattern: execSync(...)
+      - patterns:
+          - pattern-inside: |
+              import * as $CHILD_PROCESS from "node:child_process";
+              ...
+          - pattern-either:
+              - pattern: $CHILD_PROCESS.exec(...)
+              - pattern: $CHILD_PROCESS.execSync(...)
+      - pattern: "$SPAWN(..., { ..., shell: true, ... })"
+
+  - id: kwotum.weak-cryptographic-hash
+    message: MD5 and SHA-1 are forbidden for security-sensitive hashing.
+    languages: [javascript, typescript]
+    severity: ERROR
+    pattern-either:
+      - pattern: $CRYPTO.createHash("md5")
+      - pattern: $CRYPTO.createHash("sha1")
+      - pattern: createHash("md5")
+      - pattern: createHash("sha1")
+
+  - id: kwotum.service-role-outside-adapter
+    message: Read the Supabase service-role key only in the reviewed server adapter.
+    languages: [javascript, typescript]
+    severity: ERROR
+    paths:
+      include:
+        - /apps/web/app/**
+        - /apps/web/lib/**
+        - /security/semgrep/kwotum.ts
+      exclude:
+        - /apps/web/lib/supabase/service.ts
+    pattern: process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  - id: kwotum.api-error-message-leak
+    message: Do not expose raw exception messages in an HTTP JSON response.
+    languages: [javascript, typescript]
+    severity: ERROR
+    paths:
+      include:
+        - /apps/web/app/**
+        - /apps/web/lib/**
+        - /security/semgrep/kwotum.ts
+    pattern-either:
+      - pattern: "NextResponse.json({ ..., error: $ERROR.message, ... }, ...)"
+      - pattern: "NextResponse.json({ ..., message: $ERROR.message, ... }, ...)"
+      - pattern: "Response.json({ ..., error: $ERROR.message, ... }, ...)"
+      - pattern: "Response.json({ ..., message: $ERROR.message, ... }, ...)"
+
+  - id: kwotum.disabled-tls-verification
+    message: TLS certificate verification must never be disabled.
+    languages: [javascript, typescript]
+    severity: ERROR
+    pattern-either:
+      - pattern: process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+      - pattern: "({ ..., rejectUnauthorized: false, ... })"
+
+  - id: kwotum.insecure-randomness-in-server-code
+    message: Use node:crypto for identifiers, tokens and server-side randomness.
+    languages: [javascript, typescript]
+    severity: ERROR
+    paths:
+      include:
+        - /apps/web/app/**
+        - /apps/web/lib/**
+        - /security/semgrep/kwotum.ts
+    pattern: Math.random()

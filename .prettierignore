@@ -4,3 +4,10 @@ coverage
 dist
 node_modules
 pnpm-lock.yaml
+*.zip
+
+# V6 source bundles are preserved byte-for-byte for reproducible visual references.
+CODEX_MASTER_PROMPT.md
+docs/ui/CODEX_MASTER_PROMPT_V6.md
+docs/ui/lorum-landing-reference-v2/
+docs/ui/lorum-product-ui-reference-v1/

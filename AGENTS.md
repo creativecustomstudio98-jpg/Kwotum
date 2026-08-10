@@ -6,11 +6,16 @@ Wyceno to wielodostępny SaaS dla polskich firm usługowych i obsługujących je
 
 ## Źródła prawdy
 
-1. Przeczytaj ten plik i `docs/TASKS.md` przed zmianami.
+1. Przeczytaj ten plik, `docs/INDEX.md` i `docs/TASKS.md` przed zmianami.
 2. Zakres produktu: `docs/PRODUCT_REQUIREMENTS.md`, `docs/SCOPE.md`, `docs/NON_GOALS.md`.
 3. Architektura: `docs/ARCHITECTURE.md`, dane: `docs/DATABASE.md`, bezpieczeństwo: `docs/SECURITY.md`.
 4. Decyzje przekrojowe: `docs/DECISIONS.md`. Zmiana architektury wymaga wpisu ADR przed implementacją.
-5. W razie konfliktu nowsza zaakceptowana decyzja w `docs/DECISIONS.md` ma pierwszeństwo, o ile nie obniża bezpieczeństwa.
+5. UI V6: `CODEX_MASTER_PROMPT.md`, `docs/UI_SCREEN_SPEC.md`,
+   `docs/RESPONSIVE_LAYOUT.md`, `docs/VISUAL_QA.md` i
+   `docs/ui/REFERENCE_MANIFEST.md`.
+6. Nowszy zaakceptowany obraz może zastąpić starszy wyłącznie w pokazanym
+   regionie; nie rozszerza zakresu produktu i nie obniża bezpieczeństwa.
+7. W razie konfliktu nowsza zaakceptowana decyzja w `docs/DECISIONS.md` ma pierwszeństwo, o ile nie obniża bezpieczeństwa.
 
 ## Zasady pracy
 
@@ -22,6 +27,8 @@ Wyceno to wielodostępny SaaS dla polskich firm usługowych i obsługujących je
 - Nie pomijaj testów i nie obniżaj ich rygoru dla zielonego wyniku.
 - Nie dodawaj zależności bez celu, sprawdzenia utrzymania, licencji, bezpieczeństwa i wpływu na bundle.
 - Nie kopiuj template’u dashboardu ani domyślnego wyglądu biblioteki UI.
+- Nie rozpoczynaj implementacji ekranu bez wskazania konkretnego obrazu,
+  viewportu i artefaktów visual QA wymaganych przez `docs/VISUAL_QA.md`.
 - Nie zmieniaj tokenów lokalnie; decyzje wizualne należą do `packages/ui`.
 - Nie zapisuj sekretów, prawdziwych danych osobowych ani plików klientów w repozytorium.
 - Nie obchodź RLS i nie wykonuj zapytań do danych organizacji bez jawnego tenant scope.

@@ -11,6 +11,12 @@ dist/
 next-env.d.ts
 playwright-report/
 test-results/
+apps/web/public/widget/
+artifacts/redesign/
+
+# Local promotional source media and renders are not release artifacts.
+# Keep them outside Git; product visual-QA evidence remains versioned separately.
+artifacts/promo/
 
 # Environment files: only the documented example is versioned
 .env
@@ -22,6 +28,13 @@ test-results/
 .DS_Store
 .idea/
 .vscode/
+
+# Local source archives and ad-hoc backups
+*.zip
+*.tar
+*.tgz
+*.7z
+*.bak
 
 # Hosting and observability
 .vercel/

@@ -4,20 +4,30 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "node scripts/copy-widget.mjs && next build",
     "clean": "rimraf .next",
     "dev": "next dev",
+    "e2e:panel": "node scripts/run-panel-e2e.mjs",
     "lint": "eslint . --max-warnings=0",
     "postbuild": "node scripts/prepare-standalone.mjs",
-    "start": "node .next/standalone/apps/web/server.js",
+    "start": "node --env-file-if-exists=.env.local .next/standalone/apps/web/server.js",
     "test": "vitest run",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@wyceno/analytics": "workspace:*",
+    "@supabase/ssr": "0.12.3",
+    "@supabase/supabase-js": "2.110.8",
+    "@wyceno/config": "workspace:*",
+    "@wyceno/database": "workspace:*",
+    "@wyceno/email": "workspace:*",
     "@wyceno/ui": "workspace:*",
+    "@wyceno/validation": "workspace:*",
+    "@wyceno/widget": "workspace:*",
     "next": "16.2.11",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@types/node": "24.13.3",

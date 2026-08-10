@@ -1,0 +1,434 @@
+.section,
+.section * {
+  box-sizing: border-box;
+}
+
+.section {
+  padding-block: clamp(5rem, 8vw, 8rem);
+  scroll-margin-top: 6rem;
+  border-block: 1px solid var(--wy-color-border);
+  background:
+    radial-gradient(circle at 9% 13%, rgb(188 220 255 / 13%), transparent 25rem),
+    radial-gradient(circle at 91% 78%, rgb(72 150 108 / 7%), transparent 28rem), #f7fafe;
+  color: var(--wy-color-text-primary);
+}
+
+.inner {
+  min-width: 0;
+}
+
+.heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(22rem, 0.75fr);
+  align-items: end;
+  gap: clamp(3rem, 8vw, 8rem);
+}
+
+.eyebrow {
+  width: max-content;
+  margin-bottom: 1rem;
+  color: var(--wy-color-brand);
+}
+
+.heading h2 {
+  max-width: 17ch;
+  margin: 0;
+  color: var(--wy-color-text-primary);
+  font-size: clamp(2.8rem, 4.8vw, 5rem);
+  font-weight: var(--wy-font-weight-semibold);
+  letter-spacing: -0.062em;
+  line-height: 0.99;
+  text-wrap: balance;
+}
+
+.heading h2 span {
+  color: var(--wy-color-brand);
+}
+
+.lede {
+  max-width: 34rem;
+  margin: 0 0 0.35rem;
+  color: var(--wy-color-text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.board {
+  margin-top: clamp(3rem, 5vw, 4.75rem);
+  border: 1px solid rgb(15 75 54 / 15%);
+  border-radius: 1rem;
+  background: var(--wy-color-surface);
+  box-shadow:
+    0 2rem 5rem rgb(25 66 49 / 9%),
+    0 0.35rem 1rem rgb(25 66 49 / 5%);
+  overflow: hidden;
+}
+
+.boardHeader {
+  min-height: 4.8rem;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  background:
+    radial-gradient(circle at 82% 20%, rgb(128 213 166 / 16%), transparent 20rem),
+    linear-gradient(135deg, #0d5039, #093d2f);
+  color: white;
+}
+
+.boardTitle {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: var(--wy-font-weight-bold);
+  letter-spacing: -0.015em;
+}
+
+.boardTitle > span {
+  width: 0.62rem;
+  height: 0.62rem;
+  border: 2px solid rgb(255 255 255 / 40%);
+  border-radius: 50%;
+  background: #8ad5a9;
+  box-shadow: 0 0 0 0.3rem rgb(138 213 169 / 12%);
+}
+
+.boardMeta {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  list-style: none;
+}
+
+.boardMeta li {
+  min-height: 2rem;
+  padding: 0.4rem 0.68rem;
+  border: 1px solid rgb(255 255 255 / 13%);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: rgb(255 255 255 / 7%);
+  color: rgb(255 255 255 / 78%);
+  font-size: 0.75rem;
+  font-weight: var(--wy-font-weight-semibold);
+  white-space: nowrap;
+}
+
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps > li {
+  min-height: 7.7rem;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--wy-color-border);
+  display: grid;
+  grid-template-columns: 4rem minmax(10.5rem, 0.48fr) minmax(18rem, 1fr) minmax(14rem, 0.72fr);
+  align-items: center;
+  gap: clamp(1.25rem, 2.5vw, 2.5rem);
+}
+
+.marker {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+}
+
+.number {
+  color: var(--wy-color-brand);
+  font-size: 0.75rem;
+  font-weight: var(--wy-font-weight-bold);
+  letter-spacing: 0.08em;
+}
+
+.icon {
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid #d9eadf;
+  border-radius: 0.62rem;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #f3faf5, #eaf5ed);
+  color: var(--wy-color-brand);
+}
+
+.icon svg {
+  width: 1.45rem;
+  height: 1.45rem;
+}
+
+.stageTitle > span,
+.result > span {
+  color: var(--wy-color-brand);
+  font-size: 0.75rem;
+  font-weight: var(--wy-font-weight-bold);
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.stageTitle h3 {
+  margin: 0.36rem 0 0;
+  color: var(--wy-color-text-primary);
+  font-size: 1.25rem;
+  font-weight: var(--wy-font-weight-bold);
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.stageTitle p {
+  margin: 0.45rem 0 0;
+  color: var(--wy-color-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.stageTitle p strong {
+  color: var(--wy-color-text-primary);
+  font-weight: var(--wy-font-weight-semibold);
+}
+
+.description {
+  max-width: 38rem;
+  margin: 0;
+  color: var(--wy-color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.result {
+  min-height: 3.55rem;
+  padding-left: 1.15rem;
+  border-left: 2px solid #d6eadc;
+  display: grid;
+  align-content: center;
+  gap: 0.38rem;
+}
+
+.result strong {
+  color: var(--wy-color-text-primary);
+  font-size: 0.82rem;
+  font-weight: var(--wy-font-weight-semibold);
+  line-height: 1.45;
+}
+
+.rules {
+  min-height: 5.7rem;
+  padding: 1.15rem 1.5rem;
+  border-top: 1px solid var(--wy-color-border);
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.34fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 1.5rem;
+  background: #f5f8f6;
+}
+
+.rules > p {
+  margin: 0;
+  color: var(--wy-color-brand);
+  font-size: 0.75rem;
+  font-weight: var(--wy-font-weight-bold);
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.rules dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rules dl > div {
+  min-width: 0;
+  padding: 0 1.25rem;
+  border-left: 1px solid var(--wy-color-border-strong);
+}
+
+.rules dt,
+.rules dd {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.rules dt {
+  color: var(--wy-color-text-secondary);
+}
+
+.rules dd {
+  margin-top: 0.18rem;
+  color: var(--wy-color-text-primary);
+  font-weight: var(--wy-font-weight-semibold);
+}
+
+@media (max-width: 64rem) {
+  .heading {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .lede {
+    max-width: 46rem;
+  }
+
+  .steps > li {
+    grid-template-columns: 4rem minmax(10.5rem, 0.55fr) minmax(0, 1fr);
+  }
+
+  .result {
+    min-height: 0;
+    padding: 0.85rem 0 0;
+    border-top: 1px solid var(--wy-color-border);
+    border-left: 0;
+    grid-column: 2 / -1;
+  }
+}
+
+@media (max-width: 48rem) {
+  .boardHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .boardMeta {
+    flex-wrap: wrap;
+  }
+
+  .rules {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rules dl > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 40rem) {
+  .section {
+    padding-block: 3.5rem;
+    scroll-margin-top: 4.5rem;
+  }
+
+  .heading h2 {
+    max-width: 16ch;
+    font-size: clamp(2.35rem, 11.25vw, 3.1rem);
+    line-height: 1.02;
+  }
+
+  .lede {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .board {
+    margin-top: 2.25rem;
+    border-radius: 0.8rem;
+  }
+
+  .boardHeader {
+    min-height: 0;
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .boardMeta li {
+    white-space: normal;
+  }
+
+  .steps > li {
+    min-height: 0;
+    padding: 1.35rem 1.25rem;
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    align-items: start;
+    gap: 0 1rem;
+  }
+
+  .marker {
+    position: relative;
+    grid-row: 1 / span 3;
+  }
+
+  .steps > li:not(:last-child) .marker::after {
+    width: 1px;
+    height: calc(100% + 1.35rem);
+    position: absolute;
+    z-index: 0;
+    top: 4.75rem;
+    background: #d9e7dd;
+    content: "";
+  }
+
+  .number,
+  .icon {
+    position: relative;
+    z-index: 1;
+  }
+
+  .stageTitle,
+  .description,
+  .result {
+    grid-column: 2;
+  }
+
+  .description {
+    margin-top: 0.9rem;
+    font-size: 0.88rem;
+  }
+
+  .result {
+    margin-top: 1rem;
+    padding-top: 0.9rem;
+  }
+
+  .rules {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .rules dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rules dl > div,
+  .rules dl > div:first-child {
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--wy-color-border);
+    border-left: 0;
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    align-items: start;
+    gap: 0.75rem;
+  }
+
+  .rules dd {
+    margin-top: 0;
+  }
+}
+
+@media (forced-colors: active) {
+  .section,
+  .board,
+  .boardHeader,
+  .icon,
+  .result,
+  .rules,
+  .rules dl > div {
+    border-color: CanvasText;
+  }
+
+  .boardHeader {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .boardTitle > span {
+    background: Highlight;
+  }
+}

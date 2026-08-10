@@ -1,3 +1,4 @@
 # Email
 
-E-maile transakcyjne i adapter dostawcy powstaną w Etapie 8.
+Wersjonowane szablony HTML/text, deterministyczny adapter testowy oraz wymienny
+adapter dostawcy dla powiadomień transakcyjnych Etapu 8.

@@ -1,0 +1,3 @@
+-- Lokalny seed pozostaje celowo pusty.
+-- Użytkowników Auth i organizacje demonstracyjne twórz jawnie w Supabase
+-- Studio zgodnie z docs/DEVELOPMENT.md; nie zapisuj haseł w repozytorium.

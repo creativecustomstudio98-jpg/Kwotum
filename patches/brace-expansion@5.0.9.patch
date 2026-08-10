@@ -1,0 +1,17 @@
+diff --git a/dist/commonjs/index.js b/dist/commonjs/index.js
+index 362aeb585c19da8d84e8baafbd5138dffae107cc..bb3b31b403d5a1966138564fd19cd101675c9b76 100644
+--- a/dist/commonjs/index.js
++++ b/dist/commonjs/index.js
+@@ -276,4 +276,12 @@ function expand_(str, max, maxLength, isTop) {
+     }
+     return acc;
+ }
++// minimatch@3 consumes the historical CommonJS callable export, while
++// minimatch@10 consumes the named `expand` export. Keep both shapes until the
++// ESLint plugin chain supports minimatch@10 end to end.
++module.exports = Object.assign(expand, {
++    EXPANSION_MAX: exports.EXPANSION_MAX,
++    EXPANSION_MAX_LENGTH: exports.EXPANSION_MAX_LENGTH,
++    expand,
++});
+ //# sourceMappingURL=index.js.map

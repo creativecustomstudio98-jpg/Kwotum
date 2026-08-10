@@ -1,0 +1,488 @@
+[
+  {
+    "documentHeight": 2619,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "actions": [
+        {
+          "height": 56,
+          "width": 498
+        },
+        {
+          "height": 56,
+          "width": 498
+        }
+      ],
+      "cards": [
+        {
+          "bottom": 1387.5625,
+          "height": 768,
+          "left": 191.984375,
+          "right": 755.984375,
+          "top": 619.5625,
+          "width": 564
+        },
+        {
+          "bottom": 1387.5625,
+          "height": 768,
+          "left": 779.984375,
+          "right": 1343.984375,
+          "top": 619.5625,
+          "width": 564
+        }
+      ],
+      "finalCta": {
+        "bottom": 2060.5,
+        "height": 325.0625,
+        "left": 58.828125,
+        "right": 1477.15625,
+        "top": 1735.4375,
+        "width": 1418.328125
+      },
+      "pricing": {
+        "bottom": 1615.4375,
+        "height": 1518.4375,
+        "left": 0,
+        "right": 1536,
+        "top": 97,
+        "width": 1536
+      },
+      "smallestText": 12
+    },
+    "viewport": "1536"
+  },
+  {
+    "documentHeight": 2592,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "actions": [
+        {
+          "height": 56,
+          "width": 498
+        },
+        {
+          "height": 56,
+          "width": 498
+        }
+      ],
+      "cards": [
+        {
+          "bottom": 1380.609375,
+          "height": 768,
+          "left": 144,
+          "right": 708,
+          "top": 612.609375,
+          "width": 564
+        },
+        {
+          "bottom": 1380.609375,
+          "height": 768,
+          "left": 732,
+          "right": 1296,
+          "top": 612.609375,
+          "width": 564
+        }
+      ],
+      "finalCta": {
+        "bottom": 2037.796875,
+        "height": 321.8125,
+        "left": 55.15625,
+        "right": 1384.84375,
+        "top": 1715.984375,
+        "width": 1329.6875
+      },
+      "pricing": {
+        "bottom": 1600.796875,
+        "height": 1503.796875,
+        "left": 0,
+        "right": 1440,
+        "top": 97,
+        "width": 1440
+      },
+      "smallestText": 12
+    },
+    "viewport": "1440"
+  },
+  {
+    "documentHeight": 2493,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "actions": [
+        {
+          "height": 56,
+          "width": 498
+        },
+        {
+          "height": 56,
+          "width": 498
+        }
+      ],
+      "cards": [
+        {
+          "bottom": 1343,
+          "height": 768,
+          "left": 64,
+          "right": 628,
+          "top": 575,
+          "width": 564
+        },
+        {
+          "bottom": 1343,
+          "height": 768,
+          "left": 652,
+          "right": 1216,
+          "top": 575,
+          "width": 564
+        }
+      ],
+      "finalCta": {
+        "bottom": 1952.265625,
+        "height": 303.96875,
+        "left": 49.03125,
+        "right": 1230.96875,
+        "top": 1648.296875,
+        "width": 1181.9375
+      },
+      "pricing": {
+        "bottom": 1545.90625,
+        "height": 1448.90625,
+        "left": 0,
+        "right": 1280,
+        "top": 97,
+        "width": 1280
+      },
+      "smallestText": 12
+    },
+    "viewport": "1280"
+  },
+  {
+    "documentHeight": 2910,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "actions": [
+        {
+          "height": 56,
+          "width": 407.3125
+        },
+        {
+          "height": 56,
+          "width": 407.328125
+        }
+      ],
+      "cards": [
+        {
+          "bottom": 1277.703125,
+          "height": 768,
+          "left": 39.21875,
+          "right": 501.75,
+          "top": 509.703125,
+          "width": 462.53125
+        },
+        {
+          "bottom": 1277.703125,
+          "height": 768,
+          "left": 522.21875,
+          "right": 984.765625,
+          "top": 509.703125,
+          "width": 462.546875
+        }
+      ],
+      "finalCta": {
+        "bottom": 1919.515625,
+        "height": 380.09375,
+        "left": 39.21875,
+        "right": 984.765625,
+        "top": 1539.421875,
+        "width": 945.546875
+      },
+      "pricing": {
+        "bottom": 1457.515625,
+        "height": 1360.515625,
+        "left": 0,
+        "right": 1024,
+        "top": 97,
+        "width": 1024
+      },
+      "smallestText": 12
+    },
+    "viewport": "1024"
+  },
+  {
+    "documentHeight": 3512,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "actions": [
+        {
+          "height": 56,
+          "width": 686
+        },
+        {
+          "height": 56,
+          "width": 686
+        }
+      ],
+      "cards": [
+        {
+          "bottom": 1161.265625,
+          "height": 712.703125,
+          "left": 16,
+          "right": 752,
+          "top": 448.5625,
+          "width": 736
+        },
+        {
+          "bottom": 1831.625,
+          "height": 652.765625,
+          "left": 16,
+          "right": 752,
+          "top": 1178.859375,
+          "width": 736
+        }
+      ],
+      "finalCta": {
+        "bottom": 2522.453125,
+        "height": 333.828125,
+        "left": 16,
+        "right": 752,
+        "top": 2188.625,
+        "width": 736
+      },
+      "pricing": {
+        "bottom": 2108.625,
+        "height": 2035.625,
+        "left": 0,
+        "right": 768,
+        "top": 73,
+        "width": 768
+      },
+      "smallestText": 12
+    },
+    "viewport": "768"
+  },
+  {
+    "documentHeight": 3954,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "actions": [
+        {
+          "height": 56,
+          "width": 352.8125
+        },
+        {
+          "height": 56,
+          "width": 352.8125
+        }
+      ],
+      "cards": [
+        {
+          "bottom": 1311.671875,
+          "height": 747.6875,
+          "left": 16,
+          "right": 414,
+          "top": 563.984375,
+          "width": 398
+        },
+        {
+          "bottom": 2030.359375,
+          "height": 701.09375,
+          "left": 16,
+          "right": 414,
+          "top": 1329.265625,
+          "width": 398
+        }
+      ],
+      "finalCta": {
+        "bottom": 2792.75,
+        "height": 437.390625,
+        "left": 16,
+        "right": 414,
+        "top": 2355.359375,
+        "width": 398
+      },
+      "pricing": {
+        "bottom": 2291.359375,
+        "height": 2218.359375,
+        "left": 0,
+        "right": 430,
+        "top": 73,
+        "width": 430
+      },
+      "smallestText": 12
+    },
+    "viewport": "430"
+  },
+  {
+    "documentHeight": 4107,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "actions": [
+        {
+          "height": 56,
+          "width": 312.8125
+        },
+        {
+          "height": 56,
+          "width": 312.8125
+        }
+      ],
+      "cards": [
+        {
+          "bottom": 1354.515625,
+          "height": 805.0625,
+          "left": 16,
+          "right": 374,
+          "top": 549.453125,
+          "width": 358
+        },
+        {
+          "bottom": 2183.1875,
+          "height": 811.078125,
+          "left": 16,
+          "right": 374,
+          "top": 1372.109375,
+          "width": 358
+        }
+      ],
+      "finalCta": {
+        "bottom": 2945.578125,
+        "height": 437.390625,
+        "left": 16,
+        "right": 374,
+        "top": 2508.1875,
+        "width": 358
+      },
+      "pricing": {
+        "bottom": 2444.1875,
+        "height": 2371.1875,
+        "left": 0,
+        "right": 390,
+        "top": 73,
+        "width": 390
+      },
+      "smallestText": 12
+    },
+    "viewport": "390"
+  },
+  {
+    "documentHeight": 4232,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "actions": [
+        {
+          "height": 56,
+          "width": 297.8125
+        },
+        {
+          "height": 56,
+          "width": 297.8125
+        }
+      ],
+      "cards": [
+        {
+          "bottom": 1392.78125,
+          "height": 848.8125,
+          "left": 16,
+          "right": 359,
+          "top": 543.96875,
+          "width": 343
+        },
+        {
+          "bottom": 2221.453125,
+          "height": 811.078125,
+          "left": 16,
+          "right": 359,
+          "top": 1410.375,
+          "width": 343
+        }
+      ],
+      "finalCta": {
+        "bottom": 3044.84375,
+        "height": 498.390625,
+        "left": 16,
+        "right": 359,
+        "top": 2546.453125,
+        "width": 343
+      },
+      "pricing": {
+        "bottom": 2482.453125,
+        "height": 2409.453125,
+        "left": 0,
+        "right": 375,
+        "top": 73,
+        "width": 375
+      },
+      "smallestText": 12
+    },
+    "viewport": "375"
+  },
+  {
+    "documentHeight": 4528,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "regions": {
+      "actions": [
+        {
+          "height": 56,
+          "width": 250.8125
+        },
+        {
+          "height": 56,
+          "width": 250.8125
+        }
+      ],
+      "cards": [
+        {
+          "bottom": 1568.609375,
+          "height": 962.5,
+          "left": 12,
+          "right": 308,
+          "top": 606.109375,
+          "width": 296
+        },
+        {
+          "bottom": 2517.015625,
+          "height": 930.8125,
+          "left": 12,
+          "right": 308,
+          "top": 1586.203125,
+          "width": 296
+        }
+      ],
+      "finalCta": {
+        "bottom": 3340.40625,
+        "height": 498.390625,
+        "left": 12,
+        "right": 308,
+        "top": 2842.015625,
+        "width": 296
+      },
+      "pricing": {
+        "bottom": 2778.015625,
+        "height": 2705.015625,
+        "left": 0,
+        "right": 320,
+        "top": 73,
+        "width": 320
+      },
+      "smallestText": 12
+    },
+    "viewport": "320"
+  }
+]

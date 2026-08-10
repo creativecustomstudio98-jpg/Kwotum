@@ -1,0 +1,216 @@
+{
+  "name": "Lorum Product UI Reference",
+  "version": "1.0.0",
+  "brand": "Lorum",
+  "canonical_docs": [
+    "docs/00_CANONICAL_SOURCE_OF_TRUTH.md",
+    "docs/01_PRODUCT_UI_ARCHITECTURE.md",
+    "docs/02_SCREEN_INVENTORY.md",
+    "docs/03_DESIGN_SYSTEM.md",
+    "docs/04_RESPONSIVE_RULES.md",
+    "docs/05_CONTENT_AND_DATA_RULES.md",
+    "docs/06_DOCUMENT_MIGRATION_AND_CLEANUP.md",
+    "docs/07_VISUAL_QA_AND_ACCEPTANCE.md",
+    "docs/08_IMPLEMENTATION_SEQUENCE.md",
+    "docs/09_REFERENCE_MAP.md",
+    "docs/10_STATES_AND_EDGE_CASES.md",
+    "docs/11_COMPONENT_BLUEPRINTS.md",
+    "docs/12_SCREEN_ACCEPTANCE_MATRIX.md"
+  ],
+  "prompts": [
+    "prompts/00_TEAM_ORCHESTRATOR.md",
+    "prompts/01_REPOSITORY_AUDIT_AND_FREEZE.md",
+    "prompts/02_DOCUMENT_CLEANUP_AND_CANONICALIZATION.md",
+    "prompts/03_DESIGN_FOUNDATION_AND_APP_SHELL.md",
+    "prompts/04_DASHBOARD.md",
+    "prompts/05_LEADS_LIST.md",
+    "prompts/06_LEAD_DETAILS.md",
+    "prompts/07_PROCESS_LIBRARY_AND_BUILDER.md",
+    "prompts/08_LOGIC_PRICING_SCORING_RESULTS.md",
+    "prompts/09_ANALYTICS.md",
+    "prompts/10_TEMPLATES_INSTALLATION_WORDPRESS.md",
+    "prompts/11_INTEGRATIONS_AND_WEBHOOKS.md",
+    "prompts/12_AGENCY_MODULE.md",
+    "prompts/13_SETTINGS_TEAM_BILLING_PRIVACY.md",
+    "prompts/14_ONBOARDING_AND_PUBLIC_WIDGET.md",
+    "prompts/15_MOBILE_AND_RESPONSIVE_QA.md",
+    "prompts/16_FINAL_CONSOLIDATION_AND_CLEANUP.md",
+    "prompts/17_ANTI_SLOP_RECOVERY.md",
+    "prompts/README_EXECUTION_ORDER.md"
+  ],
+  "screenshots": [
+    {
+      "file": "reference/screenshots/analytics-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "61dbe3aeb43e0af9121d54124c1a51ab3263c3d8776cfa33663b7a5294e78c04"
+    },
+    {
+      "file": "reference/screenshots/builder-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "a1129187fba73a3f62588edd1d6e0298de0ad4a21a697d8f5eb9293800b9daa0"
+    },
+    {
+      "file": "reference/screenshots/builder-mobile.png",
+      "width": 390,
+      "height": 844,
+      "kind": "mobile",
+      "sha256": "f843f541ca0ae8fa975ad67d5939b292d4e0772167ef18db0c6b5481a6961093"
+    },
+    {
+      "file": "reference/screenshots/clients-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "fd739b1f1a8ebb6f52bb04b0bd171404602199ad22a77f825de79730b3d2e4ae"
+    },
+    {
+      "file": "reference/screenshots/dashboard-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "4641c28db98a3a208f6ac89d0b8387c3c1e98c103c1a552e9c1dd15bc17b1729"
+    },
+    {
+      "file": "reference/screenshots/dashboard-mobile.png",
+      "width": 390,
+      "height": 844,
+      "kind": "mobile",
+      "sha256": "c1e1c79da4c0137a94074d942afed6270f556087f0649b24af46e53b1c467d03"
+    },
+    {
+      "file": "reference/screenshots/installation-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "8766f17e413253f0a9c1f7f6395c7c0da97e0e84ab3b859b77e856db0e374ca9"
+    },
+    {
+      "file": "reference/screenshots/integrations-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "2ddd086455dc6a05a7195e1603d8f8c79646983ce3d271010f9c27ff16694523"
+    },
+    {
+      "file": "reference/screenshots/lead-detail-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "a740b4dc5e6e53848aa02b02c5308425c6f96ab1a19144e99468c0880afb954d"
+    },
+    {
+      "file": "reference/screenshots/lead-detail-mobile.png",
+      "width": 390,
+      "height": 844,
+      "kind": "mobile",
+      "sha256": "b4cccc526561f53fecd32af6f42094b6020f718e859b512538fa06ceb0fce348"
+    },
+    {
+      "file": "reference/screenshots/leads-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "fe0db38347a9b9ec9a1b7bac2ceae95d87cd557e1434484a44d6abcee3cabf63"
+    },
+    {
+      "file": "reference/screenshots/leads-mobile.png",
+      "width": 390,
+      "height": 844,
+      "kind": "mobile",
+      "sha256": "93bfd2f24b94c4e68780355e325c38eff4e95207b6ec0118214a3f9cea418229"
+    },
+    {
+      "file": "reference/screenshots/onboarding-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "98e9398dbf15452c40cb9877a7589199779d854f5b83a41b6746c88eb26cea80"
+    },
+    {
+      "file": "reference/screenshots/onboarding-mobile.png",
+      "width": 390,
+      "height": 844,
+      "kind": "mobile",
+      "sha256": "3a8095ed1c046af4ff0e99da6c55ebdc98bc03dbccc6f7835c4fd2bd67407e9e"
+    },
+    {
+      "file": "reference/screenshots/rules-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "aa597e997f0bf89e265e51974caef1a42f1803e17690ed47878d4cc1a4dbccc7"
+    },
+    {
+      "file": "reference/screenshots/settings-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "80afc45e11ec5b43d23420ace7aad3a1ea3845f2452941d1995001352fc38657"
+    },
+    {
+      "file": "reference/screenshots/templates-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "3a1792301c5a57a37beaa06b9ff1d1391152cd60d72b7dab2be27143a6da22a7"
+    },
+    {
+      "file": "reference/screenshots/widget-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "5d95fc08dc11f83b944b129543a18bbcf86e0756cb215219f82547ecc5599aa4"
+    },
+    {
+      "file": "reference/screenshots/widget-mobile.png",
+      "width": 390,
+      "height": 844,
+      "kind": "mobile",
+      "sha256": "4d5e283e9c0e079be6b2ea1569c056679ef3e076a4cf785f24bd568aa6c94200"
+    },
+    {
+      "file": "reference/screenshots/widget-result-desktop.png",
+      "width": 1440,
+      "height": 900,
+      "kind": "desktop",
+      "sha256": "9116e13dc81166186d84431dc91578e2605c6d2769ffdee0c8e83276a279d616"
+    }
+  ],
+  "boards": [
+    {
+      "file": "reference/boards/board-01-core-operations.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "3318a34b90599e3c0dadf9458704c04c89d0ae821e75850cdff8a5f159f589c4"
+    },
+    {
+      "file": "reference/boards/board-02-builder-rules.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "7865fc70131cc95a26e3c1a483c8ce73d5b4802b0ddd84b82fa4c233d4e4cd74"
+    },
+    {
+      "file": "reference/boards/board-03-growth-delivery.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "5d484c6d1d0481af90bb564e5efe8411c4715c9d129aa9c6199486b4369449b2"
+    },
+    {
+      "file": "reference/boards/board-04-system-onboarding.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "9f915f13adc9883c6b78ff04f3e2cd6d02c53a8ea2e4f4221eef81b60bb6afa1"
+    },
+    {
+      "file": "reference/boards/board-05-mobile-suite.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "7434fc2d4655534f63849dd1a513e0f418eeda85a4d2bbf6ec414d63cde25997"
+    }
+  ],
+  "source_reference": "reference/accepted-style-board.png"
+}

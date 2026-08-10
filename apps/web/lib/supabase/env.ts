@@ -1,0 +1,16 @@
+export type PublicSupabaseConfig = Readonly<{
+  publishableKey: string;
+  url: string;
+}>;
+
+export function getPublicSupabaseConfig(): PublicSupabaseConfig {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !publishableKey) {
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL and Supabase publishable key.");
+  }
+
+  return { publishableKey, url };
+}

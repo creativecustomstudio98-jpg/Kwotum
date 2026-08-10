@@ -1,3 +1,5 @@
 # Analytics
 
-Wersjonowany kontrakt eventów powstanie w Etapie 9 zgodnie z `docs/ANALYTICS_PLAN.md`.
+Wersjonowany kontrakt first-party eventów Etapu 9. Pakiet waliduje wyłącznie
+zamknięte pola bez PII; zasady consentu, retencji i agregacji opisuje
+`docs/ANALYTICS_IMPLEMENTATION.md`.

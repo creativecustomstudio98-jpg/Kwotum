@@ -470,7 +470,7 @@ const StateContent = ({
       role={error ? "alert" : undefined}
     >
       <span aria-hidden="true" className="wy-state__mark">
-        {error ? "!" : "+"}
+        {error ? "Błąd" : "Brak danych"}
       </span>
       <h3 id={titleId}>{title}</h3>
       <p>{description}</p>
@@ -586,12 +586,9 @@ export interface SidebarProps {
   productName?: string;
 }
 
-export const Sidebar = ({ items, productName = "Wyceno" }: SidebarProps) => (
+export const Sidebar = ({ items, productName = "Kwotum" }: SidebarProps) => (
   <aside className="wy-sidebar">
     <a className="wy-brand" href="#main">
-      <span aria-hidden="true" className="wy-brand__mark">
-        W
-      </span>
       <span>{productName}</span>
     </a>
     <nav aria-label="Główna nawigacja">
@@ -603,7 +600,6 @@ export const Sidebar = ({ items, productName = "Wyceno" }: SidebarProps) => (
               className={cx(item.active && "is-active")}
               href={item.href}
             >
-              <span aria-hidden="true" className="wy-nav-mark" />
               {item.label}
             </a>
           </li>
@@ -628,7 +624,7 @@ export const AppHeader = ({ context, onMenuOpen, title }: AppHeaderProps) => (
       <span className="wy-app-header__context">{context}</span>
       <strong>{title}</strong>
     </div>
-    <Badge tone="success">Tryb demonstracyjny</Badge>
+    <StatusBadge tone="neutral">Tryb demonstracyjny</StatusBadge>
   </header>
 );
 

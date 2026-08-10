@@ -18,20 +18,48 @@ jobs:
     name: Quality gate
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.0-noble@sha256:57b65fdc9ceabe0ef613124c7bbe2babcf9362c4d85e382fe3b03604e84b428a
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: wyceno_rls
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d wyceno_rls"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      APP_URL: http://127.0.0.1:3100
+      DEPLOYMENT_ENV: local
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-public-key
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_WIDGET_ORIGIN: http://127.0.0.1:3100
+      RLS_TEST_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/wyceno_rls
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v6.0.9
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version-file: .node-version
           cache: pnpm
           package-manager-cache: false
+
+      - name: Install runner dependencies
+        run: >-
+          apt-get update && apt-get install --yes --no-install-recommends
+          php-cli postgresql-client ripgrep
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -42,6 +70,12 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Static security checks
+        run: pnpm security:scan
+
+      - name: Dependency vulnerability audit
+        run: pnpm security:dependencies
+
       - name: Type-check
         run: pnpm typecheck
 
@@ -51,22 +85,120 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Install Chromium for browser checks
-        run: pnpm exec playwright install --with-deps chromium
-
       - name: Accessibility, keyboard and visual checks
         run: pnpm e2e
+
+      - name: Upload browser failure artifacts
+        if: ${{ failure() && !cancelled() }}
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          if-no-files-found: ignore
+          name: playwright-failure-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
 
   secrets:
     name: Secret scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
 
     steps:
       - name: Check out full history
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
 
       - name: Scan committed content
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  wordpress:
+    name: WordPress ${{ matrix.wordpress }} / PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - wordpress: 6.8.3
+            php: "8.3"
+          - wordpress: 6.8.3
+            php: "8.4"
+          - wordpress: 6.9.2
+            php: "8.3"
+          - wordpress: 6.9.2
+            php: "8.4"
+          - wordpress: 6.9.2
+            php: "8.5"
+          - wordpress: 7.0.2
+            php: "8.3"
+          - wordpress: 7.0.2
+            php: "8.4"
+          - wordpress: 7.0.2
+            php: "8.5"
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: wordpress
+          MYSQL_PASSWORD: wordpress
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: wordpress
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost -proot"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          coverage: none
+          php-version: ${{ matrix.php }}
+
+      - name: Install connector test dependency
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends ripgrep
+
+      - name: Run isolated connector tests
+        run: bash apps/wordpress-plugin/tests/run.sh
+
+      - name: Install WordPress
+        env:
+          WORDPRESS_VERSION: ${{ matrix.wordpress }}
+        run: |
+          curl --fail --location --silent --show-error \
+            https://github.com/wp-cli/wp-cli/releases/download/v2.12.0/wp-cli-2.12.0.phar \
+            --output /tmp/wp
+          chmod +x /tmp/wp
+          mkdir /tmp/wordpress
+          /tmp/wp core download --path=/tmp/wordpress --version="${WORDPRESS_VERSION}"
+          /tmp/wp config create --path=/tmp/wordpress \
+            --dbname=wordpress --dbuser=wordpress --dbpass=wordpress \
+            --dbhost=127.0.0.1:3306 \
+            --extra-php <<'PHP'
+          define('WYCENO_CONNECTOR_API_ORIGIN', 'https://api.wyceno.test');
+          PHP
+          /tmp/wp core install --path=/tmp/wordpress \
+            --url=https://wordpress.test --title=Wyceno \
+            --admin_user=admin --admin_password=test-only-password \
+            --admin_email=test@example.invalid --skip-email
+
+      - name: Activate and smoke-test on WordPress core
+        run: |
+          cp -R apps/wordpress-plugin /tmp/wordpress/wp-content/plugins/wyceno-connector
+          /tmp/wp plugin activate wyceno-connector --path=/tmp/wordpress
+          /tmp/wp eval \
+            'require WP_PLUGIN_DIR . "/wyceno-connector/tests/integration.php";' \
+            --path=/tmp/wordpress

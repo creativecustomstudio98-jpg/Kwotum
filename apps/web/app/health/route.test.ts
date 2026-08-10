@@ -8,6 +8,7 @@ describe("GET /health", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(response.headers.get("X-Robots-Tag")).toBe("noindex, nofollow");
     await expect(response.json()).resolves.toEqual({
       service: "web",
       status: "ok",

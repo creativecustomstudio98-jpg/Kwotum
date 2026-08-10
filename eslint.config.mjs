@@ -42,6 +42,7 @@ export default defineConfig([
     "**/.turbo/**",
     "**/coverage/**",
     "**/dist/**",
+    "apps/web/public/widget/**",
     "**/node_modules/**",
     "**/next-env.d.ts",
   ]),

@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lorum — referencja landing page</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-3.3 2.3-5 5.5-5s5 1.7 5.5 5"/><path d="M15 6.5a2.6 2.6 0 0 1 0 5"/><path d="M16.5 14c2.5.3 3.8 1.9 4 4.5"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="M8.5 9h7M8.5 13h7M8.5 17h4"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20V11M10 20V5M15 20v-8M20 20V3"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3.1 14H3v-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.5V3h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1v4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 7 3 7 3 8H3c0-1 3-1 3-8Z"/><path d="M10 20h4"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M4 6.5h14a2 2 0 0 1 2 2v10H4a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2h12"/><path d="M16 11h4v4h-4a2 2 0 0 1 0-4Z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/><path d="M7 14h2M11 14h2M15 14h2M7 18h2M11 18h2"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m8.5 12.5 5.7-5.7a4 4 0 1 1 5.6 5.6l-8.5 8.5a6 6 0 0 1-8.5-8.5l8.1-8.1"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M8 3 5 5c-1.8 1.8 1.2 7.1 4.5 10.5S18.2 21.8 20 20l2-3-5-3-2 2c-2.5-1.1-5.9-4.5-7-7l2-2-2-4Z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M9 19h6"/></symbol>
+    <symbol id="i-browser" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="16" rx="2"/><path d="M2.5 8h19M6 6h.1M9 6h.1"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18h1.5a2 2 0 0 0 0-4H12a2 2 0 0 1 0-4h3a6 6 0 0 0 0-12h-3Z"/><circle cx="7.5" cy="9" r="1"/><circle cx="10" cy="6.5" r="1"/><circle cx="14" cy="6.5" r="1"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3 7.8 7.5 9.5 4.5-1.7 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 6-5 6 5 6M16 6l5 6-5 6M14 4l-4 16"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"/></symbol>
+    <symbol id="i-branch" viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="18" cy="7" r="2"/><circle cx="18" cy="17" r="2"/><path d="M8 5h2a4 4 0 0 1 4 4v4a4 4 0 0 0 4 4M14 9a4 4 0 0 1 4-4"/></symbol>
+    <symbol id="i-score" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 12 17 8M7 16h10"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 3h14v14l-4 4H5z"/><path d="M15 21v-4h4M8 8h8M8 12h8"/></symbol>
+    <symbol id="i-analytics" viewBox="0 0 24 24"><path d="M4 20V10M9 20V5M14 20v-7M19 20V3"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.4 2.4 0 0 1 4.6.8c0 1.8-2.4 2.1-2.4 4M12 17h.1"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  </svg>
+
+  <div class="page-shell">
+    <div class="board-group board-group-1" data-board="1">
+      <header class="site-header">
+        <div class="container header-inner">
+          <a class="brand" href="#" aria-label="Lorum">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><path class="mark-a" d="M6 7c0 8 4.5 12 10 12s10-4 10-12"/><path class="mark-b" d="M6 25c0-8 4.5-12 10-12s10 4 10 12"/></svg>
+            </span>
+            <span>Lorum</span>
+          </a>
+          <nav class="desktop-nav" aria-label="Główna nawigacja">
+            <a href="#product">Produkt</a>
+            <a href="#how">Jak działa</a>
+            <a href="#industries">Branże</a>
+            <a href="#agency">Dla agencji</a>
+            <a href="#pricing">Cennik</a>
+            <a href="#faq">FAQ</a>
+          </nav>
+          <div class="header-actions">
+            <a class="login-link" href="#">Zaloguj się</a>
+            <a class="btn btn-primary btn-small" href="#demo">Zobacz demo <svg><use href="#i-arrow"/></svg></a>
+          </div>
+          <button class="mobile-menu" aria-label="Menu"><svg><use href="#i-menu"/></svg></button>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" id="product">
+          <div class="container hero-grid">
+            <div class="hero-copy">
+              <p class="eyebrow">KWALIFIKACJA I WYCENA LEADÓW</p>
+              <h1>Zamiast pytania<br>„ile kosztuje?”<br>dostajesz lead<br><span>gotowy do rozmowy.</span></h1>
+              <p class="hero-lead">Lorum prowadzi klienta przez krótki proces, zbiera zakres, budżet, termin, lokalizację i materiały, a następnie przekazuje firmie uporządkowany brief z orientacyjnym wynikiem.</p>
+              <div class="hero-buttons">
+                <a class="btn btn-primary" href="#demo">Zobacz przykładowy proces</a>
+                <a class="btn btn-secondary" href="#final">Zgłoś firmę do pilotażu</a>
+              </div>
+              <div class="hero-meta">
+                <span><svg><use href="#i-check"/></svg> Bez rejestracji</span>
+                <span><svg><use href="#i-clock"/></svg> Około 3 minuty</span>
+                <span><svg><use href="#i-check"/></svg> Dane demonstracyjne</span>
+              </div>
+              <div class="hero-note">Pierwsze procesy: meble na wymiar, ogrodzenia i usługi cyfrowe.</div>
+            </div>
+
+            <div class="question-flow" aria-label="Przykładowe odpowiedzi klienta">
+              <div class="question-card">
+                <div class="question-card-title">Zapytanie o realizację</div>
+                <div class="answer-box">
+                  <small>Czego potrzebujesz?</small>
+                  <strong>Kuchnia na wymiar</strong>
+                  <span class="answer-check"><svg><use href="#i-check"/></svg></span>
+                </div>
+                <div class="answer-box">
+                  <small>Jaki jest orientacyjny budżet?</small>
+                  <strong>25 000–35 000 zł</strong>
+                  <span class="answer-check"><svg><use href="#i-check"/></svg></span>
+                </div>
+                <div class="answer-box">
+                  <small>Kiedy planujesz realizację?</small>
+                  <strong>W ciągu 3 miesięcy</strong>
+                  <span class="answer-check"><svg><use href="#i-check"/></svg></span>
+                </div>
+              </div>
+              <div class="flow-lines" aria-hidden="true">
+                <span class="line l1"></span><span class="line l2"></span><span class="line l3"></span>
+                <span class="flow-node"><span class="mini-mark"><svg viewBox="0 0 20 20"><path d="M4 4c0 5 2.7 7 6 7s6-2 6-7M4 16c0-5 2.7-7 6-7s6 2 6 7"/></svg></span></span>
+                <span class="flow-arrow"><svg><use href="#i-arrow"/></svg></span>
+              </div>
+            </div>
+
+            <article class="lead-panel lead-panel-large">
+              <aside class="lead-sidebar" aria-hidden="true">
+                <span class="sidebar-mark"><svg viewBox="0 0 24 24"><path d="M4 4c0 6 3.6 9 8 9s8-3 8-9M4 20c0-6 3.6-9 8-9s8 3 8 9"/></svg></span>
+                <svg><use href="#i-home"/></svg>
+                <svg><use href="#i-users"/></svg>
+                <svg><use href="#i-clipboard"/></svg>
+                <svg><use href="#i-chart"/></svg>
+                <svg><use href="#i-settings"/></svg>
+                <span class="sidebar-spacer"></span>
+                <svg><use href="#i-bell"/></svg>
+                <span class="avatar avatar-small">AK</span>
+              </aside>
+              <div class="lead-content">
+                <header class="lead-header">
+                  <div class="person">
+                    <span class="avatar">AK</span>
+                    <div><strong>Anna Kowalska</strong><small>Kuchnia na wymiar</small></div>
+                  </div>
+                  <div class="lead-id">ID: L-2026-0517<br><span>17.05.2026, 09:41</span></div>
+                </header>
+                <div class="lead-score-row">
+                  <div class="score-block"><strong>85<span>/100</span></strong><em>Dobre dopasowanie</em></div>
+                  <div class="score-reasons">
+                    <span><i><svg><use href="#i-check"/></svg></i> Budżet w oczekiwanym przedziale</span>
+                    <span><i><svg><use href="#i-check"/></svg></i> Realny termin realizacji</span>
+                    <span><i><svg><use href="#i-check"/></svg></i> Komplet kluczowych informacji</span>
+                  </div>
+                </div>
+                <div class="lead-rows">
+                  <div class="lead-row"><span><svg><use href="#i-home"/></svg>Zakres</span><strong>Kuchnia w kształcie L,<br>około 8 mb zabudowy</strong></div>
+                  <div class="lead-row"><span><svg><use href="#i-wallet"/></svg>Budżet</span><strong>25 000–35 000 zł</strong></div>
+                  <div class="lead-row"><span><svg><use href="#i-calendar"/></svg>Termin</span><strong>Do 3 miesięcy</strong></div>
+                  <div class="lead-row"><span><svg><use href="#i-pin"/></svg>Lokalizacja</span><strong>Ciechanów</strong></div>
+                  <div class="lead-row lead-row-files"><span><svg><use href="#i-paperclip"/></svg>Materiały</span><div class="thumbs"><span class="kitchen-thumb t1"></span><span class="kitchen-thumb t2"></span><span class="thumb-more">+1</span></div></div>
+                  <div class="lead-row"><span><svg><use href="#i-arrow"/></svg>Następny krok</span><strong>Kontakt telefoniczny do 24h</strong></div>
+                </div>
+                <footer class="lead-actions"><button class="btn btn-primary btn-compact">Rozpocznij obsługę</button><button class="btn btn-secondary btn-compact">Dodaj notatkę</button><button class="icon-button">•••</button></footer>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="benefit-strip">
+          <div class="container benefit-grid">
+            <div class="benefit"><svg><use href="#i-clipboard"/></svg><div><strong>Zakres projektu</strong><span>Kompletny opis potrzeb</span></div></div>
+            <div class="benefit"><svg><use href="#i-wallet"/></svg><div><strong>Budżet</strong><span>Przedział lub orientacja</span></div></div>
+            <div class="benefit"><svg><use href="#i-calendar"/></svg><div><strong>Termin</strong><span>Planowany czas realizacji</span></div></div>
+            <div class="benefit"><svg><use href="#i-pin"/></svg><div><strong>Lokalizacja</strong><span>Miejsce inwestycji</span></div></div>
+            <div class="benefit"><svg><use href="#i-paperclip"/></svg><div><strong>Pliki</strong><span>Zdjęcia i dokumenty</span></div></div>
+            <div class="benefit"><svg><use href="#i-arrow"/></svg><div><strong>Następny krok</strong><span>Jasno określone działanie</span></div></div>
+          </div>
+        </section>
+
+        <section class="problem-section" id="how">
+          <div class="container problem-grid">
+            <div class="problem-copy">
+              <p class="eyebrow">PROBLEM, KTÓRY ZNASZ</p>
+              <h2>Formularz zbiera kontakt. Handlowiec nadal musi zebrać resztę.</h2>
+              <p>Większość zapytań nie zawiera informacji potrzebnych do oceny projektu. Firma odpowiada, dopytuje i czeka, a klient powtarza te same dane w kilku wiadomościach.</p>
+            </div>
+
+            <div class="compare-card">
+              <div class="compare-col compare-before">
+                <div class="compare-title">Typowe zapytanie</div>
+                <div class="message-box"><p>Dzień dobry,<br>ile kosztuje kuchnia na wymiar?<br>Proszę o kontakt.</p><small>09:31</small></div>
+                <div class="missing-title">Brakuje:</div>
+                <div class="missing-grid">
+                  <span><i><svg><use href="#i-x"/></svg></i> zakresu</span>
+                  <span><i><svg><use href="#i-x"/></svg></i> lokalizacji</span>
+                  <span><i><svg><use href="#i-x"/></svg></i> budżetu</span>
+                  <span><i><svg><use href="#i-x"/></svg></i> materiałów</span>
+                  <span><i><svg><use href="#i-x"/></svg></i> terminu</span>
+                  <span><i><svg><use href="#i-x"/></svg></i> wymiarów</span>
+                </div>
+              </div>
+              <div class="compare-arrow"><svg><use href="#i-arrow"/></svg></div>
+              <div class="compare-col compare-after">
+                <div class="compare-title success">Lead po przejściu Lorum</div>
+                <ul class="check-list">
+                  <li><i><svg><use href="#i-check"/></svg></i>Kuchnia w kształcie L</li>
+                  <li><i><svg><use href="#i-check"/></svg></i>Około 8 mb zabudowy</li>
+                  <li><i><svg><use href="#i-check"/></svg></i>Budżet 25–35 tys. zł</li>
+                  <li><i><svg><use href="#i-check"/></svg></i>Termin do 3 miesięcy</li>
+                  <li><i><svg><use href="#i-check"/></svg></i>Ciechanów</li>
+                  <li><i><svg><use href="#i-check"/></svg></i>3 zdjęcia</li>
+                  <li><i><svg><use href="#i-check"/></svg></i>Kontakt telefoniczny</li>
+                </ul>
+                <div class="after-note">Handlowiec może ocenić zapytanie przed pierwszą rozmową.</div>
+              </div>
+            </div>
+
+            <div class="how-panel">
+              <div class="how-copy">
+                <p class="eyebrow">CZTERY KROKI</p>
+                <h2>Jak działa Lorum?</h2>
+                <div class="steps">
+                  <div class="step"><span>01</span><div><strong>Dopasowujesz proces</strong><p>Wybierasz pytania, warianty odpowiedzi i informacje potrzebne do oceny projektu.</p></div></div>
+                  <div class="step"><span>02</span><div><strong>Klient opisuje potrzebę</strong><p>Przechodzi krótki proces na telefonie lub komputerze, bez branżowego języka.</p></div></div>
+                  <div class="step"><span>03</span><div><strong>Lorum porządkuje dane</strong><p>Wylicza orientacyjny wynik, sprawdza dopasowanie i tworzy brief.</p></div></div>
+                  <div class="step"><span>04</span><div><strong>Firma przejmuje lead</strong><p>Handlowiec widzi komplet informacji, priorytet i zaplanowany następny krok.</p></div></div>
+                </div>
+              </div>
+              <article class="mini-lead-card">
+                <header><span class="avatar avatar-small">AK</span><div><strong>Anna Kowalska</strong><small>Kuchnia na wymiar</small></div></header>
+                <div class="mini-score">85<span>/100</span><em>Dobre dopasowanie</em></div>
+                <div class="mini-list">
+                  <span><svg><use href="#i-home"/></svg><b>Zakres</b><small>Kuchnia L, około 8 mb</small></span>
+                  <span><svg><use href="#i-wallet"/></svg><b>Budżet</b><small>25 000–35 000 zł</small></span>
+                  <span><svg><use href="#i-calendar"/></svg><b>Termin</b><small>Do 3 miesięcy</small></span>
+                  <span><svg><use href="#i-pin"/></svg><b>Lokalizacja</b><small>Ciechanów</small></span>
+                  <span><svg><use href="#i-paperclip"/></svg><b>Materiały</b><small>3 zdjęcia</small></span>
+                </div>
+                <button class="btn btn-primary btn-compact">Rozpocznij obsługę</button>
+              </article>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="board-group board-group-2" data-board="2">
+      <section class="demo-section" id="demo">
+        <div class="container">
+          <div class="section-heading centered">
+            <p class="eyebrow">INTERAKTYWNE DEMO</p>
+            <h2>Przejdź przykładowy proces tak, jak zrobi to Twój klient.</h2>
+            <p>Wybierz branżę, odpowiedz na kilka pytań i zobacz, jak z każdą odpowiedzią powstaje uporządkowany lead.</p>
+          </div>
+
+          <div class="demo-shell">
+            <div class="demo-toolbar">
+              <div class="demo-title"><span class="demo-dot"></span><strong>Kuchnia na wymiar</strong><small>Proces demonstracyjny</small></div>
+              <div class="industry-tabs" role="tablist">
+                <button class="active">Meble</button><button>Ogrodzenia</button><button>Strony</button><button>Klimatyzacja</button><button>Remonty</button>
+              </div>
+              <div class="demo-status"><span>Podgląd klienta</span><i></i><b>Aktywny</b></div>
+            </div>
+            <div class="demo-body">
+              <aside class="demo-steps">
+                <div class="progress-caption"><span>Postęp procesu</span><strong>3 z 6</strong></div>
+                <div class="progress-bar"><i style="width:50%"></i></div>
+                <ol>
+                  <li class="done"><span>1</span><div><strong>Typ projektu</strong><small>Kuchnia na wymiar</small></div><i><svg><use href="#i-check"/></svg></i></li>
+                  <li class="done"><span>2</span><div><strong>Układ kuchni</strong><small>Układ L</small></div><i><svg><use href="#i-check"/></svg></i></li>
+                  <li class="active"><span>3</span><div><strong>Wymiary</strong><small>Aktualny krok</small></div></li>
+                  <li><span>4</span><div><strong>Budżet</strong><small>Nieuzupełnione</small></div></li>
+                  <li><span>5</span><div><strong>Termin</strong><small>Nieuzupełnione</small></div></li>
+                  <li><span>6</span><div><strong>Zdjęcia i kontakt</strong><small>Nieuzupełnione</small></div></li>
+                </ol>
+                <div class="demo-help"><svg><use href="#i-help"/></svg><span>Odpowiedzi można zmienić przed wysłaniem.</span></div>
+              </aside>
+
+              <div class="demo-question">
+                <div class="question-top"><span>Krok 3 z 6</span><small>Wymiary pomagają zawęzić orientacyjny przedział</small></div>
+                <h3>Podaj przybliżone wymiary zabudowy.</h3>
+                <p>Nie muszą być dokładne. Możesz wpisać wartości orientacyjne albo wybrać „Nie wiem”.</p>
+                <div class="measurement-grid">
+                  <label><span>Dłuższy odcinek</span><div><input value="400" readonly><b>cm</b></div></label>
+                  <label><span>Krótszy odcinek</span><div><input value="280" readonly><b>cm</b></div></label>
+                  <label><span>Wysokość pomieszczenia</span><div><input value="260" readonly><b>cm</b></div></label>
+                </div>
+                <label class="checkbox-line"><input type="checkbox"><span>Nie znam jeszcze dokładnych wymiarów</span></label>
+                <div class="context-note"><svg><use href="#i-check"/></svg><span>Na podstawie układu L i podanych wymiarów system szacuje około 8 mb zabudowy.</span></div>
+                <div class="question-actions"><button class="btn btn-secondary btn-compact">Wstecz</button><button class="btn btn-primary">Dalej: budżet <svg><use href="#i-arrow"/></svg></button></div>
+              </div>
+
+              <aside class="live-summary">
+                <div class="summary-header"><span>Lead tworzony na żywo</span><em>3 odpowiedzi</em></div>
+                <div class="summary-person"><span class="avatar avatar-small muted-avatar">?</span><div><strong>Nowe zapytanie</strong><small>Dane kontaktowe na końcu</small></div></div>
+                <div class="summary-score"><strong>48<span>/100</span></strong><em>Wstępne dopasowanie</em></div>
+                <div class="summary-rows">
+                  <div><span><svg><use href="#i-home"/></svg>Zakres</span><b>Kuchnia na wymiar</b></div>
+                  <div><span><svg><use href="#i-branch"/></svg>Układ</span><b>L</b></div>
+                  <div><span><svg><use href="#i-clipboard"/></svg>Wymiary</span><b>ok. 8 mb zabudowy</b></div>
+                  <div class="pending"><span><svg><use href="#i-wallet"/></svg>Budżet</span><b>Jeszcze nie podano</b></div>
+                  <div class="pending"><span><svg><use href="#i-calendar"/></svg>Termin</span><b>Jeszcze nie podano</b></div>
+                </div>
+                <div class="summary-estimate"><span>Orientacyjny wynik</span><strong>pojawi się po podaniu budżetu i terminu</strong></div>
+              </aside>
+            </div>
+          </div>
+          <div class="demo-footnote"><span><svg><use href="#i-clock"/></svg> Pełny proces trwa około 3 minut.</span><span><svg><use href="#i-shield"/></svg> To dane demonstracyjne — nic nie zostanie wysłane.</span></div>
+        </div>
+      </section>
+
+      <section class="industries-section" id="industries">
+        <div class="container">
+          <div class="section-heading split-heading">
+            <div><p class="eyebrow">SZABLONY BRANŻOWE</p><h2>Gotowe procesy dla firm usługowych.</h2></div>
+            <p>Każda branża zbiera inne informacje. Lorum nie zaczyna od pustego formularza — dostajesz logiczny proces, który można dopasować do własnej oferty.</p>
+          </div>
+          <div class="industry-shell">
+            <nav class="industry-nav" aria-label="Branże">
+              <button class="active"><span>01</span><div><strong>Meble na wymiar</strong><small>Kuchnie, szafy, garderoby</small></div><svg><use href="#i-arrow"/></svg></button>
+              <button><span>02</span><div><strong>Ogrodzenia i bramy</strong><small>Typ, długość, automatyka</small></div><svg><use href="#i-arrow"/></svg></button>
+              <button><span>03</span><div><strong>Strony i aplikacje</strong><small>Zakres, funkcje, budżet</small></div><svg><use href="#i-arrow"/></svg></button>
+              <button><span>04</span><div><strong>Klimatyzacja</strong><small>Pomieszczenia, metraż, montaż</small></div><svg><use href="#i-arrow"/></svg></button>
+              <button><span>05</span><div><strong>Remonty</strong><small>Zakres, stan, materiały</small></div><svg><use href="#i-arrow"/></svg></button>
+            </nav>
+            <div class="industry-detail">
+              <div class="industry-main">
+                <div class="industry-badge">AKTYWNY SZABLON</div>
+                <h3>Meble na wymiar</h3>
+                <p>Proces prowadzi klienta od rodzaju zabudowy do danych potrzebnych do przygotowania pierwszej, rzeczowej rozmowy.</p>
+                <div class="question-path">
+                  <span><b>1</b>Rodzaj zabudowy</span><i><svg><use href="#i-arrow"/></svg></i>
+                  <span><b>2</b>Układ i wymiary</span><i><svg><use href="#i-arrow"/></svg></i>
+                  <span><b>3</b>Materiały</span><i><svg><use href="#i-arrow"/></svg></i>
+                  <span><b>4</b>Budżet i termin</span><i><svg><use href="#i-arrow"/></svg></i>
+                  <span><b>5</b>Zdjęcia i kontakt</span>
+                </div>
+                <div class="industry-columns">
+                  <div><strong>Proces zawiera</strong><ul><li>12 logicznie ułożonych kroków</li><li>warunki zależne od rodzaju zabudowy</li><li>orientacyjny przedział ceny</li><li>scoring jakości leada</li></ul></div>
+                  <div><strong>Firma otrzymuje</strong><ul><li>zakres i przybliżone wymiary</li><li>budżet, termin i lokalizację</li><li>zdjęcia pomieszczenia</li><li>jasno określony następny krok</li></ul></div>
+                </div>
+                <a class="btn btn-primary" href="#">Zobacz proces dla mebli <svg><use href="#i-arrow"/></svg></a>
+              </div>
+              <div class="industry-preview">
+                <div class="room-visual" aria-hidden="true">
+                  <div class="wall-line"></div><div class="cab c1"></div><div class="cab c2"></div><div class="cab c3"></div><div class="counter"></div><div class="island"></div><div class="floor-line"></div>
+                </div>
+                <div class="industry-lead-card">
+                  <div class="summary-header"><span>Przykładowy lead</span><em>Dane demo</em></div>
+                  <div class="industry-score"><strong>87<span>/100</span></strong><em>Dobre dopasowanie</em></div>
+                  <div class="mini-list compact">
+                    <span><svg><use href="#i-home"/></svg><b>Projekt</b><small>Kuchnia w układzie L</small></span>
+                    <span><svg><use href="#i-clipboard"/></svg><b>Wymiary</b><small>ok. 8–10 mb</small></span>
+                    <span><svg><use href="#i-wallet"/></svg><b>Budżet</b><small>35–50 tys. zł</small></span>
+                    <span><svg><use href="#i-calendar"/></svg><b>Termin</b><small>3–6 miesięcy</small></span>
+                    <span><svg><use href="#i-pin"/></svg><b>Lokalizacja</b><small>Płońsk</small></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="board-group board-group-3" data-board="3">
+      <section class="outcomes-section" id="features">
+        <div class="container">
+          <div class="section-heading centered narrow">
+            <p class="eyebrow">FUNKCJE JAKO REZULTAT</p>
+            <h2>Od pierwszej odpowiedzi do gotowej obsługi.</h2>
+            <p>Nie pokazujemy katalogu funkcji. Pokazujemy jeden ciąg pracy, w którym każdy element ma konkretne zadanie.</p>
+          </div>
+          <div class="outcome-track">
+            <div class="track-line"><i></i></div>
+            <article class="outcome-stage stage-1">
+              <span class="stage-number">01</span><h3>Kwalifikacja</h3><p>Klient widzi tylko pytania istotne dla jego realizacji.</p>
+              <div class="stage-ui answer-mini"><span>Jaki typ projektu?</span><button class="active">Kuchnia</button><button>Szafa</button><button>Garderoba</button></div>
+            </article>
+            <article class="outcome-stage stage-2">
+              <span class="stage-number">02</span><h3>Wycena</h3><p>Reguły tworzą bezpieczny przedział zamiast przypadkowej liczby.</p>
+              <div class="stage-ui price-mini"><small>Orientacyjny przedział</small><strong>25–35 tys. zł</strong><span>wersja kalkulacji 1.4</span></div>
+            </article>
+            <article class="outcome-stage stage-3">
+              <span class="stage-number">03</span><h3>Podsumowanie</h3><p>Odpowiedzi trafiają do jednego, czytelnego briefu.</p>
+              <div class="stage-ui brief-mini"><span><svg><use href="#i-check"/></svg>Zakres</span><span><svg><use href="#i-check"/></svg>Budżet</span><span><svg><use href="#i-check"/></svg>Termin</span><span><svg><use href="#i-check"/></svg>Pliki</span></div>
+            </article>
+            <article class="outcome-stage stage-4">
+              <span class="stage-number">04</span><h3>Obsługa</h3><p>Status, opiekun, notatka i następny krok są w tym samym miejscu.</p>
+              <div class="stage-ui action-mini"><span>Nowy lead</span><button>Rozpocznij obsługę</button><small>Kontakt do 24h</small></div>
+            </article>
+            <article class="outcome-stage stage-5">
+              <span class="stage-number">05</span><h3>Analiza</h3><p>Widzisz, gdzie klienci kończą proces i które źródła dają lepsze leady.</p>
+              <div class="stage-ui chart-mini"><div class="bars"><i style="height:38%"></i><i style="height:55%"></i><i style="height:48%"></i><i style="height:78%"></i><i style="height:64%"></i><i style="height:88%"></i></div><span>Konwersja 12,4%</span></div>
+            </article>
+          </div>
+          <div class="feature-summary">
+            <span><svg><use href="#i-branch"/></svg><b>Logika warunkowa</b><small>Pytania zależne od odpowiedzi</small></span>
+            <span><svg><use href="#i-score"/></svg><b>Scoring</b><small>Wyjaśniony wynik jakości</small></span>
+            <span><svg><use href="#i-file"/></svg><b>Pliki</b><small>Zdjęcia i dokumentacja</small></span>
+            <span><svg><use href="#i-note"/></svg><b>Obsługa</b><small>Statusy, notatki i historia</small></span>
+            <span><svg><use href="#i-analytics"/></svg><b>Analityka</b><small>Konwersja i porzucenia</small></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="wordpress-section" id="wordpress">
+        <div class="container split-section">
+          <div class="split-copy">
+            <p class="eyebrow">WORDPRESS I DOWOLNA STRONA</p>
+            <h2>Osadzasz proces tam, gdzie klient już szuka oferty.</h2>
+            <p>Inline w treści, w popupie, jako pełnoekranowy proces albo pod własnym linkiem. Widget jest izolowany od CSS strony i ładowany dopiero wtedy, gdy jest potrzebny.</p>
+            <div class="install-steps">
+              <div><span>01</span><p><strong>Połącz stronę</strong><small>Wtyczka WordPress lub jeden skrypt.</small></p></div>
+              <div><span>02</span><p><strong>Wybierz proces</strong><small>Ustaw tryb i miejsce wyświetlenia.</small></p></div>
+              <div><span>03</span><p><strong>Sprawdź i opublikuj</strong><small>Testujesz flow bez wysyłania prawdziwego leada.</small></p></div>
+            </div>
+            <a class="btn btn-secondary" href="#">Zobacz sposób instalacji <svg><use href="#i-arrow"/></svg></a>
+          </div>
+
+          <div class="wp-browser">
+            <div class="browser-top"><span></span><span></span><span></span><div>twojafirma.pl/kuchnie-na-wymiar</div></div>
+            <div class="wp-layout">
+              <aside class="wp-sidebar"><div class="wp-logo">W</div><span class="active">Strony</span><span>Bloki</span><span>Wygląd</span><span>Wtyczki</span><span>Ustawienia</span></aside>
+              <div class="wp-editor">
+                <div class="wp-editor-toolbar"><strong>Edytuj stronę: Kuchnie na wymiar</strong><button>Podgląd</button><button class="publish">Opublikuj</button></div>
+                <div class="wp-canvas">
+                  <div class="site-mini-header"><span class="site-mini-brand">Meble Studio</span><span>Oferta&nbsp;&nbsp; Realizacje&nbsp;&nbsp; Kontakt</span></div>
+                  <div class="site-mini-hero"><div><small>KUCHNIE NA WYMIAR</small><strong>Projekt dopasowany do Twojej przestrzeni.</strong><span>Umów bezpłatną konsultację</span></div><div class="mini-room"><i></i><i></i><i></i></div></div>
+                  <div class="embedded-widget">
+                    <div class="widget-label"><span>Lorum</span><em>Widget inline</em></div>
+                    <div class="widget-question"><small>Krok 1 z 6</small><strong>Czego potrzebujesz?</strong><div><button class="active">Kuchnia na wymiar</button><button>Szafa lub garderoba</button><button>Meble do salonu</button></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="install-panel">
+              <div class="install-tabs"><button class="active">Blok</button><button>Shortcode</button><button>Popup</button></div>
+              <div class="install-option"><svg><use href="#i-browser"/></svg><div><strong>Blok Lorum</strong><span>Wybierz proces i tryb bezpośrednio w edytorze.</span></div><i><svg><use href="#i-check"/></svg></i></div>
+              <div class="code-line"><code>[lorum id="kuchnia-2026" mode="inline"]</code><button><svg><use href="#i-copy"/></svg></button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="agency-section" id="agency">
+        <div class="container agency-grid">
+          <div class="agency-copy">
+            <p class="eyebrow light">DLA AGENCJI I PARTNERÓW</p>
+            <h2>Wdrażasz klientom proces, który można powielać — bez budowania wszystkiego od zera.</h2>
+            <p>Jedno konto dla wielu firm, klonowanie sprawdzonych flow, własny branding i kontrola nad wdrożeniami.</p>
+            <ul>
+              <li><svg><use href="#i-check"/></svg>wielu klientów i stron w jednym panelu</li>
+              <li><svg><use href="#i-check"/></svg>klonowanie procesów między organizacjami</li>
+              <li><svg><use href="#i-check"/></svg>white-label i własna marża wdrożeniowa</li>
+              <li><svg><use href="#i-check"/></svg>webhooki, eksport i integracja z CRM</li>
+            </ul>
+            <a class="btn btn-light" href="#">Zobacz model partnerski <svg><use href="#i-arrow"/></svg></a>
+          </div>
+          <div class="agency-ui">
+            <div class="agency-toolbar"><div><strong>Klienci agencji</strong><small>12 aktywnych organizacji</small></div><button class="btn btn-primary btn-compact">+ Dodaj klienta</button></div>
+            <div class="agency-body">
+              <div class="client-list">
+                <div class="client active"><span class="client-logo">MW</span><div><strong>Meble Współczesne</strong><small>2 procesy • opublikowane</small></div><em>92%</em></div>
+                <div class="client"><span class="client-logo">NG</span><div><strong>Naget Ogrodzenia</strong><small>3 procesy • 1 draft</small></div><em>81%</em></div>
+                <div class="client"><span class="client-logo">CS</span><div><strong>Custom Studio</strong><small>1 proces • opublikowany</small></div><em>76%</em></div>
+                <div class="client"><span class="client-logo">FK</span><div><strong>Fortez</strong><small>1 proces • wymaga testu</small></div><em>—</em></div>
+              </div>
+              <div class="clone-panel">
+                <div class="clone-head"><span>Nowe wdrożenie</span><em>krok 2 z 3</em></div>
+                <h3>Skopiuj sprawdzony proces</h3>
+                <label><span>Proces źródłowy</span><div class="select-like">Meble na wymiar — wersja 4 <svg><use href="#i-arrow"/></svg></div></label>
+                <label><span>Klient docelowy</span><div class="select-like">Nowa organizacja <svg><use href="#i-arrow"/></svg></div></label>
+                <div class="clone-options">
+                  <span><i><svg><use href="#i-check"/></svg></i>Pytania i logika</span>
+                  <span><i><svg><use href="#i-check"/></svg></i>Scoring i wycena</span>
+                  <span><i><svg><use href="#i-check"/></svg></i>E-maile i wynik</span>
+                  <span><i><svg><use href="#i-check"/></svg></i>Branding ustawimy osobno</span>
+                </div>
+                <button class="btn btn-primary">Utwórz niezależny draft</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="proof-section" id="proof">
+        <div class="container proof-grid">
+          <div class="proof-title"><p class="eyebrow">DOWODY ZAMIAST DEKLARACJI</p><h2>Na początku pokazujemy działający produkt, nie wymyślone wyniki.</h2></div>
+          <div class="proof-items">
+            <article><svg><use href="#i-browser"/></svg><div><strong>Realne demo</strong><p>Możesz przejść pełny proces i zobaczyć wynik z oznaczeniem danych demonstracyjnych.</p></div></article>
+            <article><svg><use href="#i-branch"/></svg><div><strong>Jawna metodyka</strong><p>Wiadomo, jakie pytania, reguły i kryteria tworzą wynik oraz scoring.</p></div></article>
+            <article><svg><use href="#i-shield"/></svg><div><strong>Bezpieczeństwo procesu</strong><p>Separacja organizacji, kontrola dostępu, ochrona uploadów i historia zmian.</p></div></article>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="board-group board-group-4" data-board="4">
+      <section class="pricing-section" id="pricing">
+        <div class="container">
+          <div class="section-heading split-heading pricing-heading">
+            <div><p class="eyebrow">CENNIK</p><h2>Plan dopasowany do liczby procesów i sposobu wdrożenia.</h2></div>
+            <p>Model cenowy zostanie zatwierdzony po pilotażu. Zakres planów jest pokazany już teraz, bez udawania ostatecznych kwot.</p>
+          </div>
+          <div class="pricing-table">
+            <div class="pricing-row pricing-head-row">
+              <div class="feature-col"><strong>Zakres</strong><span>Najważniejsze różnice</span></div>
+              <div><span class="plan-label">START</span><strong>Dla małej firmy</strong><small>1 proces i podstawowa obsługa</small><em>cena po pilotażu</em><button class="btn btn-secondary btn-compact">Porozmawiaj</button></div>
+              <div class="recommended"><span class="plan-label">PRO</span><strong>Dla rozwijającej się firmy</strong><small>Więcej procesów i pełna analityka</small><em>cena po pilotażu</em><button class="btn btn-primary btn-compact">Zgłoś się do pilotażu</button><i>Najczęściej wybierany zakres</i></div>
+              <div><span class="plan-label">AGENCY</span><strong>Dla agencji</strong><small>Wielu klientów i white-label</small><em>wycena indywidualna</em><button class="btn btn-secondary btn-compact">Porozmawiaj</button></div>
+              <div><span class="plan-label">DONE-FOR-YOU</span><strong>Wdrożenie przez nas</strong><small>Analiza, konfiguracja i instalacja</small><em>wycena projektu</em><button class="btn btn-secondary btn-compact">Umów konsultację</button></div>
+            </div>
+            <div class="pricing-row"><div class="feature-col">Liczba aktywnych procesów</div><div>1</div><div>5</div><div>według pakietu</div><div>według wdrożenia</div></div>
+            <div class="pricing-row"><div class="feature-col">Logika warunkowa i wycena</div><div><svg><use href="#i-check"/></svg></div><div><svg><use href="#i-check"/></svg></div><div><svg><use href="#i-check"/></svg></div><div><svg><use href="#i-check"/></svg></div></div>
+            <div class="pricing-row"><div class="feature-col">Scoring i wyjaśnienie wyniku</div><div>podstawowy</div><div>pełny</div><div>pełny</div><div>konfiguracja przez specjalistę</div></div>
+            <div class="pricing-row"><div class="feature-col">Analityka i porzucenia kroków</div><div>podstawowa</div><div>pełna</div><div>dla wszystkich klientów</div><div>pełna</div></div>
+            <div class="pricing-row"><div class="feature-col">Branding i osadzenie</div><div><svg><use href="#i-check"/></svg></div><div><svg><use href="#i-check"/></svg></div><div>white-label</div><div>konfiguracja i instalacja</div></div>
+            <div class="pricing-row"><div class="feature-col">Wsparcie wdrożeniowe</div><div>baza wiedzy</div><div>priorytetowe</div><div>partnerskie</div><div>pełna obsługa</div></div>
+          </div>
+          <div class="pricing-mobile" aria-label="Plany cenowe na mobile">
+            <article>
+              <span class="plan-label">START</span><h3>Dla małej firmy</h3><p>1 aktywny proces i podstawowa obsługa.</p><strong>cena po pilotażu</strong>
+              <ul><li>logika i orientacyjna wycena</li><li>podstawowy scoring</li><li>osadzenie na stronie</li></ul><button class="btn btn-secondary">Porozmawiaj</button>
+            </article>
+            <article class="recommended">
+              <i>Rekomendowany zakres</i><span class="plan-label">PRO</span><h3>Dla rozwijającej się firmy</h3><p>Do 5 procesów, pełny scoring i analityka.</p><strong>cena po pilotażu</strong>
+              <ul><li>pełna logika i wycena</li><li>analityka porzuceń</li><li>priorytetowe wsparcie</li></ul><button class="btn btn-primary">Zgłoś się do pilotażu</button>
+            </article>
+            <article>
+              <span class="plan-label">AGENCY</span><h3>Dla agencji</h3><p>Wielu klientów, klonowanie i white-label.</p><strong>wycena indywidualna</strong>
+              <ul><li>wiele organizacji</li><li>white-label</li><li>wsparcie partnerskie</li></ul><button class="btn btn-secondary">Porozmawiaj</button>
+            </article>
+            <article>
+              <span class="plan-label">DONE-FOR-YOU</span><h3>Wdrożenie przez nas</h3><p>Analiza procesu, konfiguracja i instalacja.</p><strong>wycena projektu</strong>
+              <ul><li>projekt pytań i reguł</li><li>konfiguracja wyniku</li><li>test i publikacja</li></ul><button class="btn btn-secondary">Umów konsultację</button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="faq-section" id="faq">
+        <div class="container faq-grid">
+          <div class="faq-copy"><p class="eyebrow">FAQ</p><h2>Pytania, które pojawiają się przed pierwszym wdrożeniem.</h2><p>Odpowiedzi są konkretne — bez obietnic, że jeden widget rozwiąże cały proces sprzedaży.</p><a class="text-link" href="#final">Masz inne pytanie? Porozmawiajmy <svg><use href="#i-arrow"/></svg></a></div>
+          <div class="faq-list">
+            <details open><summary>Czy muszę podawać klientowi dokładną cenę?<span>−</span></summary><p>Nie. Możesz pokazać przedział, cenę „od”, rekomendowany pakiet, sam wynik kwalifikacji albo ukryć cenę całkowicie.</p></details>
+            <details><summary>Czy Lorum działa na WordPressie?<span>+</span></summary><p>Tak. Proces można dodać przez blok, shortcode, popup albo przycisk otwierający pełnoekranowy formularz.</p></details>
+            <details><summary>Czy proces można dopasować do mojej branży?<span>+</span></summary><p>Tak. Szablon jest punktem wyjścia, a pytania, reguły, scoring i wynik można dostosować do konkretnej oferty.</p></details>
+            <details><summary>Czy widget spowolni stronę?<span>+</span></summary><p>Widget jest ładowany warunkowo i nie powinien wymuszać pobierania panelu ani całej aplikacji SaaS.</p></details>
+            <details><summary>Co z RODO i plikami przesyłanymi przez klientów?<span>+</span></summary><p>System przewiduje własne treści zgód, retencję, eksport, usuwanie danych i bezpieczny dostęp do załączników.</p></details>
+            <details><summary>Czy mogę użyć własnych kolorów i logo?<span>+</span></summary><p>Tak. Każda organizacja ma własny motyw widgetu, przy zachowaniu czytelności i dostępności interfejsu.</p></details>
+            <details><summary>Czy proces może działać bez strony internetowej?<span>+</span></summary><p>Tak. Każdy opublikowany flow może posiadać własny link, który wyślesz w reklamie, wiadomości lub profilu społecznościowym.</p></details>
+            <details><summary>Czy można połączyć leady z CRM?<span>+</span></summary><p>Tak. Docelowo przez webhooki, eksport i gotowe integracje, przy zachowaniu stabilnego kontraktu API.</p></details>
+          </div>
+        </div>
+      </section>
+
+      <section class="final-section" id="final">
+        <div class="container final-panel">
+          <div class="final-copy"><p class="eyebrow light">PILOTAŻ</p><h2>Zobacz, jak może wyglądać proces wyceny w Twojej firmie.</h2><p>Przygotujemy przykładowy przepływ dla jednej usługi i pokażemy, jakie dane może otrzymywać handlowiec przed pierwszą rozmową.</p><div><a class="btn btn-light" href="#">Zgłoś firmę do pilotażu</a><a class="btn btn-ghost-light" href="#demo">Przejdź demo</a></div><small>Bez zobowiązania • Jedna usługa • Dane demonstracyjne</small></div>
+          <div class="final-preview">
+            <div class="final-question"><span>3 odpowiedzi klienta</span><div>Kuchnia na wymiar</div><div>25 000–35 000 zł</div><div>W ciągu 3 miesięcy</div></div>
+            <div class="final-node"><svg viewBox="0 0 20 20"><path d="M4 4c0 5 2.7 7 6 7s6-2 6-7M4 16c0-5 2.7-7 6-7s6 2 6 7"/></svg></div>
+            <div class="final-lead"><span>Gotowy lead</span><strong>85<small>/100</small></strong><em>Dobre dopasowanie</em><p><svg><use href="#i-check"/></svg>Zakres, budżet, termin</p><p><svg><use href="#i-check"/></svg>Lokalizacja i materiały</p><p><svg><use href="#i-check"/></svg>Następny krok</p></div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <div class="container footer-grid">
+          <div class="footer-brand"><a class="brand" href="#"><span class="brand-mark"><svg viewBox="0 0 32 32"><path class="mark-a" d="M6 7c0 8 4.5 12 10 12s10-4 10-12"/><path class="mark-b" d="M6 25c0-8 4.5-12 10-12s10 4 10 12"/></svg></span><span>Lorum</span></a><p>System kwalifikacji i orientacyjnej wyceny leadów dla firm usługowych.</p><small>© 2026 Lorum. Projekt w fazie pilotażu.</small></div>
+          <div><strong>Produkt</strong><a href="#how">Jak działa</a><a href="#demo">Demo</a><a href="#industries">Branże</a><a href="#pricing">Cennik</a></div>
+          <div><strong>Dla firm</strong><a href="#wordpress">WordPress</a><a href="#agency">Dla agencji</a><a href="#proof">Bezpieczeństwo</a><a href="#faq">FAQ</a></div>
+          <div><strong>Zasoby</strong><a href="#">Baza wiedzy</a><a href="#">Status systemu</a><a href="#">Dokumentacja</a><a href="#">Kontakt</a></div>
+          <div><strong>Informacje</strong><a href="#">Polityka prywatności</a><a href="#">Regulamin</a><a href="#">DPA</a><a href="#">RODO</a></div>
+        </div>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>

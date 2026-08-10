@@ -1,0 +1,662 @@
+[
+  {
+    "documentHeight": 5272,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "metrics": {
+      "cards": {
+        "first": [
+          {
+            "bottom": 1920.796875,
+            "height": 538.4375,
+            "left": 55.15625,
+            "right": 483.984375,
+            "top": 1382.359375,
+            "width": 428.828125
+          },
+          {
+            "bottom": 1920.796875,
+            "height": 538.4375,
+            "left": 505.578125,
+            "right": 934.40625,
+            "top": 1382.359375,
+            "width": 428.828125
+          },
+          {
+            "bottom": 1920.796875,
+            "height": 538.4375,
+            "left": 956,
+            "right": 1384.84375,
+            "top": 1382.359375,
+            "width": 428.84375
+          }
+        ],
+        "outcome": [
+          {
+            "bottom": 2436.90625,
+            "height": 242.890625,
+            "left": 573.765625,
+            "right": 1384.84375,
+            "top": 2194.015625,
+            "width": 811.078125
+          },
+          {
+            "bottom": 2695.796875,
+            "height": 242.890625,
+            "left": 573.765625,
+            "right": 1384.84375,
+            "top": 2452.90625,
+            "width": 811.078125
+          },
+          {
+            "bottom": 2954.6875,
+            "height": 242.890625,
+            "left": 573.765625,
+            "right": 1384.84375,
+            "top": 2711.796875,
+            "width": 811.078125
+          }
+        ],
+        "security": [
+          {
+            "bottom": 3415,
+            "height": 145.53125,
+            "left": 613.734375,
+            "right": 1369.453125,
+            "top": 3269.46875,
+            "width": 755.71875
+          },
+          {
+            "bottom": 3571.71875,
+            "height": 145.53125,
+            "left": 624.921875,
+            "right": 1358.265625,
+            "top": 3426.1875,
+            "width": 733.34375
+          },
+          {
+            "bottom": 3728.4375,
+            "height": 145.53125,
+            "left": 636.125,
+            "right": 1347.0625,
+            "top": 3582.90625,
+            "width": 710.9375
+          }
+        ]
+      },
+      "sections": {
+        "#how-it-works-hero": {
+          "bottom": 1000.5,
+          "height": 903.5,
+          "left": 0,
+          "right": 1440,
+          "top": 97,
+          "width": 1440
+        },
+        "#proces": {
+          "bottom": 2093.21875,
+          "height": 1092.71875,
+          "left": 0,
+          "right": 1440,
+          "top": 1000.5,
+          "width": 1440
+        },
+        "#proces-dalszy": {
+          "bottom": 3056.484375,
+          "height": 963.265625,
+          "left": 0,
+          "right": 1440,
+          "top": 2093.21875,
+          "width": 1440
+        },
+        "#bezpieczenstwo": {
+          "bottom": 3929.625,
+          "height": 873.140625,
+          "left": 0,
+          "right": 1440,
+          "top": 3056.484375,
+          "width": 1440
+        },
+        "#how-final-cta": {
+          "bottom": 4833,
+          "height": 903.375,
+          "left": 0,
+          "right": 1440,
+          "top": 3929.625,
+          "width": 1440
+        }
+      }
+    },
+    "phase": "after",
+    "viewport": "1440"
+  },
+  {
+    "documentHeight": 5070,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "metrics": {
+      "cards": {
+        "first": [
+          {
+            "bottom": 1428.265625,
+            "height": 163.703125,
+            "left": 16,
+            "right": 752,
+            "top": 1264.5625,
+            "width": 736
+          },
+          {
+            "bottom": 1600.765625,
+            "height": 163.703125,
+            "left": 16,
+            "right": 752,
+            "top": 1437.0625,
+            "width": 736
+          },
+          {
+            "bottom": 1773.265625,
+            "height": 163.703125,
+            "left": 16,
+            "right": 752,
+            "top": 1609.5625,
+            "width": 736
+          }
+        ],
+        "outcome": [
+          {
+            "bottom": 2355,
+            "height": 163.703125,
+            "left": 16,
+            "right": 752,
+            "top": 2191.296875,
+            "width": 736
+          },
+          {
+            "bottom": 2527.5,
+            "height": 163.703125,
+            "left": 16,
+            "right": 752,
+            "top": 2363.796875,
+            "width": 736
+          },
+          {
+            "bottom": 2700,
+            "height": 163.703125,
+            "left": 16,
+            "right": 752,
+            "top": 2536.296875,
+            "width": 736
+          }
+        ],
+        "security": [
+          {
+            "bottom": 3255.65625,
+            "height": 123.71875,
+            "left": 25,
+            "right": 743,
+            "top": 3131.9375,
+            "width": 718
+          },
+          {
+            "bottom": 3386.5625,
+            "height": 123.71875,
+            "left": 25,
+            "right": 743,
+            "top": 3262.84375,
+            "width": 718
+          },
+          {
+            "bottom": 3517.46875,
+            "height": 123.71875,
+            "left": 25,
+            "right": 743,
+            "top": 3393.75,
+            "width": 718
+          }
+        ]
+      },
+      "sections": {
+        "#how-it-works-hero": {
+          "bottom": 1006.046875,
+          "height": 933.046875,
+          "left": 0,
+          "right": 768,
+          "top": 73,
+          "width": 768
+        },
+        "#proces": {
+          "bottom": 1868.859375,
+          "height": 862.8125,
+          "left": 0,
+          "right": 768,
+          "top": 1006.046875,
+          "width": 768
+        },
+        "#proces-dalszy": {
+          "bottom": 2738.59375,
+          "height": 869.734375,
+          "left": 0,
+          "right": 768,
+          "top": 1868.859375,
+          "width": 768
+        },
+        "#bezpieczenstwo": {
+          "bottom": 3629.375,
+          "height": 890.78125,
+          "left": 0,
+          "right": 768,
+          "top": 2738.59375,
+          "width": 768
+        },
+        "#how-final-cta": {
+          "bottom": 4161.40625,
+          "height": 532.03125,
+          "left": 0,
+          "right": 768,
+          "top": 3629.375,
+          "width": 768
+        }
+      }
+    },
+    "phase": "after",
+    "viewport": "768"
+  },
+  {
+    "documentHeight": 5581,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "metrics": {
+      "cards": {
+        "first": [
+          {
+            "bottom": 1499.796875,
+            "height": 163.703125,
+            "left": 16,
+            "right": 414,
+            "top": 1336.09375,
+            "width": 398
+          },
+          {
+            "bottom": 1672.296875,
+            "height": 163.703125,
+            "left": 16,
+            "right": 414,
+            "top": 1508.59375,
+            "width": 398
+          },
+          {
+            "bottom": 1844.796875,
+            "height": 163.703125,
+            "left": 16,
+            "right": 414,
+            "top": 1681.09375,
+            "width": 398
+          }
+        ],
+        "outcome": [
+          {
+            "bottom": 2485.265625,
+            "height": 163.703125,
+            "left": 16,
+            "right": 414,
+            "top": 2321.5625,
+            "width": 398
+          },
+          {
+            "bottom": 2657.765625,
+            "height": 163.703125,
+            "left": 16,
+            "right": 414,
+            "top": 2494.0625,
+            "width": 398
+          },
+          {
+            "bottom": 2830.265625,
+            "height": 163.703125,
+            "left": 16,
+            "right": 414,
+            "top": 2666.5625,
+            "width": 398
+          }
+        ],
+        "security": [
+          {
+            "bottom": 3444.328125,
+            "height": 123.71875,
+            "left": 25,
+            "right": 405,
+            "top": 3320.609375,
+            "width": 380
+          },
+          {
+            "bottom": 3575.234375,
+            "height": 123.71875,
+            "left": 25,
+            "right": 405,
+            "top": 3451.515625,
+            "width": 380
+          },
+          {
+            "bottom": 3706.140625,
+            "height": 123.71875,
+            "left": 25,
+            "right": 405,
+            "top": 3582.421875,
+            "width": 380
+          }
+        ]
+      },
+      "sections": {
+        "#how-it-works-hero": {
+          "bottom": 1057.703125,
+          "height": 984.703125,
+          "left": 0,
+          "right": 430,
+          "top": 73,
+          "width": 430
+        },
+        "#proces": {
+          "bottom": 1960.21875,
+          "height": 902.515625,
+          "left": 0,
+          "right": 430,
+          "top": 1057.703125,
+          "width": 430
+        },
+        "#proces-dalszy": {
+          "bottom": 2868.859375,
+          "height": 908.640625,
+          "left": 0,
+          "right": 430,
+          "top": 1960.21875,
+          "width": 430
+        },
+        "#bezpieczenstwo": {
+          "bottom": 3836.765625,
+          "height": 967.90625,
+          "left": 0,
+          "right": 430,
+          "top": 2868.859375,
+          "width": 430
+        },
+        "#how-final-cta": {
+          "bottom": 4484.28125,
+          "height": 647.515625,
+          "left": 0,
+          "right": 430,
+          "top": 3836.765625,
+          "width": 430
+        }
+      }
+    },
+    "phase": "after",
+    "viewport": "430"
+  },
+  {
+    "documentHeight": 5573,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "metrics": {
+      "cards": {
+        "first": [
+          {
+            "bottom": 1516.859375,
+            "height": 163.703125,
+            "left": 16,
+            "right": 374,
+            "top": 1353.15625,
+            "width": 358
+          },
+          {
+            "bottom": 1689.359375,
+            "height": 163.703125,
+            "left": 16,
+            "right": 374,
+            "top": 1525.65625,
+            "width": 358
+          },
+          {
+            "bottom": 1861.859375,
+            "height": 163.703125,
+            "left": 16,
+            "right": 374,
+            "top": 1698.15625,
+            "width": 358
+          }
+        ],
+        "outcome": [
+          {
+            "bottom": 2493.796875,
+            "height": 163.703125,
+            "left": 16,
+            "right": 374,
+            "top": 2330.09375,
+            "width": 358
+          },
+          {
+            "bottom": 2666.296875,
+            "height": 163.703125,
+            "left": 16,
+            "right": 374,
+            "top": 2502.59375,
+            "width": 358
+          },
+          {
+            "bottom": 2838.796875,
+            "height": 163.703125,
+            "left": 16,
+            "right": 374,
+            "top": 2675.09375,
+            "width": 358
+          }
+        ],
+        "security": [
+          {
+            "bottom": 3444.328125,
+            "height": 123.71875,
+            "left": 25,
+            "right": 365,
+            "top": 3320.609375,
+            "width": 340
+          },
+          {
+            "bottom": 3575.234375,
+            "height": 123.71875,
+            "left": 25,
+            "right": 365,
+            "top": 3451.515625,
+            "width": 340
+          },
+          {
+            "bottom": 3706.140625,
+            "height": 123.71875,
+            "left": 25,
+            "right": 365,
+            "top": 3582.421875,
+            "width": 340
+          }
+        ]
+      },
+      "sections": {
+        "#how-it-works-hero": {
+          "bottom": 1083.296875,
+          "height": 1010.296875,
+          "left": 0,
+          "right": 390,
+          "top": 73,
+          "width": 390
+        },
+        "#proces": {
+          "bottom": 1977.28125,
+          "height": 893.984375,
+          "left": 0,
+          "right": 390,
+          "top": 1083.296875,
+          "width": 390
+        },
+        "#proces-dalszy": {
+          "bottom": 2877.390625,
+          "height": 900.109375,
+          "left": 0,
+          "right": 390,
+          "top": 1977.28125,
+          "width": 390
+        },
+        "#bezpieczenstwo": {
+          "bottom": 3836.765625,
+          "height": 959.375,
+          "left": 0,
+          "right": 390,
+          "top": 2877.390625,
+          "width": 390
+        },
+        "#how-final-cta": {
+          "bottom": 4475.421875,
+          "height": 638.65625,
+          "left": 0,
+          "right": 390,
+          "top": 3836.765625,
+          "width": 390
+        }
+      }
+    },
+    "phase": "after",
+    "viewport": "390"
+  },
+  {
+    "documentHeight": 5883,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "metrics": {
+      "cards": {
+        "first": [
+          {
+            "bottom": 1630.234375,
+            "height": 163.703125,
+            "left": 12,
+            "right": 308,
+            "top": 1466.53125,
+            "width": 296
+          },
+          {
+            "bottom": 1802.734375,
+            "height": 163.703125,
+            "left": 12,
+            "right": 308,
+            "top": 1639.03125,
+            "width": 296
+          },
+          {
+            "bottom": 1989.4375,
+            "height": 177.90625,
+            "left": 12,
+            "right": 308,
+            "top": 1811.53125,
+            "width": 296
+          }
+        ],
+        "outcome": [
+          {
+            "bottom": 2652.828125,
+            "height": 163.703125,
+            "left": 12,
+            "right": 308,
+            "top": 2489.125,
+            "width": 296
+          },
+          {
+            "bottom": 2825.328125,
+            "height": 163.703125,
+            "left": 12,
+            "right": 308,
+            "top": 2661.625,
+            "width": 296
+          },
+          {
+            "bottom": 2997.828125,
+            "height": 163.703125,
+            "left": 12,
+            "right": 308,
+            "top": 2834.125,
+            "width": 296
+          }
+        ],
+        "security": [
+          {
+            "bottom": 3645.421875,
+            "height": 123.71875,
+            "left": 21,
+            "right": 299,
+            "top": 3521.703125,
+            "width": 278
+          },
+          {
+            "bottom": 3795,
+            "height": 142.390625,
+            "left": 21,
+            "right": 299,
+            "top": 3652.609375,
+            "width": 278
+          },
+          {
+            "bottom": 3944.578125,
+            "height": 142.390625,
+            "left": 21,
+            "right": 299,
+            "top": 3802.1875,
+            "width": 278
+          }
+        ]
+      },
+      "sections": {
+        "#how-it-works-hero": {
+          "bottom": 1185.046875,
+          "height": 1112.046875,
+          "left": 0,
+          "right": 320,
+          "top": 73,
+          "width": 320
+        },
+        "#proces": {
+          "bottom": 2124.6875,
+          "height": 939.640625,
+          "left": 0,
+          "right": 320,
+          "top": 1185.046875,
+          "width": 320
+        },
+        "#proces-dalszy": {
+          "bottom": 3036.421875,
+          "height": 911.734375,
+          "left": 0,
+          "right": 320,
+          "top": 2124.6875,
+          "width": 320
+        },
+        "#bezpieczenstwo": {
+          "bottom": 4093.921875,
+          "height": 1057.5,
+          "left": 0,
+          "right": 320,
+          "top": 3036.421875,
+          "width": 320
+        },
+        "#how-final-cta": {
+          "bottom": 4759.3125,
+          "height": 665.390625,
+          "left": 0,
+          "right": 320,
+          "top": 4093.921875,
+          "width": 320
+        }
+      }
+    },
+    "phase": "after",
+    "viewport": "320"
+  }
+]

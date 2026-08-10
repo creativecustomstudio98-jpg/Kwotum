@@ -1,0 +1,662 @@
+[
+  {
+    "documentHeight": 5223,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "metrics": {
+      "cards": {
+        "first": [
+          {
+            "bottom": 1920.796875,
+            "height": 538.4375,
+            "left": 55.15625,
+            "right": 483.984375,
+            "top": 1382.359375,
+            "width": 428.828125
+          },
+          {
+            "bottom": 1920.796875,
+            "height": 538.4375,
+            "left": 505.578125,
+            "right": 934.40625,
+            "top": 1382.359375,
+            "width": 428.828125
+          },
+          {
+            "bottom": 1920.796875,
+            "height": 538.4375,
+            "left": 956,
+            "right": 1384.84375,
+            "top": 1382.359375,
+            "width": 428.84375
+          }
+        ],
+        "outcome": [
+          {
+            "bottom": 2436.90625,
+            "height": 242.890625,
+            "left": 573.765625,
+            "right": 1384.84375,
+            "top": 2194.015625,
+            "width": 811.078125
+          },
+          {
+            "bottom": 2695.796875,
+            "height": 242.890625,
+            "left": 573.765625,
+            "right": 1384.84375,
+            "top": 2452.90625,
+            "width": 811.078125
+          },
+          {
+            "bottom": 2954.6875,
+            "height": 242.890625,
+            "left": 573.765625,
+            "right": 1384.84375,
+            "top": 2711.796875,
+            "width": 811.078125
+          }
+        ],
+        "security": [
+          {
+            "bottom": 3398.65625,
+            "height": 129.1875,
+            "left": 613.734375,
+            "right": 1369.453125,
+            "top": 3269.46875,
+            "width": 755.71875
+          },
+          {
+            "bottom": 3539.03125,
+            "height": 129.1875,
+            "left": 624.921875,
+            "right": 1358.265625,
+            "top": 3409.84375,
+            "width": 733.34375
+          },
+          {
+            "bottom": 3679.40625,
+            "height": 129.1875,
+            "left": 636.125,
+            "right": 1347.0625,
+            "top": 3550.21875,
+            "width": 710.9375
+          }
+        ]
+      },
+      "sections": {
+        "#how-it-works-hero": {
+          "bottom": 1000.5,
+          "height": 903.5,
+          "left": 0,
+          "right": 1440,
+          "top": 97,
+          "width": 1440
+        },
+        "#proces": {
+          "bottom": 2093.21875,
+          "height": 1092.71875,
+          "left": 0,
+          "right": 1440,
+          "top": 1000.5,
+          "width": 1440
+        },
+        "#proces-dalszy": {
+          "bottom": 3056.484375,
+          "height": 963.265625,
+          "left": 0,
+          "right": 1440,
+          "top": 2093.21875,
+          "width": 1440
+        },
+        "#bezpieczenstwo": {
+          "bottom": 3880.59375,
+          "height": 824.109375,
+          "left": 0,
+          "right": 1440,
+          "top": 3056.484375,
+          "width": 1440
+        },
+        "#how-final-cta": {
+          "bottom": 4783.96875,
+          "height": 903.375,
+          "left": 0,
+          "right": 1440,
+          "top": 3880.59375,
+          "width": 1440
+        }
+      }
+    },
+    "phase": "before",
+    "viewport": "1440"
+  },
+  {
+    "documentHeight": 7910,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "metrics": {
+      "cards": {
+        "first": [
+          {
+            "bottom": 2276.375,
+            "height": 332.609375,
+            "left": 16,
+            "right": 752,
+            "top": 1943.765625,
+            "width": 736
+          },
+          {
+            "bottom": 2675.359375,
+            "height": 382.984375,
+            "left": 16,
+            "right": 752,
+            "top": 2292.375,
+            "width": 736
+          },
+          {
+            "bottom": 3068.125,
+            "height": 376.765625,
+            "left": 16,
+            "right": 752,
+            "top": 2691.359375,
+            "width": 736
+          }
+        ],
+        "outcome": [
+          {
+            "bottom": 3980.375,
+            "height": 327.703125,
+            "left": 16,
+            "right": 752,
+            "top": 3652.671875,
+            "width": 736
+          },
+          {
+            "bottom": 4320.875,
+            "height": 327.703125,
+            "left": 16,
+            "right": 752,
+            "top": 3993.171875,
+            "width": 736
+          },
+          {
+            "bottom": 4661.375,
+            "height": 327.703125,
+            "left": 16,
+            "right": 752,
+            "top": 4333.671875,
+            "width": 736
+          }
+        ],
+        "security": [
+          {
+            "bottom": 5396.21875,
+            "height": 181.6875,
+            "left": 28.1875,
+            "right": 739.8125,
+            "top": 5214.53125,
+            "width": 711.625
+          },
+          {
+            "bottom": 5588.296875,
+            "height": 181.6875,
+            "left": 28.1875,
+            "right": 739.8125,
+            "top": 5406.609375,
+            "width": 711.625
+          },
+          {
+            "bottom": 5780.375,
+            "height": 181.6875,
+            "left": 28.1875,
+            "right": 739.8125,
+            "top": 5598.6875,
+            "width": 711.625
+          }
+        ]
+      },
+      "sections": {
+        "#how-it-works-hero": {
+          "bottom": 1586.46875,
+          "height": 1513.46875,
+          "left": 0,
+          "right": 768,
+          "top": 73,
+          "width": 768
+        },
+        "#proces": {
+          "bottom": 3190.140625,
+          "height": 1603.671875,
+          "left": 0,
+          "right": 768,
+          "top": 1586.46875,
+          "width": 768
+        },
+        "#proces-dalszy": {
+          "bottom": 4718.375,
+          "height": 1528.234375,
+          "left": 0,
+          "right": 768,
+          "top": 3190.140625,
+          "width": 768
+        },
+        "#bezpieczenstwo": {
+          "bottom": 5924.25,
+          "height": 1205.875,
+          "left": 0,
+          "right": 768,
+          "top": 4718.375,
+          "width": 768
+        },
+        "#how-final-cta": {
+          "bottom": 7000.5,
+          "height": 1076.25,
+          "left": 0,
+          "right": 768,
+          "top": 5924.25,
+          "width": 768
+        }
+      }
+    },
+    "phase": "before",
+    "viewport": "768"
+  },
+  {
+    "documentHeight": 8526,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "metrics": {
+      "cards": {
+        "first": [
+          {
+            "bottom": 2300.359375,
+            "height": 354.84375,
+            "left": 16,
+            "right": 414,
+            "top": 1945.515625,
+            "width": 398
+          },
+          {
+            "bottom": 2721.578125,
+            "height": 405.21875,
+            "left": 16,
+            "right": 414,
+            "top": 2316.359375,
+            "width": 398
+          },
+          {
+            "bottom": 3136.578125,
+            "height": 399,
+            "left": 16,
+            "right": 414,
+            "top": 2737.578125,
+            "width": 398
+          }
+        ],
+        "outcome": [
+          {
+            "bottom": 4119.546875,
+            "height": 346.421875,
+            "left": 16,
+            "right": 414,
+            "top": 3773.125,
+            "width": 398
+          },
+          {
+            "bottom": 4478.765625,
+            "height": 346.421875,
+            "left": 16,
+            "right": 414,
+            "top": 4132.34375,
+            "width": 398
+          },
+          {
+            "bottom": 4837.984375,
+            "height": 346.421875,
+            "left": 16,
+            "right": 414,
+            "top": 4491.5625,
+            "width": 398
+          }
+        ],
+        "security": [
+          {
+            "bottom": 5644.796875,
+            "height": 200.65625,
+            "left": 28.1875,
+            "right": 401.8125,
+            "top": 5444.140625,
+            "width": 373.625
+          },
+          {
+            "bottom": 5855.84375,
+            "height": 200.65625,
+            "left": 28.1875,
+            "right": 401.8125,
+            "top": 5655.1875,
+            "width": 373.625
+          },
+          {
+            "bottom": 6066.890625,
+            "height": 200.65625,
+            "left": 28.1875,
+            "right": 401.8125,
+            "top": 5866.234375,
+            "width": 373.625
+          }
+        ]
+      },
+      "sections": {
+        "#how-it-works-hero": {
+          "bottom": 1597.546875,
+          "height": 1524.546875,
+          "left": 0,
+          "right": 430,
+          "top": 73,
+          "width": 430
+        },
+        "#proces": {
+          "bottom": 3278.421875,
+          "height": 1680.875,
+          "left": 0,
+          "right": 430,
+          "top": 1597.546875,
+          "width": 430
+        },
+        "#proces-dalszy": {
+          "bottom": 4894.984375,
+          "height": 1616.5625,
+          "left": 0,
+          "right": 430,
+          "top": 3278.421875,
+          "width": 430
+        },
+        "#bezpieczenstwo": {
+          "bottom": 6229.484375,
+          "height": 1334.5,
+          "left": 0,
+          "right": 430,
+          "top": 4894.984375,
+          "width": 430
+        },
+        "#how-final-cta": {
+          "bottom": 7429.21875,
+          "height": 1199.734375,
+          "left": 0,
+          "right": 430,
+          "top": 6229.484375,
+          "width": 430
+        }
+      }
+    },
+    "phase": "before",
+    "viewport": "430"
+  },
+  {
+    "documentHeight": 8704,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "metrics": {
+      "cards": {
+        "first": [
+          {
+            "bottom": 2336.1875,
+            "height": 354.84375,
+            "left": 16,
+            "right": 374,
+            "top": 1981.34375,
+            "width": 358
+          },
+          {
+            "bottom": 2757.40625,
+            "height": 405.21875,
+            "left": 16,
+            "right": 374,
+            "top": 2352.1875,
+            "width": 358
+          },
+          {
+            "bottom": 3172.40625,
+            "height": 399,
+            "left": 16,
+            "right": 374,
+            "top": 2773.40625,
+            "width": 358
+          }
+        ],
+        "outcome": [
+          {
+            "bottom": 4156.53125,
+            "height": 365.140625,
+            "left": 16,
+            "right": 374,
+            "top": 3791.390625,
+            "width": 358
+          },
+          {
+            "bottom": 4534.46875,
+            "height": 365.140625,
+            "left": 16,
+            "right": 374,
+            "top": 4169.328125,
+            "width": 358
+          },
+          {
+            "bottom": 4912.40625,
+            "height": 365.140625,
+            "left": 16,
+            "right": 374,
+            "top": 4547.265625,
+            "width": 358
+          }
+        ],
+        "security": [
+          {
+            "bottom": 5745.5,
+            "height": 219.625,
+            "left": 28.1875,
+            "right": 361.8125,
+            "top": 5525.875,
+            "width": 333.625
+          },
+          {
+            "bottom": 5975.515625,
+            "height": 219.625,
+            "left": 28.1875,
+            "right": 361.8125,
+            "top": 5755.890625,
+            "width": 333.625
+          },
+          {
+            "bottom": 6205.53125,
+            "height": 219.625,
+            "left": 28.1875,
+            "right": 361.8125,
+            "top": 5985.90625,
+            "width": 333.625
+          }
+        ]
+      },
+      "sections": {
+        "#how-it-works-hero": {
+          "bottom": 1622.78125,
+          "height": 1549.78125,
+          "left": 0,
+          "right": 390,
+          "top": 73,
+          "width": 390
+        },
+        "#proces": {
+          "bottom": 3314.25,
+          "height": 1691.46875,
+          "left": 0,
+          "right": 390,
+          "top": 1622.78125,
+          "width": 390
+        },
+        "#proces-dalszy": {
+          "bottom": 4969.40625,
+          "height": 1655.15625,
+          "left": 0,
+          "right": 390,
+          "top": 3314.25,
+          "width": 390
+        },
+        "#bezpieczenstwo": {
+          "bottom": 6368.125,
+          "height": 1398.71875,
+          "left": 0,
+          "right": 390,
+          "top": 4969.40625,
+          "width": 390
+        },
+        "#how-final-cta": {
+          "bottom": 7606.453125,
+          "height": 1238.328125,
+          "left": 0,
+          "right": 390,
+          "top": 6368.125,
+          "width": 390
+        }
+      }
+    },
+    "phase": "before",
+    "viewport": "390"
+  },
+  {
+    "documentHeight": 9350,
+    "errors": [],
+    "horizontalOverflow": 0,
+    "httpStatus": 200,
+    "metrics": {
+      "cards": {
+        "first": [
+          {
+            "bottom": 2429.234375,
+            "height": 450.421875,
+            "left": 12,
+            "right": 308,
+            "top": 1978.8125,
+            "width": 296
+          },
+          {
+            "bottom": 2895.015625,
+            "height": 449.78125,
+            "left": 12,
+            "right": 308,
+            "top": 2445.234375,
+            "width": 296
+          },
+          {
+            "bottom": 3354.578125,
+            "height": 443.5625,
+            "left": 12,
+            "right": 308,
+            "top": 2911.015625,
+            "width": 296
+          }
+        ],
+        "outcome": [
+          {
+            "bottom": 4396.546875,
+            "height": 412.953125,
+            "left": 12,
+            "right": 308,
+            "top": 3983.59375,
+            "width": 296
+          },
+          {
+            "bottom": 4822.296875,
+            "height": 412.953125,
+            "left": 12,
+            "right": 308,
+            "top": 4409.34375,
+            "width": 296
+          },
+          {
+            "bottom": 5248.046875,
+            "height": 412.953125,
+            "left": 12,
+            "right": 308,
+            "top": 4835.09375,
+            "width": 296
+          }
+        ],
+        "security": [
+          {
+            "bottom": 6182.140625,
+            "height": 271.46875,
+            "left": 24.1875,
+            "right": 295.8125,
+            "top": 5910.671875,
+            "width": 271.625
+          },
+          {
+            "bottom": 6464,
+            "height": 271.46875,
+            "left": 24.1875,
+            "right": 295.8125,
+            "top": 6192.53125,
+            "width": 271.625
+          },
+          {
+            "bottom": 6745.859375,
+            "height": 271.46875,
+            "left": 24.1875,
+            "right": 295.8125,
+            "top": 6474.390625,
+            "width": 271.625
+          }
+        ]
+      },
+      "sections": {
+        "#how-it-works-hero": {
+          "bottom": 1643.359375,
+          "height": 1570.359375,
+          "left": 0,
+          "right": 320,
+          "top": 73,
+          "width": 320
+        },
+        "#proces": {
+          "bottom": 3516.25,
+          "height": 1872.890625,
+          "left": 0,
+          "right": 320,
+          "top": 1643.359375,
+          "width": 320
+        },
+        "#proces-dalszy": {
+          "bottom": 5305.046875,
+          "height": 1788.796875,
+          "left": 0,
+          "right": 320,
+          "top": 3516.25,
+          "width": 320
+        },
+        "#bezpieczenstwo": {
+          "bottom": 6927.171875,
+          "height": 1622.125,
+          "left": 0,
+          "right": 320,
+          "top": 5305.046875,
+          "width": 320
+        },
+        "#how-final-cta": {
+          "bottom": 8226.609375,
+          "height": 1299.4375,
+          "left": 0,
+          "right": 320,
+          "top": 6927.171875,
+          "width": 320
+        }
+      }
+    },
+    "phase": "before",
+    "viewport": "320"
+  }
+]
