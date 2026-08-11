@@ -42,6 +42,10 @@ allowlistę originów, prywatne rozproszone kubełki limitera, audytowany zapis
 Owner/Admin oraz serwerowy guard. Odbiera `anon` i `authenticated` bezpośrednie
 wykonywanie RPC formularza; Route Handlery wykonują je jako service role
 wyłącznie po pozytywnym guardzie.
+Migracja `20260811000200_stage13d_optional_skip_json_null.sql` normalizuje SQL
+`NULL` przekazywany przez PostgREST do JSONB `null` przed walidacją odpowiedzi.
+Pozwala to pominąć wyłącznie krok opcjonalny, bez zmiany danych, sygnatury RPC
+ani minimalnych grantów `service_role`.
 
 Pliki wdrożonych migracji są niezmienne. Korekty wykonujemy nową migracją.
 Rollback aplikacji nie cofa automatycznie schematu; przed produkcyjnym
@@ -132,3 +136,8 @@ kontraktu; preferowany jest jednak rollback do wersji obsługującej guard.
 Konfiguracja `public_flow_origins` pozostaje jako audyt, a wygasłe rekordy
 `app_private.public_request_buckets` mogą zostać usunięte bez utraty danych
 biznesowych. Wdrożonego pliku migracji nie edytujemy ani nie cofamy.
+
+Rollback hotfixu Etapu 13D pozostawia znormalizowane zachowanie funkcji w
+bazie, ponieważ jest kompatybilne ze starszą aplikacją i nie zmienia danych.
+Ewentualna korekta wymaga nowej migracji `create or replace function`; ręczne
+przywrócenie poprzedniego body ponownie otworzyłoby błąd 503 dla „Pomiń”.

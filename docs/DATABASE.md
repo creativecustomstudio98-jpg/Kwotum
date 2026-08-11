@@ -267,6 +267,23 @@ przejścia są walidowane na przypiętym immutable snapshotcie. Test
 retry, konflikt, błędną opcję, próbę przeskoczenia trasy oraz ograniczenia
 odpowiedzi manifestu v2.
 
+### Hotfix Etapu 13D — opcjonalne „Pomiń” przez publiczne API
+
+Migracja `20260811000200_stage13d_optional_skip_json_null.sql` normalizuje SQL
+`NULL`, które PostgREST przekazuje dla wartości `null` w wywołaniu RPC, do
+JSONB `null` używanego przez domenę sesji. Normalizacja odbywa się przed
+walidacją i rozwiązywaniem trasy: opcjonalny krok jest usuwany z odpowiedzi,
+natomiast wymagany krok nadal kończy się `check_violation`. Nie zmienia tabel,
+sygnatury RPC, grantów ani historycznych danych i zachowuje wyłączny grant
+`service_role` wprowadzony przez bramę publicznego API.
+
+Migracja jest forward-only i zgodna z rollbackiem aplikacji. Rollback
+operacyjny zatrzymuje nowy release aplikacji, ale pozostawia normalizację w
+bazie; jej cofnięcie wymagałoby osobnej migracji naprawczej i ponownie
+otworzyłoby błąd 503 dla „Pomiń”. Test integracyjny wywołuje funkcję z
+rzeczywistym SQL `NULL`, potwierdza bezpieczny skip pola opcjonalnego oraz
+odrzucenie skipu pola wymaganego.
+
 ## Indeksy początkowe
 
 `organization_members(user_id, organization_id)`, `flows(organization_id, updated_at)`, `leads(organization_id, submitted_at desc)`, `leads(organization_id, status, submitted_at desc)`, `notifications(status, available_at, created_at)`, `session_events(flow_version_id, occurred_at)`, `webhook_deliveries(status, available_at, created_at)`.
