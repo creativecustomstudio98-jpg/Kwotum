@@ -2,7 +2,7 @@ import { HttpWidgetApi } from "./api.js";
 import type { WidgetAnswer, WidgetManifest, WidgetStep } from "./contracts.js";
 import { WidgetSessionController, type WidgetState } from "./controller.js";
 import { PreviewWidgetApi } from "./preview.js";
-import { LocalWidgetStorage, MemoryWidgetStorage, widgetStorageKey } from "./storage.js";
+import { LocalWidgetStorage, MemoryWidgetStorage } from "./storage.js";
 import { requestTurnstileToken } from "./turnstile.js";
 
 const elementName = "wyceno-widget";
@@ -86,9 +86,11 @@ export class WycenoWidgetElement extends HTMLElement {
     privacyAccepted: false,
   };
   #contactStarted = false;
+  #connected = false;
   #dialog: HTMLDialogElement | null = null;
   #lastStatus: WidgetState["status"] = "idle";
   #launched = false;
+  #localStorage: LocalWidgetStorage | null = null;
   #previewManifest: WidgetManifest | null = null;
   #renderedState: WidgetState | null = null;
   #resizeObserver: ResizeObserver | null = null;
@@ -113,8 +115,8 @@ export class WycenoWidgetElement extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this.#connected = true;
     window.addEventListener("online", this.#handleOnline);
-    window.addEventListener("storage", this.#handleStorage);
     this.#resizeObserver = new ResizeObserver((entries) => {
       const height = Math.ceil(
         entries[0]?.contentRect.height ?? this.getBoundingClientRect().height,
@@ -130,14 +132,14 @@ export class WycenoWidgetElement extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    this.#connected = false;
     window.removeEventListener("online", this.#handleOnline);
-    window.removeEventListener("storage", this.#handleStorage);
     this.#resizeObserver?.disconnect();
     this.#unsubscribe?.();
   }
 
   attributeChangedCallback(name: string, previous: string | null, next: string | null): void {
-    if (!this.isConnected || previous === next) return;
+    if (!this.#connected || !this.isConnected || previous === next) return;
     if (name === "button-label") {
       if (this.#shouldDeferInitialization()) this.#renderDeferredLauncher();
       else this.#render(this.#controller?.state ?? idleWidgetState());
@@ -181,6 +183,18 @@ export class WycenoWidgetElement extends HTMLElement {
     return this.mode !== "inline" && !this.#launched && this.#controller === null;
   }
 
+  #resetContactDraft(): void {
+    this.#contactDraft = {
+      email: "",
+      files: [],
+      marketingEmailAccepted: false,
+      name: "",
+      phone: "",
+      privacyAccepted: false,
+    };
+    this.#contactStarted = false;
+  }
+
   #renderDeferredLauncher(): void {
     const publicId = this.getAttribute("public-id") ?? "";
     if (!publicIdPattern.test(publicId)) {
@@ -203,6 +217,7 @@ export class WycenoWidgetElement extends HTMLElement {
       this.#renderStandaloneError("Brakuje poprawnego identyfikatora procesu.");
       return;
     }
+    if (this.#controller) this.#resetContactDraft();
     this.#unsubscribe?.();
     const baseUrl = resolveWidgetApiBase(
       this.getAttribute("api-base"),
@@ -214,25 +229,25 @@ export class WycenoWidgetElement extends HTMLElement {
           new PreviewWidgetApi(this.#previewManifest as WidgetManifest),
           new MemoryWidgetStorage(),
         )
-      : new WidgetSessionController(new HttpWidgetApi(baseUrl), new LocalWidgetStorage());
+      : new WidgetSessionController(
+          new HttpWidgetApi(baseUrl),
+          (this.#localStorage ??= new LocalWidgetStorage()),
+        );
     this.#unsubscribe = this.#controller.subscribe((state) => this.#render(state));
     await this.#controller.initialize(publicId);
   }
 
   readonly #handleOnline = (): void => {
-    void this.#controller?.flush();
-  };
-
-  readonly #handleStorage = (event: StorageEvent): void => {
-    if (this.previewMode) return;
-    if (this.mode !== "inline" && this.#controller === null) return;
-    const publicId = this.getAttribute("public-id");
-    if (publicId && event.key === widgetStorageKey(publicId) && event.newValue) {
-      void this.#initialize();
-    }
+    void this.#controller?.reconnect();
   };
 
   #render(state: WidgetState): void {
+    if (
+      (state.status === "expired" || state.status === "submitted") &&
+      this.#lastStatus !== state.status
+    ) {
+      this.#resetContactDraft();
+    }
     if (this.#renderedState && this.#isSyncOnlyUpdate(this.#renderedState, state)) {
       const sync = this.#shadow.querySelector<HTMLElement>(".wyceno-sync");
       if (sync) sync.textContent = this.#syncStatusLabel(state.syncStatus);

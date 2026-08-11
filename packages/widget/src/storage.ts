@@ -87,20 +87,63 @@ function isPendingAnswer(value: unknown): value is PendingAnswer {
   );
 }
 
-export class LocalWidgetStorage implements WidgetStorage {
-  readonly #storage: Storage;
+function isSameStoredSession(raw: string, session: PersistedWidgetSession): boolean {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!isPersistedSession(parsed, session.publicId)) return false;
+    return (
+      JSON.stringify({ ...parsed, savedAt: "" }) === JSON.stringify({ ...session, savedAt: "" })
+    );
+  } catch {
+    return false;
+  }
+}
 
-  constructor(storage: Storage = window.localStorage) {
-    this.#storage = storage;
+export class LocalWidgetStorage implements WidgetStorage {
+  readonly #fallback = new Map<string, PersistedWidgetSession>();
+  readonly #fallbackAuthoritative = new Set<string>();
+  readonly #storage: Storage | null;
+
+  constructor(storage?: Storage) {
+    if (storage) {
+      this.#storage = storage;
+      return;
+    }
+    try {
+      this.#storage = typeof window === "undefined" ? null : window.localStorage;
+    } catch {
+      this.#storage = null;
+    }
   }
 
   clear(publicId: string): void {
-    this.#storage.removeItem(widgetStorageKey(publicId));
+    this.#fallback.delete(publicId);
+    if (!this.#storage) {
+      this.#fallbackAuthoritative.add(publicId);
+      return;
+    }
+    try {
+      this.#storage.removeItem(widgetStorageKey(publicId));
+      this.#fallbackAuthoritative.delete(publicId);
+    } catch {
+      this.#fallbackAuthoritative.add(publicId);
+    }
+  }
+
+  #loadFallback(publicId: string): PersistedWidgetSession | null {
+    const session = this.#fallback.get(publicId);
+    return session ? structuredClone(session) : null;
   }
 
   load(publicId: string): PersistedWidgetSession | null {
-    const raw = this.#storage.getItem(widgetStorageKey(publicId));
-    if (!raw) return null;
+    if (this.#fallbackAuthoritative.has(publicId)) return this.#loadFallback(publicId);
+    let raw: string | null;
+    try {
+      raw = this.#storage?.getItem(widgetStorageKey(publicId)) ?? null;
+    } catch {
+      return this.#loadFallback(publicId);
+    }
+    if (!raw) return this.#loadFallback(publicId);
     try {
       const parsed: unknown = JSON.parse(raw);
       if (!isPersistedSession(parsed, publicId)) {
@@ -117,7 +160,9 @@ export class LocalWidgetStorage implements WidgetStorage {
         this.clear(publicId);
         return null;
       }
-      return { ...parsed, manifest };
+      const session = { ...parsed, manifest };
+      this.#fallback.set(publicId, structuredClone(session));
+      return session;
     } catch {
       this.clear(publicId);
       return null;
@@ -125,7 +170,22 @@ export class LocalWidgetStorage implements WidgetStorage {
   }
 
   save(session: PersistedWidgetSession): void {
-    this.#storage.setItem(widgetStorageKey(session.publicId), JSON.stringify(session));
+    this.#fallback.set(session.publicId, structuredClone(session));
+    if (!this.#storage) {
+      this.#fallbackAuthoritative.add(session.publicId);
+      return;
+    }
+    try {
+      const key = widgetStorageKey(session.publicId);
+      const serialized = JSON.stringify(session);
+      const current = this.#storage.getItem(key);
+      if (!current || !isSameStoredSession(current, session)) {
+        this.#storage.setItem(key, serialized);
+      }
+      this.#fallbackAuthoritative.delete(session.publicId);
+    } catch {
+      this.#fallbackAuthoritative.add(session.publicId);
+    }
   }
 }
 

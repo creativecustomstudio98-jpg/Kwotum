@@ -134,7 +134,8 @@ Każdy zapis odpowiedzi ma:
 
 Klient nie może przeskoczyć do dowolnego kroku. Baza odrzuca cel różny od
 wyniku reguł. Powrót do wcześniejszej odpowiedzi przycina późniejszą gałąź i
-jej odpowiedzi. Dwie karty uzgadniają nowszą rewizję przez wznowienie.
+jej odpowiedzi. Konflikt pojedynczej wspieranej karty pobiera nowszą rewizję
+przez wznowienie i ponawia jej lokalną kolejkę.
 
 Przeglądarka przechowuje ograniczony snapshot sesji i kolejkę w `localStorage`
 originu strony gospodarza. Pozwala to zachować odpowiedź przy chwilowej utracie
@@ -142,6 +143,17 @@ sieci i wznowić proces. Shadow DOM nie jest granicą bezpieczeństwa JavaScript
 skrypty działające w tym samym originie hosta mogą odczytać jego storage.
 Dlatego token ma zakres tylko jednej sesji, sesja wygasa, dane są walidowane
 przy odczycie, a integrator musi kontrolować skrypty third-party i CSP.
+
+Storage hosta jest pomocą w odtwarzaniu, a nie sygnałem dostępności API.
+`QuotaExceededError`, tryb prywatny lub polityka hosta nie przerywają aktywnej
+sesji: bieżąca instancja zachowuje snapshot w pamięci i kontynuuje formularz.
+Zapis pomija zmianę obejmującą wyłącznie techniczne `savedAt`, aby nie wykonywać
+zbędnych operacji host storage.
+
+Pilotaż wspiera jedną aktywną kartę na sesję. Widget nie reaguje automatycznie
+na cross-tab `storage` i nie scala równoległych snapshotów. Wiele aktywnych kart
+dla tej samej sesji pozostaje niewspierane do czasu zaprojektowania osobnego,
+wersjonowanego protokołu synchronizacji.
 
 ## State machine i błędy
 
@@ -158,6 +170,43 @@ braku sieci pozostaje w `calculating_result`, zachowuje odpowiedzi i ponawia
 
 Widget pokazuje jawny loading, komunikat niedostępności, możliwość rozpoczęcia
 od nowa po wygaśnięciu oraz status zapisu przez `aria-live`.
+
+Udany serwerowy resume przy niezmienionej lokalnej generacji przywraca `synced`,
+nawet gdy późniejszy zapis lokalny albo first-party analytics zawiedzie. Nowsza
+oczekująca mutacja zachowuje jednak swój stan `saving` lub `offline` i nie jest
+nadpisywana odpowiedzią starszego resume. Błąd żądania resume pozostawia
+odtworzony lokalny formularz jako `active + offline`; nie pokazujemy w UI
+surowych wyjątków transportu, storage ani providera.
+Każdy resume zapamiętuje tożsamość sesji, rewizję i lokalną generację mutacji.
+Odpowiedź, która wróci po nowszym answer, back albo rozpoczęciu submitu, nie
+nadpisuje już bieżących odpowiedzi, kroku ani statusu. Sam udany resume może
+potwierdzić `synced` po lokalnym back, jeśli rewizja i kolejka nie zmieniły się.
+Po odzyskaniu sieci zdarzenie `online` najpierw ponawia pending flush, a jeśli
+stan nadal jest offline albo pierwszy create był recoverable, ta sama instancja
+kontrolera wykonuje jedno deduplikowane resume/create po zakończeniu trwającej
+inicjalizacji. Retry create pokazuje loading i jest serializowane z restartem.
+Ponawialny błąd sieci nie czyści snapshotu. Odpowiedź 404/410 z endpointu
+głównej sesji (`resume`, `save`, `result`, `upload` lub `submit`) usuwa wygasły
+token, snapshot, dane kontaktowe, pliki i zgody oraz przechodzi do jawnego
+`expired`, bez kolejnego automatycznego retry. Równoległy submit i pokazany już
+`submitted` mają pierwszeństwo, aby spóźnione resume nie ukryło wyniku wysłania;
+jeśli submit zawiedzie, wygaśnięcie zostanie rozpoznane przy następnym żądaniu
+głównej sesji albo przeładowaniu. Poboczna analityka pozostaje best-effort i
+sama nie wygasza aktywnego formularza. Przeciwstawne zmiany zgody analytics są
+wysyłane kolejno, z natychmiastowym lokalnym pierwszeństwem odmowy.
+Flush jest deduplikowany wyłącznie dla konkretnego właściciela sesji. Po
+restarcie nowa sesja uruchamia własny zapis bez czekania na stary request, a
+stare zakończenie nie zmienia jej statusu ani storage. Best-effort analytics
+również nie blokuje ścieżki save/result/reconnect. Po `submitted` widget zwalnia
+pamięciowy draft danych kontaktowych, zgody i referencje do plików.
+
+Przed szerszym rolloutem pozostają trzy jawne zadania: natychmiastowe uzgodnienie
+odroczonego expiry po nieudanym równoległym submit oraz ograniczone czasowo
+`AbortSignal` dla initialize/reconnect. Pilotaż pozostaje zależny od timeoutów
+transportu przeglądarki i ponowienia po `online` lub przeładowaniu.
+Nietypowy detach/reattach custom elementu wymaga ponadto osobnej generacji lub
+anulowania lifecycle, aby stary request nie dotknął współdzielonego storage;
+statyczny embed pilota Fortez nie wykonuje takiej operacji.
 
 ## API
 
@@ -207,6 +256,11 @@ Pokrycie:
 - Playwright: hosted flow, mobile, utrata sieci, axe WCAG A/AA, popup, focus
   return, agresywny CSS hosta, kontakt/upload/submit oraz wygaśnięty token
   Turnstile, brak wywołania API przed tokenem i retry ze świeżym tokenem.
+
+Callbacki `error`, `expired`, `timeout` i `unsupported` Turnstile mają testy
+jednostkowe i zwalniają instancję challenge. Realny timeout lub niedostępność
+ładowania zewnętrznego skryptu pozostają osobnym gate przed rolloutem szerszym
+niż pilotaż.
 
 Ręczny VoiceOver/NVDA, realne CSP kilku hostów i macierz starszych przeglądarek
 pozostają obowiązkowe przed produkcją.

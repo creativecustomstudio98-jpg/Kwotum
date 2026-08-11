@@ -54,4 +54,33 @@ describe("Turnstile widget client", () => {
     await Promise.resolve();
     expect(turnstile.remove).toHaveBeenCalledWith("widget-1");
   });
+
+  it.each([
+    ["error-callback", "FAILED"],
+    ["expired-callback", "EXPIRED"],
+    ["timeout-callback", "TIMEOUT"],
+    ["unsupported-callback", "UNSUPPORTED"],
+  ] as const)("maps %s to a safe %s error and removes the widget", async (callback, code) => {
+    type TurnstileOptions = Parameters<NonNullable<Window["turnstile"]>["render"]>[1];
+    const turnstile = {
+      execute: vi.fn(),
+      remove: vi.fn(),
+      render: vi.fn((_: HTMLElement, options: TurnstileOptions) => {
+        queueMicrotask(() => options[callback]());
+        return "widget-failure";
+      }),
+    };
+    Object.defineProperty(window, "turnstile", { configurable: true, value: turnstile });
+    const target = document.createElement("div");
+    document.body.append(target);
+
+    await expect(requestTurnstileToken(target, challenge)).rejects.toMatchObject({
+      code,
+      name: "WidgetChallengeError",
+    });
+    await Promise.resolve();
+
+    expect(turnstile.execute).toHaveBeenCalledWith("widget-failure");
+    expect(turnstile.remove).toHaveBeenCalledWith("widget-failure");
+  });
 });

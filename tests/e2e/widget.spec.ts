@@ -88,11 +88,17 @@ async function mockWidgetApi(
   firstSaveOffline = false,
   failFirstChallenge = false,
 ): Promise<
-  Readonly<{ analyticsEvents: string[]; sessionRequests: string[]; submitTokens: string[] }>
+  Readonly<{
+    analyticsEvents: string[];
+    resumeRequests: string[];
+    sessionRequests: string[];
+    submitTokens: string[];
+  }>
 > {
   let revision = 0;
   let failSave = firstSaveOffline;
   const analyticsEvents: string[] = [];
+  const resumeRequests: string[] = [];
   const sessionRequests: string[] = [];
   const submitTokens: string[] = [];
   const answers: Record<string, unknown> = {};
@@ -168,6 +174,7 @@ async function mockWidgetApi(
       return;
     }
     if (url.pathname.endsWith("/sessions/current") && request.method() === "GET") {
+      resumeRequests.push(url.pathname);
       await route.fulfill({
         body: JSON.stringify({
           answers,
@@ -254,8 +261,26 @@ async function mockWidgetApi(
     }
     await route.fulfill({ body: "{}", status: 404 });
   });
-  return { analyticsEvents, sessionRequests, submitTokens };
+  return { analyticsEvents, resumeRequests, sessionRequests, submitTokens };
 }
+
+test("successful reload resume stays synced and performs one resume request", async ({ page }) => {
+  const { resumeRequests, sessionRequests } = await mockWidgetApi(page);
+  await page.goto(`/f/${publicId}`);
+
+  const widget = page.locator("wyceno-widget");
+  await expect(widget.getByRole("heading", { name: "Testowy proces wyceny" })).toBeVisible();
+  await expect(widget.getByText("Postęp zapisany.")).toBeVisible();
+  expect(sessionRequests).toHaveLength(1);
+
+  await page.reload();
+
+  await expect(widget.getByRole("heading", { name: "Testowy proces wyceny" })).toBeVisible();
+  await expect(widget.getByText("Postęp zapisany.")).toBeVisible();
+  await page.waitForTimeout(1_000);
+  expect(sessionRequests).toHaveLength(1);
+  expect(resumeRequests).toHaveLength(1);
+});
 
 test("hosted flow works by keyboard, survives network loss and passes axe", async ({ page }) => {
   const { analyticsEvents } = await mockWidgetApi(page, true);

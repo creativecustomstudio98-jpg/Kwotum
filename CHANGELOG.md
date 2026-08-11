@@ -6,6 +6,30 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Wznowienie zapisanej sesji widgetu po poprawnym `GET 200` aktualnego snapshotu
+  wraca teraz jawnie do stanu `synced`; awaria `localStorage` lub analityki nie
+  podszywa się pod utratę sieci i nie wyłącza aktywnego formularza. Magazyn hosta ma pamięciowy
+  fallback bieżącej karty, zapisuje idempotentnie bez zdarzeń wywołanych samą
+  zmianą `savedAt`, a zdarzenie `online` deduplikowanie ponawia resume/create w
+  tej samej instancji kontrolera, po zakończeniu trwającej inicjalizacji.
+  Odpowiedzi przestarzałego resume nie cofają nowszej odpowiedzi, nawigacji ani
+  trwającego submitu, a retry pierwszego create jest serializowane z restartem.
+  Flush jest przypisany do właściciela sesji, więc opóźniony zapis wygasłej
+  sesji nie blokuje ani nie zmienia nowej; zakończony submit zwalnia także
+  pamięciowy draft danych kontaktowych i referencje do plików.
+  Ponawialny błąd sieci zachowuje snapshot, a odpowiedź 404/410 z endpointu
+  głównej sesji (`resume`, `save`, `result`, `upload` lub `submit`) usuwa wygasły
+  token, dane kontaktowe i zgody oraz blokuje dalszy automatyczny retry, o ile
+  nie trwa submit lub nie pokazano już jego sukcesu. Wynik submitu ma wtedy
+  pierwszeństwo, a ewentualne wygaśnięcie zostanie rozpoznane przy następnym
+  żądaniu głównej sesji lub przeładowaniu.
+  Poboczna analityka pozostaje best-effort; decyzje zgody są serializowane, a
+  stare zakończenie eventu nie usuwa kolejki nowej sesji. Retry pamięta wejściowy
+  `publicId`, a UI nie pokazuje surowej treści wyjątku submitu. Callbacki błędu,
+  wygaśnięcia, timeoutu i braku wsparcia Turnstile mają typowane, bezpieczne
+  stany i zawsze usuwają instancję challenge.
+  Automatyczna reakcja na cross-tab `storage` została wyłączona; pilotaż
+  obsługuje jedną aktywną kartę na sesję, bez niejawnego scalania kart.
 - Generator kodu instalacyjnego i konektor WordPress dodają teraz jawne
   `api-base` wyprowadzone odpowiednio z kanonicznego `APP_URL` albo przypiętego,
   zwalidowanego `WYCENO_CONNECTOR_API_ORIGIN`. Osadzenia inline, popup,
@@ -773,8 +797,8 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
   inline, popup, fullscreen i hosted link.
 - Allowlistowany manifest, atomowe utworzenie sesji, hashowany token,
   siedmiodniowe expiry, rewizje i idempotentne mutacje odpowiedzi.
-- Autosave, wznowienie, kolejka odporna na utratę sieci, synchronizacja kart i
-  serwerowa walidacja routingu na immutable snapshotcie.
+- Autosave, wznowienie, kolejka odporna na utratę sieci, kontrola konfliktów
+  rewizji i serwerowa walidacja routingu na immutable snapshotcie.
 - Publiczne Route Handlers v1 z walidacją Zod, stabilnymi błędami, CORS,
   request ID i tokenem poza URL.
 - Testy widgetu dla XSS, uszkodzonego storage, offline, mobile, klawiatury,

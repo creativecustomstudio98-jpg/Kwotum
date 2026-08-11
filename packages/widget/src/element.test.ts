@@ -3,6 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { defineWycenoWidget, resolveWidgetApiBase } from "./element.js";
+import { type PersistedWidgetSession, widgetStorageKey } from "./storage.js";
 import { testManifest, testPublicId } from "./test-fixtures.js";
 
 class ResizeObserverStub {
@@ -110,6 +111,399 @@ describe("wyceno-widget element", () => {
     expect(element.shadowRoot?.querySelector(".wyceno-analytics")).toBeNull();
   });
 
+  it("retries a failed resume once when repeated online events arrive", async () => {
+    const stored: PersistedWidgetSession = {
+      analyticsConsent: null,
+      answers: { service: "standard" },
+      currentStepKey: "location",
+      expiresAt: "2099-01-01T00:00:00.000Z",
+      history: ["service"],
+      manifest: testManifest,
+      pending: [],
+      publicId: testPublicId,
+      revision: 1,
+      savedAt: "2026-08-11T18:00:00.000Z",
+      token: "c".repeat(64),
+      version: 1,
+    };
+    localStorage.setItem(widgetStorageKey(testPublicId), JSON.stringify(stored));
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockRejectedValueOnce(new TypeError("network unavailable"))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            answers: stored.answers,
+            currentStepKey: stored.currentStepKey,
+            expiresAt: stored.expiresAt,
+            manifest: testManifest,
+            revision: stored.revision,
+          }),
+          { headers: { "Content-Type": "application/json" }, status: 200 },
+        ),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const element = document.createElement("wyceno-widget");
+    element.setAttribute("public-id", testPublicId);
+    document.body.append(element);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(element.shadowRoot?.textContent).toContain("Brak połączenia");
+
+    for (let index = 0; index < 5; index += 1) window.dispatchEvent(new Event("online"));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(element.shadowRoot?.textContent).toContain("Postęp zapisany");
+    expect(element.shadowRoot?.textContent).toContain("Podaj lokalizację");
+  });
+
+  it("does not create a new session from an expired state on online", async () => {
+    const stored: PersistedWidgetSession = {
+      analyticsConsent: null,
+      answers: { service: "standard" },
+      currentStepKey: "location",
+      expiresAt: "2099-01-01T00:00:00.000Z",
+      history: ["service"],
+      manifest: testManifest,
+      pending: [],
+      publicId: testPublicId,
+      revision: 1,
+      savedAt: "2026-08-11T18:00:00.000Z",
+      token: "c".repeat(64),
+      version: 1,
+    };
+    localStorage.setItem(widgetStorageKey(testPublicId), JSON.stringify(stored));
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ error: { code: "SESSION_EXPIRED", message: "raw" } }), {
+        headers: { "Content-Type": "application/json" },
+        status: 410,
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const element = document.createElement("wyceno-widget");
+    element.setAttribute("public-id", testPublicId);
+    document.body.append(element);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(element.shadowRoot?.textContent).toContain("Ta sesja wygasła");
+
+    for (let index = 0; index < 5; index += 1) window.dispatchEvent(new Event("online"));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(element.shadowRoot?.textContent).toContain("Ta sesja wygasła");
+  });
+
+  it("keeps a local submit authoritative when a storage event arrives in flight", async () => {
+    const stored: PersistedWidgetSession = {
+      analyticsConsent: null,
+      answers: { location: "Gdańsk", service: "standard" },
+      currentStepKey: null,
+      expiresAt: "2099-01-01T00:00:00.000Z",
+      history: ["service", "location"],
+      manifest: testManifest,
+      pending: [],
+      publicId: testPublicId,
+      revision: 2,
+      savedAt: "2026-08-11T18:00:00.000Z",
+      token: "c".repeat(64),
+      version: 1,
+    };
+    const key = widgetStorageKey(testPublicId);
+    localStorage.setItem(key, JSON.stringify(stored));
+    let resolveSubmit!: (response: Response) => void;
+    const submitRequests: string[] = [];
+    const resumeRequests: string[] = [];
+    const fetchMock = vi.fn<typeof fetch>((input, init) => {
+      const url = new URL(String(input));
+      const method = init?.method ?? "GET";
+      if (url.pathname.endsWith("/sessions/current") && method === "GET") {
+        resumeRequests.push(url.pathname);
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              answers: stored.answers,
+              currentStepKey: stored.currentStepKey,
+              expiresAt: stored.expiresAt,
+              manifest: testManifest,
+              revision: stored.revision,
+            }),
+            { headers: { "Content-Type": "application/json" }, status: 200 },
+          ),
+        );
+      }
+      if (url.pathname.endsWith("/sessions/current/result") && method === "GET") {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              disclaimer: "To nie jest oferta.",
+              headline: "Dziękujemy",
+              nextStepLabel: "Skontaktujemy się po przesłaniu danych.",
+              pricing: null,
+            }),
+            { headers: { "Content-Type": "application/json" }, status: 200 },
+          ),
+        );
+      }
+      if (url.pathname.endsWith("/sessions/current/submit") && method === "POST") {
+        submitRequests.push(url.pathname);
+        return new Promise<Response>((resolve) => {
+          resolveSubmit = resolve;
+        });
+      }
+      return Promise.reject(new Error(`Unexpected test request: ${method} ${url.pathname}`));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const element = document.createElement("wyceno-widget");
+    element.setAttribute("public-id", testPublicId);
+    document.body.append(element);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    const contactForm = element.shadowRoot?.querySelector<HTMLFormElement>(".wyceno-contact-form");
+    const email = contactForm?.querySelector<HTMLInputElement>("#wyceno-contact-email");
+    const privacy = contactForm?.querySelector<HTMLInputElement>("#wyceno-privacy-notice");
+    expect(contactForm).not.toBeNull();
+    expect(email).not.toBeNull();
+    expect(privacy).not.toBeNull();
+    if (!contactForm || !email || !privacy) return;
+    email.value = "klient@example.test";
+    email.dispatchEvent(new Event("input", { bubbles: true }));
+    privacy.checked = true;
+    privacy.dispatchEvent(new Event("change", { bubbles: true }));
+    contactForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    for (let index = 0; index < 20; index += 1) {
+      const inFlightRaw = JSON.stringify({
+        ...stored,
+        savedAt: `2026-08-11T18:00:${String(index + 1).padStart(2, "0")}.000Z`,
+      });
+      localStorage.setItem(key, inFlightRaw);
+      window.dispatchEvent(new StorageEvent("storage", { key, newValue: inFlightRaw }));
+    }
+    await Promise.resolve();
+    expect(submitRequests).toHaveLength(1);
+    expect(resumeRequests).toHaveLength(1);
+
+    resolveSubmit(
+      new Response(
+        JSON.stringify({
+          leadPublicId: "e0000000-0000-4000-8000-000000000001",
+          submittedAt: "2026-08-11T18:00:02.000Z",
+        }),
+        { headers: { "Content-Type": "application/json" }, status: 200 },
+      ),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key,
+        newValue: JSON.stringify({ ...stored, savedAt: "2026-08-11T18:00:03.000Z" }),
+      }),
+    );
+    await Promise.resolve();
+
+    expect(submitRequests).toHaveLength(1);
+    expect(resumeRequests).toHaveLength(1);
+    expect(element.shadowRoot?.textContent).toContain("Zapytanie zostało wysłane");
+    expect(element.shadowRoot?.querySelector(".wyceno-contact-form")).toBeNull();
+    expect(element.shadowRoot?.querySelector('input[type="file"]')).toBeNull();
+  });
+
+  it("clears contact PII, consents and files before restarting an expired session", async () => {
+    const stored: PersistedWidgetSession = {
+      analyticsConsent: null,
+      answers: { location: "Gdańsk", service: "standard" },
+      currentStepKey: null,
+      expiresAt: "2099-01-01T00:00:00.000Z",
+      history: ["service", "location"],
+      manifest: testManifest,
+      pending: [],
+      publicId: testPublicId,
+      revision: 2,
+      savedAt: "2026-08-11T18:00:00.000Z",
+      token: "c".repeat(64),
+      version: 1,
+    };
+    localStorage.setItem(widgetStorageKey(testPublicId), JSON.stringify(stored));
+    let revision = 2;
+    let uploadRequests = 0;
+    let submitRequests = 0;
+    const fetchMock = vi.fn<typeof fetch>(async (input, init) => {
+      const url = new URL(String(input));
+      const method = init?.method ?? "GET";
+      if (url.pathname.endsWith("/sessions/current") && method === "GET") {
+        return new Response(
+          JSON.stringify({
+            answers: stored.answers,
+            currentStepKey: null,
+            expiresAt: stored.expiresAt,
+            manifest: testManifest,
+            revision,
+          }),
+          { headers: { "Content-Type": "application/json" }, status: 200 },
+        );
+      }
+      if (url.pathname.endsWith("/sessions/current/result") && method === "GET") {
+        return new Response(
+          JSON.stringify({
+            disclaimer: "To nie jest oferta.",
+            headline: "Dziękujemy",
+            nextStepLabel: "Skontaktujemy się po przesłaniu danych.",
+            pricing: null,
+          }),
+          { headers: { "Content-Type": "application/json" }, status: 200 },
+        );
+      }
+      if (url.pathname.endsWith("/sessions/current/files") && method === "POST") {
+        uploadRequests += 1;
+        return new Response(
+          JSON.stringify({ error: { code: "SESSION_EXPIRED", message: "raw PII detail" } }),
+          { headers: { "Content-Type": "application/json" }, status: 410 },
+        );
+      }
+      if (url.pathname.endsWith("/sessions") && method === "POST") {
+        revision = 0;
+        return new Response(
+          JSON.stringify({
+            currentStepKey: testManifest.entryStepKey,
+            expiresAt: stored.expiresAt,
+            manifest: testManifest,
+            revision,
+            token: "d".repeat(64),
+          }),
+          { headers: { "Content-Type": "application/json" }, status: 201 },
+        );
+      }
+      if (method === "PUT") {
+        const body = JSON.parse(String(init?.body)) as {
+          expectedRevision: number;
+          nextStepKey: string | null;
+        };
+        revision = body.expectedRevision + 1;
+        return new Response(JSON.stringify({ currentStepKey: body.nextStepKey, revision }), {
+          headers: { "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      if (url.pathname.endsWith("/sessions/current/submit") && method === "POST") {
+        submitRequests += 1;
+        return new Response(
+          JSON.stringify({
+            leadPublicId: "e0000000-0000-4000-8000-000000000001",
+            submittedAt: "2026-08-11T18:00:02.000Z",
+          }),
+          { headers: { "Content-Type": "application/json" }, status: 201 },
+        );
+      }
+      throw new Error(`Unexpected test request: ${method} ${url.pathname}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const element = document.createElement("wyceno-widget");
+    element.setAttribute("public-id", testPublicId);
+    document.body.append(element);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    const initialForm = element.shadowRoot?.querySelector<HTMLFormElement>(".wyceno-contact-form");
+    const initialName = initialForm?.querySelector<HTMLInputElement>("#wyceno-contact-name");
+    const initialEmail = initialForm?.querySelector<HTMLInputElement>("#wyceno-contact-email");
+    const initialPhone = initialForm?.querySelector<HTMLInputElement>("#wyceno-contact-phone");
+    const initialFiles = initialForm?.querySelector<HTMLInputElement>("#wyceno-contact-files");
+    const initialPrivacy = initialForm?.querySelector<HTMLInputElement>("#wyceno-privacy-notice");
+    const initialMarketing =
+      initialForm?.querySelector<HTMLInputElement>("#wyceno-marketing-email");
+    if (
+      !initialForm ||
+      !initialName ||
+      !initialEmail ||
+      !initialPhone ||
+      !initialFiles ||
+      !initialPrivacy ||
+      !initialMarketing
+    ) {
+      throw new Error("Missing initial contact controls.");
+    }
+    for (const [input, value] of [
+      [initialName, "Jan Kowalski"],
+      [initialEmail, "jan@example.test"],
+      [initialPhone, "+48 500 600 700"],
+    ] as const) {
+      input.value = value;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    Object.defineProperty(initialFiles, "files", {
+      configurable: true,
+      value: [new File(["%PDF-private"], "projekt.pdf", { type: "application/pdf" })],
+    });
+    initialFiles.dispatchEvent(new Event("change", { bubbles: true }));
+    initialPrivacy.checked = true;
+    initialPrivacy.dispatchEvent(new Event("change", { bubbles: true }));
+    initialMarketing.checked = true;
+    initialMarketing.dispatchEvent(new Event("change", { bubbles: true }));
+    initialForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(uploadRequests).toBe(1);
+    expect(element.shadowRoot?.textContent).toContain("Ta sesja wygasła");
+    element.shadowRoot?.querySelector<HTMLButtonElement>(".wyceno-alert button")?.click();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    const serviceForm = element.shadowRoot?.querySelector<HTMLFormElement>(".wyceno-form");
+    const service = serviceForm?.querySelector<HTMLInputElement>('input[value="standard"]');
+    if (!serviceForm || !service) throw new Error("Missing restarted service step.");
+    service.checked = true;
+    serviceForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    const locationForm = element.shadowRoot?.querySelector<HTMLFormElement>(".wyceno-form");
+    const location = locationForm?.querySelector<HTMLInputElement>('input[type="text"]');
+    if (!locationForm || !location) throw new Error("Missing restarted location step.");
+    location.value = "Warszawa";
+    locationForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    const restartedForm =
+      element.shadowRoot?.querySelector<HTMLFormElement>(".wyceno-contact-form");
+    const restartedName = restartedForm?.querySelector<HTMLInputElement>("#wyceno-contact-name");
+    const restartedEmail = restartedForm?.querySelector<HTMLInputElement>("#wyceno-contact-email");
+    const restartedPhone = restartedForm?.querySelector<HTMLInputElement>("#wyceno-contact-phone");
+    const restartedFiles = restartedForm?.querySelector<HTMLInputElement>("#wyceno-contact-files");
+    const restartedPrivacy =
+      restartedForm?.querySelector<HTMLInputElement>("#wyceno-privacy-notice");
+    const restartedMarketing =
+      restartedForm?.querySelector<HTMLInputElement>("#wyceno-marketing-email");
+    if (
+      !restartedForm ||
+      !restartedName ||
+      !restartedEmail ||
+      !restartedPhone ||
+      !restartedFiles ||
+      !restartedPrivacy ||
+      !restartedMarketing
+    ) {
+      throw new Error("Missing restarted contact controls.");
+    }
+    expect(restartedName.value).toBe("");
+    expect(restartedEmail.value).toBe("");
+    expect(restartedPhone.value).toBe("");
+    expect(restartedFiles.files).toHaveLength(0);
+    expect(restartedPrivacy.checked).toBe(false);
+    expect(restartedMarketing.checked).toBe(false);
+
+    restartedEmail.value = "nowy@example.test";
+    restartedEmail.dispatchEvent(new Event("input", { bubbles: true }));
+    restartedPrivacy.checked = true;
+    restartedPrivacy.dispatchEvent(new Event("change", { bubbles: true }));
+    restartedForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(uploadRequests).toBe(1);
+    expect(submitRequests).toBe(1);
+    expect(element.shadowRoot?.textContent).toContain("Zapytanie zostało wysłane");
+  });
+
   it.each(["popup", "fullscreen"] as const)(
     "defers the %s session and local storage until the launcher is clicked",
     async (mode) => {
@@ -133,7 +527,7 @@ describe("wyceno-widget element", () => {
 
       window.dispatchEvent(
         new StorageEvent("storage", {
-          key: `wyceno:widget:v1:${testPublicId}`,
+          key: widgetStorageKey(testPublicId),
           newValue: "{}",
         }),
       );

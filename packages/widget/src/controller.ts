@@ -1,4 +1,5 @@
 import {
+  isWidgetChallengeError,
   isWidgetApiError,
   type WidgetAnswer,
   type WidgetAnalyticsEvent,
@@ -6,6 +7,7 @@ import {
   type WidgetApi,
   type WidgetCalculatedResult,
   type WidgetManifest,
+  type WidgetSessionSnapshot,
   type WidgetStep,
   type WidgetSubmission,
   type UploadedWidgetFile,
@@ -92,13 +94,38 @@ function analyticsSource(): WidgetAnalyticsEvent["source"] {
   }
 }
 
+function challengeErrorMessage(error: unknown): string | null {
+  if (isWidgetChallengeError(error, "EXPIRED")) {
+    return "Potwierdzenie bezpieczeństwa wygasło. Spróbuj ponownie.";
+  }
+  if (isWidgetChallengeError(error, "TIMEOUT")) {
+    return "Weryfikacja bezpieczeństwa przekroczyła limit czasu. Spróbuj ponownie.";
+  }
+  if (isWidgetChallengeError(error, "UNSUPPORTED")) {
+    return "Ta przeglądarka nie obsługuje weryfikacji bezpieczeństwa.";
+  }
+  if (isWidgetChallengeError(error, "UNAVAILABLE")) {
+    return "Nie udało się uruchomić weryfikacji bezpieczeństwa. Spróbuj ponownie.";
+  }
+  if (isWidgetChallengeError(error, "FAILED")) {
+    return "Nie udało się potwierdzić bezpieczeństwa. Spróbuj ponownie.";
+  }
+  return null;
+}
+
 export class WidgetSessionController {
   readonly #api: WidgetApi;
   readonly #listeners = new Set<(state: WidgetState) => void>();
   readonly #storage: WidgetStorage;
   readonly #pendingAnalytics: WidgetAnalyticsEvent[] = [];
+  #analyticsConsentEpoch = 0;
+  #analyticsConsentRequestPromise: Promise<void> | null = null;
   #analyticsFlushPromise: Promise<void> | null = null;
-  #flushPromise: Promise<void> | null = null;
+  readonly #flushPromises = new WeakMap<ActiveSession, Promise<void>>();
+  #initializePromise: Promise<void> | null = null;
+  #mutationEpoch = 0;
+  #publicId: string | null = null;
+  #reconnectPromise: Promise<void> | null = null;
   #session: ActiveSession | null = null;
   #state: WidgetState = {
     analyticsConsent: null,
@@ -131,82 +158,117 @@ export class WidgetSessionController {
   }
 
   async initialize(publicId: string): Promise<void> {
+    if (this.#initializePromise) return this.#initializePromise;
+    const initialization = this.#initializeOnce(publicId).finally(() => {
+      if (this.#initializePromise === initialization) this.#initializePromise = null;
+    });
+    this.#initializePromise = initialization;
+    return initialization;
+  }
+
+  async #initializeOnce(publicId: string): Promise<void> {
+    this.#publicId = publicId;
     this.#setState({ status: "loading_manifest", errorMessage: null });
-    const local = this.#storage.load(publicId);
+    const local = this.#loadStored(publicId);
     if (local) {
       this.#restoreLocal(local);
+      const session = this.#session;
+      if (!session) return;
+      const mutationEpoch = this.#mutationEpoch;
+      const revision = session.revision;
+      let resumed;
       try {
-        const resumed = await this.#api.resumeSession(local.token);
-        this.#session = {
-          analyticsConsent: local.analyticsConsent ?? null,
-          answers: { ...resumed.answers },
-          currentStepKey: resumed.currentStepKey,
-          expiresAt: resumed.expiresAt,
-          history: local.history,
-          manifest: resumed.manifest,
-          pending: local.pending,
-          publicId,
-          revision: resumed.revision,
-          token: local.token,
-        };
-        for (const pending of local.pending) {
-          if (pending.answer === null) delete this.#session.answers[pending.stepKey];
-          else this.#session.answers[pending.stepKey] = pending.answer;
-          this.#session.currentStepKey = pending.nextStepKey;
-        }
-        this.#publishSession();
-        await this.flush();
-        this.trackAnalytics("widget_loaded");
-        if (this.#session.currentStepKey) {
-          this.trackAnalytics("step_viewed", this.#session.currentStepKey);
-        }
-        return;
+        resumed = await this.#api.resumeSession(local.token);
       } catch (error) {
         if (isWidgetApiError(error, "EXPIRED") || isWidgetApiError(error, "NOT_FOUND")) {
-          this.#storage.clear(publicId);
-          this.#session = null;
-          this.#setState({
-            status: "expired",
-            errorMessage: "Ta sesja wygasła. Rozpocznij proces ponownie.",
-          });
+          if (this.#canExpireFromResume(session)) this.#expireSession(session);
           return;
         }
+        if (!this.#canApplyResumedSnapshot(session, mutationEpoch, revision)) return;
         this.#setState({ syncStatus: "offline" });
         return;
       }
+
+      if (!this.#applyResumedSnapshot(session, resumed, mutationEpoch, revision)) return;
+      await this.flush();
+      if (this.#session !== session) return;
+      this.trackAnalytics("widget_loaded");
+      if (session.currentStepKey) {
+        this.trackAnalytics("step_viewed", session.currentStepKey);
+      }
+      return;
     }
 
+    const mutationEpoch = this.#mutationEpoch;
+    let created;
     try {
-      const created = await this.#api.createSession(publicId);
-      this.#session = {
-        analyticsConsent: null,
-        answers: {},
-        currentStepKey: created.currentStepKey,
-        expiresAt: created.expiresAt,
-        history: [],
-        manifest: created.manifest,
-        pending: [],
-        publicId,
-        revision: created.revision,
-        token: created.token,
-      };
-      this.#publishSession();
-      this.trackAnalytics("widget_loaded");
-      this.trackAnalytics("step_viewed", created.currentStepKey);
+      created = await this.#api.createSession(publicId);
     } catch (error) {
+      if (
+        this.#session ||
+        this.#publicId !== publicId ||
+        this.#mutationEpoch !== mutationEpoch ||
+        this.#state.status !== "loading_manifest"
+      ) {
+        return;
+      }
       this.#setState({
         errorMessage: isWidgetApiError(error, "NOT_FOUND")
           ? "Ten proces jest niedostępny."
           : "Nie udało się uruchomić procesu. Sprawdź połączenie i spróbuj ponownie.",
         status: isWidgetApiError(error, "NOT_FOUND") ? "unavailable" : "recoverable_error",
       });
+      return;
     }
+
+    if (
+      this.#session ||
+      this.#publicId !== publicId ||
+      this.#mutationEpoch !== mutationEpoch ||
+      this.#state.status !== "loading_manifest"
+    ) {
+      return;
+    }
+
+    this.#session = {
+      analyticsConsent: null,
+      answers: {},
+      currentStepKey: created.currentStepKey,
+      expiresAt: created.expiresAt,
+      history: [],
+      manifest: created.manifest,
+      pending: [],
+      publicId,
+      revision: created.revision,
+      token: created.token,
+    };
+    this.#mutationEpoch += 1;
+    this.#publishSession("synced");
+    this.trackAnalytics("widget_loaded");
+    this.trackAnalytics("step_viewed", created.currentStepKey);
   }
 
   async restart(): Promise<void> {
-    const publicId = this.#session?.publicId ?? this.#state.manifest?.publicId;
+    const reconnect = this.#reconnectPromise;
+    if (reconnect) {
+      await reconnect;
+      if (this.#state.status !== "recoverable_error" && this.#state.status !== "expired") {
+        return;
+      }
+    }
+    const initialization = this.#initializePromise;
+    if (initialization) {
+      await initialization;
+      if (this.#state.status !== "recoverable_error" && this.#state.status !== "expired") {
+        return;
+      }
+    }
+    const publicId = this.#session?.publicId ?? this.#state.manifest?.publicId ?? this.#publicId;
     if (!publicId) return;
-    this.#storage.clear(publicId);
+    this.#mutationEpoch += 1;
+    this.#analyticsConsentEpoch += 1;
+    this.#clearStored(publicId);
+    this.#pendingAnalytics.splice(0);
     this.#session = null;
     this.#state = {
       ...this.#state,
@@ -223,9 +285,23 @@ export class WidgetSessionController {
     await this.initialize(publicId);
   }
 
+  async reconnect(): Promise<void> {
+    if (this.#reconnectPromise) return this.#reconnectPromise;
+    const reconnect = (async () => {
+      const initialization = this.#initializePromise;
+      if (initialization) await initialization;
+      await this.#retryConnection();
+    })().finally(() => {
+      if (this.#reconnectPromise === reconnect) this.#reconnectPromise = null;
+    });
+    this.#reconnectPromise = reconnect;
+    return reconnect;
+  }
+
   async setAnalyticsConsent(granted: boolean): Promise<boolean> {
     const session = this.#session;
     if (!session) return false;
+    const consentEpoch = ++this.#analyticsConsentEpoch;
     const previousConsent = session.analyticsConsent;
     if (!granted) {
       session.analyticsConsent = false;
@@ -233,18 +309,31 @@ export class WidgetSessionController {
     }
     this.#setState({ analyticsConsent: granted, analyticsError: null });
     if (!granted) this.#persist();
-    try {
-      await this.#api.setAnalyticsConsent({
-        consentVersion: "analytics-v1",
-        granted,
-        mutationId: crypto.randomUUID(),
-        token: session.token,
+    const previousRequest = this.#analyticsConsentRequestPromise;
+    const request = (previousRequest ? previousRequest.catch(() => undefined) : Promise.resolve())
+      .then(() =>
+        this.#api.setAnalyticsConsent({
+          consentVersion: "analytics-v1",
+          granted,
+          mutationId: crypto.randomUUID(),
+          token: session.token,
+        }),
+      )
+      .finally(() => {
+        if (this.#analyticsConsentRequestPromise === request) {
+          this.#analyticsConsentRequestPromise = null;
+        }
       });
+    this.#analyticsConsentRequestPromise = request;
+    try {
+      await request;
+      if (this.#session !== session || this.#analyticsConsentEpoch !== consentEpoch) return false;
       session.analyticsConsent = granted;
       this.#persist();
       if (granted) void this.#flushAnalytics();
       return true;
     } catch {
+      if (this.#session !== session || this.#analyticsConsentEpoch !== consentEpoch) return false;
       if (granted) session.analyticsConsent = previousConsent;
       this.#setState({
         analyticsConsent: granted ? previousConsent : false,
@@ -258,16 +347,20 @@ export class WidgetSessionController {
   trackAnalytics(name: WidgetAnalyticsEventName, stepKey: string | null = null): void {
     const session = this.#session;
     if (!session || session.analyticsConsent === false) return;
-    this.#pendingAnalytics.push({
-      device: analyticsDevice(),
-      eventId: crypto.randomUUID(),
-      name,
-      occurredAt: new Date().toISOString(),
-      schemaVersion: 1,
-      source: analyticsSource(),
-      stepKey,
-      token: session.token,
-    });
+    try {
+      this.#pendingAnalytics.push({
+        device: analyticsDevice(),
+        eventId: crypto.randomUUID(),
+        name,
+        occurredAt: new Date().toISOString(),
+        schemaVersion: 1,
+        source: analyticsSource(),
+        stepKey,
+        token: session.token,
+      });
+    } catch {
+      return;
+    }
     if (session.analyticsConsent) void this.#flushAnalytics();
   }
 
@@ -279,6 +372,7 @@ export class WidgetSessionController {
     const capture = session?.manifest.leadCapture;
     if (!session || !capture || session.currentStepKey !== null || !this.#state.result)
       return false;
+    if (this.#state.status === "submitting" || this.#state.status === "submitted") return false;
     if (!draft.privacyAccepted) {
       this.#setState({ errorMessage: "Potwierdź zapoznanie się z informacją o prywatności." });
       return false;
@@ -313,15 +407,20 @@ export class WidgetSessionController {
       this.#setState({ errorMessage: "Możesz dodać maksymalnie 5 plików." });
       return false;
     }
+    this.#mutationEpoch += 1;
+    const submissionEpoch = this.#mutationEpoch;
     this.#setState({ errorMessage: null, status: "submitting" });
     try {
       const uploaded = [...this.#state.uploadedFiles];
       for (const file of filesToUpload) {
-        uploaded.push(await this.#api.uploadFile(file, session.token));
+        const uploadedFile = await this.#api.uploadFile(file, session.token);
+        if (!this.#isCurrentSubmission(session, submissionEpoch)) return false;
+        uploaded.push(uploadedFile);
         this.trackAnalytics("file_uploaded");
         this.#setState({ uploadedFiles: [...uploaded] });
       }
       const challengeToken = await challengeTokenProvider();
+      if (!this.#isCurrentSubmission(session, submissionEpoch)) return false;
       const submission = await this.#api.submitLead({
         challengeToken,
         contact: {
@@ -346,6 +445,7 @@ export class WidgetSessionController {
         },
         token: session.token,
       });
+      if (!this.#isCurrentSubmission(session, submissionEpoch)) return false;
       this.#setState({
         errorMessage: null,
         status: "submitted",
@@ -355,18 +455,20 @@ export class WidgetSessionController {
       this.trackAnalytics("lead_submitted");
       return true;
     } catch (error) {
+      if (!this.#isCurrentSubmission(session, submissionEpoch)) return false;
       if (isWidgetApiError(error, "EXPIRED") || isWidgetApiError(error, "NOT_FOUND")) {
-        this.#setState({
-          errorMessage: "Ta sesja wygasła. Rozpocznij proces ponownie.",
-          status: "expired",
-        });
+        this.#expireSession(session);
         return false;
       }
+      const safeChallengeMessage = challengeErrorMessage(error);
       this.#setState({
         errorMessage:
-          error instanceof Error
-            ? error.message
-            : "Nie udało się wysłać zapytania. Spróbuj ponownie.",
+          safeChallengeMessage ??
+          (isWidgetApiError(error, "CHALLENGE")
+            ? "Nie udało się potwierdzić wysłania. Spróbuj ponownie."
+            : isWidgetApiError(error, "RATE_LIMITED")
+              ? "Zbyt wiele prób. Odczekaj chwilę i spróbuj ponownie."
+              : "Nie udało się wysłać zapytania. Spróbuj ponownie."),
         status: "result",
       });
       return false;
@@ -384,6 +486,7 @@ export class WidgetSessionController {
       return false;
     }
 
+    this.#mutationEpoch += 1;
     if (answer === null) delete session.answers[currentStepKey];
     else session.answers[currentStepKey] = answer;
     const nextStepKey = resolveNextStep(session.manifest, currentStepKey, session.answers);
@@ -398,7 +501,7 @@ export class WidgetSessionController {
     if (session.history.length === 1) this.trackAnalytics("flow_started");
     this.trackAnalytics("step_answered", currentStepKey);
     if (nextStepKey) this.trackAnalytics("step_viewed", nextStepKey);
-    this.#publishSession();
+    this.#publishSession("saving");
     void this.flush();
     return true;
   }
@@ -407,6 +510,7 @@ export class WidgetSessionController {
     const session = this.#session;
     const previous = session?.history.pop();
     if (!session || !previous) return;
+    this.#mutationEpoch += 1;
     this.trackAnalytics("step_back", previous);
     this.trackAnalytics("step_viewed", previous);
     session.currentStepKey = previous;
@@ -415,14 +519,21 @@ export class WidgetSessionController {
   }
 
   async flush(): Promise<void> {
-    if (this.#flushPromise) return this.#flushPromise;
-    this.#flushPromise = this.#flushPending()
-      .then(() => this.#loadResult())
-      .then(() => this.#flushAnalytics())
-      .finally(() => {
-        this.#flushPromise = null;
-      });
-    return this.#flushPromise;
+    const owner = this.#session;
+    if (!owner) return;
+    const existing = this.#flushPromises.get(owner);
+    if (existing) return existing;
+    const flush = (async () => {
+      await this.#flushPending(owner);
+      if (this.#session !== owner) return;
+      await this.#loadResult(owner);
+      if (this.#session !== owner) return;
+      void this.#flushAnalytics();
+    })().finally(() => {
+      if (this.#flushPromises.get(owner) === flush) this.#flushPromises.delete(owner);
+    });
+    this.#flushPromises.set(owner, flush);
+    return flush;
   }
 
   #restoreLocal(local: PersistedWidgetSession): void {
@@ -438,12 +549,182 @@ export class WidgetSessionController {
       revision: local.revision,
       token: local.token,
     };
+    this.#mutationEpoch += 1;
     this.#publishSession("offline");
   }
 
-  async #flushPending(): Promise<void> {
+  #clearStored(publicId: string): void {
+    try {
+      this.#storage.clear(publicId);
+    } catch {
+      // Storage is a recoverability aid, never the source of API availability.
+    }
+  }
+
+  #loadStored(publicId: string): PersistedWidgetSession | null {
+    try {
+      return this.#storage.load(publicId);
+    } catch {
+      return null;
+    }
+  }
+
+  #canApplyResumedSnapshot(
+    session: ActiveSession,
+    mutationEpoch: number,
+    revision: number,
+  ): boolean {
+    return (
+      this.#session === session &&
+      this.#mutationEpoch === mutationEpoch &&
+      session.revision === revision &&
+      !this.#isResumeCommitBlocked()
+    );
+  }
+
+  #canCommitCreatedSession(publicId: string, mutationEpoch: number): boolean {
+    return (
+      !this.#session &&
+      this.#publicId === publicId &&
+      this.#mutationEpoch === mutationEpoch &&
+      this.#state.status === "loading_manifest"
+    );
+  }
+
+  #canExpireFromResume(session: ActiveSession): boolean {
+    return this.#session === session && !this.#isSubmissionInFlightOrComplete();
+  }
+
+  #isSubmissionInFlightOrComplete(): boolean {
+    return this.#state.status === "submitted" || this.#state.status === "submitting";
+  }
+
+  #isCurrentSubmission(session: ActiveSession, mutationEpoch: number): boolean {
+    return (
+      this.#session === session &&
+      this.#mutationEpoch === mutationEpoch &&
+      this.#state.status === "submitting"
+    );
+  }
+
+  #isResumeCommitBlocked(): boolean {
+    return (
+      this.#state.status === "expired" ||
+      this.#state.status === "submitted" ||
+      this.#state.status === "submitting" ||
+      this.#state.status === "unavailable"
+    );
+  }
+
+  #applyResumedSnapshot(
+    session: ActiveSession,
+    resumed: WidgetSessionSnapshot,
+    mutationEpoch: number,
+    revision: number,
+  ): boolean {
+    if (!this.#canApplyResumedSnapshot(session, mutationEpoch, revision)) {
+      if (
+        this.#session === session &&
+        !this.#isResumeCommitBlocked() &&
+        this.#state.status === "active" &&
+        session.pending.length === 0 &&
+        session.revision === revision &&
+        resumed.revision === revision
+      ) {
+        this.#publishSession("synced");
+      }
+      return false;
+    }
+    if (resumed.revision < session.revision) {
+      return false;
+    }
+    session.answers = { ...resumed.answers };
+    session.currentStepKey = resumed.currentStepKey;
+    session.expiresAt = resumed.expiresAt;
+    session.manifest = resumed.manifest;
+    session.revision = resumed.revision;
+    for (const pending of session.pending) {
+      if (pending.answer === null) delete session.answers[pending.stepKey];
+      else session.answers[pending.stepKey] = pending.answer;
+      session.currentStepKey = pending.nextStepKey;
+    }
+    this.#publishSession("synced");
+    return true;
+  }
+
+  async #retryConnection(): Promise<void> {
     const session = this.#session;
-    if (!session || session.pending.length === 0) return;
+    if (session) {
+      if (this.#isSubmissionInFlightOrComplete()) {
+        void this.#flushAnalytics();
+        return;
+      }
+      if (this.#state.status === "expired" || this.#state.status === "unavailable") {
+        return;
+      }
+      await this.flush();
+      if (this.#state.syncStatus !== "offline" || this.#session !== session) return;
+      if (this.#isSubmissionInFlightOrComplete()) {
+        void this.#flushAnalytics();
+        return;
+      }
+      const mutationEpoch = this.#mutationEpoch;
+      const revision = session.revision;
+      let resumed;
+      try {
+        resumed = await this.#api.resumeSession(session.token);
+      } catch (error) {
+        if (isWidgetApiError(error, "EXPIRED") || isWidgetApiError(error, "NOT_FOUND")) {
+          if (this.#canExpireFromResume(session)) this.#expireSession(session);
+        } else {
+          if (!this.#canApplyResumedSnapshot(session, mutationEpoch, revision)) return;
+          this.#setState({ syncStatus: "offline" });
+        }
+        return;
+      }
+      if (!this.#applyResumedSnapshot(session, resumed, mutationEpoch, revision)) return;
+      await this.flush();
+      return;
+    }
+
+    const publicId = this.#publicId;
+    if (!publicId || this.#state.status !== "recoverable_error") return;
+    const mutationEpoch = this.#mutationEpoch;
+    this.#setState({ errorMessage: null, status: "loading_manifest" });
+    let created;
+    try {
+      created = await this.#api.createSession(publicId);
+    } catch (error) {
+      if (!this.#canCommitCreatedSession(publicId, mutationEpoch)) return;
+      this.#setState({
+        errorMessage: isWidgetApiError(error, "NOT_FOUND")
+          ? "Ten proces jest niedostępny."
+          : "Nie udało się uruchomić procesu. Sprawdź połączenie i spróbuj ponownie.",
+        status: isWidgetApiError(error, "NOT_FOUND") ? "unavailable" : "recoverable_error",
+      });
+      return;
+    }
+    if (!this.#canCommitCreatedSession(publicId, mutationEpoch)) return;
+    this.#session = {
+      analyticsConsent: null,
+      answers: {},
+      currentStepKey: created.currentStepKey,
+      expiresAt: created.expiresAt,
+      history: [],
+      manifest: created.manifest,
+      pending: [],
+      publicId,
+      revision: created.revision,
+      token: created.token,
+    };
+    this.#mutationEpoch += 1;
+    this.#publishSession("synced");
+    this.trackAnalytics("widget_loaded");
+    this.trackAnalytics("step_viewed", created.currentStepKey);
+  }
+
+  async #flushPending(session: ActiveSession): Promise<void> {
+    if (this.#session !== session || session.pending.length === 0) return;
     this.#setState({ syncStatus: "saving" });
     while (session.pending.length > 0) {
       const pending = session.pending[0];
@@ -454,13 +735,16 @@ export class WidgetSessionController {
           expectedRevision: session.revision,
           token: session.token,
         });
+        if (this.#session !== session) return;
         session.revision = saved.revision;
         session.pending.shift();
         this.#persist();
       } catch (error) {
+        if (this.#session !== session) return;
         if (isWidgetApiError(error, "CONFLICT")) {
           try {
             const remote = await this.#api.resumeSession(session.token);
+            if (this.#session !== session) return;
             session.revision = remote.revision;
             session.manifest = remote.manifest;
             session.answers = { ...remote.answers };
@@ -469,17 +753,21 @@ export class WidgetSessionController {
               else session.answers[queued.stepKey] = queued.answer;
             }
             continue;
-          } catch {
-            this.#setState({ syncStatus: "offline" });
+          } catch (resumeError) {
+            if (this.#session !== session) return;
+            if (
+              isWidgetApiError(resumeError, "EXPIRED") ||
+              isWidgetApiError(resumeError, "NOT_FOUND")
+            ) {
+              this.#expireSession(session);
+            } else {
+              this.#setState({ syncStatus: "offline" });
+            }
             return;
           }
         }
-        if (isWidgetApiError(error, "EXPIRED")) {
-          this.#setState({
-            errorMessage: "Ta sesja wygasła. Rozpocznij proces ponownie.",
-            status: "expired",
-            syncStatus: "offline",
-          });
+        if (isWidgetApiError(error, "EXPIRED") || isWidgetApiError(error, "NOT_FOUND")) {
+          this.#expireSession(session);
           return;
         }
         this.#setState({ syncStatus: "offline" });
@@ -487,23 +775,31 @@ export class WidgetSessionController {
         return;
       }
     }
+    if (this.#session !== session) return;
     this.#setState({ syncStatus: "synced" });
     this.#persist();
   }
 
-  async #loadResult(): Promise<void> {
-    const session = this.#session;
+  async #loadResult(session: ActiveSession): Promise<void> {
     if (
-      !session ||
+      this.#session !== session ||
       session.currentStepKey !== null ||
       session.pending.length > 0 ||
       this.#state.result
     ) {
       return;
     }
+    const mutationEpoch = this.#mutationEpoch;
     this.#setState({ status: "calculating_result" });
     try {
       const result = await this.#api.getResult(session.token);
+      if (
+        this.#session !== session ||
+        this.#mutationEpoch !== mutationEpoch ||
+        session.currentStepKey !== null
+      ) {
+        return;
+      }
       this.#setState({
         errorMessage: null,
         result,
@@ -513,13 +809,10 @@ export class WidgetSessionController {
       this.trackAnalytics("result_viewed");
     } catch (error) {
       if (isWidgetApiError(error, "EXPIRED") || isWidgetApiError(error, "NOT_FOUND")) {
-        this.#setState({
-          errorMessage: "Ta sesja wygasła. Rozpocznij proces ponownie.",
-          status: "expired",
-          syncStatus: "offline",
-        });
+        this.#expireSession(session);
         return;
       }
+      if (this.#session !== session || this.#mutationEpoch !== mutationEpoch) return;
       this.#setState({
         errorMessage: "Wynik zostanie obliczony po odzyskaniu połączenia.",
         status: "calculating_result",
@@ -557,23 +850,50 @@ export class WidgetSessionController {
     this.#emit();
   }
 
+  #expireSession(session: ActiveSession): void {
+    if (this.#session !== session) return;
+    this.#mutationEpoch += 1;
+    this.#analyticsConsentEpoch += 1;
+    this.#clearStored(session.publicId);
+    this.#pendingAnalytics.splice(0);
+    this.#session = null;
+    this.#setState({
+      analyticsConsent: null,
+      analyticsError: null,
+      answers: {},
+      currentStep: null,
+      errorMessage: "Ta sesja wygasła. Rozpocznij proces ponownie.",
+      history: [],
+      manifest: null,
+      result: null,
+      status: "expired",
+      submission: null,
+      syncStatus: "offline",
+      uploadedFiles: [],
+    });
+  }
+
   #persist(): void {
     const session = this.#session;
     if (!session) return;
-    this.#storage.save({
-      analyticsConsent: session.analyticsConsent,
-      answers: { ...session.answers },
-      currentStepKey: session.currentStepKey,
-      expiresAt: session.expiresAt,
-      history: [...session.history],
-      manifest: session.manifest,
-      pending: [...session.pending],
-      publicId: session.publicId,
-      revision: session.revision,
-      savedAt: new Date().toISOString(),
-      token: session.token,
-      version: 1,
-    });
+    try {
+      this.#storage.save({
+        analyticsConsent: session.analyticsConsent,
+        answers: { ...session.answers },
+        currentStepKey: session.currentStepKey,
+        expiresAt: session.expiresAt,
+        history: [...session.history],
+        manifest: session.manifest,
+        pending: [...session.pending],
+        publicId: session.publicId,
+        revision: session.revision,
+        savedAt: new Date().toISOString(),
+        token: session.token,
+        version: 1,
+      });
+    } catch {
+      // A host storage failure cannot downgrade a successful API session to offline.
+    }
   }
 
   #setState(update: Partial<WidgetState>): void {
@@ -591,7 +911,7 @@ export class WidgetSessionController {
         if (!event) break;
         try {
           await this.#api.trackAnalyticsEvent(event);
-          this.#pendingAnalytics.shift();
+          if (this.#pendingAnalytics[0] === event) this.#pendingAnalytics.shift();
         } catch {
           return;
         }

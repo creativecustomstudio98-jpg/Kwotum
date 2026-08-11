@@ -2713,6 +2713,65 @@ czytelnych odpowiedzi bez `opcja_`, produkcyjne `/health` i `/ready` zwracają
 HTTP 200, a pierwszy wznowiony cykl cron zakończył się powodzeniem przy pustych
 kolejkach. Zakończonego alertu UAT nie wysłano ponownie.
 
+##### Korekta FTZ-05R — wiarygodny status resume i odporność storage
+
+- [x] Oddzielić wynik API resume/create od lokalnego storage i analityki.
+- [x] Przywracać `active + synced` po poprawnym resume aktualnego snapshotu,
+      także gdy zapis hosta albo wysłanie eventu analytics zawiedzie.
+- [x] Zachować `active + offline` i lokalne odpowiedzi przy rzeczywistym
+      błędzie sieci podczas resume.
+- [x] Dodać best-effort `localStorage` z pamięciowym fallbackiem bieżącej karty
+      oraz bezpiecznym `clear/load/save` bez surowych wyjątków.
+- [x] Zapisywać idempotentnie, pomijając zmianę obejmującą wyłącznie `savedAt`.
+- [x] Wyłączyć automatyczną reakcję na cross-tab `storage`; pilotaż wspiera
+      jedną aktywną kartę na sesję, a synchronizacja wielu kart wymaga osobnego
+      protokołu i pozostaje poza tym etapem.
+- [x] Po zdarzeniu `online` ponowić deduplikowane resume albo pierwszy create w
+      tej samej instancji kontrolera, po zakończeniu trwającej inicjalizacji;
+      ponawialny błąd sieci zachowuje snapshot, a 404/410 z endpointu głównej
+      sesji (`resume`, `save`, `result`, `upload` lub `submit`) usuwa wygasły
+      token, dane kontaktowe i zgody.
+- [x] Zapamiętać wejściowy `publicId`, aby retry działał także po pierwszym
+      nieudanym utworzeniu sesji.
+- [x] Chronić initial resume i reconnect przed przestarzałą odpowiedzią po
+      nowszym answer/back/submit oraz serializować retry create z restartem.
+- [x] Przypisać flush do właściciela sesji, aby wiszący zapis wygasłej sesji nie
+      blokował zapisu nowej ani nie zmieniał jej statusu; po submit zwalniać
+      pamięciowy draft kontaktu i referencje do plików.
+- [x] Serializować przeciwstawne decyzje analytics i nie pozwalać staremu
+      eventowi usunąć pierwszego eventu ponownie uruchomionej sesji.
+- [x] Dodać unit dla quota, analytics, resume 200, prawdziwej awarii sieci,
+      serialnego online retry podczas initial resume/create, 404/410, braku
+      reakcji na `storage` podczas submitu, wyścigów stale resume/create/submit
+      oraz E2E produkcyjnego buildu dla reload/resume.
+- [ ] Przed szerszym rolloutem dodać jawne uzgodnienie odroczonego 404/410,
+      które wróciło równolegle z submit, jeśli sam submit następnie zawiedzie.
+- [ ] Przed szerszym rolloutem dodać ograniczone czasowo `AbortSignal` dla
+      requestów initialize/reconnect, aby uszkodzony transport nie wisiał bez
+      końca.
+- [ ] Przed szerszym rolloutem dodać anulowanie/generację lifecycle dla
+      nietypowego detach/reattach custom elementu; nie blokuje to statycznego
+      embedu pilota Fortez.
+
+**Stan lokalny 2026-08-11 — CODE COMPLETE, RELEASE OPEN:** logi produkcyjne
+potwierdziły `OPTIONS 204` i `GET 200 /sessions/current`, gdy Safari pokazało
+status offline. Potwierdzoną przyczyną w kodzie było odziedziczenie `offline`
+ustawionego przed resume; przy pustej kolejce nic nie przełączało go później na
+`synced`. Osobna seria kilkudziesięciu `GET 200` co około 0,5–0,9 s jest
+wyłącznie dowodem obserwacyjnym i nie potwierdzono, że źródłem był widget.
+Korekta nie próbuje scalać stanu wielu kart: widget nie nasłuchuje `storage`, a
+kontrakt pilota wymaga jednej aktywnej karty na sesję. Nie zmieniono API, modelu
+danych, tenant scope ani schematu lub zakresu danych telemetrii. Lokalnie
+przeszły format, lint i typecheck całego monorepo, 22 zadania unit (w tym 66 testów
+widgetu), build 16/16, SAST, secret scan oraz 5/5 testów Chromium widgetu.
+Jednorazowy adekwatny przebieg WebKit również zakończył się wynikiem 5/5;
+tymczasowa konfiguracja i wygenerowane screenshoty nie należą do zmiany.
+Callbacki `error`, `expired`, `timeout` i `unsupported` Turnstile mają testy
+jednostkowe; realny timeout lub niedostępność ładowania zewnętrznego skryptu
+pozostają osobnym gate przed szerszym rolloutem.
+Wdrożenie wymaga review, zielonego CI i osobnego release'u; ten lokalny etap nie
+zmienia produkcji.
+
 - [x] Ujawnić publiczny tytuł i wprowadzenie w builderze z limitami schematu.
 - [x] Rozdzielić walidację treści formularza od walidacji aktywnego pytania.
 - [x] Dodać regresję autosave/reload, klawiatury, axe, mobile i overflow.
