@@ -1673,6 +1673,39 @@ export type Database = {
         };
         Returns: undefined;
       };
+      finish_notification_worker_run: {
+        Args: {
+          target_claimed: number | null;
+          target_failed: number | null;
+          target_retrying: number | null;
+          target_run_id: string;
+          target_sent: number | null;
+          target_source: "cron" | "manual";
+          target_succeeded: boolean;
+        };
+        Returns: boolean;
+      };
+      get_notification_delivery_health: {
+        Args: Record<string, never>;
+        Returns: Array<{
+          cron_age_seconds: number | null;
+          invitation_failed: number;
+          invitation_oldest_waiting_age_seconds: number | null;
+          invitation_processing: number;
+          invitation_stale_processing: number;
+          invitation_waiting: number;
+          last_cron_failed_at: string | null;
+          last_cron_outcome: "failed" | "running" | "succeeded" | null;
+          last_cron_started_at: string | null;
+          last_cron_succeeded_at: string | null;
+          notification_failed: number;
+          notification_oldest_waiting_age_seconds: number | null;
+          notification_processing: number;
+          notification_stale_processing: number;
+          notification_waiting: number;
+          observed_at: string;
+        }>;
+      };
       publish_flow: {
         Args: {
           expected_draft_revision: number;
@@ -1808,6 +1841,10 @@ export type Database = {
       };
       set_organization_lead_alert_email: {
         Args: { target_email: string; target_organization_id: string };
+        Returns: undefined;
+      };
+      start_notification_worker_run: {
+        Args: { target_run_id: string; target_source: "cron" | "manual" };
         Returns: undefined;
       };
       set_public_flow_origins: {

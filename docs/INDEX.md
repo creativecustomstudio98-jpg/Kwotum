@@ -51,6 +51,7 @@ zatwierdza funkcji spoza `SCOPE.md`.
 | Podgląd i udostępnianie procesu | `FLOW_PREVIEW_AND_SHARING_IMPLEMENTATION_2026-08-03.md` | `WIDGET_ARCHITECTURE.md`, `NOTIFICATIONS.md`, ADR-035                                                    |
 | Operacyjna obsługa leada        | `LEAD_OPERATIONS_IMPLEMENTATION_2026-08-03.md`          | `LEAD_PIPELINE.md`, `AUTHORIZATION.md`, ADR-036                                                          |
 | E-maile konta i SMTP Auth       | `AUTH_EMAILS.md`                                        | `NOTIFICATIONS.md`, `SECURITY_AND_DATA.md`, ADR-018                                                      |
+| Scheduler i monitoring outboxu  | `NOTIFICATION_OPERATIONS.md`                            | `NOTIFICATIONS.md`, `OBSERVABILITY.md`, ADR-042                                                          |
 | Webhook `lead.created`          | `WEBHOOKS.md`                                           | `API_CONTRACTS.md`, `SECURITY.md`, ADR-034                                                               |
 | Runtime liveness i readiness    | `RUNTIME_READINESS_IMPLEMENTATION_2026-08-03.md`        | `DEPLOYMENT.md`, `OBSERVABILITY.md`, ADR-037                                                             |
 | Estymacja                       | `ESTIMATION_ENGINE.md`                                  | `PRODUCT_REQUIREMENTS.md`, ADR-016                                                                       |

@@ -44,10 +44,12 @@ export const serverEnvSchema = z
       .regex(/^[a-zA-Z0-9.-]{1,253}$/)
       .optional(),
     CLAMAV_PORT: z.coerce.number().int().min(1).max(65_535).optional(),
+    CRON_SECRET: workerSecret.optional(),
     DATABASE_URL: nonEmptySecret.optional(),
     EMAIL_FROM: emailFrom.optional(),
     EMAIL_DELIVERY_MODE: z.enum(["resend", "test"]).optional(),
     MALWARE_SCAN_MODE: z.enum(["clamav", "disabled"]).optional(),
+    MONITORING_PROBE_SECRET: workerSecret.optional(),
     NOTIFICATION_WORKER_SECRET: workerSecret.optional(),
     POSTHOG_HOST: z.url().optional(),
     PUBLIC_RATE_LIMIT_SECRET: workerSecret.optional(),

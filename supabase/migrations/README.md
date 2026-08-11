@@ -81,6 +81,13 @@ Wyłącznie w pustym środowisku nowa migracja może cofnąć granty i wrapper,
 przywrócić poprzednią funkcję submitu, a następnie usunąć polityki, triggery,
 tabele i enumy w odwrotnej kolejności.
 
+Migracja `20260811000100_stage13a_notification_operations.sql` jest
+forward-only i nie zmienia danych leadów ani treści outboxu. Rollback zaczyna
+się od wyłączenia Vercel Cron, następnie przywraca poprzedni artefakt aplikacji.
+Prywatny heartbeat pozostaje w bazie; funkcji i tabeli nie usuwamy ręcznie.
+Korekta grantów, progów lub schematu wymaga nowej migracji. Szczegóły operacyjne
+są w `docs/NOTIFICATION_OPERATIONS.md`.
+
 Rollback Etapu 9 zaczyna się od wyłączenia wysyłania zdarzeń w widżecie oraz
 ukrycia dashboardu, przy zachowaniu obsługi decyzji odmowy i wycofania zgody.
 Po przyjęciu ruchu nie usuwamy historii decyzji ani zdarzeń poza zatwierdzoną

@@ -50,6 +50,12 @@ prób. Tryb testowy i adapter dostawcy używają tego samego kontraktu; różni�
 wyłącznie transportem. Wewnętrzny Route Handler jest chroniony osobnym sekretem
 i zwraca tylko zagregowane liczniki.
 
+FTZ-04 uruchamia oba e-mailowe outboxy przez pięciominutowy Vercel Cron z
+osobnym sekretem. Prywatny heartbeat PostgreSQL i chroniony agregowany probe
+wykrywają ciszę, błąd i zawieszenie schedulera oraz wiek/stany kolejki bez PII.
+Outbox nie wchodzi do publicznej readiness aplikacji; awaria poczty nie może
+wycofać zdrowej instancji obsługującej submit.
+
 Etap 12ZF dodaje osobny outbox webhooków `lead.created`, aby awaria odbiorcy
 nie blokowała submitu i nie mieszała retencji z e-mailem. Owner/Admin zarządza
 endpointem przez tenant context i RLS. Worker service-role pobiera ograniczony

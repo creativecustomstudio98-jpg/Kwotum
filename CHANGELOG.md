@@ -6,6 +6,13 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- FTZ-04 dodaje pięciominutowy Vercel Cron dla aplikacyjnego outboxu z osobnym
+  `CRON_SECRET`, zachowuje ręczny worker z niezależnym sekretem oraz zapisuje
+  prywatny heartbeat bez PII. Chroniony probe wykrywa brak, błąd i zawieszenie
+  schedulera, kolejkę starszą niż 10 minut, stale lock i terminalne `failed`.
+  Migracja, sekrety Production, niezależny alert i syntetyczna dostawa nadal
+  muszą zostać wdrożone przed zamknięciem bramki pilota.
+
 - Status w inspektorze zakładki `Kontakt` odzwierciedla teraz zapisany stan
   konfiguracji kontaktu zamiast niezależnego stanu modułu wyceny; E2E chroni
   oba stany przed regresją.

@@ -149,6 +149,21 @@ funkcje claim/complete/fail; claim stosuje `SKIP LOCKED`, lock token i odzyskuje
 próby zawieszone dłużej niż 15 minut. Każda próba trafia do osobnego rekordu.
 Szczegóły: `docs/NOTIFICATIONS.md`.
 
+### Stan lokalny Etapu 13A — operacje outboxu
+
+Migracja `20260811000100_stage13a_notification_operations.sql` dodaje
+prywatny `app_private.worker_heartbeats` oraz trzy narrow RPC service role:
+start runu, zakończenie runu i zagregowany probe. Singleton per
+`notifications`/`cron|manual` zapisuje wyłącznie UUID technicznego runu, czasy,
+wynik i cztery liczniki. Nie ma tenant ID, odbiorcy, tematu, treści ani danych
+leada. Zwykłe role nie mają grantu do tabeli ani funkcji.
+
+Probe liczy oczekujące, przetwarzane, zawieszone i terminalnie błędne rekordy
+obu outboxów oraz wiek najstarszego `pending/retry`. Aplikacja mapuje agregaty
+na zamknięte stany monitoringu. Migracja jest forward-only, a rollback
+zatrzymuje scheduler i pozostawia heartbeat oraz kolejki w bazie. Szczegóły:
+`docs/NOTIFICATION_OPERATIONS.md` i ADR-042.
+
 ### Stan wdrożenia Etapu 12ZK
 
 Migracja `20260810000100_stage12zk_contact_delivery.sql` dodaje wersjonowaną
