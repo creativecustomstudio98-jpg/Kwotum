@@ -3408,6 +3408,49 @@
   gap: 1rem;
 }
 
+.question-inspector__form-copy {
+  margin: -1rem -1rem 0;
+  padding: 1rem;
+  border-bottom: 1px solid var(--wy-color-border);
+  display: grid;
+  gap: 0.85rem;
+  background: var(--wy-color-surface-subtle);
+}
+
+.question-inspector__form-copy > label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--wy-color-text-primary);
+  font-size: 0.7rem;
+  font-weight: var(--wy-font-weight-semibold);
+}
+
+.question-inspector__section-heading {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.question-inspector__section-heading h3,
+.question-inspector__section-heading p {
+  margin: 0;
+}
+
+.question-inspector__section-heading h3 {
+  color: var(--wy-color-text-primary);
+  font-size: 0.78rem;
+}
+
+.question-inspector__section-heading p {
+  color: var(--wy-color-text-muted);
+  font-size: 0.65rem;
+  font-weight: var(--wy-font-weight-regular);
+  line-height: 1.45;
+}
+
+.question-inspector__section-heading--question {
+  margin-top: -0.1rem;
+}
+
 .question-inspector > label,
 .question-options,
 .conditional-logic label {

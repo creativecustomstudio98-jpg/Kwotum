@@ -6,6 +6,13 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Builder udostępnia teraz osobne pola „Tytuł formularza” i „Wprowadzenie” dla
+  publicznego hosted linku oraz embedu. Walidacja rozróżnia treść otwarcia od
+  tytułu aktywnego pytania, prowadzi fokus do właściwego pola i zachowuje
+  autosave, undo/redo oraz istniejącą geometrię trzech kolumn. Zmiana zamyka
+  regresję UAT pierwszego pilota, w której proces Fortez zachował treść
+  „Meble na wymiar” z bazowego szablonu.
+
 - FTZ-04 dodaje pięciominutowy Vercel Cron dla aplikacyjnego outboxu z osobnym
   `CRON_SECRET`, zachowuje ręczny worker z niezależnym sekretem oraz zapisuje
   prywatny heartbeat bez PII. Chroniony probe wykrywa brak, błąd i zawieszenie

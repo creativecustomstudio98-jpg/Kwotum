@@ -26,6 +26,7 @@ const remainingScreenArtifactDirectory = path.join(artifactRoot, "12s-remaining-
 const contactDeliveryArtifactDirectory = path.join(artifactRoot, "12zk-contact-delivery-settings");
 const builderStateArtifactDirectory = path.join(artifactRoot, "12v-builder-state/after");
 const builderGeometryArtifactDirectory = path.join(artifactRoot, "12w-builder-geometry");
+const builderPublicCopyArtifactDirectory = path.join(artifactRoot, "13c-fortez-public-form-copy");
 const builderInteractionArtifactDirectory = path.join(artifactRoot, "12x-builder-interactions");
 const builderToggleArtifactDirectory = path.join(artifactRoot, "12y-builder-toggle/after");
 const builderSectionArtifactDirectory = path.join(artifactRoot, "12z-builder-sections/after");
@@ -505,6 +506,89 @@ test.describe("panel reference reconstruction", () => {
       if ((await firstTitle.inputValue()) !== originalTitle) {
         await firstTitle.fill(originalTitle);
         await expect(page.getByText("Niezapisane zmiany", { exact: true })).toBeVisible();
+        await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
+          timeout: 15_000,
+        });
+      }
+    }
+  });
+
+  test("builder edits, validates and persists the public form title and introduction", async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    test.skip(!editorFlowId, "Test treści publicznej wymaga PANEL_E2E_EDITOR_FLOW_ID.");
+    await mkdir(path.join(builderPublicCopyArtifactDirectory, "desktop"), { recursive: true });
+    await mkdir(path.join(builderPublicCopyArtifactDirectory, "mobile"), { recursive: true });
+    await page.setViewportSize({ height: 1_086, width: 1_448 });
+    await page.evaluate(() => localStorage.setItem("lorum:panel-sidebar-collapsed", "true"));
+    await page.goto(`/panel/${organizationId}/procesy/${editorFlowId}`);
+
+    const inspector = page.getByRole("complementary", {
+      name: "Ustawienia formularza i pytania",
+    });
+    const publicTitle = inspector.getByLabel("Tytuł formularza");
+    const publicIntro = inspector.getByLabel("Wprowadzenie");
+    const originalTitle = await publicTitle.inputValue();
+    const originalIntro = await publicIntro.inputValue();
+    const changedTitle = "Dobór przyczepy — test treści publicznej";
+    const changedIntro =
+      "Odpowiedz na kilka pytań. Ostateczny dobór, cena i dostępność wymagają potwierdzenia przez firmę.";
+
+    try {
+      await publicTitle.fill(changedTitle);
+      await publicIntro.fill(changedIntro);
+      await expect(page.getByText("Niezapisane zmiany", { exact: true })).toBeVisible();
+      await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
+        timeout: 15_000,
+      });
+
+      await page.reload();
+      await expect(publicTitle).toHaveValue(changedTitle);
+      await expect(publicIntro).toHaveValue(changedIntro);
+
+      await page.screenshot({
+        animations: "disabled",
+        path: path.join(builderPublicCopyArtifactDirectory, "desktop", "after-1448x1086.png"),
+      });
+
+      await publicTitle.fill("X");
+      await expect(
+        inspector.getByText("Tytuł formularza musi mieć od 2 do 160 znaków."),
+      ).toBeVisible();
+      await page.locator(".builder-validation-overview").click();
+      await expect(publicTitle).toBeFocused();
+      await publicTitle.fill(changedTitle);
+      await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
+        timeout: 15_000,
+      });
+
+      await page.setViewportSize({ height: 844, width: 390 });
+      await page.goto(`/panel/${organizationId}/procesy/${editorFlowId}`);
+      await page.getByRole("tab", { name: "Ustawienia" }).press("Enter");
+      await expect(publicTitle).toBeVisible();
+      await page.screenshot({
+        animations: "disabled",
+        path: path.join(builderPublicCopyArtifactDirectory, "mobile", "after-390x844.png"),
+      });
+
+      const accessibility = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze();
+      expect(accessibility.violations).toEqual([]);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow).toBeLessThanOrEqual(1);
+    } finally {
+      await page.setViewportSize({ height: 1_086, width: 1_448 });
+      await page.goto(`/panel/${organizationId}/procesy/${editorFlowId}`);
+      if (
+        (await publicTitle.inputValue()) !== originalTitle ||
+        (await publicIntro.inputValue()) !== originalIntro
+      ) {
+        await publicTitle.fill(originalTitle);
+        await publicIntro.fill(originalIntro);
         await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
           timeout: 15_000,
         });
