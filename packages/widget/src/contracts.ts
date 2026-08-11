@@ -241,3 +241,23 @@ export class WidgetApiError extends Error {
 export function isWidgetApiError(error: unknown, code?: WidgetApiErrorCode): boolean {
   return error instanceof WidgetApiError && (code === undefined || error.code === code);
 }
+
+export type WidgetChallengeErrorCode =
+  "EXPIRED" | "FAILED" | "TIMEOUT" | "UNAVAILABLE" | "UNSUPPORTED";
+
+export class WidgetChallengeError extends Error {
+  readonly code: WidgetChallengeErrorCode;
+
+  constructor(code: WidgetChallengeErrorCode) {
+    super("Widget security challenge failed.");
+    this.name = "WidgetChallengeError";
+    this.code = code;
+  }
+}
+
+export function isWidgetChallengeError(
+  error: unknown,
+  code?: WidgetChallengeErrorCode,
+): error is WidgetChallengeError {
+  return error instanceof WidgetChallengeError && (code === undefined || error.code === code);
+}

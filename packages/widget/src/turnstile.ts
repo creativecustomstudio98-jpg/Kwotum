@@ -1,4 +1,8 @@
-import type { WidgetManifest } from "./contracts.js";
+import {
+  WidgetChallengeError,
+  type WidgetChallengeErrorCode,
+  type WidgetManifest,
+} from "./contracts.js";
 
 const scriptSource = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const scriptId = "kwotum-turnstile-script";
@@ -43,21 +47,21 @@ function loadTurnstile(): Promise<TurnstileApi> {
     const timeout = window.setTimeout(() => {
       loading = null;
       script.remove();
-      reject(new Error("Weryfikacja bezpieczeństwa nie odpowiedziała. Spróbuj ponownie."));
+      reject(new WidgetChallengeError("TIMEOUT"));
     }, 15_000);
     const finish = (): void => {
       window.clearTimeout(timeout);
       if (window.turnstile) resolve(window.turnstile);
       else {
         loading = null;
-        reject(new Error("Nie udało się uruchomić weryfikacji bezpieczeństwa."));
+        reject(new WidgetChallengeError("UNAVAILABLE"));
       }
     };
     const fail = (): void => {
       window.clearTimeout(timeout);
       loading = null;
       script.remove();
-      reject(new Error("Nie udało się uruchomić weryfikacji bezpieczeństwa."));
+      reject(new WidgetChallengeError("UNAVAILABLE"));
     };
     script.addEventListener("load", finish, { once: true });
     script.addEventListener("error", fail, { once: true });
@@ -91,29 +95,27 @@ export async function requestTurnstileToken(
       remove();
       resolve(token);
     };
-    const fail = (message: string): void => {
+    const fail = (code: WidgetChallengeErrorCode): void => {
       if (settled) return;
       settled = true;
       remove();
-      reject(new Error(message));
+      reject(new WidgetChallengeError(code));
     };
     widget.id = turnstile.render(container, {
       action: challenge.action,
       appearance: challenge.appearance,
       callback: succeed,
       "error-callback": () => {
-        fail("Nie udało się potwierdzić bezpieczeństwa. Spróbuj ponownie.");
+        fail("FAILED");
         return true;
       },
       execution: "execute",
-      "expired-callback": () => fail("Potwierdzenie bezpieczeństwa wygasło. Spróbuj ponownie."),
+      "expired-callback": () => fail("EXPIRED"),
       retry: "never",
       "response-field": false,
       sitekey: challenge.siteKey,
-      "timeout-callback": () =>
-        fail("Weryfikacja bezpieczeństwa przekroczyła limit czasu. Spróbuj ponownie."),
-      "unsupported-callback": () =>
-        fail("Ta przeglądarka nie obsługuje weryfikacji bezpieczeństwa."),
+      "timeout-callback": () => fail("TIMEOUT"),
+      "unsupported-callback": () => fail("UNSUPPORTED"),
     });
     turnstile.execute(widget.id);
   });
