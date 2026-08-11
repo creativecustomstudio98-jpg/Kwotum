@@ -779,6 +779,29 @@
     gap: 22px;
   }
 
+  .question-inspector__form-copy {
+    margin: -24px -28px 0;
+    padding: 24px 28px;
+    gap: 14px;
+  }
+
+  .question-inspector__form-copy > label {
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .question-inspector__section-heading {
+    gap: 4px;
+  }
+
+  .question-inspector__section-heading h3 {
+    font-size: 13px;
+  }
+
+  .question-inspector__section-heading p {
+    font-size: 11px;
+  }
+
   .question-inspector > label,
   .question-options,
   .conditional-logic label {

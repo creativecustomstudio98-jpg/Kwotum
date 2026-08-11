@@ -1,7 +1,7 @@
 import { flowDocumentSchema, validateFlowDocument, type FlowDocument } from "@wyceno/validation";
 
 export type FlowEditorIssueField =
-  "document" | "graph" | "name" | "option" | "title" | "validation";
+  "document" | "graph" | "intro" | "name" | "option" | "publicTitle" | "title" | "validation";
 
 export type FlowEditorIssue = Readonly<{
   field: FlowEditorIssueField;
@@ -91,6 +91,8 @@ export function validateFlowEditor(document: FlowDocument, name: string): FlowEd
 }
 
 function editorFieldFromPath(path: readonly string[]): FlowEditorIssueField {
+  if (path.length === 1 && path[0] === "title") return "publicTitle";
+  if (path.length === 1 && path[0] === "intro") return "intro";
   if (path.includes("title")) return "title";
   if (path.includes("options")) return "option";
   if (path.includes("validation")) return "validation";
@@ -102,6 +104,8 @@ function schemaIssueMessage(
   path: readonly string[],
   originalMessage: string,
 ): string {
+  if (field === "publicTitle") return "Tytuł formularza musi mieć od 2 do 160 znaków.";
+  if (field === "intro") return "Wprowadzenie do formularza jest wymagane.";
   if (field === "title") return "Treść pytania jest wymagana.";
   if (field === "option") {
     const optionIndex = path.indexOf("options");

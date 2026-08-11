@@ -35,6 +35,29 @@ describe("validateFlowEditor", () => {
     );
   });
 
+  it("maps invalid public form copy independently from a question title", () => {
+    const source = document();
+    source.title = " ";
+    source.intro = " ";
+    const result = validateFlowEditor(source, "Proces kwalifikacji");
+
+    expect(result.canSave).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "publicTitle",
+          message: "Tytuł formularza musi mieć od 2 do 160 znaków.",
+          stepKey: null,
+        }),
+        expect.objectContaining({
+          field: "intro",
+          message: "Wprowadzenie do formularza jest wymagane.",
+          stepKey: null,
+        }),
+      ]),
+    );
+  });
+
   it("reports inverted numeric boundaries in Polish", () => {
     const source = document();
     const numericStep = source.steps.find((step) => step.type === "number")!;
