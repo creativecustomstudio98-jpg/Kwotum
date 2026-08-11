@@ -211,7 +211,15 @@ export function EstimationEditorWorkspace({
         <div className="flow-builder__panel-heading">
           <div>
             <h2>Ustawienia · {areaTitle(area)}</h2>
-            <p>{estimation ? "Konfiguracja aktywna" : "Konfiguracja nieaktywna"}</p>
+            <p>
+              {area === "contact"
+                ? asLeadCaptureV2(document.leadCapture)
+                  ? "Konfiguracja aktywna"
+                  : "Konfiguracja nieaktywna"
+                : estimation
+                  ? "Konfiguracja aktywna"
+                  : "Konfiguracja nieaktywna"}
+            </p>
           </div>
         </div>
         {area === "contact" ? (
