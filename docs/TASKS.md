@@ -2772,6 +2772,37 @@ pozostają osobnym gate przed szerszym rolloutem.
 Wdrożenie wymaga review, zielonego CI i osobnego release'u; ten lokalny etap nie
 zmienia produkcji.
 
+##### Korekta FTZ-05B — branding wnętrza embedu Fortez
+
+**Stan lokalny 2026-08-11 — CODE COMPLETE, RELEASE OPEN:** produkcyjny UAT
+ujawnił, że dotychczasowy kontrakt obejmował tylko launcher. Wnętrze pokazywało
+inicjały tytułu procesu, domyślny zielony motyw Kwotum i tekstowy przycisk
+zamknięcia nachodzący na status. ADR-044 wprowadza ograniczony kontrakt
+atrybutów marki i ról `--wyceno-widget-*` bez zmiany API, manifestu, bazy, RLS
+ani sesji. Lokalny preset Fortez używa własnego logo z tego samego originu,
+lżejsze nagłówki Arial/Helvetica o wadze 500, aktualny pomarańcz z kontrastowym
+ciemnym tekstem, kanciaste kontrolki i grafitowy backdrop.
+
+- [x] Zapisać ADR-044 i granicę między konfiguracją embedu a przyszłym
+      brandingiem przechowywanym w panelu.
+- [x] Dodać bezpieczne `brand-name`, `brand-subtitle` i `brand-logo-url` z
+      same-origin HTTP(S), fallbackiem inicjałów i bez restartu sesji.
+- [x] Udostępnić wyłącznie allowlistowane role wnętrza, zachowując izolację
+      Shadow DOM oraz domyślne wartości Kwotum.
+- [x] Umieścić kwadratowe zamknięcie `×` strukturalnie w nagłówku obok statusu.
+- [x] Dodać negatywne testy URL/XSS, hostile-host CSS, computed styles,
+      odrzucenie `url(...)` w rolach kolorów, zachowanie niewysłanej odpowiedzi
+      i fokusu po zmianie marki, geometrię nagłówka, Escape i zwrot fokusu.
+- [x] Przygotować lokalny preset Fortez i artefakt Chromium desktop bez danych
+      osobowych ani wysłania leada.
+- [x] Przejść automatyczny Chromium i WebKit/Safari, mobile 390/320,
+      forced-colors, pełne gate'y i niezależny review bez P0/P1.
+- [ ] Potwierdzić ręczny zoom przeglądarki 200% na produkcyjnym embedzie; test
+      320 px i powiększenie bazowego tekstu są zielone, ale nie zastępują
+      rzeczywistego zoomu Safari.
+- [ ] Wdrożyć wersję Kwotum, następnie minimalną zmianę `index.html` Fortez,
+      wykonać produkcyjny UAT i zachować natychmiastowy rollback.
+
 - [x] Ujawnić publiczny tytuł i wprowadzenie w builderze z limitami schematu.
 - [x] Rozdzielić walidację treści formularza od walidacji aktywnego pytania.
 - [x] Dodać regresję autosave/reload, klawiatury, axe, mobile i overflow.
@@ -2787,7 +2818,8 @@ zmienia produkcji.
       kompatybilny fallback `api-base` oraz ograniczony on-brand kontrakt
       launchera bez zmiany wnętrza procesu; wdrożenie release'u nadal
       poprzedza embed Fortez.
-- [ ] Osadzić popup na stronie Fortez dopiero po technicznym i prawnym GO.
+- [x] Osadzić popup na stronie Fortez po technicznym i prawnym GO; stary kanał
+      kontaktu pozostaje dostępny.
 
 - [ ] Uruchomić jedną organizację z ograniczonym ruchem i możliwością
       natychmiastowego wyłączenia embedu.

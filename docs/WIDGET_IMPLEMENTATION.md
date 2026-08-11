@@ -11,7 +11,7 @@ Ten sam renderer obsługuje osadzenie i hosted link `/f/:publicId`.
 
 `@wyceno/widget` kompiluje natywne moduły ES bez frameworka runtime. Build
 aplikacji kopiuje wersjonowany artefakt do `/widget/v1/` i zatrzymuje się po
-przekroczeniu 90 KiB gzip JavaScriptu. Aktualny pomiar wynosi około 13,9 KiB
+przekroczeniu 90 KiB gzip JavaScriptu. Aktualny pomiar wynosi około 23,4 KiB
 gzip.
 
 Minimalne osadzenie:
@@ -81,8 +81,81 @@ wyceno-widget.firma-cta {
 ```
 
 Integrator odpowiada za kontrast własnych kolorów w stanach default, hover i
-focus. Zmienne dotyczą wyłącznie launchera; nie pozwalają stronie gospodarza
-nadpisywać treści, kontrolek ani warstwy procesu w Shadow DOM.
+focus. Zmienne `--wyceno-launcher-*` dotyczą wyłącznie launchera.
+
+### Ograniczony branding wnętrza embedu
+
+Osadzony widget może otrzymać tekstową nazwę marki, podtytuł i logo z originu
+strony gospodarza:
+
+```html
+<wyceno-widget
+  public-id="LOSOWY_PUBLICZNY_UUID"
+  api-base="https://app.example"
+  mode="popup"
+  brand-name="Firma"
+  brand-subtitle="Autoryzowany partner"
+  brand-logo-url="/img/logo-firmy.svg"
+></wyceno-widget>
+```
+
+`brand-logo-url` może być względnym lub absolutnym adresem HTTP(S), ale po
+rozwiązaniu musi wskazywać dokładnie origin hosta i nie może zawierać
+credentiali. `javascript:`, `data:`, obcy origin, błędny URL i URL z
+`user:password@` są odrzucane bez requestu. Obraz używa anonimowego CORS i
+`referrerpolicy="no-referrer"`. Walidowany jest URL pierwszego requestu;
+redirect HTTP jest późniejszą decyzją przeglądarki, dlatego integrator musi
+wskazać statyczny, nieprzekierowujący asset i ograniczyć `img-src` CSP strony.
+Obraz ma pusty `alt`, ponieważ w tym samym regionie zawsze pozostaje dostępna
+tekstowa `brand-name`. Przy poprawnym wordmarku nazwa jest wizualnie ukryta, aby
+jej nie dublować, a obok logo widoczny jest podtytuł. Po błędzie ładowania
+renderer pokazuje inicjały i ponownie ujawnia nazwę. Nazwa i podtytuł trafiają
+wyłącznie do `textContent`. Zmiana tych atrybutów podmienia tylko region marki —
+nie tworzy ani nie wznawia ponownie sesji, nie zastępuje formularza i nie usuwa
+niewysłanej odpowiedzi ani fokusu.
+
+Wnętrze nadal jest izolowane przez Shadow DOM. Integrator może ustawić tylko
+role z poniższej allowlisty; nie otrzymuje selektorów, `::part`, raw CSS, HTML
+ani skryptu wewnętrznego procesu:
+
+| Właściwość                               | Rola                                          |
+| ---------------------------------------- | --------------------------------------------- |
+| `--wyceno-widget-font-family`            | tekst i kontrolki                             |
+| `--wyceno-widget-heading-font-family`    | nagłówki oraz legendy                         |
+| `--wyceno-widget-heading-font-weight`    | waga nagłówków                                |
+| `--wyceno-widget-heading-letter-spacing` | tracking nagłówków                            |
+| `--wyceno-widget-primary`                | wypełnione CTA, progress i zaznaczenie        |
+| `--wyceno-widget-primary-hover`          | hover wypełnionego CTA                        |
+| `--wyceno-widget-primary-text`           | tekst na wypełnionym CTA                      |
+| `--wyceno-widget-accent-text`            | kontrastowy akcent dla linków i małego tekstu |
+| `--wyceno-widget-primary-soft`           | tło zaznaczenia i ring CTA                    |
+| `--wyceno-widget-text`                   | tekst podstawowy                              |
+| `--wyceno-widget-muted`                  | tekst pomocniczy i status                     |
+| `--wyceno-widget-surface`                | powierzchnia formularza                       |
+| `--wyceno-widget-soft`                   | neutralne tło drugiego poziomu                |
+| `--wyceno-widget-border`                 | zwykłe obramowanie                            |
+| `--wyceno-widget-border-strong`          | mocne obramowanie opcji                       |
+| `--wyceno-widget-secondary-border`       | ramka secondary i zamknięcia                  |
+| `--wyceno-widget-control-radius`         | pola, opcje i przyciski                       |
+| `--wyceno-widget-panel-radius`           | karta procesu                                 |
+| `--wyceno-widget-symbol-radius`          | znak wyniku                                   |
+| `--wyceno-widget-panel-shadow`           | cień karty                                    |
+| `--wyceno-widget-backdrop`               | tło modalne popupu/fullscreen                 |
+| `--wyceno-widget-logo-width`             | szerokość logo desktop (domyślnie `160px`)    |
+| `--wyceno-widget-logo-width-mobile`      | szerokość logo do 700 px (domyślnie `122px`)  |
+
+Kolor wypełnienia i kolor małego tekstu są celowo rozdzielone: jaskrawy akcent
+może mieć dobry kontrast z ciemnym tekstem na CTA, ale niewystarczający jako
+mały tekst na bieli. Integrator odpowiada za WCAG AA całego przekazanego
+zestawu. Wartości domyślne zachowują wygląd Kwotum i kompatybilność starszych
+embedów. Role kolorystyczne są mapowane wyłącznie do właściwości CSS typu
+`color`, `background-color` i `border-color`; wartość `url(...)` jest
+odrzucana przez gramatykę właściwości i nie wykonuje requestu.
+
+Ten kontrakt jest konfiguracją konkretnego embedu. Nie trafia do publicznego
+manifestu i nie zmienia hosted linku. Automatyczny branding tenanta we
+wszystkich powierzchniach wymaga osobnego modelu danych, kontrolowanego storage,
+RLS oraz testu dwóch organizacji zgodnie z ADR-044.
 
 ## Manifest v1 i v2
 

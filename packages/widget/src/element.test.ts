@@ -2,7 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { defineWycenoWidget, resolveWidgetApiBase } from "./element.js";
+import { defineWycenoWidget, resolveBrandLogoUrl, resolveWidgetApiBase } from "./element.js";
 import { type PersistedWidgetSession, widgetStorageKey } from "./storage.js";
 import { testManifest, testPublicId } from "./test-fixtures.js";
 
@@ -69,6 +69,7 @@ describe("wyceno-widget element", () => {
     expect(shadow).not.toBeNull();
     expect(shadow?.querySelector('link[rel="stylesheet"]')).not.toBeNull();
     expect(shadow?.querySelector("img")).toBeNull();
+    expect(shadow?.querySelector(".wyceno-brand-mark")?.getAttribute("aria-hidden")).toBe("true");
     expect(shadow?.textContent).toContain("<img src=x onerror=alert(1)>");
     expect(shadow?.querySelectorAll('input[type="radio"]')).toHaveLength(2);
     expect(ready).toHaveBeenCalledOnce();
@@ -92,6 +93,79 @@ describe("wyceno-widget element", () => {
     expect(
       resolveWidgetApiBase(null, "file:///tmp/widget/element.js", "http://127.0.0.1:3100"),
     ).toBe("http://127.0.0.1:3100");
+  });
+
+  it("accepts only credential-free same-origin HTTP(S) brand logos", () => {
+    const pageUrl = "https://fortez-przyczepy.pl/oferta";
+    expect(resolveBrandLogoUrl("/img/logo-fortez.svg", pageUrl)).toBe(
+      "https://fortez-przyczepy.pl/img/logo-fortez.svg",
+    );
+    expect(resolveBrandLogoUrl("https://fortez-przyczepy.pl/img/logo-fortez.svg", pageUrl)).toBe(
+      "https://fortez-przyczepy.pl/img/logo-fortez.svg",
+    );
+    expect(resolveBrandLogoUrl("https://cdn.example.test/logo.svg", pageUrl)).toBeNull();
+    expect(
+      resolveBrandLogoUrl("https://user:secret@fortez-przyczepy.pl/logo.svg", pageUrl),
+    ).toBeNull();
+    expect(resolveBrandLogoUrl("javascript:alert(1)", pageUrl)).toBeNull();
+    expect(resolveBrandLogoUrl("data:image/svg+xml,<svg/>", pageUrl)).toBeNull();
+    expect(resolveBrandLogoUrl("http://[::1", pageUrl)).toBeNull();
+  });
+
+  it("renders safe tenant branding and keeps close inside the header without restarting", async () => {
+    const element = document.createElement("wyceno-widget");
+    element.setAttribute("brand-logo-url", "/img/logo-fortez.svg");
+    element.setAttribute("brand-name", "Fortez <img src=x onerror=alert(1)>");
+    element.setAttribute("brand-subtitle", "Autoryzowany dealer Neptun");
+    element.setAttribute("mode", "popup");
+    element.setAttribute("public-id", testPublicId);
+    document.body.append(element);
+
+    const launcher = element.shadowRoot?.querySelector<HTMLButtonElement>(".wyceno-launcher");
+    launcher?.click();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    const shadow = element.shadowRoot;
+    const logo = shadow?.querySelector<HTMLImageElement>(".wyceno-brand-logo img");
+    expect(logo?.src).toBe(new URL("/img/logo-fortez.svg", window.location.href).href);
+    expect(logo?.alt).toBe("");
+    expect(logo?.crossOrigin).toBe("anonymous");
+    expect(logo?.referrerPolicy).toBe("no-referrer");
+    expect(shadow?.textContent).toContain("Fortez <img src=x onerror=alert(1)>");
+    expect(shadow?.textContent).toContain("Autoryzowany dealer Neptun");
+    expect(shadow?.querySelector(".wyceno-brand-copy img")).toBeNull();
+    expect(shadow?.querySelector(".wyceno-brand")?.classList).toContain("wyceno-brand--with-logo");
+
+    const close = shadow?.querySelector<HTMLButtonElement>(
+      '.wyceno-close[aria-label="Zamknij formularz"]',
+    );
+    expect(close?.textContent).toBe("×");
+    expect(close?.closest(".wyceno-header")).not.toBeNull();
+    expect(shadow?.querySelector(".wyceno-dialog > .wyceno-close")).toBeNull();
+    expect(fetch).toHaveBeenCalledTimes(1);
+
+    const pendingChoice = shadow?.querySelector<HTMLInputElement>('input[type="radio"]');
+    pendingChoice?.click();
+    pendingChoice?.focus();
+    expect(pendingChoice?.checked).toBe(true);
+    expect(shadow?.activeElement).toBe(pendingChoice);
+
+    element.setAttribute("brand-name", "Nowa organizacja");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(shadow?.textContent).toContain("Nowa organizacja");
+    expect(shadow?.querySelector('input[type="radio"]')).toBe(pendingChoice);
+    expect(pendingChoice?.checked).toBe(true);
+    expect(shadow?.activeElement).toBe(pendingChoice);
+
+    const refreshedLogo = shadow?.querySelector<HTMLImageElement>(".wyceno-brand-logo img");
+    refreshedLogo?.dispatchEvent(new Event("error"));
+    expect(shadow?.querySelector(".wyceno-brand-logo")).toBeNull();
+    expect(shadow?.querySelector(".wyceno-brand-mark")?.textContent).toBe("NO");
+    expect(shadow?.querySelector(".wyceno-brand-mark")?.getAttribute("aria-hidden")).toBe("true");
+    expect(shadow?.querySelector(".wyceno-brand")?.classList).not.toContain(
+      "wyceno-brand--with-logo",
+    );
   });
 
   it("uses the memory-only adapter in preview mode without fetch or localStorage", async () => {

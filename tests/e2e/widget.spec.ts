@@ -6,6 +6,7 @@ test.beforeAll(async () => {
   await mkdir("artifacts/redesign/after", { recursive: true });
   await mkdir("artifacts/visual-qa/12s-remaining-screens/after", { recursive: true });
   await mkdir("artifacts/visual-qa/13b-ftz03b-turnstile", { recursive: true });
+  await mkdir("artifacts/visual-qa/13f-widget-branding/after", { recursive: true });
 });
 
 const publicId = "f0000000-0000-4000-8000-000000000001";
@@ -472,8 +473,53 @@ test("hosted widget fills the desktop surface and preserves the result hierarchy
   });
 });
 
+test("popup without embed branding preserves the default Kwotum fallback", async ({ page }) => {
+  const { sessionRequests } = await mockWidgetApi(page);
+  await page.goto("/design-system");
+  await page.evaluate(
+    ({ id }) => {
+      localStorage.clear();
+      const script = document.createElement("script");
+      script.type = "module";
+      script.src = "/widget/v1/loader.js";
+      document.head.append(script);
+      const widget = document.createElement("wyceno-widget");
+      widget.setAttribute("mode", "popup");
+      widget.setAttribute("public-id", id);
+      document.body.append(widget);
+    },
+    { id: publicId },
+  );
+
+  const widget = page.locator("wyceno-widget");
+  const launcher = widget.getByRole("button", { name: "Rozpocznij wycenę" });
+  await launcher.click();
+  await expect(widget.getByRole("dialog")).toBeVisible();
+  await expect(widget.getByRole("heading", { name: "Testowy proces wyceny" })).toBeVisible();
+  await expect(widget.locator(".wyceno-brand-mark")).toHaveText("TP");
+  await expect(widget.locator(".wyceno-brand-logo")).toHaveCount(0);
+  await expect(widget.getByRole("button", { name: "Dalej" })).toHaveCSS(
+    "background-color",
+    "rgb(11, 96, 72)",
+  );
+  await expect(widget.getByRole("button", { name: "Zamknij formularz" })).toHaveCount(1);
+  await expect.poll(() => sessionRequests).toHaveLength(1);
+});
+
 test("popup is isolated from hostile host CSS and returns focus on close", async ({ page }) => {
   const { sessionRequests } = await mockWidgetApi(page);
+  let unexpectedThemeRequests = 0;
+  await page.route("https://tracker.example.test/**", async (route) => {
+    unexpectedThemeRequests += 1;
+    await route.abort("blockedbyclient");
+  });
+  await page.route("**/test-assets/fortez-logo.svg", async (route) => {
+    await route.fulfill({
+      body: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 88"><rect width="14" height="88" fill="#ff6a13"/><text x="30" y="61" fill="#171a1b" font-family="Arial,sans-serif" font-size="52" font-weight="900">FORTEZ</text></svg>',
+      contentType: "image/svg+xml",
+      status: 200,
+    });
+  });
   await page.goto("/design-system");
   await page.addStyleTag({
     content:
@@ -487,12 +533,41 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
       script.src = "/widget/v1/loader.js";
       document.head.append(script);
       const widget = document.createElement("wyceno-widget");
+      widget.setAttribute("brand-logo-url", "/test-assets/fortez-logo.svg");
+      widget.setAttribute("brand-name", "Fortez");
+      widget.setAttribute("brand-subtitle", "Autoryzowany dealer Neptun");
       widget.setAttribute("mode", "popup");
       widget.setAttribute("public-id", id);
-      widget.style.setProperty("--wyceno-launcher-background-color", "#b84000");
-      widget.style.setProperty("--wyceno-launcher-border-color", "#873000");
+      widget.style.setProperty("--wyceno-widget-font-family", "Arial, Helvetica, sans-serif");
+      widget.style.setProperty(
+        "--wyceno-widget-heading-font-family",
+        "Arial, Helvetica, sans-serif",
+      );
+      widget.style.setProperty("--wyceno-widget-heading-font-weight", "500");
+      widget.style.setProperty("--wyceno-widget-heading-letter-spacing", "-0.02em");
+      widget.style.setProperty("--wyceno-widget-primary", "#ff6a13");
+      widget.style.setProperty("--wyceno-widget-primary-hover", "#ff7a2d");
+      widget.style.setProperty("--wyceno-widget-primary-text", "#111111");
+      widget.style.setProperty("--wyceno-widget-accent-text", "#bd4308");
+      widget.style.setProperty("--wyceno-widget-primary-soft", "#fff4e9");
+      widget.style.setProperty("--wyceno-widget-text", "#171a1b");
+      widget.style.setProperty("--wyceno-widget-muted", "#69706e");
+      widget.style.setProperty("--wyceno-widget-soft", "#f1f3f2");
+      widget.style.setProperty("--wyceno-widget-border", "#d5d9d7");
+      widget.style.setProperty("--wyceno-widget-border-strong", "#b9bfbc");
+      widget.style.setProperty("--wyceno-widget-secondary-border", "#171a1b");
+      widget.style.setProperty("--wyceno-widget-control-radius", "0px");
+      widget.style.setProperty("--wyceno-widget-panel-radius", "0px");
+      widget.style.setProperty("--wyceno-widget-symbol-radius", "0px");
+      widget.style.setProperty("--wyceno-widget-panel-shadow", "none");
+      widget.style.setProperty("--wyceno-widget-backdrop", "rgb(23 26 27 / 72%)");
+      widget.style.setProperty("--wyceno-launcher-background-color", "#ff6a13");
+      widget.style.setProperty("--wyceno-launcher-border-color", "#ff6a13");
+      widget.style.setProperty("--wyceno-launcher-hover-background-color", "#ff7a2d");
+      widget.style.setProperty("--wyceno-launcher-hover-border-color", "#ff7a2d");
+      widget.style.setProperty("--wyceno-launcher-text-color", "#111111");
       widget.style.setProperty("--wyceno-launcher-border-radius", "0px");
-      widget.style.setProperty("--wyceno-launcher-ring-color", "#f3a36e");
+      widget.style.setProperty("--wyceno-launcher-ring-color", "rgb(255 106 19 / 32%)");
       document.body.append(widget);
     },
     { id: publicId },
@@ -501,9 +576,9 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
   const widget = page.locator("wyceno-widget");
   const launcher = widget.getByRole("button", { name: "Rozpocznij wycenę" });
   await expect(launcher).toBeVisible();
-  await expect(launcher).toHaveCSS("color", "rgb(255, 255, 255)");
-  await expect(launcher).toHaveCSS("background-color", "rgb(184, 64, 0)");
-  await expect(launcher).toHaveCSS("border-color", "rgb(135, 48, 0)");
+  await expect(launcher).toHaveCSS("color", "rgb(17, 17, 17)");
+  await expect(launcher).toHaveCSS("background-color", "rgb(255, 106, 19)");
+  await expect(launcher).toHaveCSS("border-color", "rgb(255, 106, 19)");
   await expect(launcher).toHaveCSS("border-radius", "0px");
   await page.waitForTimeout(100);
   expect(sessionRequests).toEqual([]);
@@ -515,6 +590,21 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
   await launcher.click();
   await expect(widget.getByRole("dialog")).toBeVisible();
   await expect(widget.getByRole("heading", { name: "Testowy proces wyceny" })).toBeVisible();
+  await expect(
+    widget.locator('.wyceno-brand-logo img[src$="/test-assets/fortez-logo.svg"]'),
+  ).toBeVisible();
+  await expect(widget.locator(".wyceno-brand-mark")).toHaveCount(0);
+  await expect(widget.locator(".wyceno-brand-copy strong")).toHaveText("Fortez");
+  await expect(widget.locator(".wyceno-brand-copy small")).toHaveText("Autoryzowany dealer Neptun");
+  const primary = widget.getByRole("button", { name: "Dalej" });
+  await expect(primary).toHaveCSS("background-color", "rgb(255, 106, 19)");
+  await expect(primary).toHaveCSS("color", "rgb(17, 17, 17)");
+  await expect(primary).toHaveCSS("border-radius", "0px");
+  const headingFamily = await widget
+    .locator("legend")
+    .evaluate((element) => getComputedStyle(element).fontFamily.replaceAll('"', ""));
+  expect(headingFamily).toBe("Arial, Helvetica, sans-serif");
+  await expect(widget.locator("legend")).toHaveCSS("font-weight", "500");
   await expect.poll(() => sessionRequests).toHaveLength(1);
   expect(
     await page.evaluate(({ id }) => localStorage.getItem(`wyceno:widget:v1:${id}`), {
@@ -524,7 +614,31 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
   await page.screenshot({
     animations: "disabled",
     fullPage: false,
-    path: "artifacts/redesign/after/widget-popup-1440.png",
+    path: "artifacts/visual-qa/13f-widget-branding/after/widget-fortez-popup-1440.png",
+  });
+  const chrome = await widget.locator(".wyceno-header").evaluate((header) => {
+    const close = header.querySelector<HTMLElement>(".wyceno-close");
+    const sync = header.querySelector<HTMLElement>(".wyceno-sync");
+    if (!close || !sync) throw new Error("Missing branded dialog controls");
+    const closeRect = close.getBoundingClientRect();
+    const headerRect = header.getBoundingClientRect();
+    const syncRect = sync.getBoundingClientRect();
+    return {
+      closeHeight: closeRect.height,
+      closeInsideHeader: closeRect.top >= headerRect.top && closeRect.bottom <= headerRect.bottom,
+      closeWidth: closeRect.width,
+      overlapsSync:
+        closeRect.left < syncRect.right &&
+        closeRect.right > syncRect.left &&
+        closeRect.top < syncRect.bottom &&
+        closeRect.bottom > syncRect.top,
+    };
+  });
+  expect(chrome).toEqual({
+    closeHeight: 42,
+    closeInsideHeader: true,
+    closeWidth: 42,
+    overlapsSync: false,
   });
   await page.keyboard.press("Escape");
   await expect(widget.getByRole("dialog")).not.toBeVisible();
@@ -536,5 +650,111 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
   const close = widget.getByRole("button", { name: "Zamknij formularz" });
   await close.click();
   await expect(widget.getByRole("dialog")).not.toBeVisible();
+  await expect(launcher).toBeFocused();
+
+  await page.setViewportSize({ height: 844, width: 390 });
+  await launcher.click();
+  await expect(widget.getByRole("dialog")).toBeVisible();
+  expect(sessionRequests).toHaveLength(1);
+  const mobileGeometry = await widget.getByRole("dialog").evaluate((dialog) => {
+    const choices = Array.from(dialog.querySelectorAll<HTMLElement>(".wyceno-choice"));
+    const close = dialog.querySelector<HTMLElement>(".wyceno-close");
+    const logo = dialog.querySelector<HTMLElement>(".wyceno-brand-logo");
+    const sync = dialog.querySelector<HTMLElement>(".wyceno-sync");
+    if (choices.length < 2 || !close || !logo || !sync) {
+      throw new Error("Missing mobile branded controls");
+    }
+    const first = choices[0].getBoundingClientRect();
+    const second = choices[1].getBoundingClientRect();
+    const closeRect = close.getBoundingClientRect();
+    const logoRect = logo.getBoundingClientRect();
+    const syncRect = sync.getBoundingClientRect();
+    return {
+      choicesAreSingleColumn: Math.abs(first.left - second.left) < 1 && second.top >= first.bottom,
+      closeHeight: closeRect.height,
+      closeWidth: closeRect.width,
+      hasHorizontalOverflow: dialog.scrollWidth > dialog.clientWidth,
+      logoWidth: logoRect.width,
+      overlapsSync:
+        closeRect.left < syncRect.right &&
+        closeRect.right > syncRect.left &&
+        closeRect.top < syncRect.bottom &&
+        closeRect.bottom > syncRect.top,
+    };
+  });
+  expect(mobileGeometry).toEqual({
+    choicesAreSingleColumn: true,
+    closeHeight: 42,
+    closeWidth: 42,
+    hasHorizontalOverflow: false,
+    logoWidth: 122,
+    overlapsSync: false,
+  });
+  const accessibility = await new AxeBuilder({ page }).include("wyceno-widget").analyze();
+  expect(accessibility.violations).toEqual([]);
+  await page.screenshot({
+    animations: "disabled",
+    fullPage: false,
+    path: "artifacts/visual-qa/13f-widget-branding/after/widget-fortez-popup-390x844.png",
+  });
+
+  await page.setViewportSize({ height: 800, width: 320 });
+  await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
+  await widget.evaluate((element) => {
+    element.setAttribute("brand-name", "F".repeat(120));
+    element.setAttribute("brand-subtitle", "S".repeat(160));
+    document.documentElement.style.fontSize = "32px";
+  });
+  const narrowGeometry = await widget.getByRole("dialog").evaluate((dialog) => {
+    const close = dialog.querySelector<HTMLElement>(".wyceno-close");
+    const copy = dialog.querySelector<HTMLElement>(".wyceno-brand-copy");
+    const heading = dialog.querySelector<HTMLElement>("h1");
+    if (!close || !copy || !heading) throw new Error("Missing narrow branded controls");
+    const closeRect = close.getBoundingClientRect();
+    const copyRect = copy.getBoundingClientRect();
+    return {
+      brandOverlapsClose:
+        copyRect.left < closeRect.right &&
+        copyRect.right > closeRect.left &&
+        copyRect.top < closeRect.bottom &&
+        copyRect.bottom > closeRect.top,
+      dialogOverflow: dialog.scrollWidth - dialog.clientWidth,
+      headingOverflow: heading.scrollWidth - heading.clientWidth,
+    };
+  });
+  expect(narrowGeometry).toEqual({
+    brandOverlapsClose: false,
+    dialogOverflow: 0,
+    headingOverflow: 0,
+  });
+  await page.screenshot({
+    animations: "disabled",
+    fullPage: false,
+    path: "artifacts/visual-qa/13f-widget-branding/after/widget-fortez-popup-320x800-forced-colors.png",
+  });
+
+  await page.emulateMedia({ forcedColors: "none", reducedMotion: "reduce" });
+  await widget.evaluate((element) => {
+    document.documentElement.style.fontSize = "";
+    element.style.setProperty(
+      "--wyceno-widget-primary",
+      "url(https://tracker.example.test/primary.png)",
+    );
+    element.style.setProperty(
+      "--wyceno-widget-backdrop",
+      "url(https://tracker.example.test/backdrop.png)",
+    );
+  });
+  const constrainedColors = await widget.getByRole("dialog").evaluate((dialog) => ({
+    backdropImage: getComputedStyle(dialog, "::backdrop").backgroundImage,
+    primaryImage: getComputedStyle(
+      dialog.querySelector<HTMLElement>(".wyceno-primary") as HTMLElement,
+    ).backgroundImage,
+  }));
+  expect(constrainedColors).toEqual({ backdropImage: "none", primaryImage: "none" });
+  await page.waitForTimeout(100);
+  expect(unexpectedThemeRequests).toBe(0);
+
+  await widget.getByRole("button", { name: "Zamknij formularz" }).click();
   await expect(launcher).toBeFocused();
 });
