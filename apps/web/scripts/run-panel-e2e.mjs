@@ -314,7 +314,12 @@ try {
         ? process.env.PANEL_E2E_RETAIN_STAGES.split(",")
             .map((stage) => stage.trim())
             .filter(Boolean)
-        : ["12ze-self-service-estimation", "12zf-webhook-v1", "12zk-contact-delivery-settings"];
+        : [
+            "12ze-self-service-estimation",
+            "12zf-webhook-v1",
+            "12zk-contact-delivery-settings",
+            "12zk-contact-builder",
+          ];
       for (const stage of retainedStages) {
         const stageArtifactSource = path.join(artifactRoot, stage);
         const stageArtifactTarget = path.join(repositoryRoot, "artifacts/visual-qa", stage);

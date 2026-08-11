@@ -25,6 +25,14 @@ tenantowy adres alertów niezależny od konta użytkownika. Zmiana wymaga ADR,
 migracji forward-only, tenantowego RLS, testów negatywnych i kompatybilności z
 istniejącymi procesami `email_required`.
 
+**Aktualizacja 2026-08-11:** migracje FTZ-01/FTZ-02 są zastosowane na
+produkcji, a tenant Fortez ma skonfigurowany niezależny adres dostawy poza
+repozytorium. Podczas przygotowania draftu wykryto brak kontrolki buildera dla
+`phone_required`; poprawka z osobnym obszarem Kontakt, wersjonowaną informacją
+prywatności i serwerowym przeliczaniem hashy consentu przechodzi lokalny gate.
+Prawdziwe dane pozostają `NO-GO` do wdrożenia tej poprawki, schedulera,
+monitoringu, review prawnego, warsztatu i pełnego UAT dostawy.
+
 ## 2. Potwierdzony stan strony Fortez
 
 Kontrolę wykonano na publicznej produkcji `https://fortez-przyczepy.pl` oraz

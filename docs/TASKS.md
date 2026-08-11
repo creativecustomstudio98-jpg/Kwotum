@@ -2473,9 +2473,16 @@ alertów, warsztatu, DPA, UAT oraz podpisanego GO.
       forced RLS blokujące Sales, suspended i drugi tenant.
 - [x] Dodać telefon do e-maila firmy, webhooka, panelu i bezpiecznych fallbacków
       prezentacyjnych.
+- [x] Udostępnić w builderze konfigurację `email_required` / `phone_required`,
+      wersjonowaną informację prywatności i jawne wyłączenie plików bez ręcznej
+      edycji bazy.
+- [x] Przeliczać po stronie serwera hash treści informacji prywatności i zgody
+      marketingowej przy zapisie oraz publikacji draftu.
 - [x] Uruchomić unit, typecheck oraz pełny `pnpm test:rls` na czystej bazie.
-- [ ] Zastosować migrację na staging/produkcji i wykonać syntetyczny UAT
-      rzeczywistej dostawy przed pierwszym prawdziwym leadem.
+- [x] Zastosować migrację produkcyjną i skonfigurować tenantowy adres alertów
+      Fortez poza repozytorium.
+- [ ] Wdrożyć kontrolkę buildera i wykonać syntetyczny UAT rzeczywistej dostawy
+      przed pierwszym prawdziwym leadem.
 
 **Gate lokalny 2026-08-10:** pełna historia migracji i RLS przechodzi, w tym
 phone-only submit, brak potwierdzenia klienta bez e-maila, adres snapshotowany w
@@ -2484,6 +2491,16 @@ unit/RLS/WordPress, build i izolowany E2E ustawień 1536/390 px są zielone;
 artefakty 19/20 zapisano w `artifacts/visual-qa/12zk-contact-delivery-settings/`.
 Gate produkcyjny jest otwarty do wdrożenia, schedulera, monitoringu i
 syntetycznej dostawy.
+
+**Stan 2026-08-11 — BUILDER CONTACT POLICY LOCAL PASS:** podczas konfiguracji
+produkcyjnego draftu wykryto, że schema i widget wspierają phone-first, lecz
+Owner nie miał kontrolki buildera do ustawienia tej polityki. Dodano osobny
+obszar Kontakt z kompatybilnym domyślnym `email_required`, phone-first,
+wersjonowaną informacją prywatności i plikami domyślnie wyłączonymi. Serwer
+normalizuje hash treści przed zapisem. Web 163/163, lint, typecheck, build oraz
+izolowany E2E buildera 1/1 są zielone; fixture Auth/DB/Storage został usunięty
+bez pozostałości. Zmiana nadal wymaga review, CI i wdrożenia przed konfiguracją
+draftu Fortez.
 
 ## Etap 12ZH — bezpieczny podgląd i wysłanie procesu
 
