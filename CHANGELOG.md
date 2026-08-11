@@ -6,6 +6,14 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Builder procesu udostępnia teraz Ownerowi/Adminowi osobną zakładkę
+  `Kontakt`: wybór `email_required` / `phone_required`, wersjonowaną informację
+  prywatności, bezpieczny URL polityki i jawny przełącznik załączników.
+  Domyślnie zachowuje zgodność `email_required`, nie dodaje zgody marketingowej
+  i ostrzega przed plikami bez produkcyjnego skanera malware. Serwer przelicza
+  SHA-256 treści informacji i zgody przy każdym zapisie/publikacji, więc klient
+  panelu nie może utrwalić niespójnego dowodu consentu. E2E potwierdza
+  phone-first, zapis, publikację, axe i cleanup syntetycznego tenanta.
 - Zastąpiono poprzedni symbol dokładnym znakiem Kwotum V3 dostarczonym przez
   właściciela. Wersjonowane assety zasilają faviconę, Apple touch icon,
   marketing, auth, panel, demonstracje oraz wiadomości, bez zmiany tenantowego

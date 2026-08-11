@@ -1800,7 +1800,7 @@
   padding: 7px 10px;
   border-bottom: 1px solid var(--wy-color-border);
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
   background: var(--wy-color-surface);
 }
@@ -1837,6 +1837,17 @@
 .estimation-builder__outline,
 .estimation-builder__inspector {
   scrollbar-gutter: stable;
+}
+
+.contact-settings__legal-note {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--wy-color-brand) 18%, var(--wy-color-border));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--wy-color-brand) 5%, var(--wy-color-surface));
+  color: var(--wy-color-text-secondary);
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .estimation-builder__rule-list {

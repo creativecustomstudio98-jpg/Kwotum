@@ -31,6 +31,7 @@ const builderToggleArtifactDirectory = path.join(artifactRoot, "12y-builder-togg
 const builderSectionArtifactDirectory = path.join(artifactRoot, "12z-builder-sections/after");
 const builderOptionArtifactDirectory = path.join(artifactRoot, "12za-builder-options/after");
 const builderEstimationArtifactDirectory = path.join(artifactRoot, "12ze-self-service-estimation");
+const builderContactArtifactDirectory = path.join(artifactRoot, "12zk-contact-builder");
 const webhookArtifactDirectory = path.join(artifactRoot, "12zf-webhook-v1");
 
 async function signIn(page: Page) {
@@ -1216,6 +1217,8 @@ test.describe("panel reference reconstruction", () => {
     await Promise.all([
       mkdir(path.join(builderEstimationArtifactDirectory, "desktop"), { recursive: true }),
       mkdir(path.join(builderEstimationArtifactDirectory, "mobile"), { recursive: true }),
+      mkdir(path.join(builderContactArtifactDirectory, "desktop"), { recursive: true }),
+      mkdir(path.join(builderContactArtifactDirectory, "mobile"), { recursive: true }),
     ]);
 
     const builderUrl = `/panel/${organizationId}/procesy/${editorFlowId}`;
@@ -1226,6 +1229,31 @@ test.describe("panel reference reconstruction", () => {
 
     const areaTabs = page.locator(".flow-builder__questions .flow-builder__area-tabs");
     const undo = page.getByRole("button", { exact: true, name: "Cofnij" });
+
+    await areaTabs.getByRole("tab", { exact: true, name: "Kontakt" }).click();
+    await page.getByRole("button", { name: "Włącz zbieranie kontaktu" }).click();
+    await page.getByLabel("Wymagany kanał kontaktu").selectOption("phone_required");
+    await page
+      .getByLabel("Treść informacji prywatności")
+      .fill("Potwierdzam zapoznanie się z informacją prywatności testowej organizacji.");
+    await page.getByLabel("Wersja informacji").fill("panel-e2e-v1");
+    await page
+      .getByLabel("Adres polityki prywatności")
+      .fill("https://example.test/polityka-prywatnosci");
+    await page.getByRole("button", { name: "Zapisz treść informacji" }).click();
+    await expect(page.locator(".contact-result-preview")).toContainText("Telefon jest wymagany");
+    await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
+      timeout: 15_000,
+    });
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(builderContactArtifactDirectory, "desktop", "contact-1448x1086.png"),
+    });
+    const contactDesktopAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(contactDesktopAccessibility.violations).toEqual([]);
+
     await areaTabs.getByRole("tab", { exact: true, name: "Wycena" }).click();
     const setup = page.locator(".estimation-setup");
     await expect(setup).toBeVisible();
@@ -1291,6 +1319,17 @@ test.describe("panel reference reconstruction", () => {
     await page.setViewportSize({ height: 844, width: 390 });
     const mobileAreaTabs = page.locator(".flow-builder__area-tabs--mobile");
     await expect(mobileAreaTabs).toBeVisible();
+    await mobileAreaTabs.getByRole("tab", { exact: true, name: "Kontakt" }).click();
+    await page.getByRole("tab", { exact: true, name: "Ustawienia" }).click();
+    await expect(page.getByRole("heading", { name: "Ustawienia · Kontakt" })).toBeVisible();
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(builderContactArtifactDirectory, "mobile", "contact-390x844.png"),
+    });
+    const contactMobileAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(contactMobileAccessibility.violations).toEqual([]);
     await mobileAreaTabs.getByRole("tab", { exact: true, name: "Scoring" }).click();
     await page.getByRole("tab", { exact: true, name: "Ustawienia" }).click();
     await expect(page.locator(".estimation-builder__inspector")).toBeVisible();
