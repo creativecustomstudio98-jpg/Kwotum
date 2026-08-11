@@ -13,6 +13,9 @@ wersjonowany.
 - wznowienie sesji, zapis odpowiedzi, upload i submit są ponownie walidowane
   przez API;
 - inline, popup, fullscreen i hosted link korzystają z tego samego kontraktu.
+- popup i fullscreen nie tworzą ani nie wznawiają sesji przed kliknięciem
+  launchera; jawne zmienne `--wyceno-launcher-*` obejmują tylko jego kolory i
+  promień narożników.
 
 Architekturę i implementację opisują `../../docs/WIDGET_ARCHITECTURE.md` oraz
 `../../docs/WIDGET_IMPLEMENTATION.md`.

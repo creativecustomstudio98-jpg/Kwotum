@@ -29,6 +29,10 @@ Shortcode:
 Tryby: `inline`, `popup`, `fullscreen`. Ten sam kontrakt udostępnia blok
 Gutenberg „Kwotum”.
 
+Shortcode i blok przekazują do publicznego elementu jawny `api-base` wyłącznie
+z przypiętego, zwalidowanego `WYCENO_CONNECTOR_API_ORIGIN`. W HTML nie pojawia
+się credential połączenia ani token instalacyjny.
+
 ## Macierz kompatybilności
 
 | WordPress | PHP 8.3 | PHP 8.4 | PHP 8.5 |

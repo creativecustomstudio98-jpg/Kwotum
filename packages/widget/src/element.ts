@@ -11,6 +11,23 @@ const publicIdPattern =
 
 type WidgetMode = "fullscreen" | "inline" | "popup";
 
+function idleWidgetState(): WidgetState {
+  return {
+    analyticsConsent: null,
+    analyticsError: null,
+    answers: {},
+    currentStep: null,
+    errorMessage: null,
+    history: [],
+    manifest: null,
+    result: null,
+    status: "idle",
+    submission: null,
+    syncStatus: "synced",
+    uploadedFiles: [],
+  };
+}
+
 function create<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   className?: string,
@@ -30,6 +47,18 @@ function dispatchWidgetEvent(element: HTMLElement, name: string, detail?: unknow
       ...(detail === undefined ? {} : { detail }),
     }),
   );
+}
+
+export function resolveWidgetApiBase(
+  explicitBase: string | null,
+  moduleUrl: string,
+  pageOrigin: string,
+): string {
+  if (explicitBase) return explicitBase;
+  const parsedModuleUrl = new URL(moduleUrl);
+  return parsedModuleUrl.protocol === "http:" || parsedModuleUrl.protocol === "https:"
+    ? parsedModuleUrl.origin
+    : pageOrigin;
 }
 
 function initials(value: string): string {
@@ -59,6 +88,7 @@ export class WycenoWidgetElement extends HTMLElement {
   #contactStarted = false;
   #dialog: HTMLDialogElement | null = null;
   #lastStatus: WidgetState["status"] = "idle";
+  #launched = false;
   #previewManifest: WidgetManifest | null = null;
   #renderedState: WidgetState | null = null;
   #resizeObserver: ResizeObserver | null = null;
@@ -92,7 +122,11 @@ export class WycenoWidgetElement extends HTMLElement {
       dispatchWidgetEvent(this, "resize", { height });
     });
     this.#resizeObserver.observe(this);
-    void this.#initialize();
+    if (this.#shouldDeferInitialization()) {
+      this.#renderDeferredLauncher();
+    } else {
+      void this.#initialize();
+    }
   }
 
   disconnectedCallback(): void {
@@ -102,8 +136,22 @@ export class WycenoWidgetElement extends HTMLElement {
     this.#unsubscribe?.();
   }
 
-  attributeChangedCallback(): void {
-    if (this.isConnected) void this.#initialize();
+  attributeChangedCallback(name: string, previous: string | null, next: string | null): void {
+    if (!this.isConnected || previous === next) return;
+    if (name === "button-label") {
+      if (this.#shouldDeferInitialization()) this.#renderDeferredLauncher();
+      else this.#render(this.#controller?.state ?? idleWidgetState());
+      return;
+    }
+    if (name === "mode" && this.#controller) {
+      this.#render(this.#controller.state);
+      return;
+    }
+    if (this.#shouldDeferInitialization()) {
+      this.#renderDeferredLauncher();
+      return;
+    }
+    void this.#initialize();
   }
 
   get mode(): WidgetMode {
@@ -117,11 +165,36 @@ export class WycenoWidgetElement extends HTMLElement {
 
   set previewManifest(value: WidgetManifest | null) {
     this.#previewManifest = value ? structuredClone(value) : null;
-    if (this.isConnected) void this.#initialize();
+    if (!this.isConnected) return;
+    if (this.#shouldDeferInitialization()) {
+      this.#renderDeferredLauncher();
+      return;
+    }
+    void this.#initialize();
   }
 
   get previewMode(): boolean {
     return this.hasAttribute("preview") && this.#previewManifest !== null;
+  }
+
+  #shouldDeferInitialization(): boolean {
+    return this.mode !== "inline" && !this.#launched && this.#controller === null;
+  }
+
+  #renderDeferredLauncher(): void {
+    const publicId = this.getAttribute("public-id") ?? "";
+    if (!publicIdPattern.test(publicId)) {
+      this.#renderStandaloneError("Brakuje poprawnego identyfikatora procesu.");
+      return;
+    }
+    const state = idleWidgetState();
+    const container = create("div", `wyceno-shell wyceno-shell--${this.mode}`);
+    container.append(this.#createLauncher());
+    this.#shadow.querySelector(".wyceno-shell")?.remove();
+    this.#shadow.append(container);
+    this.#dialog = null;
+    this.#lastStatus = state.status;
+    this.#renderedState = state;
   }
 
   async #initialize(): Promise<void> {
@@ -131,7 +204,11 @@ export class WycenoWidgetElement extends HTMLElement {
       return;
     }
     this.#unsubscribe?.();
-    const baseUrl = this.getAttribute("api-base") ?? window.location.origin;
+    const baseUrl = resolveWidgetApiBase(
+      this.getAttribute("api-base"),
+      import.meta.url,
+      window.location.origin,
+    );
     this.#controller = this.previewMode
       ? new WidgetSessionController(
           new PreviewWidgetApi(this.#previewManifest as WidgetManifest),
@@ -148,6 +225,7 @@ export class WycenoWidgetElement extends HTMLElement {
 
   readonly #handleStorage = (event: StorageEvent): void => {
     if (this.previewMode) return;
+    if (this.mode !== "inline" && this.#controller === null) return;
     const publicId = this.getAttribute("public-id");
     if (publicId && event.key === widgetStorageKey(publicId) && event.newValue) {
       void this.#initialize();
@@ -166,13 +244,7 @@ export class WycenoWidgetElement extends HTMLElement {
     if (this.mode === "inline") {
       container.append(this.#renderContent(state));
     } else {
-      const launcher = create(
-        "button",
-        "wyceno-launcher",
-        this.getAttribute("button-label") ?? "Rozpocznij wycenę",
-      );
-      launcher.type = "button";
-      launcher.addEventListener("click", () => this.#openDialog());
+      const launcher = this.#createLauncher();
       container.append(launcher);
 
       const dialog = create("dialog", `wyceno-dialog wyceno-dialog--${this.mode}`);
@@ -214,6 +286,17 @@ export class WycenoWidgetElement extends HTMLElement {
     this.#renderedState = state;
   }
 
+  #createLauncher(): HTMLButtonElement {
+    const launcher = create(
+      "button",
+      "wyceno-launcher",
+      this.getAttribute("button-label") ?? "Rozpocznij wycenę",
+    );
+    launcher.type = "button";
+    launcher.addEventListener("click", () => this.#openDialog());
+    return launcher;
+  }
+
   #isSyncOnlyUpdate(previous: WidgetState, next: WidgetState): boolean {
     return (
       previous.syncStatus !== next.syncStatus &&
@@ -240,10 +323,17 @@ export class WycenoWidgetElement extends HTMLElement {
   }
 
   #openDialog(): void {
-    this.#dialog?.showModal();
+    const initialization = this.#controller ? null : this.#initialize();
+    this.#launched = true;
+    if (this.#dialog && !this.#dialog.open) this.#dialog.showModal();
     this.#dialog?.querySelector<HTMLElement>("button, input, textarea")?.focus();
-    this.#controller?.trackAnalytics("widget_opened");
-    this.#controller?.trackAnalytics("cta_clicked");
+
+    const trackOpen = (): void => {
+      this.#controller?.trackAnalytics("widget_opened");
+      this.#controller?.trackAnalytics("cta_clicked");
+    };
+    if (initialization) void initialization.then(trackOpen);
+    else trackOpen();
   }
 
   #renderContent(state: WidgetState): HTMLElement {
@@ -268,7 +358,10 @@ export class WycenoWidgetElement extends HTMLElement {
     }
 
     if (state.status === "loading_manifest" || state.status === "idle") {
-      content.append(create("p", "wyceno-status", "Uruchamiamy formularz…"));
+      const loading = create("p", "wyceno-status", "Uruchamiamy formularz…");
+      loading.setAttribute("role", "status");
+      loading.setAttribute("aria-live", "polite");
+      content.append(loading);
       return content;
     }
 
@@ -862,6 +955,7 @@ export class WycenoWidgetElement extends HTMLElement {
     const shell = create("div", "wyceno-shell wyceno-shell--inline");
     shell.append(alert);
     this.#shadow.append(shell);
+    this.#dialog = null;
   }
 }
 

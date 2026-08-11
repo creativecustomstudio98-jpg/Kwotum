@@ -358,9 +358,28 @@ button {
   color: #ffffff;
 }
 
+.wyceno-launcher {
+  border-color: var(--wyceno-launcher-border-color, var(--wyceno-accent));
+  border-radius: var(--wyceno-launcher-border-radius, 5px);
+  background-color: var(--wyceno-launcher-background-color, var(--wyceno-accent));
+  color: var(--wyceno-launcher-text-color, #ffffff);
+}
+
 .wyceno-primary:hover,
 .wyceno-launcher:hover {
   box-shadow: 0 0 0 3px var(--wyceno-accent-soft);
+}
+
+.wyceno-launcher:hover {
+  border-color: var(
+    --wyceno-launcher-hover-border-color,
+    var(--wyceno-launcher-border-color, var(--wyceno-accent))
+  );
+  background-color: var(
+    --wyceno-launcher-hover-background-color,
+    var(--wyceno-launcher-background-color, var(--wyceno-accent))
+  );
+  box-shadow: 0 0 0 3px var(--wyceno-launcher-ring-color, var(--wyceno-accent-soft));
 }
 
 .wyceno-secondary {
@@ -636,6 +655,13 @@ button {
 :focus-visible {
   outline: 3px solid var(--wyceno-accent);
   outline-offset: 3px;
+}
+
+.wyceno-launcher:focus-visible {
+  outline-color: var(
+    --wyceno-launcher-ring-color,
+    var(--wyceno-launcher-border-color, var(--wyceno-accent))
+  );
 }
 
 @media (max-width: 700px) {
