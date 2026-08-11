@@ -35,6 +35,14 @@ pozostaje w trybie testowym, a uploady są zablokowane fail-closed do czasu
 podłączenia skanera malware. Przed otwarciem pilota trzeba również zamknąć
 pozycje bezpieczeństwa i operacji z Etapu 13.
 
+Lokalna implementacja FTZ-04 dodaje pięciominutowy Vercel Cron w katalogu
+projektu `apps/web`, osobny `CRON_SECRET`, prywatny heartbeat i chroniony
+`MONITORING_PROBE_SECRET`. Produkcja nadal nie ma tych dwóch sekretów,
+migracji, niezależnego alertu ani dowodu syntetycznej dostawy. Aktualny Pro
+Trial musi zostać zastąpiony utrzymanym Pro/Enterprise albo zatwierdzonym
+schedulerem zewnętrznym przed końcem triala. Procedura:
+`NOTIFICATION_OPERATIONS.md`.
+
 ## Pipeline
 
 Install z frozen lockfile → lint → typecheck → unit/integration → build → security checks → artefakt immutable → migracja expand → deploy → smoke test → obserwacja → contract/cleanup w późniejszym release.

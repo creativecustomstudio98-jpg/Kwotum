@@ -1273,3 +1273,44 @@ wycofać aplikację. Rotacja kluczy wymaga skoordynowanej zmiany Cloudflare i
 sekretów środowiska. Turnstile staje się kolejnym subprocessorem wymagającym
 zatwierdzenia prawnego i pozostaje pozycją produkcyjnego GO mimo ukończenia
 implementacji lokalnej.
+
+## ADR-042: odseparowany Vercel Cron, prywatny heartbeat i probe outboxu
+
+**Status:** accepted dla lokalnej implementacji FTZ-04 na podstawie polecenia
+kontynuacji właściciela produktu z 2026-08-11
+
+**Decyzja:** produkcyjny outbox `notifications` i `flow_invitations` jest
+przetwarzany co pięć minut przez Vercel Cron. Ponieważ Vercel wykonuje cron jako
+HTTP GET i automatycznie przekazuje tylko `CRON_SECRET`, istniejący ręczny POST
+z `NOTIFICATION_WORKER_SECRET` pozostaje bez zmian, a GET otrzymuje odrębne
+uwierzytelnienie. Oba wywołania korzystają z tej samej idempotentnej logiki
+claim/retry i nie ufają nagłówkowi User-Agent jako kontroli dostępu.
+
+Baza utrzymuje jeden prywatny heartbeat na źródło `cron`/`manual`, z UUID
+bieżącego runu, czasami, wynikiem i wyłącznie zagregowanymi licznikami. Start
+nowego runu zastępuje bieżący token; późne zakończenie starszego, nakładającego
+się runu nie może nadpisać nowszego stanu. Narrow RPC są dostępne wyłącznie dla
+service role. Osobny `MONITORING_PROBE_SECRET` chroni zagregowany probe kolejki;
+nie współdzieli uprawnień z cronem ani ręcznym workerem.
+
+Probe zwraca 503 dla brakującego/starego/nieudanego/zawieszonego schedulera,
+wieku `pending/retry` ponad 10 minut, locku ponad 15 minut i nierozwiązanego
+`failed`. Nie zwraca tenantów, odbiorców, treści, payloadów ani danych
+dostawcy. Readiness aplikacji nie zależy od outboxu, aby awaria dostawy e-mail
+nie wycofywała zdrowych instancji obsługujących formularz.
+
+**Dlaczego:** sam fakt regularnego wejścia na route nie dowodzi, że worker
+kończy się sukcesem, a Vercel nie ponawia nieudanego cron joba. Wspólny sekret
+rozszerzałby skutki kompromitacji, a publiczny szczegółowy probe ujawniałby stan
+biznesowy kolejki. Heartbeat w bazie działa niezależnie od bezstanowej instancji
+i pozwala zewnętrznemu monitorowi wykryć zarówno ciszę schedulera, jak i
+narastanie kolejki.
+
+**Konsekwencje:** `CRON_SECRET`, `MONITORING_PROBE_SECRET` i
+`NOTIFICATION_WORKER_SECRET` muszą być różnymi, Production-only sekretami.
+Vercel Pro Trial pozwala na cykl pięciominutowy, ale downgrade do Hobby łamie
+kontrakt; przed końcem triala wymagany jest plan Pro/Enterprise lub zatwierdzony
+zastępczy scheduler. Migracja jest forward-only. Rollback zatrzymuje cron przed
+cofnięciem aplikacji i pozostawia kolejki oraz heartbeat w bazie. FTZ-04 nie
+jest zamknięte, dopóki migracja, sekrety, niezależny alert i syntetyczna dostawa
+nie zostaną potwierdzone na jednym immutable SHA.

@@ -19,6 +19,14 @@ może zapisywać status i czas zewnętrznego pomiaru, ale nie body błędu provi
 Lokalny smoke test nie zastępuje uptime checku ani alertu stagingowego.
 Docelowy alert readiness wymaga progu, właściciela i runbooka wybranego w 13A.
 
+FTZ-04 definiuje dla aplikacyjnego outboxu cron co 5 minut, brak heartbeat po
+12 minutach, maksymalnie 90 sekund stanu `running`, wiek `pending/retry` 10
+minut, stale lock 15 minut oraz zero nierozwiązanych `failed`. Probe jest
+chroniony osobnym sekretem i nie wchodzi do publicznej readiness. Dopóki
+niezależny monitor, kanał eskalacji i test alarmu nie są aktywne, implementacja
+lokalna nie zamyka bramki produkcyjnej. Szczegóły:
+`NOTIFICATION_OPERATIONS.md`.
+
 ## Alerty
 
 Krytyczne: trwała niemożność submitu, podejrzenie tenant leakage, kolejka bez postępu, utrata bazy. Wysokie: skok 5xx, e-mail/webhook failure rate, błędy widgetu. Każdy alert ma właściciela, runbook i próg oparty na wpływie.

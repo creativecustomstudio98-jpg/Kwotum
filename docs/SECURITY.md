@@ -232,6 +232,13 @@ idempotency zależy także od dostawcy. Produkcyjne włączenie wymaga rotowalne
 sekretu workera, scheduler alertów, zatwierdzonego providera/DPA/transferów i
 zweryfikowanej domeny nadawcy.
 
+Lokalny FTZ-04 rozdziela sekret automatycznego GET, ręcznego POST i probe,
+zapisuje heartbeat bez PII w `app_private` oraz odbiera `anon` i
+`authenticated` wszystkie RPC operacyjne. Probe zwraca wyłącznie agregaty i
+zamknięte kody; nie jest częścią publicznej readiness. Produkcyjne ryzyko
+pozostaje otwarte do wdrożenia migracji, rotowalnych sekretów, niezależnego
+alertu i syntetycznej dostawy na jednym SHA.
+
 ## Kontrole wdrożone w Etapie 9
 
 - event jest zapisywany dopiero po najnowszej zgodzie `analytics-v1`, a odmowa

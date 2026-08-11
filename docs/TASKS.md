@@ -2616,6 +2616,25 @@ ani rollback drill.
 - [ ] Uruchomić schedulery powiadomień, retencji, analytics purge i webhooków.
 - [ ] Zweryfikować health, readiness, CSP, CORS, cookies, OAuth i noindex.
 
+#### Podetap FTZ-04 — scheduler i alarmy aplikacyjnego outboxu
+
+**Stan lokalny 2026-08-11:** ADR-042, pięciominutowy Vercel Cron, odseparowane
+uwierzytelnienie GET/POST, prywatny heartbeat, agregowany probe i testy są
+zaimplementowane. Nie zamyka to FTZ-04: produkcja nie ma jeszcze migracji,
+`CRON_SECRET`, `MONITORING_PROBE_SECRET`, niezależnego alertu ani syntetycznej
+dostawy. Konto działa jako Pro Trial; utrzymanie cyklu wymaga Pro/Enterprise
+albo zatwierdzonego schedulera zastępczego.
+
+- [x] Zapisać ADR-042 i rollback bez usuwania kolejek.
+- [x] Dodać GET dla Vercel Cron z osobnym sekretem i zachować ręczny POST.
+- [x] Zapisać heartbeat bez PII i narrow RPC wyłącznie dla service role.
+- [x] Dodać chroniony probe schedulera, wieku kolejki, stale lock i `failed`.
+- [x] Pokryć unit, route, granty i RLS przypadkami negatywnymi.
+- [ ] Wdrożyć migrację i release na jednym immutable SHA.
+- [ ] Ustawić odrębne sekrety Production i potwierdzić dwa cykle heartbeat.
+- [ ] Podłączyć niezależny alert, ownera/kanał i przećwiczyć 503 → recovery.
+- [ ] Skonfigurować ograniczony klucz Resend i wykonać syntetyczną dostawę.
+
 ### Etap 13B — bezpieczeństwo, prawo i operacje
 
 - [ ] Wdrożyć rozproszony rate limit per IP/origin, adaptacyjny Turnstile

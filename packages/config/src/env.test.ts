@@ -52,7 +52,9 @@ describe("environment validation", () => {
         APP_URL: "https://app.wyceno.test",
         CLAMAV_HOST: "clamav.internal",
         CLAMAV_PORT: "3310",
+        CRON_SECRET: "c".repeat(32),
         MALWARE_SCAN_MODE: "clamav",
+        MONITORING_PROBE_SECRET: "m".repeat(32),
         PUBLIC_RATE_LIMIT_SECRET: "p".repeat(32),
         RETENTION_WORKER_SECRET: "r".repeat(32),
         WEBHOOK_SIGNING_SECRET: "s".repeat(32),
@@ -61,7 +63,9 @@ describe("environment validation", () => {
     ).toMatchObject({
       CLAMAV_HOST: "clamav.internal",
       CLAMAV_PORT: 3310,
+      CRON_SECRET: "c".repeat(32),
       MALWARE_SCAN_MODE: "clamav",
+      MONITORING_PROBE_SECRET: "m".repeat(32),
       PUBLIC_RATE_LIMIT_SECRET: "p".repeat(32),
       WEBHOOK_WORKER_SECRET: "w".repeat(32),
     });

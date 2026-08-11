@@ -72,6 +72,8 @@ Wymagane zmienne server-side:
 EMAIL_DELIVERY_MODE=test
 EMAIL_FROM=powiadomienia@example.test
 NOTIFICATION_WORKER_SECRET=minimum-32-znaki-losowego-sekretu
+CRON_SECRET=minimum-32-znaki-odrebnego-sekretu-schedulera
+MONITORING_PROBE_SECRET=minimum-32-znaki-odrebnego-sekretu-monitoringu
 ```
 
 Tryb `test` uruchamia rzeczywisty renderer, kolejkę i zapis statusów, lecz nie
@@ -90,7 +92,7 @@ Produkcyjny nadawca może zawierać bezpieczną nazwę prezentacyjną, np.
 nowej linii i niepoprawny adres, aby nagłówek nie mógł zostać rozszerzony przez
 iniekcję.
 
-Scheduler wywołuje:
+Ręczny operator wywołuje:
 
 ```http
 POST /api/v1/internal/notifications/process
@@ -99,7 +101,14 @@ Authorization: Bearer <NOTIFICATION_WORKER_SECRET>
 
 Odpowiedź zawiera wyłącznie liczniki `claimed`, `sent`, `retrying` i `failed`.
 Endpoint zawsze używa `private, no-store`; błąd nie ujawnia odbiorcy, tematu ani
-treści. Scheduler i jego alerty produkcyjne powstają przy wdrożeniu Etapu 13.
+treści.
+
+Vercel Cron wywołuje ten sam route metodą GET co pięć minut i uwierzytelnia się
+odrębnym `CRON_SECRET`. Prywatny probe
+`GET /api/v1/internal/notifications/health` wymaga jeszcze innego
+`MONITORING_PROBE_SECRET`, zwraca wyłącznie agregaty i 503 dla przekroczonych
+progów. Pełny kontrakt, kolejność wdrożenia i runbook opisuje
+`NOTIFICATION_OPERATIONS.md`.
 
 Ten sam chroniony endpoint przetwarza również osobny outbox
 `flow_invitations`. Odpowiedź sumuje bezpieczne liczniki obu kolejek. Worker
