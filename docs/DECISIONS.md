@@ -1314,3 +1314,45 @@ zastępczy scheduler. Migracja jest forward-only. Rollback zatrzymuje cron przed
 cofnięciem aplikacji i pozostawia kolejki oraz heartbeat w bazie. FTZ-04 nie
 jest zamknięte, dopóki migracja, sekrety, niezależny alert i syntetyczna dostawa
 nie zostaną potwierdzone na jednym immutable SHA.
+
+## ADR-043: historyczna projekcja odpowiedzi leada do prezentacji
+
+**Status:** accepted dla korekty jakości briefu pierwszego pilotażu Fortez na
+podstawie produkcyjnego UAT z 2026-08-11
+
+**Decyzja:** `lead_answers.answer` pozostaje niezmienioną, surową odpowiedzią
+sesji. Klucze opcji są nadal źródłem dla routingu, pricingu, scoringu, audytu i
+integracji. Osobne `lead_answers.display_answer` przechowuje tenantową projekcję
+przeznaczoną wyłącznie do prezentacji w panelu i powiadomieniach. Projekcja
+powstaje przy zapisie odpowiedzi leada z etykiet
+opcji w dokładnie tym immutable `flow_versions.snapshot`, na który wskazuje
+lead. Nie korzysta z bieżącego draftu ani późniejszej publikacji procesu.
+
+Wybór pojedynczy i wielokrotny zachowują odpowiednio etykietę oraz kolejność
+etykiet, a techniczny sentinel `__unknown__` jest prezentowany jako „Do
+ustalenia”. Tekst, liczba i wartość logiczna zachowują swój typ. Brak pasującej
+etykiety nie usuwa odpowiedzi: kontrolowany fallback zachowuje surową wartość.
+Migracja backfilluje istniejące leady przez złożony tenantowy join i ustawia
+projekcję triggerem dla nowych insertów, także gdy przez krótki czas działa
+poprzednia wersja aplikacji. Panel czyta pole przez dotychczasowe RLS
+`lead_answers`; nie rozszerzamy Sales dostępu do edytorskich `flow_versions`.
+
+**Dlaczego:** techniczne klucze są stabilnym kontraktem logiki, ale nie są
+czytelną odpowiedzią dla firmy. Nadpisanie surowego pola zniszczyłoby
+wyjaśnialność obliczeń, a rozwiązywanie etykiet z aktualnego draftu mogłoby
+zmieniać historyczny brief. Odczyt snapshotu bezpośrednio przez panel
+rozszerzałby uprawnienia ról operacyjnych i powielał logikę w wielu
+powierzchniach.
+
+**Konsekwencje:** migracja jest forward-only. Rollback aplikacji może
+ignorować nowe pole, podczas gdy trigger nadal utrzymuje spójną projekcję;
+kolumny ani backfillu nie usuwamy. Każdy nowy typ odpowiedzi lub zmiana
+kontraktu opcji wymaga parytetowego testu surowej wartości i prezentacji.
+Historycznej wiadomości już dostarczonej przez providera nie da się zmienić;
+poprawka obejmuje panel istniejącego leada oraz kolejne claimy outboxu bez
+automatycznego ponawiania zakończonej dostawy. Nowy biały renderer jest
+utrwalony jako `lead-customer-v2`, `lead-company-v2` i `flow-invitation-v2`.
+Rekordy v1 pozostają legalne i zawsze korzystają z zamrożonych rendererów v1,
+aby retry z tym samym kluczem idempotencji nie zmieniało treści. Rollout wymaga
+krótkiej pauzy workerów pomiędzy migracją włączającą nowe wersje a wdrożeniem
+aplikacji obsługującej oba kontrakty.

@@ -141,3 +141,19 @@ Rollback hotfixu Etapu 13D pozostawia znormalizowane zachowanie funkcji w
 bazie, ponieważ jest kompatybilne ze starszą aplikacją i nie zmienia danych.
 Ewentualna korekta wymaga nowej migracji `create or replace function`; ręczne
 przywrócenie poprzedniego body ponownie otworzyłoby błąd 503 dla „Pomiń”.
+
+Rollback projekcji odpowiedzi Etapu 13E nie usuwa `display_answer`, backfillu
+ani triggera. Poprzednia aplikacja może bezpiecznie ignorować nowe pole, a
+trigger nadal uzupełnia je przy insertach wykonywanych przez starszy submit.
+Jeżeli resolver wymaga korekty, najpierw blokujemy nowe wysłania formularza,
+wdrażamy nową migrację naprawczą z ponownym kontrolowanym backfillem, a dopiero
+potem wznawiamy ruch. Surowe `lead_answers.answer` pozostaje nienaruszonym
+źródłem routingu, obliczeń i audytu.
+
+Ta sama migracja dopuszcza wersje v1 i v2 szablonów, lecz nowe rekordy tworzy
+jako v2. Podczas rollout workerów nie cofamy migracji ani nie przepisujemy
+rekordów kolejki. Zatrzymujemy scheduler przed migracją, wdrażamy aplikację
+obsługującą oba kontrakty i wznawiamy scheduler dopiero po smoke. Rollback
+aplikacji wymaga pozostawienia workerów zatrzymanych do czasu forward-only
+migracji naprawczej przełączającej nowe enqueue z powrotem na wersję obsługiwaną
+przez poprzedni artefakt; istniejące rekordy v1 i v2 zachowują własną wersję.

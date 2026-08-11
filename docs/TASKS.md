@@ -2603,10 +2603,11 @@ SMTP do Supabase oraz wdrożono sześć wersjonowanych, polskich szablonów Auth
 Syntetyczne potwierdzenie rejestracji zostało dostarczone z poprawnym nadawcą i
 bez domyślnej treści Supabase; dowód i rollback opisuje `AUTH_EMAILS.md`.
 Prawne zatwierdzenie dostawcy, testy w rzeczywistych klientach pocztowych oraz
-outbox aplikacji nadal pozostają otwarte. Pozycje poniżej pozostają otwarte,
-ponieważ nie wdrożono jeszcze release'u z Turnstile i limiterem, prywatnego
-skanera malware, monitoringu ani schedulerów; nie wykonano też smoke, restore
-ani rollback drill.
+niezależny alert probe nadal pozostają otwarte. Aplikacyjny outbox, scheduler,
+heartbeat i syntetyczna dostawa firmy działają produkcyjnie. Pozycje poniżej
+pozostają otwarte, ponieważ nie wdrożono jeszcze prywatnego skanera malware,
+pełnego monitoringu ani pozostałych schedulerów; nie wykonano też restore ani
+rollback drill.
 
 - [ ] Wybrać hosting, region Supabase, provider e-mail, domeny, prywatny ClamAV,
       CDN/WAF, Turnstile i monitoring.
@@ -2618,22 +2619,24 @@ ani rollback drill.
 
 #### Podetap FTZ-04 — scheduler i alarmy aplikacyjnego outboxu
 
-**Stan lokalny 2026-08-11:** ADR-042, pięciominutowy Vercel Cron, odseparowane
-uwierzytelnienie GET/POST, prywatny heartbeat, agregowany probe i testy są
-zaimplementowane. Nie zamyka to FTZ-04: produkcja nie ma jeszcze migracji,
-`CRON_SECRET`, `MONITORING_PROBE_SECRET`, niezależnego alertu ani syntetycznej
-dostawy. Konto działa jako Pro Trial; utrzymanie cyklu wymaga Pro/Enterprise
-albo zatwierdzonego schedulera zastępczego.
+**Stan produkcyjny 2026-08-11:** ADR-042, pięciominutowy Vercel Cron,
+odseparowane uwierzytelnienie GET/POST, prywatny heartbeat, agregowany probe i
+testy są wdrożone. Sekrety Production są rozdzielone, dwa cykle heartbeat
+zostały potwierdzone, a syntetyczny alert firmy został dostarczony dokładnie
+raz. FTZ-04 pozostaje otwarte wyłącznie przez brak niezależnego monitora z
+ustalonym ownerem i przećwiczonym alarmem 503 → recovery. Konto działa jako Pro
+Trial; utrzymanie cyklu wymaga Pro/Enterprise albo zatwierdzonego schedulera
+zastępczego.
 
 - [x] Zapisać ADR-042 i rollback bez usuwania kolejek.
 - [x] Dodać GET dla Vercel Cron z osobnym sekretem i zachować ręczny POST.
 - [x] Zapisać heartbeat bez PII i narrow RPC wyłącznie dla service role.
 - [x] Dodać chroniony probe schedulera, wieku kolejki, stale lock i `failed`.
 - [x] Pokryć unit, route, granty i RLS przypadkami negatywnymi.
-- [ ] Wdrożyć migrację i release na jednym immutable SHA.
-- [ ] Ustawić odrębne sekrety Production i potwierdzić dwa cykle heartbeat.
+- [x] Wdrożyć migrację i release na jednym immutable SHA.
+- [x] Ustawić odrębne sekrety Production i potwierdzić dwa cykle heartbeat.
 - [ ] Podłączyć niezależny alert, ownera/kanał i przećwiczyć 503 → recovery.
-- [ ] Skonfigurować ograniczony klucz Resend i wykonać syntetyczną dostawę.
+- [x] Skonfigurować ograniczony klucz Resend i wykonać syntetyczną dostawę.
 
 ### Etap 13B — bezpieczeństwo, prawo i operacje
 
@@ -2697,19 +2700,23 @@ CSP Fortez, prawnego zatwierdzenia dostawcy i smoke na rzeczywistym embedzie.
 
 #### Podetap FTZ-05 — publiczna treść procesu Fortez
 
-**Stan lokalny 2026-08-11:** wersja 2 procesu „Dobór przyczepy Neptun” jest
-opublikowana z poprawnym tytułem i wprowadzeniem. Końcowy UAT ujawnił osobny
-błąd granicy PostgREST/RPC: `null` z przycisku „Pomiń” docierał jako SQL
-`NULL`, przez co pole opcjonalne zwracało 503 i widget przechodził w stan
-offline. Hotfix normalizuje wartość przed walidacją, zachowuje blokadę pól
-wymaganych i dodaje produkcyjnie zgodny test regresji.
+**Stan 2026-08-11:** wersja 2 procesu „Dobór przyczepy Neptun” jest opublikowana
+z poprawnym tytułem i wprowadzeniem. Hotfix granicy PostgREST/RPC normalizujący
+`null` z przycisku „Pomiń” został wdrożony i potwierdzony syntetycznym submitem.
+Lead powstał, a dokładnie jeden alert firmy został dostarczony przez Resend.
+UAT ujawnił następnie błąd prezentacji: brief i panel pokazywały techniczne
+klucze opcji. Etap 13E zachowuje te klucze dla logiki, dodaje historyczną
+projekcję etykiet oraz wersjonowany biały renderer e-mail v2; wdrożenie tej
+korekty pozostaje bieżącym gate.
 
 - [x] Ujawnić publiczny tytuł i wprowadzenie w builderze z limitami schematu.
 - [x] Rozdzielić walidację treści formularza od walidacji aktywnego pytania.
 - [x] Dodać regresję autosave/reload, klawiatury, axe, mobile i overflow.
 - [x] Wdrożyć hotfix treści, ustawić poprawne dane Fortez i opublikować wersję 2.
-- [ ] Wdrożyć i zweryfikować hotfix „Pomiń” dla pól opcjonalnych.
-- [ ] Wykonać syntetyczny submit, potwierdzić lead i dostawę alertu firmy.
+- [x] Wdrożyć i zweryfikować hotfix „Pomiń” dla pól opcjonalnych.
+- [x] Wykonać syntetyczny submit, potwierdzić lead i dostawę alertu firmy.
+- [ ] Wdrożyć Etap 13E, potwierdzić czytelne etykiety w istniejącym leadzie i
+      renderer e-mail v2 bez ponownej wysyłki zakończonego alertu UAT.
 - [ ] Osadzić popup na stronie Fortez dopiero po technicznym i prawnym GO.
 
 - [ ] Uruchomić jedną organizację z ograniczonym ruchem i możliwością

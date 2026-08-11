@@ -6,6 +6,19 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Brief leada rozdziela teraz surowe klucze odpowiedzi od czytelnej projekcji
+  etykiet utrwalonej z immutable wersji procesu. Forward-only migracja
+  backfilluje istniejące leady, chroni nowe inserty triggerem i przekazuje
+  etykiety do panelu oraz kolejnych claimów powiadomień bez zmiany routingu,
+  pricingu, scoringu ani historycznie dostarczonych wiadomości.
+- Wiadomości transakcyjne używają teraz białego, tabelowego układu z inline
+  CSS, hybrydowego wrappera MSO, zoptymalizowanego znaku Kwotum PNG pod
+  absolutnym adresem HTTPS, tekstowego wordmarku i czytelnego renderu mobilnego.
+  Nowy projekt ma wersję v2, a zamrożone renderery v1 pozostają dostępne dla
+  deterministycznych retry. Alert firmy pokazuje telefon jako pierwszy, pomija
+  nieobecne kanały kontaktu oraz całe puste sekcje ceny i score zamiast
+  eksponować „Nie podano” lub „Nie obliczono”.
+
 - Zapis odpowiedzi normalizuje teraz SQL `NULL` przekazany przez PostgREST do
   jawnego JSON-owego `null`, zanim sprawdzi wymaganie, trasę i zapis sesji.
   Dzięki temu „Pomiń” działa dla pól opcjonalnych bez stanu offline, ale nadal
