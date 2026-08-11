@@ -108,6 +108,12 @@ Zakończonego alertu UAT nie ponawiamy. Brakuje jeszcze niezależnego monitora
 wywołującego chroniony probe oraz kontrolowanego testu 503 → recovery; dlatego
 FTZ-04 nie jest zamknięte.
 
+Korekta Stage13E została wdrożona migracją `20260811000300` i produkcyjnym
+release'em `c74f38e28d20775c7dfa5b6730eb0d5336d48aef`. Po smoke teście istniejącego
+leada wznowiono Cron Jobs; przebieg rozpoczęty `2026-08-11T14:40:12Z` zakończył
+się powodzeniem, a kolejki notification/invitation miały po `0` waiting,
+processing i failed. Nie utworzono nowego leada ani drugiej wiadomości UAT.
+
 ## Runbook incydentu
 
 1. Nie publikować procesu i nie tworzyć kolejnych rzeczywistych danych.

@@ -6,6 +6,11 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Stage13E wdrożono produkcyjnie migracją `20260811000300` i immutable SHA
+  `c74f38e28d20775c7dfa5b6730eb0d5336d48aef`. Smoke potwierdził HTTP 200 dla
+  `/health` i `/ready`, czytelne etykiety dziewięciu odpowiedzi istniejącego
+  leada, brak `opcja_` w panelu oraz zdrowy pierwszy cykl cron po wznowieniu.
+  Nie utworzono nowego leada i nie ponowiono dostarczonego alertu UAT.
 - Brief leada rozdziela teraz surowe klucze odpowiedzi od czytelnej projekcji
   etykiet utrwalonej z immutable wersji procesu. Forward-only migracja
   backfilluje istniejące leady, chroni nowe inserty triggerem i przekazuje

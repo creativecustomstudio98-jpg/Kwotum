@@ -2706,8 +2706,12 @@ z poprawnym tytułem i wprowadzeniem. Hotfix granicy PostgREST/RPC normalizując
 Lead powstał, a dokładnie jeden alert firmy został dostarczony przez Resend.
 UAT ujawnił następnie błąd prezentacji: brief i panel pokazywały techniczne
 klucze opcji. Etap 13E zachowuje te klucze dla logiki, dodaje historyczną
-projekcję etykiet oraz wersjonowany biały renderer e-mail v2; wdrożenie tej
-korekty pozostaje bieżącym gate.
+projekcję etykiet oraz wersjonowany biały renderer e-mail v2. Migracja
+`20260811000300` i release `c74f38e28d20775c7dfa5b6730eb0d5336d48aef`
+zostały wdrożone 2026-08-11. Istniejący lead pokazuje komplet dziewięciu
+czytelnych odpowiedzi bez `opcja_`, produkcyjne `/health` i `/ready` zwracają
+HTTP 200, a pierwszy wznowiony cykl cron zakończył się powodzeniem przy pustych
+kolejkach. Zakończonego alertu UAT nie wysłano ponownie.
 
 - [x] Ujawnić publiczny tytuł i wprowadzenie w builderze z limitami schematu.
 - [x] Rozdzielić walidację treści formularza od walidacji aktywnego pytania.
@@ -2715,7 +2719,7 @@ korekty pozostaje bieżącym gate.
 - [x] Wdrożyć hotfix treści, ustawić poprawne dane Fortez i opublikować wersję 2.
 - [x] Wdrożyć i zweryfikować hotfix „Pomiń” dla pól opcjonalnych.
 - [x] Wykonać syntetyczny submit, potwierdzić lead i dostawę alertu firmy.
-- [ ] Wdrożyć Etap 13E, potwierdzić czytelne etykiety w istniejącym leadzie i
+- [x] Wdrożyć Etap 13E, potwierdzić czytelne etykiety w istniejącym leadzie i
       renderer e-mail v2 bez ponownej wysyłki zakończonego alertu UAT.
 - [ ] Osadzić popup na stronie Fortez dopiero po technicznym i prawnym GO.
 
