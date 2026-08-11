@@ -1,6 +1,7 @@
 # Operacje produkcyjne outboxu powiadomień
 
-**Status:** implementacja lokalna FTZ-04; wdrożenie i alert zewnętrzny otwarte
+**Status:** scheduler, heartbeat i syntetyczna dostawa działają produkcyjnie;
+niezależny alert zewnętrzny pozostaje otwarty
 **Ostatni przegląd:** 2026-08-11
 
 Dokument obejmuje scheduler, heartbeat i monitoring dwóch aplikacyjnych
@@ -72,25 +73,40 @@ zapisane przed zamknięciem FTZ-04.
 
 Kolejność jest obowiązkowa:
 
-1. utworzyć backup point bazy i zastosować migrację;
-2. dodać w Vercel Production osobne `CRON_SECRET` i
+1. zatrzymać Vercel Cron GET i zablokować ręczne uruchomienia POST; potwierdzić,
+   że żaden worker nie jest w stanie `running`;
+2. utworzyć backup point bazy i zastosować migrację;
+3. dodać w Vercel Production osobne `CRON_SECRET` i
    `MONITORING_PROBE_SECRET`; istniejącego `NOTIFICATION_WORKER_SECRET` nie
    rotować bez potrzeby;
-3. skonfigurować ograniczony klucz `RESEND_API_KEY`, poprawny `EMAIL_FROM` i
+4. skonfigurować ograniczony klucz `RESEND_API_KEY`, poprawny `EMAIL_FROM` i
    dopiero po review prawnym ustawić `EMAIL_DELIVERY_MODE=resend`;
-4. wdrożyć aplikację; potwierdzić cron w Vercel i pierwszy heartbeat;
-5. podłączyć niezależny monitor z sekretem probe i przetestować alarm przez
+5. wdrożyć aplikację obsługującą wszystkie wersje szablonów obecne w kolejce i
+   wykonać smoke bez uruchamiania dostawy;
+6. wznowić Vercel Cron i ręczny POST dopiero po smoke; potwierdzić pierwszy
+   heartbeat oraz brak terminalnego błędu `configuration`;
+7. podłączyć niezależny monitor z sekretem probe i przetestować alarm przez
    kontrolowane zatrzymanie cron albo obniżenie heartbeat w środowisku
    stagingowym;
-6. utworzyć syntetyczny lead bez danych osoby i potwierdzić dokładnie jedną
+8. utworzyć syntetyczny lead bez danych osoby i potwierdzić dokładnie jedną
    dostawę firmy, stan `sent`, SPF/DKIM/DMARC oraz brak PII w logach;
-7. zachować dowód na immutable SHA. Dopiero wtedy można oznaczyć FTZ-04 jako
+9. zachować dowód na immutable SHA. Dopiero wtedy można oznaczyć FTZ-04 jako
    zamknięte.
 
 Konto Vercel ma obecnie Pro Trial. Harmonogram co pięć minut wymaga utrzymania
 planu Pro/Enterprise. Przed końcem triala trzeba zatwierdzić płatny Pro albo
 wdrożyć i przetestować niezależny scheduler; plan Hobby dopuszcza wyłącznie
 cron dzienny i nie spełnia tego kontraktu.
+
+## Dowód produkcyjny 2026-08-11
+
+Migracja heartbeat, release schedulera i rozdzielone sekrety Production zostały
+wdrożone. Potwierdzono dwa kolejne zdrowe cykle cron. Syntetyczny lead bez
+danych rzeczywistej osoby utworzył dokładnie jeden alert firmy, który worker
+oznaczył jako `sent`, a Resend potwierdził jednym identyfikatorem wiadomości.
+Zakończonego alertu UAT nie ponawiamy. Brakuje jeszcze niezależnego monitora
+wywołującego chroniony probe oraz kontrolowanego testu 503 → recovery; dlatego
+FTZ-04 nie jest zamknięte.
 
 ## Runbook incydentu
 

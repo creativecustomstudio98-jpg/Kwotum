@@ -31,6 +31,21 @@ begin
   ) <> 3 then
     raise exception 'notification recipients or initial state are invalid';
   end if;
+  if exists (
+    select 1
+    from public.notifications
+    where template_version not in ('lead-customer-v2', 'lead-company-v2')
+      or (
+        kind = 'lead_customer_confirmation'
+        and template_version <> 'lead-customer-v2'
+      )
+      or (
+        kind = 'lead_company_alert'
+        and template_version <> 'lead-company-v2'
+      )
+  ) then
+    raise exception 'new lead notifications did not use matching v2 templates';
+  end if;
   begin
     perform * from public.claim_notification_batch(gen_random_uuid(), 10, 'test');
     raise exception 'authenticated member claimed the outbox';
@@ -52,6 +67,45 @@ end;
 $$;
 
 reset role;
+
+do $$
+begin
+  update public.notifications
+  set template_version = case kind
+    when 'lead_customer_confirmation' then 'lead-customer-v1'
+    when 'lead_company_alert' then 'lead-company-v1'
+  end;
+
+  if exists (
+    select 1
+    from public.notifications
+    where template_version not in ('lead-customer-v1', 'lead-company-v1')
+  ) then
+    raise exception 'legacy v1 notification templates are no longer legal';
+  end if;
+
+  update public.notifications
+  set template_version = case kind
+    when 'lead_customer_confirmation' then 'lead-customer-v2'
+    when 'lead_company_alert' then 'lead-company-v2'
+  end;
+
+  begin
+    update public.notifications
+    set template_version = 'lead-company-v2'
+    where kind = 'lead_customer_confirmation';
+    raise exception 'notification accepted a template for the wrong kind';
+  exception
+    when check_violation then
+      null;
+  end;
+
+  update public.notifications
+  set template_version = 'lead-customer-v1'
+  where kind = 'lead_customer_confirmation';
+end;
+$$;
+
 set role service_role;
 
 create temporary table claimed_notifications as
@@ -85,12 +139,41 @@ begin
   if company_claim.recipient_email <> 'lead-delivery@example.test'
     or customer_claim.recipient_email <> 'klient@example.test'
     or company_claim.contact_email <> 'klient@example.test'
+    or company_claim.template_version <> 'lead-company-v2'
+    or customer_claim.template_version <> 'lead-customer-v1'
+    or phone_claim.template_version <> 'lead-company-v2'
     or phone_claim.recipient_email <> 'lead-delivery@example.test'
     or phone_claim.contact_phone <> '+48 500 600 700'
     or jsonb_array_length(phone_claim.answers) <> 3
     or company_claim.company_name <> 'Tenant A'
   then
     raise exception 'claimed delivery data is incomplete or incorrectly scoped';
+  end if;
+  if not exists (
+    select 1
+    from jsonb_array_elements(company_claim.answers) answer
+    where answer ->> 'question' = 'Jakiej usługi potrzebujesz?'
+      and answer -> 'answer' = '"Wariant premium"'::jsonb
+  ) or exists (
+    select 1
+    from jsonb_array_elements(company_claim.answers) answer
+    where answer ->> 'question' = 'Jakiej usługi potrzebujesz?'
+      and answer -> 'answer' = '"premium"'::jsonb
+  ) then
+    raise exception 'notification claim exposed a raw option key instead of its label';
+  end if;
+  if not exists (
+    select 1
+    from jsonb_array_elements(customer_claim.answers) answer
+    where answer ->> 'question' = 'Jakiej usługi potrzebujesz?'
+      and answer -> 'answer' = '"premium"'::jsonb
+  ) or exists (
+    select 1
+    from jsonb_array_elements(customer_claim.answers) answer
+    where answer ->> 'question' = 'Jakiej usługi potrzebujesz?'
+      and answer -> 'answer' = '"Wariant premium"'::jsonb
+  ) then
+    raise exception 'legacy v1 notification retry did not retain its raw answer';
   end if;
 
   perform public.complete_notification_delivery(

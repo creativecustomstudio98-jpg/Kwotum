@@ -125,8 +125,11 @@ przypięty do tej samej wersji. Szczegóły: `docs/ESTIMATION_ENGINE.md`.
 Migracja `20260725000200_stage7_lead_pipeline.sql` dodaje tenantowe `leads`,
 `lead_answers`, `consent_records`, `lead_files`, `lead_notes` i
 `lead_status_history`. Lead zachowuje snapshot nazw procesu, kontaktu i
-serwerowego wyniku; odpowiedzi zachowują tytuły pytań z wersji. Jedna sesja ma
-co najwyżej jeden lead, a jej odpowiedzi stają się niezmienne po submit.
+serwerowego wyniku; odpowiedzi zachowują tytuły pytań z wersji, surową wartość
+potrzebną logice oraz czytelną projekcję etykiet z przypiętego immutable
+snapshotu. Jedna sesja ma co najwyżej jeden lead, a jej odpowiedzi stają się
+niezmienne po submit. Zgodnie z ADR-043 role operacyjne czytają projekcję przez
+RLS leada bez uzyskania dostępu do edytorskiego `flow_versions`.
 
 Publiczne funkcje mają wyłącznie wąski zakres rezerwacji/potwierdzenia pliku i
 atomowego submitu. Bezpośrednie tabele nie mają grantów anonimowych. Członkowie

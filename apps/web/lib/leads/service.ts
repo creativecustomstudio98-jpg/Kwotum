@@ -151,14 +151,14 @@ export async function listLeads(
   if (leadIds.length > 0) {
     const { data: timelineAnswers, error: timelineError } = await supabase
       .from("lead_answers")
-      .select("lead_id, answer")
+      .select("lead_id, display_answer")
       .eq("organization_id", context.organizationId)
       .eq("step_key", "termin")
       .in("lead_id", leadIds);
     if (timelineError) throw new Error("Nie udało się pobrać terminów leadów.");
     for (const timelineAnswer of timelineAnswers) {
-      if (typeof timelineAnswer.answer === "string") {
-        timelineByLeadId.set(timelineAnswer.lead_id, timelineAnswer.answer);
+      if (typeof timelineAnswer.display_answer === "string") {
+        timelineByLeadId.set(timelineAnswer.lead_id, timelineAnswer.display_answer);
       }
     }
   }
@@ -241,7 +241,7 @@ export async function getLeadDetail(context: TenantContext, leadId: string): Pro
       .limit(100),
     supabase
       .from("lead_answers")
-      .select("step_key, question_title, answer")
+      .select("step_key, question_title, display_answer")
       .eq("organization_id", context.organizationId)
       .eq("lead_id", leadId)
       .order("created_at"),
@@ -375,7 +375,7 @@ export async function getLeadDetail(context: TenantContext, leadId: string): Pro
 
   return {
     answers: answersResult.data.map((answer) => ({
-      answer: answer.answer,
+      answer: answer.display_answer,
       questionTitle: answer.question_title,
       stepKey: answer.step_key,
     })),

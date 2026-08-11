@@ -16,6 +16,7 @@ const message = renderNotificationEmail({
   organizationId: "a0000000-0000-4000-8000-000000000001",
   price: null,
   score: null,
+  templateVersion: "lead-customer-v2",
 });
 
 const request = {

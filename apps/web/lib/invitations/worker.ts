@@ -1,6 +1,7 @@
 import { parseServerEnv } from "@wyceno/config/env";
 import type { Database, NotificationErrorCode } from "@wyceno/database";
 import {
+  isFlowInvitationTemplateVersion,
   renderFlowInvitationEmail,
   ResendEmailDeliveryAdapter,
   TestEmailDeliveryAdapter,
@@ -57,7 +58,7 @@ export async function processFlowInvitationBatch(
   let retrying = 0;
   let sent = 0;
   for (const claim of claims) {
-    if (claim.template_version !== "flow-invitation-v1") {
+    if (!isFlowInvitationTemplateVersion(claim.template_version)) {
       await input.repository.fail(claim, {
         errorCode: "configuration",
         provider,
@@ -75,6 +76,7 @@ export async function processFlowInvitationBatch(
         personalMessage: claim.personal_message,
         publicId: claim.public_flow_id,
         recipientName: claim.recipient_name,
+        templateVersion: claim.template_version,
       });
     } catch {
       await input.repository.fail(claim, {

@@ -1,5 +1,5 @@
 import type { Database } from "@wyceno/database";
-import { TestEmailDeliveryAdapter } from "@wyceno/email";
+import { TestEmailDeliveryAdapter, type EmailDeliveryAdapter } from "@wyceno/email";
 import { describe, expect, it, vi } from "vitest";
 
 import { processFlowInvitationBatch, type FlowInvitationRepository } from "./worker";
@@ -54,7 +54,7 @@ describe("flow invitation worker", () => {
   });
 
   it("fails an unsupported template without delivery", async () => {
-    const repo = repository([claim({ template_version: "unknown" })]);
+    const repo = repository([claim({ template_version: "unknown" as Claim["template_version"] })]);
     await expect(
       processFlowInvitationBatch({
         adapter: new TestEmailDeliveryAdapter(),
@@ -69,5 +69,29 @@ describe("flow invitation worker", () => {
       expect.anything(),
       expect.objectContaining({ errorCode: "configuration", retryable: false }),
     );
+  });
+
+  it("dispatches a new invitation through the v2 renderer", async () => {
+    const repo = repository([claim({ template_version: "flow-invitation-v2" })]);
+    const deliver = vi.fn<EmailDeliveryAdapter["deliver"]>(async () => ({
+      messageId: "test_invitation_v2",
+      outcome: "sent",
+    }));
+
+    await expect(
+      processFlowInvitationBatch({
+        adapter: { deliver, name: "test" },
+        appUrl: "https://app.wyceno.test",
+        batchSize: 10,
+        from: "powiadomienia@example.test",
+        repository: repo,
+        workerId: crypto.randomUUID(),
+      }),
+    ).resolves.toEqual({ claimed: 1, failed: 0, retrying: 0, sent: 1 });
+
+    const message = deliver.mock.calls[0]?.[0].message;
+    expect(message?.templateVersion).toBe("flow-invitation-v2");
+    expect(message?.html).toContain("kwotum-logo-icon-v3.png");
+    expect(message?.html).toContain('<table role="presentation" width="640"');
   });
 });
