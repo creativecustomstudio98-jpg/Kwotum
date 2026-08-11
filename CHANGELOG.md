@@ -6,6 +6,19 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Osadzony widget ma teraz ograniczony, wielokrotnego użytku kontrakt brandingu
+  wnętrza bez osłabiania Shadow DOM: tekstową nazwę i podtytuł, same-origin
+  HTTP(S) logo z bezpiecznym fallbackiem oraz allowlistowane role
+  `--wyceno-widget-*` dla typografii, kolorów i geometrii. Atrybuty marki nie
+  restartują sesji ani nie zastępują aktywnego formularza. Przy prawdziwym
+  wordmarku nazwa pozostaje dostępna semantycznie, ale nie jest wizualnie
+  dublowana. Popup używa prawdziwego slotu nagłówka dla statusu i kwadratowego
+  `×`, więc zamknięcie nie nachodzi już na treść; akcja pozostaje wizualnie
+  związana z odpowiedziami. Referencyjny preset Fortez używa własnego logo,
+  lżejszych nagłówków Arial/Helvetica o wadze 500, pomarańczu z kontrastowym
+  ciemnym tekstem, kanciastych
+  kontrolek oraz grafitowego backdropu.
+
 - Wznowienie zapisanej sesji widgetu po poprawnym `GET 200` aktualnego snapshotu
   wraca teraz jawnie do stanu `synced`; awaria `localStorage` lub analityki nie
   podszywa się pod utratę sieci i nie wyłącza aktywnego formularza. Magazyn hosta ma pamięciowy

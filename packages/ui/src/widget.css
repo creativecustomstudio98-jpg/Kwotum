@@ -1,14 +1,16 @@
 :host {
-  color: #17211d;
+  color: var(--wyceno-widget-text, #17211d);
   color-scheme: light;
   display: block;
-  font-family:
+  font-family: var(
+    --wyceno-widget-font-family,
     Inter,
     ui-sans-serif,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
-    sans-serif;
+    sans-serif
+  );
   line-height: 1.45;
   text-align: left;
 }
@@ -30,36 +32,52 @@ button {
 }
 
 .wyceno-shell {
-  --wyceno-accent: #0b6048;
-  --wyceno-accent-soft: #e5f2eb;
-  --wyceno-border: #d9dfdb;
-  --wyceno-border-strong: #b8c4bd;
+  --wyceno-accent: var(--wyceno-widget-primary, #0b6048);
+  --wyceno-accent-hover: var(--wyceno-widget-primary-hover, #084f3c);
+  --wyceno-accent-contrast: var(--wyceno-widget-primary-text, #ffffff);
+  --wyceno-accent-soft: var(--wyceno-widget-primary-soft, #e5f2eb);
+  --wyceno-accent-text: var(--wyceno-widget-accent-text, #0b6048);
+  --wyceno-border: var(--wyceno-widget-border, #d9dfdb);
+  --wyceno-border-strong: var(--wyceno-widget-border-strong, #b8c4bd);
+  --wyceno-secondary-border: var(--wyceno-widget-secondary-border, var(--wyceno-border-strong));
+  --wyceno-control-radius: var(--wyceno-widget-control-radius, 5px);
   --wyceno-error: #b43a3f;
-  --wyceno-muted: #68736d;
-  --wyceno-surface: #ffffff;
-  --wyceno-soft: #f4f6f3;
+  --wyceno-heading-font-family: var(--wyceno-widget-heading-font-family, inherit);
+  --wyceno-heading-font-weight: var(--wyceno-widget-heading-font-weight, 760);
+  --wyceno-heading-letter-spacing: var(--wyceno-widget-heading-letter-spacing, -0.045em);
+  --wyceno-muted: var(--wyceno-widget-muted, #68736d);
+  --wyceno-panel-radius: var(--wyceno-widget-panel-radius, 10px);
+  --wyceno-surface: var(--wyceno-widget-surface, #ffffff);
+  --wyceno-soft: var(--wyceno-widget-soft, #f4f6f3);
+  --wyceno-symbol-radius: var(--wyceno-widget-symbol-radius, 50%);
+  --wyceno-text: var(--wyceno-widget-text, #17211d);
 
-  color: #17211d;
+  color: var(--wyceno-text);
 }
 
 .wyceno-card {
-  width: min(100%, 1080px);
+  width: 100%;
+  max-width: 1080px;
   min-height: 720px;
   margin: 0 auto;
   border: 1px solid var(--wyceno-border);
-  border-radius: 10px;
+  border-radius: var(--wyceno-panel-radius);
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   overflow: hidden;
-  background: var(--wyceno-surface);
-  box-shadow: 0 18px 48px rgb(20 61 47 / 7%);
+  background-color: var(--wyceno-surface);
+  box-shadow: var(--wyceno-widget-panel-shadow, 0 18px 48px rgb(20 61 47 / 7%));
+}
+
+.wyceno-shell--popup .wyceno-card {
+  min-height: 560px;
 }
 
 .wyceno-preview-notice {
   margin: 0;
   padding: 10px 14px;
   border-bottom: 1px solid #bed6cc;
-  background: #edf7f2;
+  background-color: #edf7f2;
   color: #13533f;
   font-size: 13px;
   font-weight: 700;
@@ -78,6 +96,7 @@ button {
 
 .wyceno-brand {
   min-width: 0;
+  flex: 1 1 auto;
   display: flex;
   align-items: center;
   gap: 11px;
@@ -87,24 +106,59 @@ button {
   width: 34px;
   height: 34px;
   flex: 0 0 auto;
-  border-radius: 5px;
+  border-radius: var(--wyceno-control-radius);
   display: grid;
   place-items: center;
-  background: var(--wyceno-accent);
-  color: var(--wyceno-surface);
+  background-color: var(--wyceno-accent);
+  color: var(--wyceno-accent-contrast);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
-.wyceno-brand > div {
+.wyceno-brand-logo {
+  width: var(--wyceno-widget-logo-width, 160px);
+  max-width: 38vw;
+  height: 52px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.wyceno-brand-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.wyceno-brand-copy {
   min-width: 0;
   display: grid;
 }
 
+.wyceno-brand--with-logo .wyceno-brand-copy strong {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.wyceno-brand--with-logo .wyceno-brand-copy small {
+  color: var(--wyceno-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
 .wyceno-brand strong {
   overflow: hidden;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 750;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -113,6 +167,15 @@ button {
 .wyceno-brand small {
   color: var(--wyceno-muted);
   font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.wyceno-header-actions {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
 }
 
 .wyceno-progress-region {
@@ -134,25 +197,25 @@ button {
   width: 100%;
   height: 4px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--wyceno-control-radius);
   display: block;
   overflow: hidden;
   appearance: none;
-  background: var(--wyceno-soft);
+  background-color: var(--wyceno-soft);
 }
 
 .wyceno-progress-region progress::-webkit-progress-bar {
-  background: var(--wyceno-soft);
+  background-color: var(--wyceno-soft);
 }
 
 .wyceno-progress-region progress::-webkit-progress-value {
-  border-radius: 999px;
-  background: var(--wyceno-accent);
+  border-radius: var(--wyceno-control-radius);
+  background-color: var(--wyceno-accent);
 }
 
 .wyceno-progress-region progress::-moz-progress-bar {
-  border-radius: 999px;
-  background: var(--wyceno-accent);
+  border-radius: var(--wyceno-control-radius);
+  background-color: var(--wyceno-accent);
 }
 
 .wyceno-stage {
@@ -171,14 +234,15 @@ button {
 .wyceno-introduction h1 {
   margin: 7px 0 8px;
   font-size: clamp(1.65rem, 3vw, 2rem);
-  font-weight: 760;
-  letter-spacing: -0.045em;
+  font-family: var(--wyceno-heading-font-family);
+  font-weight: var(--wyceno-heading-font-weight);
+  letter-spacing: var(--wyceno-heading-letter-spacing);
   line-height: 1.08;
 }
 
 .wyceno-eyebrow {
   margin: 0;
-  color: var(--wyceno-accent);
+  color: var(--wyceno-accent-text);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -194,7 +258,7 @@ button {
 .wyceno-intro {
   margin: 0;
   max-width: 590px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .wyceno-sync {
@@ -208,13 +272,13 @@ button {
   margin-bottom: 22px;
   padding: 12px 14px;
   border: 1px solid var(--wyceno-border);
-  border-radius: 6px;
+  border-radius: var(--wyceno-control-radius);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 14px;
   order: 0;
-  background: var(--wyceno-soft);
+  background-color: var(--wyceno-soft);
 }
 
 .wyceno-analytics.is-resolved {
@@ -223,7 +287,7 @@ button {
   border-width: 1px 0 0;
   border-radius: 0;
   order: 3;
-  background: transparent;
+  background-color: transparent;
 }
 
 .wyceno-analytics p {
@@ -248,8 +312,8 @@ button {
 .wyceno-text-button {
   padding-inline: 0;
   border: 0;
-  background: transparent;
-  color: var(--wyceno-accent);
+  background-color: transparent;
+  color: var(--wyceno-accent-text);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -271,14 +335,15 @@ legend {
   max-width: 620px;
   padding: 0;
   font-size: clamp(1.55rem, 3vw, 2rem);
-  font-weight: 760;
-  letter-spacing: -0.045em;
+  font-family: var(--wyceno-heading-font-family);
+  font-weight: var(--wyceno-heading-font-weight);
+  letter-spacing: var(--wyceno-heading-letter-spacing);
   line-height: 1.08;
 }
 
 .wyceno-description {
   margin: 9px 0 0;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .wyceno-choices {
@@ -289,16 +354,16 @@ legend {
 }
 
 .wyceno-choice {
-  min-height: 50px;
+  min-height: 52px;
   padding: 11px 13px;
   border: 1px solid var(--wyceno-border);
-  border-radius: 5px;
+  border-radius: var(--wyceno-control-radius);
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--wyceno-surface);
+  background-color: var(--wyceno-surface);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   transition:
     border-color 140ms ease,
@@ -312,7 +377,7 @@ legend {
 
 .wyceno-choice:has(input:checked) {
   border-color: var(--wyceno-accent);
-  background: var(--wyceno-accent-soft);
+  background-color: var(--wyceno-accent-soft);
   box-shadow: inset 0 0 0 1px var(--wyceno-accent);
 }
 
@@ -333,11 +398,11 @@ textarea {
   margin-top: 20px;
   padding: 11px 12px;
   border: 1px solid var(--wyceno-border);
-  border-radius: 6px;
+  border-radius: var(--wyceno-control-radius);
   display: block;
   resize: vertical;
-  background: var(--wyceno-surface);
-  color: #17211d;
+  background-color: var(--wyceno-surface);
+  color: var(--wyceno-text);
 }
 
 textarea {
@@ -345,28 +410,30 @@ textarea {
 }
 
 button {
-  min-height: 42px;
+  min-height: 46px;
   padding: 9px 16px;
-  border-radius: 5px;
+  border-radius: var(--wyceno-control-radius);
+  font-size: 14px;
   font-weight: 700;
 }
 
 .wyceno-primary,
 .wyceno-launcher {
   border: 1px solid var(--wyceno-accent);
-  background: var(--wyceno-accent);
-  color: #ffffff;
+  background-color: var(--wyceno-accent);
+  color: var(--wyceno-accent-contrast);
 }
 
 .wyceno-launcher {
   border-color: var(--wyceno-launcher-border-color, var(--wyceno-accent));
   border-radius: var(--wyceno-launcher-border-radius, 5px);
   background-color: var(--wyceno-launcher-background-color, var(--wyceno-accent));
-  color: var(--wyceno-launcher-text-color, #ffffff);
+  color: var(--wyceno-launcher-text-color, var(--wyceno-accent-contrast));
 }
 
-.wyceno-primary:hover,
-.wyceno-launcher:hover {
+.wyceno-primary:hover {
+  border-color: var(--wyceno-accent-hover);
+  background-color: var(--wyceno-accent-hover);
   box-shadow: 0 0 0 3px var(--wyceno-accent-soft);
 }
 
@@ -383,9 +450,9 @@ button {
 }
 
 .wyceno-secondary {
-  border: 1px solid var(--wyceno-border-strong);
-  background: var(--wyceno-surface);
-  color: #17211d;
+  border: 1px solid var(--wyceno-secondary-border);
+  background-color: var(--wyceno-surface);
+  color: var(--wyceno-text);
 }
 
 .wyceno-actions {
@@ -401,11 +468,25 @@ button {
   margin-right: auto;
 }
 
+.wyceno-shell--popup .wyceno-form {
+  min-height: 0;
+}
+
+.wyceno-shell--popup .wyceno-actions {
+  margin-top: 0;
+  padding-top: 28px;
+}
+
 .wyceno-error {
   min-height: 1.35rem;
   margin: 9px 0 0;
   color: var(--wyceno-error);
   font-size: 11px;
+}
+
+.wyceno-error:empty {
+  min-height: 0;
+  margin: 0;
 }
 
 .wyceno-result,
@@ -420,19 +501,19 @@ button {
 .wyceno-alert {
   padding: 34px;
   border: 1px solid var(--wyceno-border);
-  border-radius: 8px;
-  background: var(--wyceno-soft);
+  border-radius: var(--wyceno-control-radius);
+  background-color: var(--wyceno-soft);
 }
 
 .wyceno-result-icon {
   width: 44px;
   height: 44px;
   margin: 0 auto 14px;
-  border-radius: 50%;
+  border-radius: var(--wyceno-symbol-radius);
   display: grid;
   place-items: center;
-  background: var(--wyceno-accent-soft);
-  color: var(--wyceno-accent);
+  background-color: var(--wyceno-accent-soft);
+  color: var(--wyceno-accent-text);
   font-size: 18px;
   font-weight: 800;
 }
@@ -442,8 +523,9 @@ button {
   margin: 7px auto 10px;
   max-width: 620px;
   font-size: clamp(1.55rem, 3vw, 2rem);
-  font-weight: 760;
-  letter-spacing: -0.045em;
+  font-family: var(--wyceno-heading-font-family);
+  font-weight: var(--wyceno-heading-font-weight);
+  letter-spacing: var(--wyceno-heading-letter-spacing);
   line-height: 1.08;
 }
 
@@ -457,10 +539,10 @@ button {
 .wyceno-price {
   margin: 22px auto 16px;
   padding: 18px 24px;
-  border: 1px solid #cce5d7;
-  border-radius: 7px;
-  background: var(--wyceno-accent-soft);
-  color: var(--wyceno-accent);
+  border: 1px solid var(--wyceno-border);
+  border-radius: var(--wyceno-control-radius);
+  background-color: var(--wyceno-accent-soft);
+  color: var(--wyceno-accent-text);
   font-size: clamp(1.75rem, 4vw, 2.35rem);
   font-weight: 780;
   letter-spacing: -0.04em;
@@ -468,7 +550,7 @@ button {
 
 .wyceno-next-action {
   margin: 18px 0 0;
-  color: var(--wyceno-accent);
+  color: var(--wyceno-accent-text);
   font-size: 12px;
   font-weight: 750;
 }
@@ -476,7 +558,7 @@ button {
 .wyceno-answer-summary {
   margin: 18px 0 0;
   border: 1px solid var(--wyceno-border);
-  border-radius: 6px;
+  border-radius: var(--wyceno-control-radius);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   overflow: hidden;
@@ -584,8 +666,8 @@ button {
   min-height: 44px;
   padding: 9px 11px;
   border: 1px solid var(--wyceno-border);
-  border-radius: 6px;
-  background: var(--wyceno-surface);
+  border-radius: var(--wyceno-control-radius);
+  background-color: var(--wyceno-surface);
   color: inherit;
 }
 
@@ -613,21 +695,21 @@ button {
   margin-top: 5px;
   grid-column: 2;
   display: block;
-  color: var(--wyceno-accent);
+  color: var(--wyceno-accent-text);
   font-weight: 700;
 }
 
 .wyceno-dialog {
   width: 100%;
-  max-width: min(1120px, calc(100vw - 32px));
+  max-width: min(1080px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
   padding: 0;
   border: 0;
-  background: transparent;
+  background-color: transparent;
 }
 
 .wyceno-dialog::backdrop {
-  background: rgb(13 32 27 / 68%);
+  background-color: var(--wyceno-widget-backdrop, rgb(13 32 27 / 68%));
 }
 
 .wyceno-dialog--fullscreen {
@@ -643,17 +725,29 @@ button {
 }
 
 .wyceno-close {
-  position: absolute;
-  z-index: 2;
-  top: 13px;
-  right: 14px;
-  border: 1px solid var(--wyceno-border);
-  background: var(--wyceno-surface);
-  color: #17211d;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  border: 1px solid var(--wyceno-secondary-border);
+  border-radius: var(--wyceno-control-radius);
+  display: grid;
+  place-items: center;
+  background-color: var(--wyceno-surface);
+  color: var(--wyceno-text);
+  font-size: 27px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.wyceno-close:hover {
+  border-color: var(--wyceno-text);
+  background-color: var(--wyceno-soft);
 }
 
 :focus-visible {
-  outline: 3px solid var(--wyceno-accent);
+  outline: 3px solid var(--wyceno-accent-text);
   outline-offset: 3px;
 }
 
@@ -675,11 +769,32 @@ button {
   .wyceno-header {
     min-height: 64px;
     padding: 11px 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 12px;
+  }
+
+  .wyceno-brand-logo {
+    width: var(--wyceno-widget-logo-width-mobile, 122px);
+    max-width: 42vw;
+    height: 40px;
+  }
+
+  .wyceno-header-actions {
+    display: contents;
   }
 
   .wyceno-sync {
-    max-width: 132px;
+    max-width: none;
+    grid-column: 1 / -1;
+    grid-row: 2;
     font-size: 9px;
+    text-align: left;
+  }
+
+  .wyceno-close {
+    grid-column: 2;
+    grid-row: 1;
   }
 
   .wyceno-progress-region {
@@ -730,7 +845,7 @@ button {
     margin: auto -16px calc(-22px - env(safe-area-inset-bottom));
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--wyceno-border);
-    background: var(--wyceno-surface);
+    background-color: var(--wyceno-surface);
   }
 
   .wyceno-actions button {
@@ -754,11 +869,6 @@ button {
     height: 100dvh;
     max-width: none;
     max-height: none;
-  }
-
-  .wyceno-close {
-    top: 10px;
-    right: 10px;
   }
 }
 

@@ -1356,3 +1356,50 @@ Rekordy v1 pozostają legalne i zawsze korzystają z zamrożonych rendererów v1
 aby retry z tym samym kluczem idempotencji nie zmieniało treści. Rollout wymaga
 krótkiej pauzy workerów pomiędzy migracją włączającą nowe wersje a wdrożeniem
 aplikacji obsługującej oba kontrakty.
+
+## ADR-044: ograniczony branding wnętrza osadzonego widgetu
+
+**Status:** accepted dla poprawki wizualnej pierwszego pilotażu Fortez na
+podstawie produkcyjnego UAT z 2026-08-11
+
+**Decyzja:** osadzony `<wyceno-widget>` otrzymuje opcjonalne, prezentacyjne
+atrybuty `brand-name`, `brand-subtitle` i `brand-logo-url` oraz jawny zestaw
+zmiennych CSS `--wyceno-widget-*` opisujących role kolorów, typografii,
+geometrii, cienia, tła dialogu i szerokości logo. Renderer mapuje wyłącznie te
+role na prywatne tokeny wewnątrz Shadow DOM; nie udostępnia `::part`, surowego
+arkusza CSS, HTML ani skryptu klienta.
+
+Logo może być względnym lub absolutnym adresem HTTP(S) bez danych logowania,
+ale po rozwiązaniu musi mieć ten sam origin co strona gospodarza. Jest
+renderowane jako dekoracyjny obraz obok tekstowej nazwy marki, z inicjałami
+nazwy jako kontrolowanym fallbackiem. Nieudany, niedozwolony lub brakujący URL
+nie wykonuje kodu, a obraz nie przekazuje nagłówka `Referer` i jest ładowany w
+trybie anonimowego CORS. Walidacja obejmuje URL pierwszego requestu; redirecty
+HTTP pozostają odpowiedzialnością serwera gospodarza i jego `img-src` CSP.
+Integrator musi wskazać statyczny, nieprzekierowujący asset. Nazwa i podtytuł
+są zawsze wstawiane przez `textContent`.
+
+Kontrakt dotyczy instalacji na stronie gospodarza. Nie zmienia publicznego
+manifestu, wersji procesu, bazy, RLS, hosted linku ani podglądu w panelu.
+Automatyczne przechowywanie brandingu tenanta i jego publikacja na wszystkich
+powierzchniach pozostają osobnym etapem wymagającym kontrolowanego storage,
+walidacji Owner/Admin, publicznej projekcji bez `organization_id` i testów
+izolacji dwóch tenantów.
+
+**Dlaczego:** Shadow DOM prawidłowo chroni formularz przed agresywnym CSS
+gospodarza, ale dotychczas pozwalał dopasować wyłącznie launcher. Wnętrze
+pozostawało zielone, używało zastępczych inicjałów tytułu procesu i nie mogło
+pokazać logo klienta. Próba przebicia izolacji selektorami strony byłaby krucha,
+a dodanie Fortez do kodu SaaS złamałoby wielodostępność. Ograniczone role dają
+powtarzalny kontrakt dla kolejnych instalacji bez rozszerzania dostępu do danych
+ani uruchamiania dowolnego kodu.
+
+**Konsekwencje:** integrator odpowiada za kontrast przekazanych wartości, a
+testy referencyjnych presetów muszą potwierdzać WCAG AA. Domyślne wartości
+Kwotum zachowują kompatybilność istniejących embedów. Zmiana atrybutów marki nie
+może restartować sesji ani zastępować DOM aktywnego formularza. Role kolorów są
+używane wyłącznie w właściwościach akceptujących kolor, więc wartość `url(...)`
+jest nieważna i nie uruchamia pobrania. Popup ma strukturalny slot nagłówka dla
+statusu i przycisku zamknięcia, dzięki czemu kontrolki nie nachodzą na siebie.
+Migracja nie jest potrzebna; rollback polega na usunięciu nowych atrybutów i
+zmiennych z embedu oraz cofnięciu wersji widgetu.

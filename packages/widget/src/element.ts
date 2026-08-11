@@ -61,6 +61,31 @@ export function resolveWidgetApiBase(
     : pageOrigin;
 }
 
+export function resolveBrandLogoUrl(value: string | null, pageUrl: string): string | null {
+  const candidateValue = value?.trim();
+  if (!candidateValue || candidateValue.length > 2_048) return null;
+  try {
+    const page = new URL(pageUrl);
+    const candidate = new URL(candidateValue, page);
+    if (
+      (candidate.protocol !== "http:" && candidate.protocol !== "https:") ||
+      candidate.origin !== page.origin ||
+      candidate.username !== "" ||
+      candidate.password !== ""
+    ) {
+      return null;
+    }
+    return candidate.href;
+  } catch {
+    return null;
+  }
+}
+
+function normalizedBrandText(value: string | null, fallback: string, maxLength: number): string {
+  const normalized = value?.trim().replace(/\s+/g, " ") ?? "";
+  return normalized ? normalized.slice(0, maxLength) : fallback;
+}
+
 function initials(value: string): string {
   return (
     value
@@ -73,7 +98,16 @@ function initials(value: string): string {
 }
 
 export class WycenoWidgetElement extends HTMLElement {
-  static observedAttributes = ["api-base", "button-label", "mode", "preview", "public-id"];
+  static observedAttributes = [
+    "api-base",
+    "brand-logo-url",
+    "brand-name",
+    "brand-subtitle",
+    "button-label",
+    "mode",
+    "preview",
+    "public-id",
+  ];
 
   readonly #shadow: ShadowRoot;
   #controller: WidgetSessionController | null = null;
@@ -140,9 +174,13 @@ export class WycenoWidgetElement extends HTMLElement {
 
   attributeChangedCallback(name: string, previous: string | null, next: string | null): void {
     if (!this.#connected || !this.isConnected || previous === next) return;
-    if (name === "button-label") {
+    if (name === "brand-logo-url" || name === "brand-name" || name === "brand-subtitle") {
       if (this.#shouldDeferInitialization()) this.#renderDeferredLauncher();
-      else this.#render(this.#controller?.state ?? idleWidgetState());
+      else this.#updateRenderedBranding();
+      return;
+    }
+    if (name === "button-label") {
+      this.#updateLauncherLabel();
       return;
     }
     if (name === "mode" && this.#controller) {
@@ -263,9 +301,11 @@ export class WycenoWidgetElement extends HTMLElement {
       container.append(launcher);
 
       const dialog = create("dialog", `wyceno-dialog wyceno-dialog--${this.mode}`);
-      const close = create("button", "wyceno-close", "Zamknij");
+      dialog.setAttribute("aria-label", "Formularz zapytania");
+      const close = create("button", "wyceno-close", "×");
       close.type = "button";
       close.setAttribute("aria-label", "Zamknij formularz");
+      close.title = "Zamknij";
       close.addEventListener("click", () => dialog.close());
       dialog.addEventListener("close", () => {
         if (this.#started && this.#controller?.state.status === "active") {
@@ -274,7 +314,7 @@ export class WycenoWidgetElement extends HTMLElement {
         launcher.focus();
         dispatchWidgetEvent(this, "closed");
       });
-      dialog.append(close, this.#renderContent(state));
+      dialog.append(this.#renderContent(state, close));
       container.append(dialog);
       this.#dialog = dialog;
     }
@@ -310,6 +350,19 @@ export class WycenoWidgetElement extends HTMLElement {
     launcher.type = "button";
     launcher.addEventListener("click", () => this.#openDialog());
     return launcher;
+  }
+
+  #updateLauncherLabel(): void {
+    const launcher = this.#shadow.querySelector<HTMLButtonElement>(".wyceno-launcher");
+    if (launcher) {
+      launcher.textContent = this.getAttribute("button-label") ?? "Rozpocznij wycenę";
+    }
+  }
+
+  #updateRenderedBranding(): void {
+    const currentBrand = this.#shadow.querySelector<HTMLElement>(".wyceno-header .wyceno-brand");
+    if (!currentBrand) return;
+    currentBrand.replaceWith(this.#renderBrand(this.#controller?.state.manifest ?? null));
   }
 
   #isSyncOnlyUpdate(previous: WidgetState, next: WidgetState): boolean {
@@ -351,8 +404,9 @@ export class WycenoWidgetElement extends HTMLElement {
     else trackOpen();
   }
 
-  #renderContent(state: WidgetState): HTMLElement {
+  #renderContent(state: WidgetState, close?: HTMLButtonElement): HTMLElement {
     const content = create("section", "wyceno-card");
+    content.dataset.status = state.status;
     content.setAttribute(
       "aria-busy",
       state.status === "loading_manifest" ||
@@ -371,6 +425,9 @@ export class WycenoWidgetElement extends HTMLElement {
       previewNotice.setAttribute("role", "status");
       content.append(previewNotice);
     }
+
+    const manifest = state.manifest;
+    if (manifest || close) content.append(this.#renderHeader(state, manifest, close));
 
     if (state.status === "loading_manifest" || state.status === "idle") {
       const loading = create("p", "wyceno-status", "Uruchamiamy formularz…");
@@ -399,24 +456,7 @@ export class WycenoWidgetElement extends HTMLElement {
       return content;
     }
 
-    const manifest = state.manifest;
     if (!manifest) return content;
-
-    const header = create("header", "wyceno-header");
-    const brand = create("div", "wyceno-brand");
-    brand.append(create("span", "wyceno-brand-mark", initials(manifest.title)));
-    const brandCopy = create("div");
-    brandCopy.append(create("strong", undefined, manifest.title));
-    brandCopy.append(create("small", undefined, "Proces zapytania"));
-    brand.append(brandCopy);
-    header.append(brand);
-
-    const sync = create("p", "wyceno-sync");
-    sync.setAttribute("role", "status");
-    sync.setAttribute("aria-live", "polite");
-    sync.textContent = this.#syncStatusLabel(state.syncStatus);
-    header.append(sync);
-    content.append(header);
 
     const currentIndex = state.currentStep
       ? Math.max(
@@ -555,6 +595,82 @@ export class WycenoWidgetElement extends HTMLElement {
       stage.append(this.#renderStep(state.currentStep, state));
     }
     return content;
+  }
+
+  #renderHeader(
+    state: WidgetState,
+    manifest: WidgetManifest | null,
+    close?: HTMLButtonElement,
+  ): HTMLElement {
+    const header = create("header", "wyceno-header");
+    header.append(this.#renderBrand(manifest));
+
+    const actions = create("div", "wyceno-header-actions");
+    if (manifest) {
+      const sync = create("p", "wyceno-sync");
+      sync.setAttribute("role", "status");
+      sync.setAttribute("aria-live", "polite");
+      sync.textContent = this.#syncStatusLabel(state.syncStatus);
+      actions.append(sync);
+    }
+    if (close) actions.append(close);
+    header.append(actions);
+    return header;
+  }
+
+  #renderBrand(manifest: WidgetManifest | null): HTMLElement {
+    const fallbackName = manifest?.title ?? "Formularz zapytania";
+    const explicitName = this.getAttribute("brand-name");
+    const brandName = normalizedBrandText(explicitName, fallbackName, 120);
+    const subtitle = normalizedBrandText(
+      this.getAttribute("brand-subtitle"),
+      explicitName ? (manifest?.title ?? "Proces zapytania") : "Proces zapytania",
+      160,
+    );
+    const brand = create("div", "wyceno-brand");
+    const hasLogo =
+      resolveBrandLogoUrl(this.getAttribute("brand-logo-url"), window.location.href) !== null;
+    if (hasLogo) brand.classList.add("wyceno-brand--with-logo");
+    brand.append(
+      this.#renderBrandMark(brandName, () => {
+        brand.classList.remove("wyceno-brand--with-logo");
+      }),
+    );
+    const brandCopy = create("div", "wyceno-brand-copy");
+    brandCopy.append(create("strong", undefined, brandName));
+    brandCopy.append(create("small", undefined, subtitle));
+    brand.append(brandCopy);
+    return brand;
+  }
+
+  #renderBrandMark(brandName: string, onLogoError: () => void): HTMLElement {
+    const fallback = (): HTMLSpanElement => {
+      const mark = create("span", "wyceno-brand-mark", initials(brandName));
+      mark.setAttribute("aria-hidden", "true");
+      return mark;
+    };
+    const logoUrl = resolveBrandLogoUrl(this.getAttribute("brand-logo-url"), window.location.href);
+    if (!logoUrl) return fallback();
+
+    const wrapper = create("span", "wyceno-brand-logo");
+    const logo = create("img");
+    logo.alt = "";
+    logo.crossOrigin = "anonymous";
+    logo.decoding = "async";
+    logo.height = 52;
+    logo.referrerPolicy = "no-referrer";
+    logo.src = logoUrl;
+    logo.width = 160;
+    logo.addEventListener(
+      "error",
+      () => {
+        onLogoError();
+        wrapper.replaceWith(fallback());
+      },
+      { once: true },
+    );
+    wrapper.append(logo);
+    return wrapper;
   }
 
   #renderAnswerSummary(state: WidgetState): HTMLElement {
