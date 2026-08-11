@@ -1231,6 +1231,10 @@ test.describe("panel reference reconstruction", () => {
     const undo = page.getByRole("button", { exact: true, name: "Cofnij" });
 
     await areaTabs.getByRole("tab", { exact: true, name: "Kontakt" }).click();
+    const contactInspector = page.getByRole("complementary", { name: "Ustawienia: Kontakt" });
+    await expect(contactInspector.getByText("Konfiguracja nieaktywna", { exact: true })).toHaveText(
+      "Konfiguracja nieaktywna",
+    );
     await page.getByRole("button", { name: "Włącz zbieranie kontaktu" }).click();
     await page.getByLabel("Wymagany kanał kontaktu").selectOption("phone_required");
     await page
@@ -1242,6 +1246,9 @@ test.describe("panel reference reconstruction", () => {
       .fill("https://example.test/polityka-prywatnosci");
     await page.getByRole("button", { name: "Zapisz treść informacji" }).click();
     await expect(page.locator(".contact-result-preview")).toContainText("Telefon jest wymagany");
+    await expect(contactInspector.getByText("Konfiguracja aktywna", { exact: true })).toHaveText(
+      "Konfiguracja aktywna",
+    );
     await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
       timeout: 15_000,
     });

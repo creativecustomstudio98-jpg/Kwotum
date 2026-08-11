@@ -6,6 +6,9 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Status w inspektorze zakładki `Kontakt` odzwierciedla teraz zapisany stan
+  konfiguracji kontaktu zamiast niezależnego stanu modułu wyceny; E2E chroni
+  oba stany przed regresją.
 - Builder procesu udostępnia teraz Ownerowi/Adminowi osobną zakładkę
   `Kontakt`: wybór `email_required` / `phone_required`, wersjonowaną informację
   prywatności, bezpieczny URL polityki i jawny przełącznik załączników.
