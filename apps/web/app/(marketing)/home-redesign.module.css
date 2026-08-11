@@ -2386,14 +2386,11 @@
   font-weight: 700;
 }
 
-.dashboardBrand i {
+.dashboardBrand img {
   width: 0.95rem;
   height: 0.95rem;
-  border: 0.3rem solid var(--wy-marketing-brand);
-  border-top-color: transparent;
-  border-radius: 50%;
   display: block;
-  transform: rotate(30deg);
+  object-fit: contain;
 }
 
 .dashboardAccount i {
@@ -2694,15 +2691,12 @@
   font-size: 1.2rem;
 }
 
-.processPhone header i {
+.processPhone header img {
   width: 1.35rem;
   height: 1.35rem;
   margin-right: calc(50% - 0.7rem);
-  border: 0.37rem solid var(--wy-marketing-brand);
-  border-top-color: transparent;
-  border-radius: 50%;
   display: block;
-  transform: rotate(30deg);
+  object-fit: contain;
 }
 
 .phoneProgress {
@@ -2854,11 +2848,8 @@
 .heroSignalRail li > span {
   width: 1.45rem;
   height: 1.45rem;
-  border: 0.28rem solid #aeb8c7;
-  border-top-color: transparent;
-  border-radius: 50%;
   display: block;
-  transform: rotate(30deg);
+  background: url("/kwotum-logo-icon-v3.png") center / contain no-repeat;
 }
 
 @media (max-width: 75rem) {
@@ -4127,23 +4118,8 @@
 .integrationBrandMark {
   width: 1.45rem;
   height: 1.45rem;
-  position: relative;
-  border: 0.27rem solid var(--wy-marketing-brand);
-  border-top-color: transparent;
-  border-radius: 50%;
   display: block;
-  transform: rotate(37deg);
-}
-
-.integrationBrandMark::after {
-  width: 0.55rem;
-  height: 0.55rem;
-  position: absolute;
-  top: -0.28rem;
-  right: -0.27rem;
-  border-radius: 0 0.4rem 0;
-  background: var(--wy-marketing-brand);
-  content: "";
+  object-fit: contain;
 }
 
 .integrationLeadCard > header strong {

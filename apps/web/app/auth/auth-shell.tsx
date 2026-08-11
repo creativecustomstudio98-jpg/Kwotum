@@ -100,7 +100,7 @@ function Brand({ inverse = false }: Readonly<{ inverse?: boolean }>) {
       href="/"
     >
       <span className="auth-brand__mark" aria-hidden="true">
-        <Image alt="" height={28} src="/Logoicon.svg" width={28} />
+        <Image alt="" height={28} src="/kwotum-logo-v3.png" width={28} />
       </span>
       <span>Kwotum</span>
     </Link>

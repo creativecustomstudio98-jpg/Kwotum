@@ -128,7 +128,7 @@ export default async function PanelPage() {
     <main className="organization-picker">
       <header className="organization-picker__header">
         <Link aria-label="Kwotum — strona główna" href="/">
-          <Image alt="" height={46} priority src="/Logoicon.svg" width={46} />
+          <Image alt="" height={46} priority src="/kwotum-logo-v3.png" width={46} />
           <strong>Kwotum</strong>
         </Link>
         <form action={signOut} className="organization-picker__logout">

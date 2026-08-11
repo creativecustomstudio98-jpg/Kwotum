@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -171,21 +172,7 @@ export function Brand({ className, withMark = false }: { className?: string; wit
     >
       {withMark ? (
         <span aria-hidden="true" className="marketing-brand__mark">
-          <svg fill="none" viewBox="0 0 32 32">
-            <path
-              d="M22.9 6.45A11.4 11.4 0 1 0 27.4 15.6M19.35 19.35 28.4 28.4"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="4.8"
-            />
-            <path
-              d="M22.9 6.45A11.4 11.4 0 0 1 27.4 15.6"
-              stroke="#9ad672"
-              strokeLinecap="round"
-              strokeWidth="4.8"
-            />
-          </svg>
+          <Image alt="" height={38} src="/kwotum-logo-v3.png" width={38} />
         </span>
       ) : null}
       <span className="marketing-brand__name">kwotum</span>

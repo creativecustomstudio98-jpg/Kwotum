@@ -18,7 +18,8 @@ export const metadata: Metadata = {
   description:
     "Kwotum porządkuje zapytania klientów, kwalifikuje leady i wskazuje następny krok sprzedażowy.",
   icons: {
-    icon: [{ type: "image/svg+xml", url: "/Logoicon.svg" }],
+    apple: [{ sizes: "180x180", type: "image/png", url: "/apple-touch-icon-v3.png" }],
+    icon: [{ sizes: "192x192", type: "image/png", url: "/kwotum-logo-icon-v3.png" }],
   },
   metadataBase: new URL(siteOrigin),
   title: {

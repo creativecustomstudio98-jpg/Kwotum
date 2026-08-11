@@ -6,6 +6,10 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Zastąpiono poprzedni symbol dokładnym znakiem Kwotum V3 dostarczonym przez
+  właściciela. Wersjonowane assety zasilają faviconę, Apple touch icon,
+  marketing, auth, panel, demonstracje oraz wiadomości, bez zmiany tenantowego
+  brandingu formularzy klientów.
 - Etap 12ZK dodaje wersjonowaną politykę kontaktu `email_required` /
   `phone_required`, tenantowy adres alertów zarządzany przez Ownera/Admina,
   phone-first submit bez fałszywego potwierdzenia e-mail oraz kompletny brief z

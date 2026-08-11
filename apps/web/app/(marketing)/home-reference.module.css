@@ -2485,9 +2485,7 @@
 /* Właściwy znak marki, portret demonstracyjny i zachowany kolor ikon. */
 
 .productMark {
-  background: currentColor;
-  -webkit-mask: url("/Logoicon.svg") center / contain no-repeat;
-  mask: url("/Logoicon.svg") center / contain no-repeat;
+  background: url("/kwotum-logo-icon-v3.png") center / contain no-repeat;
 }
 
 .productMark i {
@@ -2502,8 +2500,7 @@
 .bridgeNode .productMark {
   width: 90%;
   height: 90%;
-  -webkit-mask-size: 135%;
-  mask-size: 135%;
+  background-size: 135%;
 }
 
 .avatar {

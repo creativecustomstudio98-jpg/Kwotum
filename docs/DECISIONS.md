@@ -900,6 +900,11 @@ zerwaniu sesji, osadzeń, lokalnych preferencji i integracji.
 decyzji. Nie wolno przedstawiać dostępności domeny ani ochrony znaku jako
 potwierdzonej bez profesjonalnego badania.
 
+Korekta właścicielska z 2026-08-11 zastępuje geometrię wcześniejszego symbolu
+dostarczonym gradientowym znakiem Q z trzema liniami i potwierdzeniem. Tło oraz
+światło znaku są przezroczyste. Zakres obejmuje wszystkie powierzchnie marki
+Kwotum, ale nie tenantowe logo firmy wyświetlane w jej formularzu.
+
 ## ADR-034: tenantowy webhook `lead.created` z osobnym outboxem i pochodnym sekretem
 
 **Status:** accepted dla Etapu 12ZF na podstawie domyślnej decyzji programu

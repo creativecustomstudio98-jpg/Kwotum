@@ -2555,6 +2555,24 @@ pakietach, w tym web 106/106, PostgreSQL/RLS, lint 8/8, typecheck 8/8 i build
 utworzenia stagingu ani nie zamyka żadnej zewnętrznej pozycji 13A; wejście do
 13A nadal wymaga ukończenia 12ZE–12ZG oraz decyzji infrastrukturalnych.
 
+## Podetap 12ZL — zaakceptowany znak Kwotum V3
+
+- [x] Zablokować dostarczony znak i SHA-256 wariantów runtime.
+- [x] Podmienić faviconę, Apple touch icon, publiczną nawigację, auth i panel.
+- [x] Podmienić znak w demonstracjach produktu i wiadomościach.
+- [x] Zachować tenantowy branding formularza klienta.
+- [x] Wykonać format, lint, typecheck, unit, build i responsywny E2E.
+
+**Gate:** runtime nie odwołuje się do poprzedniego `Logoicon.svg`; wszystkie
+warianty zachowują przezroczyste tło, a desktop i mobile nie mają overflow ani
+regresji dostępności.
+
+**Gate zamknięty lokalnie 2026-08-11:** format i `git diff --check` przechodzą;
+web ma zielone lint, typecheck i unit 161/161, email ma zielone lint, typecheck,
+unit 18/18 i build, pełny build monorepo przechodzi 16/16, a responsywny Chromium
+E2E przechodzi 8/8 dla viewportów od 320 px do 1536 px. W runtime nie pozostały
+odwołania do poprzedniego `Logoicon.svg`.
+
 ## Etap 13 — Produkcja
 
 ### Etap 13A — staging i infrastruktura

@@ -56,7 +56,11 @@ function safeLine(value: string): string {
   return value.replace(/[\r\n\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]+/g, " ").trim();
 }
 
-function document(subject: string, content: string): string {
+function document(subject: string, content: string, appUrl: string): string {
+  const logoUrl = new URL(appUrl);
+  logoUrl.pathname = "/kwotum-logo-v3.png";
+  logoUrl.search = "";
+  logoUrl.hash = "";
   return `<!doctype html>
 <html lang="pl">
 <head>
@@ -66,6 +70,12 @@ function document(subject: string, content: string): string {
 </head>
 <body style="${bodyStyle}">
   <main style="${mainStyle}">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 28px">
+      <tr>
+        <td style="padding-right:10px;vertical-align:middle"><img src="${escapeHtml(logoUrl.toString())}" width="36" height="36" alt="" style="display:block;width:36px;height:36px"></td>
+        <td style="color:#143d2f;font-size:20px;font-weight:bold;vertical-align:middle">Kwotum</td>
+      </tr>
+    </table>
     ${content}
     <p style="margin-top:32px;color:#52675f;font-size:14px">Wiadomość transakcyjna wygenerowana przez Kwotum.</p>
   </main>
@@ -90,6 +100,7 @@ function customerTemplate(input: NotificationTemplateInput): RenderedEmail {
     <p>Twoje zapytanie dotyczące procesu „${escapeHtml(flow)}” zostało przekazane do firmy ${escapeHtml(company)}.</p>
     <p>${escapeHtml(priceText)}</p>
     <p>Wynik ma charakter orientacyjny i nie stanowi oferty. Firma może skontaktować się, aby potwierdzić zakres i warunki.</p>`,
+      input.appUrl,
     ),
     subject,
     templateVersion: "lead-customer-v1",
@@ -151,6 +162,7 @@ function companyTemplate(input: NotificationTemplateInput): RenderedEmail {
     <h2 style="margin:24px 0 12px;font-size:20px">Odpowiedzi klienta</h2>
     ${answersHtml}
     <p><a href="${escapeHtml(detailsUrl)}" style="color:#0d5c43;font-weight:bold">Otwórz szczegóły leada w panelu</a></p>`,
+      input.appUrl,
     ),
     subject,
     templateVersion: "lead-company-v1",
@@ -203,6 +215,7 @@ export function renderFlowInvitationEmail(input: FlowInvitationTemplateInput): R
     ${optionalHtml}
     <p><a href="${escapeHtml(processUrl)}" style="display:inline-block;padding:12px 18px;background:#06753a;color:#ffffff;text-decoration:none;font-weight:bold">Otwórz formularz</a></p>
     <p style="color:#52675f;font-size:14px">Link prowadzi do bezpiecznego formularza Kwotum. Nie odpowiadaj na tę automatyczną wiadomość.</p>`,
+      input.appUrl,
     ),
     subject,
     templateVersion: "flow-invitation-v1",
