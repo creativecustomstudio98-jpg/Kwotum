@@ -7,8 +7,7 @@ import { useMemo, useState } from "react";
 import { AllowedOriginsForm } from "./allowed-origins-form";
 import { FlowPreview } from "./flow-preview";
 import { InvitationForm } from "./invitation-form";
-
-type InstallationMode = "fullscreen" | "hosted" | "inline" | "popup";
+import { installationCode, type InstallationMode } from "./installation-code";
 
 export function InstallationPanel({
   allowedOrigins,
@@ -332,14 +331,4 @@ function invitationStatusLabel(status: "failed" | "pending" | "processing" | "re
   if (status === "retry") return "Ponowienie";
   if (status === "processing") return "Wysyłanie";
   return "W kolejce";
-}
-
-function installationCode(appOrigin: string, publicId: string, mode: InstallationMode): string {
-  if (mode === "hosted") return `${appOrigin}/f/${publicId}`;
-  const buttonLabel = mode === "popup" ? '\n  button-label="Rozpocznij wycenę"' : "";
-  return `<script type="module" src="${appOrigin}/widget/v1/loader.js"></script>
-<wyceno-widget
-  public-id="${publicId}"
-  mode="${mode}"${buttonLabel}
-></wyceno-widget>`;
 }

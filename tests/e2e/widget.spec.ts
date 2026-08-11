@@ -87,10 +87,13 @@ async function mockWidgetApi(
   page: Page,
   firstSaveOffline = false,
   failFirstChallenge = false,
-): Promise<Readonly<{ analyticsEvents: string[]; submitTokens: string[] }>> {
+): Promise<
+  Readonly<{ analyticsEvents: string[]; sessionRequests: string[]; submitTokens: string[] }>
+> {
   let revision = 0;
   let failSave = firstSaveOffline;
   const analyticsEvents: string[] = [];
+  const sessionRequests: string[] = [];
   const submitTokens: string[] = [];
   const answers: Record<string, unknown> = {};
   await page.route("**/turnstile/v0/api.js?render=explicit", async (route) => {
@@ -129,6 +132,7 @@ async function mockWidgetApi(
       return;
     }
     if (url.pathname.endsWith("/sessions") && request.method() === "POST") {
+      sessionRequests.push(url.pathname);
       await route.fulfill({
         body: JSON.stringify({
           currentStepKey: "service",
@@ -250,7 +254,7 @@ async function mockWidgetApi(
     }
     await route.fulfill({ body: "{}", status: 404 });
   });
-  return { analyticsEvents, submitTokens };
+  return { analyticsEvents, sessionRequests, submitTokens };
 }
 
 test("hosted flow works by keyboard, survives network loss and passes axe", async ({ page }) => {
@@ -444,7 +448,7 @@ test("hosted widget fills the desktop surface and preserves the result hierarchy
 });
 
 test("popup is isolated from hostile host CSS and returns focus on close", async ({ page }) => {
-  await mockWidgetApi(page);
+  const { sessionRequests } = await mockWidgetApi(page);
   await page.goto("/design-system");
   await page.addStyleTag({
     content:
@@ -460,6 +464,10 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
       const widget = document.createElement("wyceno-widget");
       widget.setAttribute("mode", "popup");
       widget.setAttribute("public-id", id);
+      widget.style.setProperty("--wyceno-launcher-background-color", "#b84000");
+      widget.style.setProperty("--wyceno-launcher-border-color", "#873000");
+      widget.style.setProperty("--wyceno-launcher-border-radius", "0px");
+      widget.style.setProperty("--wyceno-launcher-ring-color", "#f3a36e");
       document.body.append(widget);
     },
     { id: publicId },
@@ -469,13 +477,37 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
   const launcher = widget.getByRole("button", { name: "Rozpocznij wycenę" });
   await expect(launcher).toBeVisible();
   await expect(launcher).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(launcher).toHaveCSS("background-color", "rgb(184, 64, 0)");
+  await expect(launcher).toHaveCSS("border-color", "rgb(135, 48, 0)");
+  await expect(launcher).toHaveCSS("border-radius", "0px");
+  await page.waitForTimeout(100);
+  expect(sessionRequests).toEqual([]);
+  expect(
+    await page.evaluate(({ id }) => localStorage.getItem(`wyceno:widget:v1:${id}`), {
+      id: publicId,
+    }),
+  ).toBeNull();
   await launcher.click();
   await expect(widget.getByRole("dialog")).toBeVisible();
+  await expect(widget.getByRole("heading", { name: "Testowy proces wyceny" })).toBeVisible();
+  await expect.poll(() => sessionRequests).toHaveLength(1);
+  expect(
+    await page.evaluate(({ id }) => localStorage.getItem(`wyceno:widget:v1:${id}`), {
+      id: publicId,
+    }),
+  ).not.toBeNull();
   await page.screenshot({
     animations: "disabled",
     fullPage: false,
     path: "artifacts/redesign/after/widget-popup-1440.png",
   });
+  await page.keyboard.press("Escape");
+  await expect(widget.getByRole("dialog")).not.toBeVisible();
+  await expect(launcher).toBeFocused();
+
+  await launcher.click();
+  await expect(widget.getByRole("dialog")).toBeVisible();
+  expect(sessionRequests).toHaveLength(1);
   const close = widget.getByRole("button", { name: "Zamknij formularz" });
   await close.click();
   await expect(widget.getByRole("dialog")).not.toBeVisible();

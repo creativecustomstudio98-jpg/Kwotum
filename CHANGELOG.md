@@ -6,6 +6,19 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Generator kodu instalacyjnego i konektor WordPress dodają teraz jawne
+  `api-base` wyprowadzone odpowiednio z kanonicznego `APP_URL` albo przypiętego,
+  zwalidowanego `WYCENO_CONNECTOR_API_ORIGIN`. Osadzenia inline, popup,
+  fullscreen, shortcode i blok Gutenberg kierują dzięki temu publiczne API do
+  Kwotum zamiast do originu strony gospodarza; hosted link zachowuje
+  dotychczasowy kontrakt, a credential nadal nie trafia do HTML.
+- Popup i fullscreen widgetu tworzą lub wznawiają sesję dopiero po kliknięciu
+  launchera; samo wyświetlenie CTA nie dotyka `localStorage` ani publicznego
+  API. Stan po kliknięciu pokazuje jawny loading i zachowuje dialog, zdarzenia,
+  Escape oraz zwrot fokusu. Kompatybilny fallback `api-base` używa originu
+  modułu zamiast domeny gospodarza. Launcher udostępnia ograniczone zmienne
+  `--wyceno-launcher-*` dla on-brand kolorów i promienia narożników bez
+  otwierania stylowania wnętrza Shadow DOM.
 - Stage13E wdrożono produkcyjnie migracją `20260811000300` i immutable SHA
   `c74f38e28d20775c7dfa5b6730eb0d5336d48aef`. Smoke potwierdził HTTP 200 dla
   `/health` i `/ready`, czytelne etykiety dziewięciu odpowiedzi istniejącego

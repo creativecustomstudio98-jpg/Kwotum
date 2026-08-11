@@ -30,6 +30,60 @@ Minimalne osadzenie:
 powtórnym użyciu. Shadow DOM oraz osobny arkusz `widget.css` izolują kontrolki
 od CSS strony gospodarza. Hosted link ma `noindex`.
 
+Tryb `inline` inicjalizuje sesję po podłączeniu elementu. Tryby `popup` i
+`fullscreen` przed kliknięciem launchera renderują wyłącznie przycisk: nie
+odczytują ani nie zapisują `localStorage` i nie wywołują publicznego API.
+Kliknięcie otwiera natywny `dialog`, pokazuje stan „Uruchamiamy formularz…” i
+dopiero wtedy tworzy albo wznawia sesję. `wyceno:ready` nadal oznacza gotowy
+manifest, a `wyceno:closed` zachowuje zwrot fokusu do launchera.
+
+`api-base` powinien jawnie wskazywać origin Kwotum w kodzie instalacyjnym.
+Renderer ma kompatybilny fallback do originu własnego modułu, dzięki czemu
+starszy cross-origin embed nie próbuje wywoływać API domeny gospodarza.
+
+### On-brand launcher popupu
+
+Etykietę ustawia atrybut `button-label`. Kolory i geometria launchera mają
+ograniczony publiczny kontrakt CSS custom properties dziedziczonych przez
+Shadow DOM:
+
+| Właściwość                                 | Domyślna wartość            |
+| ------------------------------------------ | --------------------------- |
+| `--wyceno-launcher-background-color`       | akcent Kwotum               |
+| `--wyceno-launcher-border-color`           | akcent Kwotum               |
+| `--wyceno-launcher-text-color`             | `#ffffff`                   |
+| `--wyceno-launcher-border-radius`          | `5px`                       |
+| `--wyceno-launcher-hover-background-color` | kolor tła launchera         |
+| `--wyceno-launcher-hover-border-color`     | kolor obramowania launchera |
+| `--wyceno-launcher-ring-color`             | jasny akcent Kwotum         |
+
+Przykład kanciastego launchera w kolorze marki gospodarza:
+
+```css
+wyceno-widget.firma-cta {
+  --wyceno-launcher-background-color: #b84000;
+  --wyceno-launcher-border-color: #873000;
+  --wyceno-launcher-hover-background-color: #9f3800;
+  --wyceno-launcher-hover-border-color: #762900;
+  --wyceno-launcher-ring-color: #f3a36e;
+  --wyceno-launcher-border-radius: 0;
+}
+```
+
+```html
+<wyceno-widget
+  class="firma-cta"
+  public-id="LOSOWY_PUBLICZNY_UUID"
+  api-base="https://app.example"
+  mode="popup"
+  button-label="Pomóż mi dobrać rozwiązanie"
+></wyceno-widget>
+```
+
+Integrator odpowiada za kontrast własnych kolorów w stanach default, hover i
+focus. Zmienne dotyczą wyłącznie launchera; nie pozwalają stronie gospodarza
+nadpisywać treści, kontrolek ani warstwy procesu w Shadow DOM.
+
 ## Manifest v1 i v2
 
 Manifest jest jawną projekcją immutable snapshotu, a nie zwróconym draftem.

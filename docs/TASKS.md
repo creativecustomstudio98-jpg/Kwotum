@@ -2721,6 +2721,13 @@ kolejkach. Zakończonego alertu UAT nie wysłano ponownie.
 - [x] Wykonać syntetyczny submit, potwierdzić lead i dostawę alertu firmy.
 - [x] Wdrożyć Etap 13E, potwierdzić czytelne etykiety w istniejącym leadzie i
       renderer e-mail v2 bez ponownej wysyłki zakończonego alertu UAT.
+- [x] Dodać jawne `api-base` do generowanego embedu i konektora WordPress oraz
+      pokryć inline, popup, fullscreen, hosted link, shortcode i blok Gutenberg
+      testami regresji bez ujawnienia credentialu.
+- [x] Przygotować i lokalnie zweryfikować lazy initialization popup/fullscreen,
+      kompatybilny fallback `api-base` oraz ograniczony on-brand kontrakt
+      launchera bez zmiany wnętrza procesu; wdrożenie release'u nadal
+      poprzedza embed Fortez.
 - [ ] Osadzić popup na stronie Fortez dopiero po technicznym i prawnym GO.
 
 - [ ] Uruchomić jedną organizację z ograniczonym ruchem i możliwością

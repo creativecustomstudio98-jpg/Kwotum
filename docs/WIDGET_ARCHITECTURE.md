@@ -9,6 +9,10 @@ Izolacja od CSS i JS hosta, mały bundle, dostępność niezależna od strony, s
 Jeden wersjonowany moduł rejestruje natywny custom element, ignoruje kolejne
 identyczne inicjalizacje i wspiera inline/popup/fullscreen. Hosted link używa
 tego samego renderera. Loader nie pobiera Reacta ani aplikacji panelowej.
+Inline inicjalizuje sesję po podłączeniu, natomiast popup i fullscreen do
+kliknięcia launchera pozostają bez sesji, requestów API i dostępu do
+`localStorage`. Jawne, ograniczone zmienne CSS launchera dziedziczą się przez
+Shadow DOM; nie otwierają stylowania wnętrza procesu przez hosta.
 
 ## State machine
 

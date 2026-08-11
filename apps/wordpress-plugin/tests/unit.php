@@ -38,6 +38,10 @@ wyceno_assert(
 
 $html = Embed::shortcode(['height' => '9999', 'id' => $flow_id, 'mode' => 'popup']);
 wyceno_assert(str_contains($html, 'public-id="' . $flow_id . '"'), 'Shortcode lost the public flow ID.');
+wyceno_assert(
+    str_contains($html, 'api-base="https://api.wyceno.test"'),
+    'Shortcode lost the pinned public API origin.'
+);
 wyceno_assert(str_contains($html, 'mode="popup"'), 'Popup mode was not rendered.');
 wyceno_assert(str_contains($html, 'min-height:1600px'), 'Height was not clamped.');
 wyceno_assert(! str_contains($html, $credential), 'Credential leaked into frontend HTML.');
