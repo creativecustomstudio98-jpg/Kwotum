@@ -297,6 +297,15 @@ one-time secret, retry i dead letter wynikają wyłącznie z ADR-034 i
 `WEBHOOKS.md`. Finalne viewporty, overlay i różnice zapisuje
 `artifacts/visual-qa/12zf-webhook-v1/diff.md`.
 
+Decyzja AB pochodzi z dostarczonego i zaakceptowanego przez właściciela znaku
+Kwotum z 2026-08-11. Zastępuje poprzedni symbol we wszystkich powierzchniach
+marki: publicznym shellu, demonstracjach produktu, auth, panelu, faviconach i
+wiadomościach. Tło i światło litery Q pozostają przezroczyste; gradientowy
+obwód, trzy linie i potwierdzenie należą do znaku. Wariant runtime 768 × 768 px
+ma SHA-256
+`9c552e5edbec779374b7b9439e096513768f7972a29913541eb4525a4b75367c`.
+Kontrakt wariantów opisuje `ui/kwotum-brand-v3/README.md`.
+
 Pełny audyt, pomiary, luki i klasyfikację cleanupu zawierają
 `landing-desktop-v7/REFERENCE_AUDIT.md` oraz `MEASUREMENTS.md`. W D0 nie
 zmieniono aplikacji ani nie usunięto poprzednich plików runtime.

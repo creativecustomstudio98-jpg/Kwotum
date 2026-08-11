@@ -129,7 +129,7 @@ export function PanelNavigation({
         <div className="panel-rail__header">
           <Link aria-label="Kwotum — wybór organizacji" className="panel-rail__brand" href="/panel">
             <span className="panel-rail__brand-mark">
-              <Image alt="" height={38} priority src="/Logoicon.svg" width={38} />
+              <Image alt="" height={38} priority src="/kwotum-logo-v3.png" width={38} />
             </span>
             <span className="panel-rail__brand-copy">
               <strong className="panel-rail__brand-name">Kwotum</strong>

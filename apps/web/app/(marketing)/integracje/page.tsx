@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { marketingMetadata } from "../../../lib/marketing/metadata";
 import { Breadcrumbs } from "../components";
 
@@ -173,12 +175,7 @@ function LeadRecord() {
 }
 
 function BrandMark() {
-  return (
-    <svg aria-hidden="true" fill="none" viewBox="0 0 32 32">
-      <path d="M22.9 6.45A11.4 11.4 0 1 0 27.4 15.6M19.35 19.35 28.4 28.4" />
-      <path className="integration-brand-mark__accent" d="M22.9 6.45A11.4 11.4 0 0 1 27.4 15.6" />
-    </svg>
-  );
+  return <Image alt="" aria-hidden="true" height={25} src="/kwotum-logo-v3.png" width={25} />;
 }
 
 function CheckIcon() {

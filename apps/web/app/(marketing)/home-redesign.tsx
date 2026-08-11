@@ -338,7 +338,14 @@ export function HomeRedesign() {
 
             <article className={styles.integrationLeadCard}>
               <header>
-                <span className={styles.integrationBrandMark} aria-hidden="true" />
+                <Image
+                  alt=""
+                  aria-hidden="true"
+                  className={styles.integrationBrandMark}
+                  height={24}
+                  src="/kwotum-logo-v3.png"
+                  width={24}
+                />
                 <strong>Kwotum</strong>
               </header>
               <div>
@@ -581,7 +588,7 @@ export function HomeRedesign() {
       >
         <div className={styles.finalCtaPanel} data-home-proof="final-cta-system">
           <div aria-label="Kwotum" className={styles.finalCtaBrand}>
-            <Image alt="" aria-hidden="true" height={32} src="/Logoicon.svg" width={32} />
+            <Image alt="" aria-hidden="true" height={32} src="/kwotum-logo-v3.png" width={32} />
             <strong>kwotum</strong>
           </div>
 
@@ -972,7 +979,7 @@ function HeroProductRender() {
       <div aria-hidden="true" className={styles.productDashboard}>
         <header className={styles.dashboardTopbar}>
           <span className={styles.dashboardBrand}>
-            <i />
+            <Image alt="" aria-hidden="true" height={15} src="/kwotum-logo-v3.png" width={15} />
             Kwotum
           </span>
           <span className={styles.dashboardAccount}>
@@ -1093,7 +1100,7 @@ function HeroProductRender() {
       <div aria-hidden="true" className={styles.processPhone}>
         <header>
           <span>‹</span>
-          <i />
+          <Image alt="" height={22} src="/kwotum-logo-v3.png" width={22} />
         </header>
         <div className={styles.phoneProgress}>
           <small>Krok 2 z 6</small>

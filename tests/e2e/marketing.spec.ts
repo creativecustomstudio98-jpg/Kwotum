@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 
 import { indexedRoutes } from "../../apps/web/lib/marketing/content";
 
@@ -32,6 +32,13 @@ const homeBoardTwoViewports = [
 
 const mobileGuidedFlowViewports = [320, 375, 390, 430] as const;
 const mobileKeyInformationViewports = [320, 375, 390, 430] as const;
+
+const expectOnlyKwotumBrandImages = async (productScene: Locator): Promise<void> => {
+  const images = productScene.locator("img");
+  await expect(images).toHaveCount(2);
+  await expect(images.first()).toHaveAttribute("src", /kwotum-logo-v3\.png/);
+  await expect(images.nth(1)).toHaveAttribute("src", /kwotum-logo-v3\.png/);
+};
 
 const extractAttribute = (html: string, relation: string, attribute: string): string | null => {
   const tag = html.match(new RegExp(`<link[^>]+rel=["']${relation}["'][^>]*>`, "i"))?.[0];
@@ -71,7 +78,7 @@ test.describe("marketing and SEO", () => {
 
     const productScene = page.locator('[data-home-proof="rendered-product-scene"]');
     await expect(productScene).toBeVisible();
-    await expect(productScene.locator("img")).toHaveCount(0);
+    await expectOnlyKwotumBrandImages(productScene);
 
     const heroSignals = page.getByRole("list", {
       name: "Najczęstsze zastosowania i kanały Kwotum",
@@ -128,7 +135,7 @@ test.describe("marketing and SEO", () => {
       await expect(productScene).toBeVisible();
       await expect(guidedFlow).toBeVisible();
 
-      await expect(productScene.locator("img")).toHaveCount(0);
+      await expectOnlyKwotumBrandImages(productScene);
 
       if (viewport.width > 1_200) {
         const navigationCenterOffset = await page
