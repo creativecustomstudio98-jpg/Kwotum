@@ -95,6 +95,8 @@ przypięty do tej samej wersji. Szczegóły: `docs/ESTIMATION_ENGINE.md`.
 - `consent_records` — typ, treść/hash wersji, timestamp i źródło;
 - `notifications` — tenantowy outbox ze snapshotem odbiorcy, wersją szablonu,
   statusem, blokadą i terminem retry;
+- `organization_notification_settings` — prywatny adres dostawy alertów
+  dostępny tylko Ownerowi/Adminowi;
 - `notification_delivery_attempts` — historia prób bez treści wiadomości;
 - `flow_invitations` — tenantowy outbox wysłania aktualnego hosted flow,
   przypięty do immutable wersji, autora i idempotency key;
@@ -111,7 +113,8 @@ przypięty do tej samej wersji. Szczegóły: `docs/ESTIMATION_ENGINE.md`.
 
 - unique membership `(organization_id, user_id)`;
 - jeden aktywny publiczny alias na flow;
-- lead wymaga `flow_version_id`;
+- lead wymaga `flow_version_id` oraz co najmniej jednego kanału: e-maila albo
+  telefonu;
 - `price_min <= price_max`, waluta ISO 4217;
 - odpowiedź jest unikalna dla `(session_id, step_id)` z wersjonowaniem zapisu;
 - eventy i submit przyjmują idempotency key;
@@ -134,16 +137,27 @@ status zmienia kontrolowana funkcja z historią i audit logiem. Szczegóły:
 ### Stan wdrożenia Etapu 8
 
 Migracja `20260725000300_stage8_notifications.sql` opakowuje RPC submitu tak,
-aby w tej samej transakcji dopisać dokładnie dwa rekordy outboxu. Unikalność
-`(lead_id, kind)` chroni retry przed duplikacją. Odbiorcą alertu v1 jest
-najstarszy aktywny Owner; brak odbiorcy tworzy jawny stan `failed`, zamiast
-gubić zdarzenie.
+aby w tej samej transakcji dopisać rekordy outboxu. Unikalność `(lead_id, kind)`
+chroni retry przed duplikacją. Pierwotnym odbiorcą alertu v1 był najstarszy
+aktywny Owner; ADR-039 i migracja Etapu 12ZK zastępują go tenantową
+konfiguracją, zachowując fallback dla niezmigrowanych organizacji. Brak
+odbiorcy tworzy jawny stan `failed`, zamiast gubić zdarzenie.
 
 Tabele mają wymuszone RLS. Aktywny członek widzi statusy wyłącznie swojego
 tenanta, ale nie ma bezpośredniego zapisu. Rola workera może wywołać tylko
 funkcje claim/complete/fail; claim stosuje `SKIP LOCKED`, lock token i odzyskuje
 próby zawieszone dłużej niż 15 minut. Każda próba trafia do osobnego rekordu.
 Szczegóły: `docs/NOTIFICATIONS.md`.
+
+### Stan wdrożenia Etapu 12ZK
+
+Migracja `20260810000100_stage12zk_contact_delivery.sql` dodaje wersjonowaną
+politykę `email_required` / `phone_required`, nullable `contact_email` z
+więzem co najmniej jednego kanału oraz `organization_notification_settings`.
+Polityka jest ponownie sprawdzana z immutable snapshotu w RPC submitu. Lead bez
+e-maila nie tworzy potwierdzenia klienta, lecz alert firmy zachowuje jego
+telefon. Owner/Admin zapisują odbiorcę przez audytowane RPC; Sales, zawieszone
+konto i drugi tenant są blokowani przez capability oraz forced RLS.
 
 ### Stan wdrożenia Etapu 12ZH
 
@@ -311,3 +325,27 @@ revocation bez dostępu do sekretu. Migracja Etapu 11 ma rollback przed
 wdrożeniem: wyłączyć trasy konektora, unieważnić aktywne credentiale, usunąć
 funkcje/policies, a następnie tabele w kolejności connections → install_tokens.
 Po wdrożeniu plik migracji jest niezmienny.
+
+## Publiczna brama formularza
+
+`public_flow_origins` przechowuje maksymalnie 10 dokładnych originów na proces,
+organizację i aktora zapisu. Tabela ma forced RLS: odczyt wyłącznie Owner/Admin,
+zapis wyłącznie przez `set_public_flow_origins`, z tenant scope i audit logiem.
+Nie przechowuje wildcardów, ścieżek, query ani credentiali; HTTP jest
+dopuszczony tylko dla loopbacku lokalnego.
+
+`app_private.public_request_buckets` przechowuje wyłącznie SHA-256 materiału
+kubełka, początek/expiry stałego okna i licznik. Surowy IP, origin, token sesji,
+flow ID i organization ID nie są kolumnami tej tabeli. Adres klienta trafia do
+funkcji już jako HMAC-SHA-256 obliczony server-side osobnym sekretem.
+`enforce_public_request_guard` rozpoznaje proces albo hash sesji, sprawdza exact
+origin i atomowo zużywa budżety IP/origin/flow/session/org. Funkcja oraz
+operacyjne RPC formularza są wykonywalne tylko dla `service_role`; `anon` i
+`authenticated` nie mogą ominąć Route Handlera. Panelowy podgląd manifestu ma
+osobne RPC Owner/Admin z tenant scope.
+
+Rollback FTZ-03A najpierw wycofuje ruch publiczny do bezpiecznej odpowiedzi 503
+albo usuwa embed. Nie wdrażamy starej aplikacji po odebraniu grantów `anon`.
+Awaryjna kompatybilność wymaga jawnej migracji naprawczej przywracającej granty
+na czas rollbacku aplikacji. Tabela originów zostaje konfiguracją audytową, a
+wygasłe kubełki można bezpiecznie usunąć; nie usuwa się danych biznesowych.

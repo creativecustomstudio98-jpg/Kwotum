@@ -3,6 +3,7 @@ import type { WidgetAnswer, WidgetManifest, WidgetStep } from "./contracts.js";
 import { WidgetSessionController, type WidgetState } from "./controller.js";
 import { PreviewWidgetApi } from "./preview.js";
 import { LocalWidgetStorage, MemoryWidgetStorage, widgetStorageKey } from "./storage.js";
+import { requestTurnstileToken } from "./turnstile.js";
 
 const elementName = "wyceno-widget";
 const publicIdPattern =
@@ -59,6 +60,7 @@ export class WycenoWidgetElement extends HTMLElement {
   #dialog: HTMLDialogElement | null = null;
   #lastStatus: WidgetState["status"] = "idle";
   #previewManifest: WidgetManifest | null = null;
+  #renderedState: WidgetState | null = null;
   #resizeObserver: ResizeObserver | null = null;
   #started = false;
   #unsubscribe: (() => void) | null = null;
@@ -153,6 +155,12 @@ export class WycenoWidgetElement extends HTMLElement {
   };
 
   #render(state: WidgetState): void {
+    if (this.#renderedState && this.#isSyncOnlyUpdate(this.#renderedState, state)) {
+      const sync = this.#shadow.querySelector<HTMLElement>(".wyceno-sync");
+      if (sync) sync.textContent = this.#syncStatusLabel(state.syncStatus);
+      this.#renderedState = state;
+      return;
+    }
     const dialogWasOpen = this.#dialog?.open === true;
     const container = create("div", `wyceno-shell wyceno-shell--${this.mode}`);
     if (this.mode === "inline") {
@@ -203,6 +211,32 @@ export class WycenoWidgetElement extends HTMLElement {
       });
     }
     this.#lastStatus = state.status;
+    this.#renderedState = state;
+  }
+
+  #isSyncOnlyUpdate(previous: WidgetState, next: WidgetState): boolean {
+    return (
+      previous.syncStatus !== next.syncStatus &&
+      previous.analyticsConsent === next.analyticsConsent &&
+      previous.analyticsError === next.analyticsError &&
+      previous.answers === next.answers &&
+      previous.currentStep === next.currentStep &&
+      previous.errorMessage === next.errorMessage &&
+      previous.history === next.history &&
+      previous.manifest === next.manifest &&
+      previous.result === next.result &&
+      previous.status === next.status &&
+      previous.submission === next.submission &&
+      previous.uploadedFiles === next.uploadedFiles
+    );
+  }
+
+  #syncStatusLabel(syncStatus: WidgetState["syncStatus"]): string {
+    if (this.previewMode) return "Podgląd lokalny — nic nie zapisujemy.";
+    if (syncStatus === "offline") {
+      return "Brak połączenia — odpowiedź jest zachowana na tym urządzeniu.";
+    }
+    return syncStatus === "saving" ? "Zapisujemy odpowiedź…" : "Postęp zapisany.";
   }
 
   #openDialog(): void {
@@ -272,13 +306,7 @@ export class WycenoWidgetElement extends HTMLElement {
     const sync = create("p", "wyceno-sync");
     sync.setAttribute("role", "status");
     sync.setAttribute("aria-live", "polite");
-    sync.textContent = this.previewMode
-      ? "Podgląd lokalny — nic nie zapisujemy."
-      : state.syncStatus === "offline"
-        ? "Brak połączenia — odpowiedź jest zachowana na tym urządzeniu."
-        : state.syncStatus === "saving"
-          ? "Zapisujemy odpowiedź…"
-          : "Postęp zapisany.";
+    sync.textContent = this.#syncStatusLabel(state.syncStatus);
     header.append(sync);
     content.append(header);
 
@@ -461,7 +489,9 @@ export class WycenoWidgetElement extends HTMLElement {
       create(
         "p",
         "wyceno-description",
-        "E-mail jest wymagany. Imię, telefon i pliki możesz dodać opcjonalnie.",
+        capture.contactPolicy === "phone_required"
+          ? "Telefon jest wymagany. Imię, e-mail i pliki możesz dodać opcjonalnie."
+          : "E-mail jest wymagany. Imię, telefon i pliki możesz dodać opcjonalnie.",
       ),
     );
     const form = create("form", "wyceno-contact-form");
@@ -482,13 +512,23 @@ export class WycenoWidgetElement extends HTMLElement {
     name.input.addEventListener("input", () => {
       this.#contactDraft.name = name.input.value;
     });
-    const email = this.#contactInput("email", "E-mail", "wyceno-contact-email", true);
+    const email = this.#contactInput(
+      "email",
+      "E-mail",
+      "wyceno-contact-email",
+      capture.contactPolicy === "email_required",
+    );
     email.input.autocomplete = "email";
     email.input.value = this.#contactDraft.email;
     email.input.addEventListener("input", () => {
       this.#contactDraft.email = email.input.value;
     });
-    const phone = this.#contactInput("tel", "Telefon", "wyceno-contact-phone", false);
+    const phone = this.#contactInput(
+      "tel",
+      "Telefon",
+      "wyceno-contact-phone",
+      capture.contactPolicy === "phone_required",
+    );
     phone.input.autocomplete = "tel";
     phone.input.value = this.#contactDraft.phone;
     phone.input.addEventListener("input", () => {
@@ -559,17 +599,40 @@ export class WycenoWidgetElement extends HTMLElement {
       event.preventDefault();
       if (!form.reportValidity()) return;
       this.#controller?.trackAnalytics("cta_clicked");
-      void this.#controller?.submitLead({
-        email: this.#contactDraft.email,
-        files: this.#contactDraft.files,
-        marketingEmailAccepted: this.#contactDraft.marketingEmailAccepted,
-        name: this.#contactDraft.name,
-        phone: this.#contactDraft.phone,
-        privacyAccepted: this.#contactDraft.privacyAccepted,
-      });
+      void this.#controller?.submitLead(
+        {
+          email: this.#contactDraft.email,
+          files: this.#contactDraft.files,
+          marketingEmailAccepted: this.#contactDraft.marketingEmailAccepted,
+          name: this.#contactDraft.name,
+          phone: this.#contactDraft.phone,
+          privacyAccepted: this.#contactDraft.privacyAccepted,
+        },
+        () => this.#challengeToken(),
+      );
     });
     section.append(form);
     return section;
+  }
+
+  async #challengeToken(): Promise<string> {
+    if (this.previewMode) return "preview-local";
+    const challenge = this.#controller?.state.manifest?.challenge;
+    if (!challenge) return "local-disabled";
+    const stage = this.#shadow.querySelector<HTMLElement>(".wyceno-stage");
+    if (!stage) throw new Error("Nie udało się uruchomić weryfikacji bezpieczeństwa.");
+    const region = create("div", "wyceno-challenge");
+    region.setAttribute("role", "status");
+    region.setAttribute("aria-live", "polite");
+    region.append(create("p", undefined, "Potwierdzamy bezpieczeństwo wysłania…"));
+    const target = create("div", "wyceno-challenge-target");
+    region.append(target);
+    stage.append(region);
+    try {
+      return await requestTurnstileToken(target, challenge);
+    } finally {
+      region.remove();
+    }
   }
 
   #renderAnalyticsConsent(state: WidgetState): HTMLElement {

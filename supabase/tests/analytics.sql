@@ -4,9 +4,9 @@ create temporary table analytics_control_sessions (
   session_number integer primary key,
   token text not null
 );
-grant select, insert on analytics_control_sessions to anon;
+grant select, insert on analytics_control_sessions to anon, service_role;
 
-set role anon;
+set role service_role;
 
 do $$
 declare
@@ -156,7 +156,7 @@ end;
 $$;
 
 reset role;
-set role anon;
+set role service_role;
 
 do $$
 declare

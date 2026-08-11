@@ -73,8 +73,9 @@ const privacyText = "Akceptuję informację o przetwarzaniu danych w celu przygo
 const privacyHash = createHash("sha256").update(privacyText).digest("hex");
 const document = structuredClone(baseTemplate.snapshot);
 document.leadCapture = {
+  contactPolicy: "email_required",
   filesEnabled: false,
-  leadCaptureSchemaVersion: 1,
+  leadCaptureSchemaVersion: 2,
   privacyNotice: {
     label: privacyText,
     textHash: privacyHash,

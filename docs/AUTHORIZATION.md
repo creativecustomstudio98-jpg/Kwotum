@@ -9,6 +9,7 @@
 | Flow, pricing, publikacja          |   tak |               tak |         nie |
 | Podgląd i wysłanie procesu         |   tak |               tak |         nie |
 | Integracje                         |   tak | tak bez płatności |         nie |
+| Adres dostawy alertów o leadach    |   tak |               tak |         nie |
 | Leady, statusy, notatki            |   tak |               tak |         tak |
 | Priorytet, kontakt i zadania leada |   tak |               tak |         tak |
 | Przypisanie właściciela leada      |   tak |               tak |         nie |
@@ -52,6 +53,13 @@ które ponownie sprawdza aktywną rolę i oba UUID; zwykły klient nie ma grantu
 `UPDATE` na `leads`. Etap 12 udostępnia eksport wyłącznie aktywnemu Ownerowi;
 Admin i Sales nie mają tego capability ani bezpośredniego dostępu do eksportu.
 
+Etap 12ZK dodaje Ownerowi i Adminowi `notification:manage`. Capability pozwala
+odczytać i ustawić tenantowy adres dostawy alertów o nowych leadach. Zapis
+przechodzi przez `set_organization_lead_alert_email`, normalizuje adres i
+tworzy audit log bez kopiowania adresu. Sales, zawieszone konto i drugi tenant
+nie widzą rekordu konfiguracji oraz otrzymują generyczne `NOT_FOUND` przy
+próbie zmiany.
+
 Etap 12ZI dodaje Ownerowi i Adminowi `lead:assign`, a wszystkim aktywnym rolom
 `lead:operate`. Pierwsze pozwala przypisać leada wyłącznie aktywnemu członkowi
 tej samej organizacji. Drugie obejmuje priorytet, planowanie kontaktu, tworzenie
@@ -84,6 +92,8 @@ Macierz bazowa i IDOR są testowane jednostkowo w
 Przypadki leadów i zmiany statusu rozszerza
 `supabase/tests/lead_pipeline.sql`, łącznie z drugim tenantem i członkiem
 zawieszonym.
+Konfigurację dostawy rozszerza `supabase/tests/contact_delivery.sql`: Owner,
+Admin, Sales, zawieszone konto, drugi tenant, minimalne granty i audytowany RPC.
 Analitykę rozszerza `supabase/tests/analytics.sql`: raw access Owner/Sales,
 agregat Sales, drugi tenant, consent withdrawal, retencja i próg małej próby.
 Zaproszenia rozszerza `supabase/tests/flow_invitations.sql`: idempotencja,

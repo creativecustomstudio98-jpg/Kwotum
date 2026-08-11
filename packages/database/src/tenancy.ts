@@ -14,6 +14,7 @@ export type Capability =
   | "lead:read"
   | "lead:status"
   | "member:manage"
+  | "notification:manage"
   | "organization:delete"
   | "organization:read"
   | "organization:update"
@@ -64,6 +65,7 @@ const capabilitiesByRole = {
     "lead:read",
     "lead:status",
     "member:manage",
+    "notification:manage",
     "organization:delete",
     "organization:read",
     "organization:update",
@@ -87,6 +89,7 @@ const capabilitiesByRole = {
     "lead:operate",
     "lead:read",
     "lead:status",
+    "notification:manage",
     "organization:read",
     "storage:delete",
     "storage:read",

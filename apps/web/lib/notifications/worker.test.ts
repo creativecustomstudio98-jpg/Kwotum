@@ -10,10 +10,15 @@ afterEach(() => vi.restoreAllMocks());
 
 function claim(overrides: Partial<Claim> = {}): Claim {
   return {
+    answers: [
+      { answer: "Laweta", question: "Rodzaj przyczepy" },
+      { answer: 2700, question: "DMC" },
+    ],
     attempt_number: 1,
     company_name: "Studio Mebli",
     contact_email: "klient@example.test",
     contact_name: "Jan",
+    contact_phone: "+48 500 600 700",
     flow_title: "Kuchnia",
     kind: "lead_customer_confirmation",
     lead_id: "e0000000-0000-4000-8000-000000000001",

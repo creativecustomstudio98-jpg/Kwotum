@@ -64,11 +64,18 @@ export type WidgetConsentContent = Readonly<{
 }>;
 
 export type WidgetManifest = Readonly<{
+  challenge: Readonly<{
+    action: "kwotum_lead_submit";
+    appearance: "interaction-only";
+    provider: "turnstile";
+    siteKey: string;
+  }> | null;
   entryStepKey: string;
   intro: string;
   leadCapture: Readonly<{
+    contactPolicy: "email_required" | "phone_required";
     filesEnabled: boolean;
-    leadCaptureSchemaVersion: 1;
+    leadCaptureSchemaVersion: 1 | 2;
     marketingEmailConsent: WidgetConsentContent | null;
     privacyNotice: WidgetConsentContent &
       Readonly<{
@@ -142,8 +149,9 @@ export type UploadedWidgetFile = Readonly<{
 }>;
 
 export type SubmitLeadInput = Readonly<{
+  challengeToken: string;
   contact: Readonly<{
-    email: string;
+    email?: string;
     name?: string;
     phone?: string;
   }>;
@@ -211,7 +219,14 @@ export interface WidgetApi {
 }
 
 export type WidgetApiErrorCode =
-  "CONFLICT" | "EXPIRED" | "INVALID" | "NETWORK" | "NOT_FOUND" | "RATE_LIMITED" | "UNAVAILABLE";
+  | "CHALLENGE"
+  | "CONFLICT"
+  | "EXPIRED"
+  | "INVALID"
+  | "NETWORK"
+  | "NOT_FOUND"
+  | "RATE_LIMITED"
+  | "UNAVAILABLE";
 
 export class WidgetApiError extends Error {
   readonly code: WidgetApiErrorCode;

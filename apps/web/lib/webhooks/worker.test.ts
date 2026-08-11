@@ -82,6 +82,15 @@ describe("webhook worker", () => {
     expect(envelope.data.lead.contact.email).toBe("webhook-test@example.invalid");
   });
 
+  it("keeps a phone-only lead in the production webhook contract", () => {
+    const envelope = buildWebhookEnvelope(claim({ contact_email: null }));
+    expect(envelope.data.lead.contact).toEqual({
+      email: null,
+      name: "Klient Testowy",
+      phone: "+48 500 600 700",
+    });
+  });
+
   it("signs the exact body and marks a 2xx delivery successful", async () => {
     const setupResult = setup({ outcome: "delivered", responseStatus: 204 });
     const result = await processWebhookBatch({
@@ -143,7 +152,7 @@ describe("webhook worker", () => {
 
   it("dead-letters an incomplete database projection without calling the network", async () => {
     const setupResult = setup({ outcome: "delivered", responseStatus: 200 }, [
-      claim({ contact_email: null }),
+      claim({ contact_email: null, contact_phone: null }),
     ]);
     const result = await processWebhookBatch({
       adapter: setupResult.adapter,

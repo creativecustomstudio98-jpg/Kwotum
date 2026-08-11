@@ -1,18 +1,20 @@
 import { NextResponse } from "next/server";
 
-export const publicCorsHeaders = {
+const publicCorsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, X-Wyceno-Session",
   "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Max-Age": "86400",
 } as const;
 
 type PublicErrorCode =
   | "ANALYTICS_CONSENT_REQUIRED"
+  | "CHALLENGE_FAILED"
+  | "CHALLENGE_UNAVAILABLE"
   | "FLOW_NOT_FOUND"
   | "INVALID_ANSWER"
   | "INVALID_FILE"
   | "INVALID_REQUEST"
+  | "ORIGIN_NOT_ALLOWED"
   | "RATE_LIMITED"
   | "RESULT_NOT_READY"
   | "SESSION_CONFLICT"
@@ -27,12 +29,23 @@ export function requestId(request: Request): string {
 
 export function jsonResponse(
   body: unknown,
-  init: { cacheControl?: string; requestId: string; status?: number },
+  init: {
+    cacheControl?: string;
+    corsOrigin?: string | null | undefined;
+    requestId: string;
+    retryAfter?: number | undefined;
+    status?: number;
+  },
 ): NextResponse {
+  const corsHeaders = init.corsOrigin
+    ? { "Access-Control-Allow-Origin": init.corsOrigin, Vary: "Origin" }
+    : { Vary: "Origin" };
   return NextResponse.json(body, {
     headers: {
       ...publicCorsHeaders,
+      ...corsHeaders,
       "Cache-Control": init.cacheControl ?? "private, no-store",
+      ...(init.retryAfter ? { "Retry-After": String(init.retryAfter) } : {}),
       "X-Request-Id": init.requestId,
       "X-Content-Type-Options": "nosniff",
     },
@@ -45,18 +58,31 @@ export function errorResponse(
   message: string,
   status: number,
   id: string,
+  corsOrigin?: string | null,
+  retryAfter?: number,
 ): NextResponse {
-  return jsonResponse({ error: { code, message, request_id: id } }, { requestId: id, status });
+  return jsonResponse(
+    { error: { code, message, request_id: id } },
+    { corsOrigin, requestId: id, retryAfter, status },
+  );
 }
 
-export function optionsResponse(): Response {
-  return new Response(null, { headers: publicCorsHeaders, status: 204 });
+export function optionsResponse(corsOrigin: string | null): Response {
+  return new Response(null, {
+    headers: {
+      ...publicCorsHeaders,
+      ...(corsOrigin ? { "Access-Control-Allow-Origin": corsOrigin } : {}),
+      Vary: "Origin",
+    },
+    status: 204,
+  });
 }
 
 export function mapDatabaseError(
   error: Readonly<{ code?: string; message?: string }> | null,
   resource: "flow" | "session",
   id: string,
+  corsOrigin?: string | null,
 ): NextResponse {
   const message = error?.message ?? "";
   if (error?.code === "P0002") {
@@ -65,6 +91,7 @@ export function mapDatabaseError(
       resource === "flow" ? "Ten proces jest niedostępny." : "Nie znaleziono sesji.",
       404,
       id,
+      corsOrigin,
     );
   }
   if (error?.code === "40001") {
@@ -73,28 +100,43 @@ export function mapDatabaseError(
       "Sesja została zmieniona w innym miejscu. Odświeżamy odpowiedzi.",
       409,
       id,
+      corsOrigin,
     );
   }
   if (error?.code === "23505" && message === "session already submitted") {
-    return errorResponse("SESSION_CONFLICT", "Ta sesja została już wysłana.", 409, id);
+    return errorResponse("SESSION_CONFLICT", "Ta sesja została już wysłana.", 409, id, corsOrigin);
   }
   if (error?.code === "22023" && message === "session expired") {
-    return errorResponse("SESSION_EXPIRED", "Ta sesja wygasła.", 410, id);
+    return errorResponse("SESSION_EXPIRED", "Ta sesja wygasła.", 410, id, corsOrigin);
   }
   if (error?.code === "23514" || message === "invalid answer") {
     if (message === "session is incomplete") {
-      return errorResponse("RESULT_NOT_READY", "Wynik nie jest jeszcze gotowy.", 409, id);
+      return errorResponse(
+        "RESULT_NOT_READY",
+        "Wynik nie jest jeszcze gotowy.",
+        409,
+        id,
+        corsOrigin,
+      );
     }
-    return errorResponse("INVALID_ANSWER", "Odpowiedź jest nieprawidłowa.", 422, id);
+    return errorResponse("INVALID_ANSWER", "Odpowiedź jest nieprawidłowa.", 422, id, corsOrigin);
   }
   if (error?.code === "54000") {
-    return errorResponse("RATE_LIMITED", "Za dużo żądań. Spróbuj ponownie za chwilę.", 429, id);
+    return errorResponse(
+      "RATE_LIMITED",
+      "Za dużo żądań. Spróbuj ponownie za chwilę.",
+      429,
+      id,
+      corsOrigin,
+      60,
+    );
   }
   return errorResponse(
     "UNAVAILABLE",
     "Usługa jest chwilowo niedostępna. Spróbuj ponownie.",
     503,
     id,
+    corsOrigin,
   );
 }
 

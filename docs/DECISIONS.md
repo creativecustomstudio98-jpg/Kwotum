@@ -1117,3 +1117,154 @@ Obecny plan prywatnego repozytorium nie udostępnia branch protection, więc
 GitHub nie wymusza statusów przed merge. Do czasu GitHub Pro zielone Quality
 Gate, Gitleaks, Semgrep i WordPress na jednym SHA są ręczną, obowiązkową bramką
 właściciela; nie wolno merge'ować czerwonego lub niepełnego przebiegu.
+
+## ADR-039: wersjonowana polityka kontaktu i tenantowy adres alertów o leadach
+
+**Status:** accepted dla przygotowania pilotażu Fortez na podstawie decyzji
+właściciela produktu z 2026-08-10
+
+**Decyzja:** immutable snapshot opublikowanej wersji procesu otrzymuje
+`leadCaptureSchemaVersion: 2` oraz jawną `contactPolicy`. W pierwszej wersji
+obsługujemy dwie polityki: `email_required` i `phone_required`. Istniejące
+snapshoty v1 zachowują dotychczasową semantykę `email_required`; nie są
+przepisywane ani unieważniane. Publiczny manifest ujawnia wyłącznie wybraną
+politykę, aby widget mógł pokazać właściwe pola i oznaczenia wymagania. Serwer
+ponownie waliduje ją z immutable snapshotu i nie ufa samemu payloadowi klienta.
+Każdy lead musi mieć co najmniej e-mail albo telefon. Zgoda marketingowa e-mail
+bez adresu e-mail jest odrzucana. Potwierdzenie dla klienta powstaje tylko, gdy
+lead podał e-mail.
+
+Adres powiadomień firmy jest osobną tenantową konfiguracją, niezależną od konta
+użytkownika i adresu właściciela organizacji. Owner albo Admin ustawia jeden
+znormalizowany adres `lead_alert_email` przez kontrolowany zapis po stronie
+serwera. Sales nie odczytuje ani nie zmienia konfiguracji. Outbox utrwala
+snapshot odbiorcy w chwili utworzenia leada. Dla organizacji bez konfiguracji
+pozostaje kompatybilny fallback do najstarszego aktywnego Ownera; jego użycie
+jest stanem przejściowym, a nie docelową konfiguracją pilota. Publicznego adresu
+Fortez ani innych rzeczywistych danych klienta nie zapisujemy w repozytorium —
+wartość zostanie ustawiona dopiero w tenantowej konfiguracji środowiska.
+
+**Dlaczego:** w branżach wymagających szybkiego oddzwonienia, w tym w pilotażu
+Fortez, telefon jest podstawowym kanałem, a e-mail klienta nie zawsze jest
+dostępny. Jednocześnie firma może nie obsługiwać panelu, zaś firmowy adres
+kontaktowy może przekazywać wiadomości do istniejącej skrzynki. Wiązanie alertu
+z kontem Ownera wymuszałoby sztuczne konto albo wysyłkę do niewłaściwej osoby.
+Jawna polityka w wersji procesu i niezależny adres odbiorczy rozwiązują oba
+problemy bez osłabiania tenant isolation.
+
+**Konsekwencje:** `leads.contact_email` staje się nullable, a aplikacja, eksport,
+webhook i panel muszą bezpiecznie obsłużyć lead telefoniczny. Migracja jest
+forward-only i dodaje ograniczenie wymagające co najmniej jednego kanału
+kontaktu. Rollback aplikacji nie cofa schematu: snapshoty v2 pozostają poprawne,
+więc starszej wersji aplikacji nie wolno wdrożyć bez feature gate blokującego
+procesy `phone_required`. Wyłączenie nowej konfiguracji pozostawia historyczne
+snapshoty odbiorców w outboxie, a organizacje bez wpisu nadal korzystają z
+fallbacku Ownera. Przed dopuszczeniem prawdziwych leadów wymagane są negatywne
+testy RLS, UAT leada bez e-maila i kontrola rzeczywistej dostawy na skonfigurowany
+adres firmy.
+
+## ADR-040: serwerowa brama publicznego formularza z tenantową allowlistą originów
+
+**Status:** accepted dla podetapu FTZ-03A przygotowania pilotażu Fortez na
+podstawie polecenia kontynuacji właściciela produktu z 2026-08-10
+
+**Decyzja:** wszystkie przeglądarkowe endpointy formularza przechodzą przez
+jedną serwerową bramę przed wykonaniem operacji domenowej. Brama rozpoznaje
+opublikowany proces po `public_id` albo sesję wyłącznie po hashu tokenu,
+sprawdza dokładny znormalizowany origin oraz atomowo zużywa limity zapisane w
+PostgreSQL. Dozwolone originy są konfiguracją konkretnego procesu i
+organizacji, zarządzaną wyłącznie przez Ownera albo Admina. Zastąpienie listy
+blokuje wiersz procesu, aby dwa równoczesne zapisy nie złożyły konfiguracji.
+Hosted link z originu `APP_URL` pozostaje dozwolony. Żądanie przeglądarkowe z innym originem
+jest odrzucane przed odczytem manifestu i przed każdą mutacją. Odpowiedź CORS
+odzwierciedla wyłącznie zatwierdzony origin, dodaje `Vary: Origin` i nigdy nie
+używa wildcardu.
+
+Limiter jest rozproszony, ponieważ jego liczniki i stałe okna znajdują się w
+PostgreSQL, a nie w pamięci bezstanowej instancji aplikacji. Stosuje osobne
+budżety zależne od rodzaju operacji dla zahashowanego adresu klienta, originu,
+procesu, sesji i organizacji. Baza przechowuje wyłącznie HMAC-SHA-256 adresu IP
+oraz nieodwracalne hashe kluczy kubełków; surowy IP nie jest zapisywany ani
+logowany. Na Vercel źródłem adresu jest nadpisywany przez platformę
+`x-vercel-forwarded-for`. Poza środowiskiem lokalnym brak zaufanego nagłówka
+powoduje odrzucenie żądania. Odpowiedź 429 zawiera `Retry-After`.
+
+Publiczne RPC wykonujące operacje formularza tracą grant `anon`. Route
+Handlery po pozytywnym przejściu bramy używają serwerowego klienta wyłącznie do
+wąskich, `security definer` RPC. Dzięki temu bezpośrednie wywołanie Supabase nie
+omija origin allowlisty ani limitera. Service role nie trafia do klienta i nie
+jest używana w zwykłym ruchu panelu. Preflight bez tokenu może potwierdzić
+jedynie, czy origin występuje przy dowolnym aktywnym procesie; właściwe żądanie
+zawsze ponownie sprawdza origin dla konkretnego procesu lub sesji.
+
+**Dlaczego:** CORS jest kontrolą przeglądarki, a nie uwierzytelnieniem. Samo
+zastąpienie `*` allowlistą w Next.js pozostawiłoby anonimowe RPC Supabase jako
+pełne obejście. Limiter w pamięci pojedynczej funkcji również nie zapewnia
+globalnego budżetu po skalowaniu lub restarcie. Tenantowa konfiguracja pozwala
+uruchomić ten sam SaaS na domenach różnych klientów bez globalnego rozszerzania
+zaufania.
+
+**Konsekwencje:** przed osadzeniem procesu operator musi zapisać dokładny origin
+witryny, na przykład `https://example.pl`; ścieżki i wildcardy nie są
+akceptowane. Brak konfiguracji blokuje osadzenie cross-origin, ale nie hosted
+link. Brak nagłówka `Origin` nie jest traktowany jako uwierzytelnienie i dlatego
+nadal podlega limitom. Migracja jest expand-and-restrict: nowa tabela originów i
+prywatne kubełki są zgodne ze starszą aplikacją, lecz po odebraniu grantu `anon`
+rollback wymaga najpierw ponownego wdrożenia wersji korzystającej z bramy albo
+czasowego przywrócenia grantów według runbooka. Kubełki wygasają i mogą zostać
+usunięte bez wpływu na dane biznesowe. Adaptacyjny Turnstile jest osobnym
+podetapem FTZ-03B; ADR-041 zamyka jego implementację lokalną, ale konfiguracja i
+smoke środowiska nadal blokują produkcyjny GO.
+
+## ADR-041: adaptacyjny Turnstile na finalnym zapisie leada
+
+**Status:** accepted dla podetapu FTZ-03B przygotowania pilotażu Fortez na
+podstawie polecenia kontynuacji właściciela produktu z 2026-08-10
+
+**Decyzja:** każde produkcyjne wysłanie leada wymaga świeżego tokenu Cloudflare
+Turnstile. Widget używa jawnego renderowania z `appearance: interaction-only`
+oraz `execution: execute`: element weryfikacyjny pozostaje niewidoczny, gdy
+Cloudflare nie wymaga interakcji, ale nie tworzymy własnego, nieaudytowalnego
+scoringu ryzyka. Token jest dołączany wyłącznie do finalnego żądania submit i
+nie jest zapisywany w bazie, analytics ani logach. Tryb podglądu procesu nie
+tworzy leada i dlatego korzysta z lokalnego adaptera bez providera.
+
+Route Handler po pozytywnym origin/rate guardzie, walidacji tokenu sesji i
+payloadu, lecz przed RPC tworzącym lead, wywołuje serwerowe Siteverify. Wymaga
+`success`, zgodnej akcji `kwotum_lead_submit`, dozwolonego hosta oraz świeżego
+wyniku. Zaufany adres klienta jest przekazywany jako opcjonalny `remoteip`, ale
+nie jest utrwalany. `mutationId` jest `idempotency_key` walidacji, dzięki czemu
+jedno automatyczne ponowienie Siteverify po błędzie sieci używa tej samej
+operacji. Timeout, błąd providera, brak konfiguracji poza local, niezgodny host
+lub akcja oraz token zużyty, nieważny lub wygasły kończą się fail-closed przed
+zapisem leada. Ponowienie przez użytkownika zawsze pobiera nowy token, ponieważ
+token Turnstile jest jednorazowy.
+
+Publiczny site key i stała akcja są dokładane przez warstwę HTTP do manifestu
+runtime; immutable snapshot procesu i baza nie przechowują klucza providera.
+Sekret pozostaje wyłącznie po stronie serwera. Local może działać bez Turnstile
+tylko wtedy, gdy oba klucze są nieobecne; preview, staging i production
+wymagają kompletnej pary i blokują publiczną ścieżkę przy błędnej konfiguracji.
+Testy integracyjne używają wyłącznie oficjalnych kluczy testowych Cloudflare.
+
+Host aplikacji i wszystkie hosty osadzenia muszą być jawnie wpisane w ustawienia
+widgetu Cloudflare. CSP aplikacji i hosta klienta dopuszcza wyłącznie oficjalny
+origin challenge w `script-src` i `frame-src`; skrypt nie jest proxy'owany ani
+cache'owany przez Kwotum. Nie włączamy pre-clearance, nie uzależniamy działania
+od cookies Cloudflare i nie traktujemy Turnstile jako zamiennika walidacji,
+origin allowlisty, limitera ani kontroli uprawnień.
+
+**Dlaczego:** sprawdzanie wyłącznie po stronie klienta jest możliwe do ominięcia,
+a własny próg „podejrzanego” ruchu byłby trudny do wyjaśnienia, strojenia i
+testowania przed pierwszym pilotem. Managed challenge pozwala providerowi
+adaptować poziom tarcia, a obowiązkowe Siteverify utrzymuje jedną jednoznaczną
+bramę bezpieczeństwa przed utworzeniem danych biznesowych.
+
+**Konsekwencje:** awaria Turnstile może czasowo zablokować nowe leady Kwotum;
+pilot zachowuje więc dotychczasowy formularz lub kanał kontaktu jako jawny
+fallback operacyjny. Rollback aplikacji nie może po cichu wyłączyć weryfikacji:
+należy najpierw odłączyć embed albo przywrócić poprzedni kanał, a dopiero potem
+wycofać aplikację. Rotacja kluczy wymaga skoordynowanej zmiany Cloudflare i
+sekretów środowiska. Turnstile staje się kolejnym subprocessorem wymagającym
+zatwierdzenia prawnego i pozostaje pozycją produkcyjnego GO mimo ukończenia
+implementacji lokalnej.

@@ -5,11 +5,18 @@ import { mkdir } from "node:fs/promises";
 test.beforeAll(async () => {
   await mkdir("artifacts/redesign/after", { recursive: true });
   await mkdir("artifacts/visual-qa/12s-remaining-screens/after", { recursive: true });
+  await mkdir("artifacts/visual-qa/13b-ftz03b-turnstile", { recursive: true });
 });
 
 const publicId = "f0000000-0000-4000-8000-000000000001";
 const token = "d".repeat(64);
 const manifest = {
+  challenge: {
+    action: "kwotum_lead_submit",
+    appearance: "interaction-only",
+    provider: "turnstile",
+    siteKey: "1x00000000000000000000AA",
+  },
   entryStepKey: "service",
   intro: "Odpowiedz na dwa krótkie pytania.",
   leadCapture: {
@@ -76,11 +83,44 @@ const manifest = {
   title: "Testowy proces wyceny",
 };
 
-async function mockWidgetApi(page: Page, firstSaveOffline = false): Promise<string[]> {
+async function mockWidgetApi(
+  page: Page,
+  firstSaveOffline = false,
+  failFirstChallenge = false,
+): Promise<Readonly<{ analyticsEvents: string[]; submitTokens: string[] }>> {
   let revision = 0;
   let failSave = firstSaveOffline;
   const analyticsEvents: string[] = [];
+  const submitTokens: string[] = [];
   const answers: Record<string, unknown> = {};
+  await page.route("**/turnstile/v0/api.js?render=explicit", async (route) => {
+    await route.fulfill({
+      body: `(() => {
+        const widgets = new Map();
+        let nextId = 0;
+        let attempts = 0;
+        window.turnstile = {
+          render: (_container, options) => {
+            const id = "e2e-turnstile-" + (++nextId);
+            widgets.set(id, options);
+            return id;
+          },
+          execute: (id) => {
+            const options = widgets.get(id);
+            attempts += 1;
+            window.__kwotumTurnstileAttempts = attempts;
+            queueMicrotask(() => {
+              if (${String(failFirstChallenge)} && attempts === 1) options["expired-callback"]();
+              else options.callback("e2e-single-use-token-" + attempts);
+            });
+          },
+          remove: (id) => widgets.delete(id)
+        };
+      })();`,
+      contentType: "application/javascript",
+      status: 200,
+    });
+  });
   await page.route("**/api/v1/public/**", async (route: Route) => {
     const request = route.request();
     const url = new URL(request.url());
@@ -169,6 +209,12 @@ async function mockWidgetApi(page: Page, firstSaveOffline = false): Promise<stri
       return;
     }
     if (url.pathname.endsWith("/sessions/current/submit") && request.method() === "POST") {
+      const body = request.postDataJSON() as { challengeToken?: unknown };
+      if (typeof body.challengeToken !== "string") {
+        await route.fulfill({ body: "{}", status: 422 });
+        return;
+      }
+      submitTokens.push(body.challengeToken);
       await route.fulfill({
         body: JSON.stringify({
           leadPublicId: "e0000000-0000-4000-8000-000000000001",
@@ -204,11 +250,11 @@ async function mockWidgetApi(page: Page, firstSaveOffline = false): Promise<stri
     }
     await route.fulfill({ body: "{}", status: 404 });
   });
-  return analyticsEvents;
+  return { analyticsEvents, submitTokens };
 }
 
 test("hosted flow works by keyboard, survives network loss and passes axe", async ({ page }) => {
-  const analyticsEvents = await mockWidgetApi(page, true);
+  const { analyticsEvents } = await mockWidgetApi(page, true);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ height: 844, width: 390 });
   await page.goto(`/f/${publicId}`);
@@ -294,6 +340,50 @@ test("hosted flow works by keyboard, survives network loss and passes axe", asyn
     fullPage: true,
     path: "artifacts/visual-qa/12s-remaining-screens/after/widget-forced-colors-320x-full.png",
   });
+});
+
+test("expired Turnstile token is not submitted and retry obtains a fresh token", async ({
+  page,
+}) => {
+  const { submitTokens } = await mockWidgetApi(page, false, true);
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto(`/f/${publicId}`);
+
+  const widget = page.locator("wyceno-widget");
+  await widget.getByRole("button", { exact: true, name: "Nie zgadzam się" }).click();
+  await widget.getByLabel("Wariant standardowy").check();
+  await widget.getByRole("button", { name: "Dalej" }).click();
+  await widget.getByRole("textbox").fill("Gdańsk");
+  await widget.getByRole("button", { name: "Dalej" }).click();
+  await widget.getByLabel("E-mail").fill("klient@example.test");
+  await widget.getByLabel(/Potwierdzam zapoznanie/).check();
+  await page.screenshot({
+    animations: "disabled",
+    fullPage: true,
+    path: "artifacts/visual-qa/13b-ftz03b-turnstile/before-mobile-390x844.png",
+  });
+  await widget.getByRole("button", { name: "Wyślij zapytanie" }).click();
+
+  await expect(widget.getByRole("alert")).toContainText("Potwierdzenie bezpieczeństwa wygasło");
+  expect(submitTokens).toEqual([]);
+  await page.screenshot({
+    animations: "disabled",
+    fullPage: true,
+    path: "artifacts/visual-qa/13b-ftz03b-turnstile/retry-mobile-390x844.png",
+  });
+
+  await widget.getByRole("button", { name: "Wyślij zapytanie" }).click();
+  await expect(widget.getByRole("heading", { name: "Zapytanie zostało wysłane" })).toBeVisible();
+  expect(submitTokens).toEqual(["e2e-single-use-token-2"]);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as typeof window & { __kwotumTurnstileAttempts?: number })
+            .__kwotumTurnstileAttempts,
+      ),
+    )
+    .toBe(2);
 });
 
 test("hosted widget fills the desktop surface and preserves the result hierarchy", async ({

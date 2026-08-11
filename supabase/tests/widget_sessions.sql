@@ -54,13 +54,13 @@ revoke all on function test_support.widget_public_id() from public;
 revoke all on function test_support.widget_v2_public_id() from public;
 revoke all on function test_support.expire_widget_session(text) from public;
 revoke all on function test_support.raw_widget_token_is_stored(text) from public;
-grant usage on schema test_support to anon;
-grant execute on function test_support.widget_public_id() to anon;
-grant execute on function test_support.widget_v2_public_id() to anon;
-grant execute on function test_support.expire_widget_session(text) to anon;
-grant execute on function test_support.raw_widget_token_is_stored(text) to anon;
+grant usage on schema test_support to anon, service_role;
+grant execute on function test_support.widget_public_id() to anon, service_role;
+grant execute on function test_support.widget_v2_public_id() to anon, service_role;
+grant execute on function test_support.expire_widget_session(text) to anon, service_role;
+grant execute on function test_support.raw_widget_token_is_stored(text) to anon, service_role;
 
-set role anon;
+set role service_role;
 
 do $$
 declare
@@ -391,7 +391,7 @@ from public.published_flows published
 cross join generate_series(1, 120) as series(value)
 where published.public_id = test_support.widget_public_id();
 
-set role anon;
+set role service_role;
 do $$
 begin
   begin

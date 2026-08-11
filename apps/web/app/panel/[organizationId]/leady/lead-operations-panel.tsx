@@ -38,6 +38,7 @@ export function LeadOperationsPanel({
   canAssign,
   canManageAllTasks,
   contactEmail,
+  contactPhone,
   currentUserId,
   leadId,
   notes,
@@ -47,7 +48,8 @@ export function LeadOperationsPanel({
 }: Readonly<{
   canAssign: boolean;
   canManageAllTasks: boolean;
-  contactEmail: string;
+  contactEmail: string | null;
+  contactPhone: string | null;
   currentUserId: string;
   leadId: string;
   notes: Notes;
@@ -236,7 +238,10 @@ export function LeadOperationsPanel({
         {status === "new" ? (
           <LeadStartForm leadId={leadId} organizationId={organizationId} />
         ) : (
-          <a className="lead-reference-primary-action" href={`mailto:${contactEmail}`}>
+          <a
+            className="lead-reference-primary-action"
+            href={contactEmail ? `mailto:${contactEmail}` : `tel:${contactPhone ?? ""}`}
+          >
             Skontaktuj się z klientem
           </a>
         )}

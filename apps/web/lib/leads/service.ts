@@ -16,8 +16,9 @@ import { createClient } from "../supabase/server";
 import { deriveLeadOperationProjection } from "./operations";
 
 export type LeadSummary = Readonly<{
-  contactEmail: string;
+  contactEmail: string | null;
   contactName: string | null;
+  contactPhone: string | null;
   flowTitle: string;
   id: string;
   priceCurrency: string | null;
@@ -39,7 +40,7 @@ export type LeadDetail = Readonly<{
       type: "marketing_email" | "privacy_notice";
     }>
   >;
-  contactEmail: string;
+  contactEmail: string | null;
   contactName: string | null;
   contactPhone: string | null;
   files: ReadonlyArray<
@@ -137,7 +138,7 @@ export async function listLeads(
   let query = supabase
     .from("leads")
     .select(
-      "id, contact_email, contact_name, flow_title, price_currency, price_max_minor, price_min_minor, score, score_category_label, status, submitted_at",
+      "id, contact_email, contact_name, contact_phone, flow_title, price_currency, price_max_minor, price_min_minor, score, score_category_label, status, submitted_at",
     )
     .eq("organization_id", context.organizationId)
     .order("submitted_at", { ascending: false })
@@ -164,6 +165,7 @@ export async function listLeads(
   return data.map((lead) => ({
     contactEmail: lead.contact_email,
     contactName: lead.contact_name,
+    contactPhone: lead.contact_phone,
     flowTitle: lead.flow_title,
     id: lead.id,
     priceCurrency: lead.price_currency,

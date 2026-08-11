@@ -51,6 +51,8 @@ export type LeadSubmissionDraft = Readonly<{
   privacyAccepted: boolean;
 }>;
 
+export type ChallengeTokenProvider = () => Promise<string>;
+
 type ActiveSession = {
   analyticsConsent: boolean | null;
   answers: Record<string, WidgetAnswer>;
@@ -224,6 +226,13 @@ export class WidgetSessionController {
   async setAnalyticsConsent(granted: boolean): Promise<boolean> {
     const session = this.#session;
     if (!session) return false;
+    const previousConsent = session.analyticsConsent;
+    if (!granted) {
+      session.analyticsConsent = false;
+      this.#pendingAnalytics.splice(0);
+    }
+    this.#setState({ analyticsConsent: granted, analyticsError: null });
+    if (!granted) this.#persist();
     try {
       await this.#api.setAnalyticsConsent({
         consentVersion: "analytics-v1",
@@ -232,15 +241,16 @@ export class WidgetSessionController {
         token: session.token,
       });
       session.analyticsConsent = granted;
-      if (!granted) this.#pendingAnalytics.splice(0);
-      this.#setState({ analyticsConsent: granted, analyticsError: null });
       this.#persist();
       if (granted) void this.#flushAnalytics();
       return true;
     } catch {
+      if (granted) session.analyticsConsent = previousConsent;
       this.#setState({
+        analyticsConsent: granted ? previousConsent : false,
         analyticsError: "Nie zapisaliśmy tej decyzji. Sprawdź połączenie i spróbuj ponownie.",
       });
+      this.#persist();
       return false;
     }
   }
@@ -261,7 +271,10 @@ export class WidgetSessionController {
     if (session.analyticsConsent) void this.#flushAnalytics();
   }
 
-  async submitLead(draft: LeadSubmissionDraft): Promise<boolean> {
+  async submitLead(
+    draft: LeadSubmissionDraft,
+    challengeTokenProvider: ChallengeTokenProvider,
+  ): Promise<boolean> {
     const session = this.#session;
     const capture = session?.manifest.leadCapture;
     if (!session || !capture || session.currentStepKey !== null || !this.#state.result)
@@ -270,8 +283,18 @@ export class WidgetSessionController {
       this.#setState({ errorMessage: "Potwierdź zapoznanie się z informacją o prywatności." });
       return false;
     }
-    if (!draft.email.trim()) {
+    if (capture.contactPolicy === "email_required" && !draft.email.trim()) {
       this.#setState({ errorMessage: "Podaj adres e-mail." });
+      return false;
+    }
+    if (capture.contactPolicy === "phone_required" && !draft.phone?.trim()) {
+      this.#setState({ errorMessage: "Podaj numer telefonu." });
+      return false;
+    }
+    if (draft.marketingEmailAccepted && !draft.email.trim()) {
+      this.#setState({
+        errorMessage: "Podaj adres e-mail albo wyłącz zgodę na wiadomości marketingowe.",
+      });
       return false;
     }
     const unmatchedUploaded = [...this.#state.uploadedFiles];
@@ -298,9 +321,11 @@ export class WidgetSessionController {
         this.trackAnalytics("file_uploaded");
         this.#setState({ uploadedFiles: [...uploaded] });
       }
+      const challengeToken = await challengeTokenProvider();
       const submission = await this.#api.submitLead({
+        challengeToken,
         contact: {
-          email: draft.email.trim(),
+          ...(draft.email.trim() ? { email: draft.email.trim() } : {}),
           ...(draft.name?.trim() ? { name: draft.name.trim() } : {}),
           ...(draft.phone?.trim() ? { phone: draft.phone.trim() } : {}),
         },

@@ -32,7 +32,7 @@ export type WebhookEnvelopeV1 = Readonly<{
   data: Readonly<{
     lead: Readonly<{
       contact: Readonly<{
-        email: string;
+        email: string | null;
         name: string | null;
         phone: string | null;
       }>;

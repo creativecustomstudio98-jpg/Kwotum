@@ -79,7 +79,7 @@ export default async function OrganizationDashboard({
   const currentLeads = leadsInPeriod(leads, analytics.overview.period);
   const previousLeads = leadsInPeriod(leads, previousAnalytics.overview.period);
   const operationalLeads = leads.filter(
-    (lead) => !lead.contactEmail.startsWith("visualqa+wykres-"),
+    (lead) => !lead.contactEmail?.startsWith("visualqa+wykres-"),
   );
   const pricedLeads = currentLeads.filter(hasPlnEstimate);
   const previousPricedLeads = previousLeads.filter(hasPlnEstimate);
@@ -289,11 +289,21 @@ export default async function OrganizationDashboard({
                               />
                             ) : (
                               <span aria-hidden="true" className="panel-avatar">
-                                {initials(lead.contactName ?? lead.contactEmail)}
+                                {initials(
+                                  lead.contactName ??
+                                    lead.contactEmail ??
+                                    lead.contactPhone ??
+                                    "Klient",
+                                )}
                               </span>
                             )}
                             <span>
-                              <strong>{lead.contactName ?? lead.contactEmail}</strong>
+                              <strong>
+                                {lead.contactName ??
+                                  lead.contactEmail ??
+                                  lead.contactPhone ??
+                                  "Klient"}
+                              </strong>
                               <small>
                                 {lead.score === null ? "Bez score" : `${lead.score}/100`}
                               </small>
@@ -382,11 +392,15 @@ export default async function OrganizationDashboard({
                 {attentionLeads.map((lead) => (
                   <li key={lead.id}>
                     <span aria-hidden="true" className="panel-avatar">
-                      {initials(lead.contactName ?? lead.contactEmail)}
+                      {initials(
+                        lead.contactName ?? lead.contactEmail ?? lead.contactPhone ?? "Klient",
+                      )}
                     </span>
                     <div>
                       <strong>{lead.flowTitle}</strong>
-                      <small>{lead.contactName ?? lead.contactEmail}</small>
+                      <small>
+                        {lead.contactName ?? lead.contactEmail ?? lead.contactPhone ?? "Klient"}
+                      </small>
                     </div>
                     <p>
                       <PanelIcon name="notification" />

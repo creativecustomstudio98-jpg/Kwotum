@@ -3,7 +3,13 @@
 import { Button } from "@wyceno/ui";
 import { useActionState, useEffect, useRef } from "react";
 
-import { createFlowInvitationAction, initialFlowInvitationActionState } from "./actions";
+import { createFlowInvitationAction, type FlowInvitationActionState } from "./actions";
+
+const initialFlowInvitationActionState: FlowInvitationActionState = {
+  error: null,
+  invitationId: null,
+  success: null,
+};
 
 export function InvitationForm({
   flowId,

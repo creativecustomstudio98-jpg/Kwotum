@@ -6,6 +6,7 @@ import { getOrganizationSettings } from "../../../../lib/organizations/service";
 import { PanelPageHeader } from "../../panel-page-header";
 import { SettingsNavigation } from "../settings-navigation";
 import { OrganizationForm } from "./organization-form";
+import { NotificationDeliveryForm } from "./notification-delivery-form";
 
 export const metadata: Metadata = {
   robots: { follow: false, index: false },
@@ -23,6 +24,7 @@ export default async function OrganizationSettingsPage({
   const context = await requireTenantContext(organizationId);
   const settings = await getOrganizationSettings(context);
   const canEdit = hasCapability(context, "organization:update");
+  const canManageNotifications = hasCapability(context, "notification:manage");
 
   return (
     <main className="panel-workspace settings-panel">
@@ -53,6 +55,26 @@ export default async function OrganizationSettingsPage({
               slug={settings.slug}
             />
           </section>
+          {canManageNotifications ? (
+            <section
+              className="panel-card settings-detail-card"
+              aria-labelledby="lead-delivery-title"
+            >
+              <div className="panel-card__header settings-detail-card__heading">
+                <div>
+                  <h2 id="lead-delivery-title">Dostawa nowych leadów</h2>
+                  <p>
+                    Wiadomości trafiają na firmowy adres niezależnie od kont użytkowników panelu.
+                  </p>
+                </div>
+                <span className="panel-status panel-status--qualified">Owner / Admin</span>
+              </div>
+              <NotificationDeliveryForm
+                leadAlertEmail={settings.leadAlertEmail}
+                organizationId={organizationId}
+              />
+            </section>
+          ) : null}
           <section className="panel-card settings-identity-card">
             <div>
               <h2>Granica danych organizacji</h2>

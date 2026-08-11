@@ -50,6 +50,7 @@ export default async function FlowInstallationPage({
       <div className="panel-page">
         {installation.publicId && installation.publishedAt ? (
           <InstallationPanel
+            allowedOrigins={installation.allowedOrigins}
             appOrigin={appOrigin}
             currentVersion={installation.currentVersion ?? 1}
             flowId={flowId}

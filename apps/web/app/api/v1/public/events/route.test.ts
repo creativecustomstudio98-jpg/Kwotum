@@ -1,9 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("../../../../../lib/public-api/request-guard", () => ({
+  guardPublicOptions: vi.fn(),
+  guardPublicRequest: vi.fn().mockResolvedValue({
+    allowed: true,
+    context: { corsOrigin: null },
+  }),
+}));
 
 import { POST } from "./route";
 
 describe("public analytics events route", () => {
-  it("rejects arbitrary PII before accessing the database", async () => {
+  it("rejects arbitrary PII before the domain RPC", async () => {
     const response = await POST(
       new Request("https://app.wyceno.test/api/v1/public/events", {
         body: JSON.stringify({

@@ -16,7 +16,10 @@ import { parseWidgetManifest } from "./manifest.js";
 
 type ErrorEnvelope = { error?: { code?: unknown; message?: unknown } };
 
-function apiErrorCode(status: number): WidgetApiErrorCode {
+function apiErrorCode(status: number, providerCode?: unknown): WidgetApiErrorCode {
+  if (providerCode === "CHALLENGE_FAILED" || providerCode === "CHALLENGE_UNAVAILABLE") {
+    return "CHALLENGE";
+  }
   if (status === 404) return "NOT_FOUND";
   if (status === 409) return "CONFLICT";
   if (status === 410) return "EXPIRED";
@@ -39,7 +42,7 @@ async function requestJson(url: string, init?: RequestInit): Promise<unknown> {
   if (!response.ok) {
     const message =
       typeof body.error?.message === "string" ? body.error.message : "Żądanie nie powiodło się.";
-    throw new WidgetApiError(apiErrorCode(response.status), message);
+    throw new WidgetApiError(apiErrorCode(response.status, body.error?.code), message);
   }
   return body;
 }
@@ -162,6 +165,7 @@ export class HttpWidgetApi implements WidgetApi {
   async submitLead(input: SubmitLeadInput): Promise<WidgetSubmission> {
     const value = await requestJson(`${this.#baseUrl}/sessions/current/submit`, {
       body: JSON.stringify({
+        challengeToken: input.challengeToken,
         contact: input.contact,
         fileIds: input.fileIds,
         marketingEmailConsent: input.marketingEmailConsent,
@@ -213,7 +217,7 @@ export class HttpWidgetApi implements WidgetApi {
         typeof value.error?.message === "string"
           ? value.error.message
           : "Nie udało się przesłać pliku.";
-      throw new WidgetApiError(apiErrorCode(response.status), message);
+      throw new WidgetApiError(apiErrorCode(response.status, value.error?.code), message);
     }
     if (!isRecord(value)) throw new WidgetApiError("UNAVAILABLE", "Nieprawidłowa odpowiedź API.");
     return {

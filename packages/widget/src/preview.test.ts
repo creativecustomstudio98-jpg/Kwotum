@@ -28,6 +28,7 @@ describe("PreviewWidgetApi", () => {
     await expect(api.getResult(created.token)).resolves.toMatchObject({ pricing: null });
     await expect(
       api.submitLead({
+        challengeToken: "preview-local",
         contact: { email: "preview@example.test" },
         fileIds: [],
         marketingEmailConsent: null,

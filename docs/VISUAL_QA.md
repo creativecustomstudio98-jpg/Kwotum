@@ -429,3 +429,63 @@ naruszeń desktop/mobile, a cleanup pozostawia 0 rekordów syntetycznego tenanta
 Overlay 50% oraz difference ×3 obejmują pełny desktop. Źródło 12S określa
 anatomię integracji, nie treść webhooka; brak osobnej referencji mobile
 pozostawia transformację na 3/4. Szczegółową listę różnic zapisuje `diff.md`.
+
+## Etap 12ZK — ustawienia dostawy nowych leadów
+
+- zakres: karta `Dostawa nowych leadów` na
+  `/panel/[organizationId]/ustawienia`;
+- źródło anatomii: zaakceptowany ekran ustawień 12S 1536 × 1024, SHA-256
+  `af0e83d101f559587ba060072a20a56429102fcca4606001685c88f40f135766`;
+- artefakty: `artifacts/visual-qa/12zk-contact-delivery-settings/`;
+- wynik: **PASS, 19/20**; kompletność 4, geometria 4, typografia 4, gęstość
+  i stany 3, transformacja mobile 4;
+- desktop zachowuje istniejącą oś i szerokość kart, a mobile 390 × 844 składa
+  etykietę, pole, opis i działającą akcję do jednej kolumny bez overflow;
+- dostęp do karty i zapisu mają wyłącznie Owner/Admin; Sales nie otrzymuje
+  danych konfiguracyjnych ani kontrolki.
+
+Izolowany scenariusz produkcyjnego standalone przechodzi 1/1, axe nie zgłasza
+naruszeń, a cleanup pozostawia 0 rekordów syntetycznych. Pełny bieżący E2E jest
+blokowany przez równoległy Etap 12ZL na niezwiązanym ekranie wyboru organizacji;
+szczegóły, difference i kryteria odbioru zapisuje `diff.md`.
+
+## Podetap 13B / FTZ-03A — originy publicznego formularza
+
+- zakres: karta `Dozwolone domeny` i spójność dolnej powierzchni instalacji na
+  `/panel/[organizationId]/procesy/[flowId]/instalacja`;
+- referencja języka panelu: zaakceptowany szczegół leada 1536 × 1024 z 12O;
+  stan `before-template-redesign.png` został odrzucony jako zbyt generyczny;
+- artefakty: `artifacts/visual-qa/13b-ftz03a-public-guard/`;
+- wynik: **PASS, 19/20**; kompletność 4, geometria 4, typografia 4, gęstość
+  i stany 4, transformacja mobile 3;
+- desktop 1536 × 1024 używa jednej powierzchni z pionowym podziałem, sekcjami
+  liniowymi i płaskimi statusami zamiast zestawu kart SaaS;
+- mobile 390 × 844 składa etykietę, textarea i akcję w jedną kolumnę bez
+  poziomego overflow.
+
+Izolowany scenariusz produkcyjnego standalone przechodzi 1/1, axe nie zgłasza
+naruszeń, a cleanup pozostawia 0 rekordów syntetycznych. Ten sam test potwierdza
+zapis dwóch originów po reloadzie, exact CORS, odmowę obcej witryny, preflight
+oraz `429` z `Retry-After`. `reference.png`, `after.png`, overlay 50% i
+difference obejmują zmieniony region przy identycznym płótnie;
+`redesign-before-after.png` dokumentuje usunięcie generycznego układu kart, a
+pełny mobilny render ma 390 × 3622 px. Szczegółowe różnice zapisuje `diff.md`.
+
+## Podetap 13B / FTZ-03B — adaptacyjny Turnstile
+
+- zakres: mobilny stan finalnego submitu po wygaśnięciu tokenu;
+- źródło języka: zaakceptowany widget 12S, lokalny `reference.png`, SHA-256
+  `b2893072a81ada2c8b27fb7c2ee754d0c67bb77b28e36705caf3301704bc41c9`;
+- artefakty: `artifacts/visual-qa/13b-ftz03b-turnstile/`;
+- wynik: **PASS, 19/20**; kompletność 4, geometria 4, typografia 4, gęstość i
+  stany 3, transformacja mobile 4;
+- viewport 390 × 844 zapisuje pełny formularz 390 × 1437 bez poziomego
+  overflow, utraty pól i stale widocznej karty CAPTCHA;
+- komunikat wygaśnięcia ma `role=alert`, zachowuje dane i prowadzi do tej samej
+  działającej akcji, która pobiera nowy token.
+
+Pełny `widget.spec.ts` przechodzi 4/4 na mobile i desktop wraz z axe,
+klawiaturą, forced colors, hostile host CSS oraz retry. Stub providera
+potwierdza zero wywołań submit po wygasłym tokenie i dokładnie jeden submit po
+drugim tokenie. Rzeczywista interaktywna ramka pozostaje elementem UAT na
+docelowych hostach Cloudflare.

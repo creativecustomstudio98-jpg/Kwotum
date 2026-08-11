@@ -220,15 +220,47 @@ function parseConsentContent(value: unknown): WidgetConsentContent {
   };
 }
 
-function parseLeadCapture(value: unknown): WidgetManifest["leadCapture"] {
-  if (value === null) return null;
+function parseChallenge(value: unknown): WidgetManifest["challenge"] {
+  if (value === null || value === undefined) return null;
   if (
     !isRecord(value) ||
-    value.leadCaptureSchemaVersion !== 1 ||
+    value.action !== "kwotum_lead_submit" ||
+    value.appearance !== "interaction-only" ||
+    value.provider !== "turnstile" ||
+    typeof value.siteKey !== "string" ||
+    value.siteKey.length < 3 ||
+    value.siteKey.length > 32 ||
+    !/^[A-Za-z0-9_-]+$/.test(value.siteKey)
+  ) {
+    throw new Error("Nieprawidłowa konfiguracja zabezpieczenia formularza.");
+  }
+  return {
+    action: value.action,
+    appearance: value.appearance,
+    provider: value.provider,
+    siteKey: value.siteKey,
+  };
+}
+
+function parseLeadCapture(value: unknown): WidgetManifest["leadCapture"] {
+  if (value === null) return null;
+  const schemaVersion = isRecord(value) ? value.leadCaptureSchemaVersion : null;
+  if (
+    !isRecord(value) ||
+    (schemaVersion !== 1 && schemaVersion !== 2) ||
     typeof value.filesEnabled !== "boolean" ||
     !isRecord(value.privacyNotice)
   ) {
     throw new Error("Nieprawidłowa konfiguracja danych kontaktowych.");
+  }
+  const contactPolicy =
+    schemaVersion === 1
+      ? "email_required"
+      : value.contactPolicy === "email_required" || value.contactPolicy === "phone_required"
+        ? value.contactPolicy
+        : null;
+  if (contactPolicy === null) {
+    throw new Error("Nieprawidłowa polityka danych kontaktowych.");
   }
   const policyUrl = value.privacyNotice.policyUrl;
   if (
@@ -238,8 +270,9 @@ function parseLeadCapture(value: unknown): WidgetManifest["leadCapture"] {
     throw new Error("Nieprawidłowy adres polityki prywatności.");
   }
   return {
+    contactPolicy,
     filesEnabled: value.filesEnabled,
-    leadCaptureSchemaVersion: 1,
+    leadCaptureSchemaVersion: schemaVersion,
     marketingEmailConsent:
       value.marketingEmailConsent === null
         ? null
@@ -281,6 +314,7 @@ export function parseWidgetManifest(value: unknown): WidgetManifest {
     throw new Error("Manifest ma nieobsługiwany wynik.");
   }
   return {
+    challenge: parseChallenge(value.challenge),
     entryStepKey,
     intro: requiredString(value, "intro", 800),
     leadCapture: parseLeadCapture(value.leadCapture),

@@ -8,15 +8,20 @@ implementuje eksportu ani automatycznej retencji.
 
 ## Kontakt i potwierdzenia
 
-Wynik orientacyjny pojawia się przed kontaktem. Formularz wymaga adresu e-mail;
-imię i telefon są opcjonalne. Opublikowany snapshot może włączyć
-`leadCaptureSchemaVersion: 1` i zawiera wtedy wersjonowaną informację
+Wynik orientacyjny pojawia się przed kontaktem. Snapshot
+`leadCaptureSchemaVersion: 1` zachowuje wymagany e-mail i opcjonalny telefon.
+Wersja 2 wybiera jawną politykę `email_required` albo `phone_required`; zawsze
+musi istnieć co najmniej jeden kanał. Snapshot zawiera wersjonowaną informację
 prywatności oraz opcjonalną, odrębną zgodę marketingową. Widget:
 
 - nie zaznacza kontrolek domyślnie;
 - wymaga potwierdzenia informacji prywatności;
 - przesyła wersję i SHA-256 dokładnie z manifestu;
 - nigdy nie uzależnia wysłania zapytania od zgody marketingowej.
+
+Zgoda marketingowa e-mail jest dozwolona wyłącznie, gdy respondent podał
+e-mail. Proces phone-first może wysłać lead bez e-maila; firma otrzyma wtedy
+telefon, a potwierdzenie e-mail dla respondenta nie jest tworzone.
 
 Baza porównuje dowód z immutable snapshotem. Rekord zgody/potwierdzenia zawiera
 typ, wersję, hash i czas; nie kopiuje pełnej treści prawnej.

@@ -552,7 +552,7 @@ export type Database = {
       >;
       leads: Table<
         {
-          contact_email: string;
+          contact_email: string | null;
           contact_name: string | null;
           contact_phone: string | null;
           erasure_pending_at: string | null;
@@ -579,7 +579,7 @@ export type Database = {
           updated_at: string;
         },
         {
-          contact_email: string;
+          contact_email?: string | null;
           contact_name?: string | null;
           contact_phone?: string | null;
           erasure_pending_at?: string | null;
@@ -606,7 +606,7 @@ export type Database = {
           updated_at?: string;
         },
         {
-          contact_email?: string;
+          contact_email?: string | null;
           contact_name?: string | null;
           contact_phone?: string | null;
           erasure_pending_at?: string | null;
@@ -874,6 +874,29 @@ export type Database = {
           user_id?: string;
         }
       >;
+      organization_notification_settings: Table<
+        {
+          created_at: string;
+          lead_alert_email: string;
+          organization_id: string;
+          updated_at: string;
+          updated_by: string;
+        },
+        {
+          created_at?: string;
+          lead_alert_email: string;
+          organization_id: string;
+          updated_at?: string;
+          updated_by: string;
+        },
+        {
+          created_at?: string;
+          lead_alert_email?: string;
+          organization_id?: string;
+          updated_at?: string;
+          updated_by?: string;
+        }
+      >;
       organization_data_policies: Table<
         {
           created_at: string;
@@ -947,6 +970,29 @@ export type Database = {
           display_name?: string | null;
           id?: string;
           updated_at?: string;
+        }
+      >;
+      public_flow_origins: Table<
+        {
+          created_at: string;
+          created_by: string;
+          flow_id: string;
+          organization_id: string;
+          origin: string;
+        },
+        {
+          created_at?: string;
+          created_by: string;
+          flow_id: string;
+          organization_id: string;
+          origin: string;
+        },
+        {
+          created_at?: string;
+          created_by?: string;
+          flow_id?: string;
+          organization_id?: string;
+          origin?: string;
         }
       >;
       published_flows: Table<
@@ -1393,10 +1439,12 @@ export type Database = {
           worker_id: string;
         };
         Returns: Array<{
+          answers: Json;
           attempt_number: number;
           company_name: string;
-          contact_email: string;
+          contact_email: string | null;
           contact_name: string | null;
+          contact_phone: string | null;
           flow_title: string;
           kind: NotificationKind;
           lead_id: string;
@@ -1514,6 +1562,17 @@ export type Database = {
         Args: { target_public_id: string };
         Returns: Json;
       };
+      enforce_public_request_guard: {
+        Args: {
+          application_origin: string;
+          client_fingerprint: string;
+          request_action: string;
+          request_origin: string | null;
+          session_token?: string | null;
+          target_public_id?: string | null;
+        };
+        Returns: Json;
+      };
       disconnect_wordpress: {
         Args: { connector_credential: string };
         Returns: boolean;
@@ -1570,6 +1629,10 @@ export type Database = {
       };
       get_widget_manifest: {
         Args: { target_public_id: string };
+        Returns: Json;
+      };
+      get_flow_installation_manifest: {
+        Args: { target_flow_id: string; target_organization_id: string };
         Returns: Json;
       };
       get_analytics_overview: {
@@ -1742,6 +1805,18 @@ export type Database = {
           session_token: string;
         };
         Returns: Json;
+      };
+      set_organization_lead_alert_email: {
+        Args: { target_email: string; target_organization_id: string };
+        Returns: undefined;
+      };
+      set_public_flow_origins: {
+        Args: {
+          target_flow_id: string;
+          target_organization_id: string;
+          target_origins: string[];
+        };
+        Returns: undefined;
       };
       validate_flow: {
         Args: { target_flow_id: string };
