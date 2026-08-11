@@ -2697,17 +2697,18 @@ CSP Fortez, prawnego zatwierdzenia dostawcy i smoke na rzeczywistym embedzie.
 
 #### Podetap FTZ-05 — publiczna treść procesu Fortez
 
-**Stan lokalny 2026-08-11:** produkcyjny UAT procesu „Dobór przyczepy Neptun”
-ujawnił odziedziczony z szablonu tytuł i wprowadzenie „Meble na wymiar”. Model
-danych i manifest były poprawne, ale builder nie udostępniał edycji pól
-`document.title` i `document.intro`. Hotfix dodaje te pola do istniejącego
-inspektora bez zmiany geometrii kolumn, rozdziela ich walidację od tytułu
-pytania oraz pokrywa zapis, reload, fokus błędu, mobile, axe i overflow.
+**Stan lokalny 2026-08-11:** wersja 2 procesu „Dobór przyczepy Neptun” jest
+opublikowana z poprawnym tytułem i wprowadzeniem. Końcowy UAT ujawnił osobny
+błąd granicy PostgREST/RPC: `null` z przycisku „Pomiń” docierał jako SQL
+`NULL`, przez co pole opcjonalne zwracało 503 i widget przechodził w stan
+offline. Hotfix normalizuje wartość przed walidacją, zachowuje blokadę pól
+wymaganych i dodaje produkcyjnie zgodny test regresji.
 
 - [x] Ujawnić publiczny tytuł i wprowadzenie w builderze z limitami schematu.
 - [x] Rozdzielić walidację treści formularza od walidacji aktywnego pytania.
 - [x] Dodać regresję autosave/reload, klawiatury, axe, mobile i overflow.
-- [ ] Wdrożyć hotfix, ustawić poprawne treści Fortez i opublikować wersję 2.
+- [x] Wdrożyć hotfix treści, ustawić poprawne dane Fortez i opublikować wersję 2.
+- [ ] Wdrożyć i zweryfikować hotfix „Pomiń” dla pól opcjonalnych.
 - [ ] Wykonać syntetyczny submit, potwierdzić lead i dostawę alertu firmy.
 - [ ] Osadzić popup na stronie Fortez dopiero po technicznym i prawnym GO.
 

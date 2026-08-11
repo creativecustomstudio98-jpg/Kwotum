@@ -6,6 +6,11 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Zapis odpowiedzi normalizuje teraz SQL `NULL` przekazany przez PostgREST do
+  jawnego JSON-owego `null`, zanim sprawdzi wymaganie, trasę i zapis sesji.
+  Dzięki temu „Pomiń” działa dla pól opcjonalnych bez stanu offline, ale nadal
+  nie może ominąć pola wymaganego. Regresję pokrywa produkcyjnie zgodny test RPC.
+
 - Builder udostępnia teraz osobne pola „Tytuł formularza” i „Wprowadzenie” dla
   publicznego hosted linku oraz embedu. Walidacja rozróżnia treść otwarcia od
   tytułu aktywnego pytania, prowadzi fokus do właściwego pola i zachowuje
