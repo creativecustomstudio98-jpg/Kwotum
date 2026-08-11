@@ -2570,8 +2570,9 @@ regresji dostępności.
 **Gate zamknięty lokalnie 2026-08-11:** format i `git diff --check` przechodzą;
 web ma zielone lint, typecheck i unit 161/161, email ma zielone lint, typecheck,
 unit 18/18 i build, pełny build monorepo przechodzi 16/16, a responsywny Chromium
-E2E przechodzi 8/8 dla viewportów od 320 px do 1536 px. W runtime nie pozostały
-odwołania do poprzedniego `Logoicon.svg`.
+E2E przechodzi 34/34 dla marketingu oraz 8/8 dla wspólnego shellu na viewportach
+od 320 px do 1536 px. W runtime nie pozostały odwołania do poprzedniego
+`Logoicon.svg`.
 
 ## Etap 13 — Produkcja
 
