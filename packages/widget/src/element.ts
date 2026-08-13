@@ -200,7 +200,14 @@ export class WycenoWidgetElement extends HTMLElement {
   }
 
   get compactInline(): boolean {
-    return this.mode === "inline" && this.getAttribute("inline-layout") === "compact";
+    return (
+      this.mode === "inline" &&
+      (this.getAttribute("inline-layout") === "compact" || this.integratedInline)
+    );
+  }
+
+  get integratedInline(): boolean {
+    return this.mode === "inline" && this.getAttribute("inline-layout") === "integrated";
   }
 
   get previewManifest(): WidgetManifest | null {
@@ -487,7 +494,7 @@ export class WycenoWidgetElement extends HTMLElement {
     content.append(progressRegion);
 
     const stage = create("div", "wyceno-stage");
-    if (state.history.length === 0 && state.status === "active") {
+    if (state.history.length === 0 && state.status === "active" && !this.integratedInline) {
       const introduction = create("div", "wyceno-introduction");
       introduction.append(
         create("p", "wyceno-eyebrow", `Krótki dobór · ${manifest.steps.length} pytań`),
@@ -496,7 +503,11 @@ export class WycenoWidgetElement extends HTMLElement {
       introduction.append(create("p", "wyceno-intro", manifest.intro));
       stage.append(introduction);
     }
-    if (!this.previewMode) stage.append(this.#renderAnalyticsConsent(state));
+    const analyticsConsent = this.previewMode ? null : this.#renderAnalyticsConsent(state);
+    const appendAnalyticsConsent = (): void => {
+      if (analyticsConsent && !analyticsConsent.isConnected) stage.append(analyticsConsent);
+    };
+    if (!this.integratedInline) appendAnalyticsConsent();
     content.append(stage);
 
     if (state.status === "calculating_result") {
@@ -513,6 +524,7 @@ export class WycenoWidgetElement extends HTMLElement {
         ),
       );
       stage.append(status);
+      appendAnalyticsConsent();
       return content;
     }
 
@@ -579,6 +591,7 @@ export class WycenoWidgetElement extends HTMLElement {
           );
         }
         stage.append(confirmation);
+        appendAnalyticsConsent();
         return content;
       }
       if (state.status === "submitting") {
@@ -589,17 +602,20 @@ export class WycenoWidgetElement extends HTMLElement {
             "Bezpiecznie zapisujemy pliki, odpowiedzi i dane kontaktowe…",
           ),
         );
+        appendAnalyticsConsent();
         return content;
       }
       if (manifest.leadCapture) {
         stage.append(this.#renderLeadCapture(state));
       }
+      appendAnalyticsConsent();
       return content;
     }
 
     if (state.currentStep) {
       stage.append(this.#renderStep(state.currentStep, state));
     }
+    appendAnalyticsConsent();
     return content;
   }
 
@@ -1127,7 +1143,7 @@ export class WycenoWidgetElement extends HTMLElement {
   }
 
   #shellClassName(): string {
-    return `wyceno-shell wyceno-shell--${this.mode}${this.compactInline ? " wyceno-shell--inline-compact" : ""}`;
+    return `wyceno-shell wyceno-shell--${this.mode}${this.compactInline ? " wyceno-shell--inline-compact" : ""}${this.integratedInline ? " wyceno-shell--inline-integrated" : ""}`;
   }
 }
 

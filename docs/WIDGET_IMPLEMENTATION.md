@@ -47,6 +47,15 @@ uzupełnieniu potwierdza gotowość. Nie stosujemy automatycznego przejścia po
 kliknięciu opcji, ponieważ użytkownik musi móc poprawić wybór przed zapisem,
 a obsługa klawiaturą i czytnikiem ekranu pozostaje przewidywalna.
 
+`inline-layout="integrated"` rozszerza kontrakt kompaktowy dla sekcji, w której
+host zapewnia już tytuł, instrukcję i identyfikację firmy. Wariant usuwa
+wizualną kartę, powtórzony region marki i drugie wprowadzenie, ale zachowuje
+status zapisu, progress, legendę pytania, walidację i wszystkie kontrolki.
+Zgoda analityczna pozostaje opcjonalna i dostępna klawiaturą, lecz jest
+renderowana po aktywnym formularzu, aby nie udawała pierwszego obowiązkowego
+kroku. Integrator musi przekazać kompletny, kontrastowy zestaw powierzchni,
+tekstu, obramowań i fokusu; brak tokenów nadal daje bezpieczne wartości Kwotum.
+
 `api-base` powinien jawnie wskazywać origin Kwotum w kodzie instalacyjnym.
 Renderer ma kompatybilny fallback do originu własnego modułu, dzięki czemu
 starszy cross-origin embed nie próbuje wywoływać API domeny gospodarza.
@@ -130,6 +139,7 @@ ani skryptu wewnętrznego procesu:
 
 | Właściwość                               | Rola                                          |
 | ---------------------------------------- | --------------------------------------------- |
+| `--wyceno-widget-color-scheme`           | natywne kontrolki w motywie `light` / `dark`  |
 | `--wyceno-widget-font-family`            | tekst i kontrolki                             |
 | `--wyceno-widget-heading-font-family`    | nagłówki oraz legendy                         |
 | `--wyceno-widget-heading-font-weight`    | waga nagłówków                                |
@@ -146,6 +156,7 @@ ani skryptu wewnętrznego procesu:
 | `--wyceno-widget-border`                 | zwykłe obramowanie                            |
 | `--wyceno-widget-border-strong`          | mocne obramowanie opcji                       |
 | `--wyceno-widget-secondary-border`       | ramka secondary i zamknięcia                  |
+| `--wyceno-widget-error`                  | czytelny komunikat błędu                      |
 | `--wyceno-widget-control-radius`         | pola, opcje i przyciski                       |
 | `--wyceno-widget-panel-radius`           | karta procesu                                 |
 | `--wyceno-widget-symbol-radius`          | znak wyniku                                   |

@@ -766,40 +766,59 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
     element.style.setProperty("--wyceno-widget-backdrop", "rgb(23 26 27 / 72%)");
     element.setAttribute("brand-name", "Fortez");
     element.setAttribute("brand-subtitle", "6 pytań · około 2 min");
-    element.setAttribute("inline-layout", "compact");
+    element.setAttribute("inline-layout", "integrated");
+    element.style.setProperty("--wyceno-widget-color-scheme", "dark");
+    element.style.setProperty("--wyceno-widget-surface", "#171a1b");
+    element.style.setProperty("--wyceno-widget-soft", "#222728");
+    element.style.setProperty("--wyceno-widget-text", "#f4f5f4");
+    element.style.setProperty("--wyceno-widget-muted", "#a9afad");
+    element.style.setProperty("--wyceno-widget-border", "#394041");
+    element.style.setProperty("--wyceno-widget-border-strong", "#727a77");
+    element.style.setProperty("--wyceno-widget-secondary-border", "#727a77");
+    element.style.setProperty("--wyceno-widget-primary-soft", "#382317");
+    element.style.setProperty("--wyceno-widget-accent-text", "#ff8a4a");
+    element.style.setProperty("--wyceno-widget-error", "#ff9b9e");
     element.setAttribute("mode", "inline");
+    document.body.style.background = "#171a1b";
   });
   const inlineCard = widget.locator(".wyceno-card");
   const inlinePrimary = widget.getByRole("button", { name: "Dalej" });
   await expect(inlineCard).toBeVisible();
+  await expect(inlineCard).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(widget.locator(".wyceno-brand")).toHaveCSS("display", "none");
+  await expect(widget.locator(".wyceno-introduction")).toHaveCount(0);
   await expect(inlinePrimary).toBeDisabled();
   await expect(widget.getByText("Wybierz lub wpisz odpowiedź, aby przejść dalej.")).toBeVisible();
   await widget.getByRole("radio").first().check();
   await expect(inlinePrimary).toBeEnabled();
   await expect(widget.getByText("Gotowe — przejdź do następnego kroku.")).toBeVisible();
+  await widget.evaluate((element) => element.scrollIntoView({ block: "start" }));
   const inlineGeometry = await inlineCard.evaluate((card) => {
     const actions = card.querySelector<HTMLElement>(".wyceno-actions");
+    const analytics = card.querySelector<HTMLElement>(".wyceno-analytics");
     const choices = card.querySelector<HTMLElement>(".wyceno-choices");
-    if (!actions || !choices) throw new Error("Missing inline guidance controls");
+    if (!actions || !analytics || !choices) throw new Error("Missing inline guidance controls");
     const actionsRect = actions.getBoundingClientRect();
+    const analyticsRect = analytics.getBoundingClientRect();
     const choicesRect = choices.getBoundingClientRect();
     return {
       actionGap: Math.round(actionsRect.top - choicesRect.bottom),
+      analyticsAfterAction: analyticsRect.top >= actionsRect.bottom,
       cardHeight: Math.round(card.getBoundingClientRect().height),
       horizontalOverflow: card.scrollWidth - card.clientWidth,
     };
   });
   expect(inlineGeometry.actionGap).toBeLessThanOrEqual(64);
+  expect(inlineGeometry.analyticsAfterAction).toBe(true);
   expect(inlineGeometry.cardHeight).toBeLessThan(720);
   expect(inlineGeometry.horizontalOverflow).toBe(0);
-  await page.screenshot({
+  await inlineCard.screenshot({
     animations: "disabled",
-    fullPage: false,
-    path: "artifacts/visual-qa/13g-widget-inline-guidance/after/widget-inline-guidance-1440.png",
+    path: "artifacts/visual-qa/13h-widget-inline-integrated/after/widget-inline-integrated-1440.png",
   });
 
   await page.setViewportSize({ height: 844, width: 390 });
-  await inlinePrimary.scrollIntoViewIfNeeded();
+  await widget.evaluate((element) => element.scrollIntoView({ block: "start" }));
   const inlineMobileGeometry = await inlineCard.evaluate((card) => {
     const actions = card.querySelector<HTMLElement>(".wyceno-actions");
     const guidance = card.querySelector<HTMLElement>(".wyceno-step-guidance");
@@ -819,9 +838,8 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
   });
   const inlineAccessibility = await new AxeBuilder({ page }).include("wyceno-widget").analyze();
   expect(inlineAccessibility.violations).toEqual([]);
-  await page.screenshot({
+  await inlineCard.screenshot({
     animations: "disabled",
-    fullPage: false,
-    path: "artifacts/visual-qa/13g-widget-inline-guidance/after/widget-inline-guidance-390x844.png",
+    path: "artifacts/visual-qa/13h-widget-inline-integrated/after/widget-inline-integrated-390x844.png",
   });
 });
