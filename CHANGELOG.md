@@ -6,6 +6,15 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Jasna powierzchnia aktywnej pozycji sidebara kończy się teraz 16 px przed
+  prawą krawędzią w wariancie rozwiniętym. W zwiniętym zaczyna się równo z
+  lewym brzegiem bez zaokrąglenia, a prawy skos kończy się 10 px przed prawym
+  brzegiem raila. Routing, focus, wymiary 256/72 px i mobilna nawigacja
+  pozostają bez zmian.
+
+- Tranzytywne `nanoid` jest przypięte do `3.3.18`, która usuwa podatność
+  GHSA-2v37-7h3g-55p8 wykrytą przez gate zależności.
+
 - Desktopowy sidebar panelu Kwotum ma teraz finalną geometrię 256/72 px,
   płaskie tło `#0d2b24`, lokalny Instrument Sans, grupy Praca/Narzędzia/System
   oraz aktywną zakładkę z dwoma prawymi ścięciami. Zachowano routing,

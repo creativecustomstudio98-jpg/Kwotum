@@ -1412,9 +1412,12 @@ zaakceptowanej referencji i specyfikacji właściciela z 2026-08-13
 **Decyzja:** wspólny desktopowy sidebar `/panel/[organizationId]` pozostaje
 jednym komponentem z capability-gated konfiguracją, ale przyjmuje płaski język
 Kwotum: 256 px w stanie rozwiniętym, 72 px w stanie zwiniętym, tło `#0d2b24`,
-trzy nazwane grupy oraz jasną aktywną zakładkę dochodzącą do prawej krawędzi i
-zakończoną dwoma ścięciami. Nie używa gradientu, poświaty, blur, tekstury,
-cienia ani powierzchni glass. App shell ma jedno źródło szerokości
+trzy nazwane grupy oraz jasną aktywną zakładkę zakończoną dwoma ścięciami.
+W stanie rozwiniętym aktywna powierzchnia kończy się 16 px przed prawą
+krawędzią sidebara. W stanie zwiniętym zaczyna się równo z lewą krawędzią
+raila, bez lewego zaokrąglenia, a prawy skos kończy się 10 px przed jego prawą
+krawędzią. Nie używa gradientu,
+poświaty, blur, tekstury, cienia ani powierzchni glass. App shell ma jedno źródło szerokości
 `--kw-sidebar-width`; trasy i ekrany nie otrzymują lokalnych `margin-left`.
 
 Tokeny `--kw-sidebar-*` są ograniczonym, semantycznym kontraktem komponentu
@@ -1442,3 +1445,15 @@ wyłącznie w nawigacji; istniejąca trasa organizacji pozostaje bez zmian.
 Serwerowe źródła organizacji, profilu, capabilities, auth i tenant scope nie są
 modyfikowane. Rollback usuwa font i tokeny P1, przywraca 240/78 oraz poprzedni
 CSS, nie dotykając danych ani preferencji użytkownika.
+
+**Korekta geometrii 2026-08-13:** nowszy zaakceptowany zrzut właściciela,
+3338 × 1962 px, SHA-256
+`b08ac479744086b70850339e9a3b427dfb6509d443745887f91565989be55e4d`,
+zastępuje wcześniejszą interpretację wyłącznie w zakończeniu aktywnej pozycji.
+Jasna powierzchnia nie dochodzi już do prawego brzegu; skos pozostaje wewnątrz
+sidebara. Link, focus, routing i geometria app shellu pozostają bez zmian.
+
+Finalny zaakceptowany crop zwiniętego wariantu, 236 × 200 px, SHA-256
+`a35d9b646ed18fc1d85c23c01e8ee5da6f4a697011b652051cd43a942360334d`,
+doprecyzowuje wyjątek: po collapse jasna powierzchnia zaczyna się równo z lewą
+krawędzią raila, bez lewego zaokrąglenia, a prawy skos pozostaje wewnątrz.
