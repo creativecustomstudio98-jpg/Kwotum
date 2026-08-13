@@ -34,19 +34,20 @@ reduced motion i forced colors.
 
 ## Transformacje modułów
 
-| Moduł            | Desktop                                          | Tablet                                         | Mobile                                                    |
-| ---------------- | ------------------------------------------------ | ---------------------------------------------- | --------------------------------------------------------- |
-| Hero             | copy → odpowiedzi → lead                         | relacja nadal pozioma, copy może przejść wyżej | mini odpowiedzi i lead obok siebie                        |
-| Pasek danych     | 6 kolumn                                         | 3 × 2 albo 6 kompaktowych pozycji              | 3 × 2                                                     |
-| Demo             | kroki / pytanie / live lead                      | dwie kolumny z zachowaną kolejnością           | pełny krok, wynik poniżej                                 |
-| Tabela leadów    | gęsta tabela                                     | mniej kolumn i kontrolowane zawijanie          | lista kart z szybkimi akcjami                             |
-| Lead detail      | dokument + panel operacyjny                      | panel schodzi pod nagłówek lub dokument        | jedna kolejność i sticky primary action                   |
-| Builder          | rail + lista + preview + inspector               | trzy obszary bez przedwczesnego stacku         | drill-down: Kroki / Podgląd / Ustawienia                  |
-| Nawigacja panelu | sidebar Kwotum 256 px / zwinięty rail 72 px      | biała dolna nawigacja do 56 rem                | Start / Leady / Procesy / Analityka / Więcej, bez scrolla |
-| Szablony panelu  | 5 kart, filtry, KPI i podgląd procesu            | 3/2 karty, podgląd pod opisem                  | 1 karta, filtry i KPI w jednej kolumnie                   |
-| Ustawienia       | nawigacja kategorii + formularz                  | węższa nawigacja                               | lista kategorii → osobny ekran                            |
-| Widget           | wycentrowana powierzchnia procesu                | pełna szerokość w kontenerze                   | pojedyncze pytanie i dolne akcje                          |
-| Pricing          | tabela porównawcza tylko po zatwierdzeniu modelu | kontrolowane przewijanie semantyczne           | pionowe plany, bez ściskania tabeli                       |
+| Moduł             | Desktop                                          | Tablet                                          | Mobile                                                    |
+| ----------------- | ------------------------------------------------ | ----------------------------------------------- | --------------------------------------------------------- |
+| Hero              | copy → odpowiedzi → lead                         | relacja nadal pozioma, copy może przejść wyżej  | mini odpowiedzi i lead obok siebie                        |
+| Pasek danych      | 6 kolumn                                         | 3 × 2 albo 6 kompaktowych pozycji               | 3 × 2                                                     |
+| Demo              | kroki / pytanie / live lead                      | dwie kolumny z zachowaną kolejnością            | pełny krok, wynik poniżej                                 |
+| Tabela leadów     | gęsta tabela                                     | mniej kolumn i kontrolowane zawijanie           | lista kart z szybkimi akcjami                             |
+| Lead detail       | dokument + panel operacyjny                      | panel schodzi pod nagłówek lub dokument         | jedna kolejność i sticky primary action                   |
+| Builder           | rail + lista + preview + inspector               | trzy obszary bez przedwczesnego stacku          | drill-down: Kroki / Podgląd / Ustawienia                  |
+| Nawigacja panelu  | sidebar Kwotum 256 px / zwinięty rail 72 px      | biała dolna nawigacja do 56 rem                 | Start / Leady / Procesy / Analityka / Więcej, bez scrolla |
+| Wybór organizacji | intro 484 px + lista 934 px                      | intro nad listą, trzy korzyści w jednym rzędzie | intro, korzyści i pomoc nad kartami organizacji           |
+| Szablony panelu   | 5 kart, filtry, KPI i podgląd procesu            | 3/2 karty, podgląd pod opisem                   | 1 karta, filtry i KPI w jednej kolumnie                   |
+| Ustawienia        | nawigacja kategorii + formularz                  | węższa nawigacja                                | lista kategorii → osobny ekran                            |
+| Widget            | wycentrowana powierzchnia procesu                | pełna szerokość w kontenerze                    | pojedyncze pytanie i dolne akcje                          |
+| Pricing           | tabela porównawcza tylko po zatwierdzeniu modelu | kontrolowane przewijanie semantyczne            | pionowe plany, bez ściskania tabeli                       |
 
 Dolna nawigacja panelu uwzględnia safe area i rezerwuje własną wysokość
 w dokumencie. „Więcej” jest modalnym arkuszem dla capability-gated narzędzi,

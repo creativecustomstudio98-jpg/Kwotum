@@ -126,6 +126,20 @@
   --kw-sidebar-font:
     var(--wy-font-instrument-sans, "Instrument Sans"), var(--wy-font-inter, "Inter"), ui-sans-serif,
     system-ui, sans-serif;
+  --kw-organization-canvas: #fbfcfb;
+  --kw-organization-intro: #fdfefd;
+  --kw-organization-surface-soft: #f4f9f6;
+  --kw-organization-text: #102920;
+  --kw-organization-text-muted: #61746d;
+  --kw-organization-text-subtle: #71827a;
+  --kw-organization-line: #e1e6e2;
+  --kw-organization-line-soft: #e6ebe7;
+  --kw-organization-accent: #168259;
+  --kw-organization-accent-hover: #0b6d49;
+  --kw-organization-accent-strong: #0d5d3e;
+  --kw-organization-accent-soft: #edf7f1;
+  --kw-organization-success-soft: #eaf7ef;
+  --kw-organization-font: var(--kw-sidebar-font);
 }
 
 .wy-marketing-v7-theme {

@@ -6,6 +6,12 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Ekran `/panel` odwzorowuje finalną referencję wyboru organizacji: header
+  80 px, lewy panel informacyjny, działającą wyszukiwarkę oraz tabelaryczne
+  wiersze z rzeczywistą rolą, statusem i ostatnią aktywnością. Używa aktualnego
+  logo i zieleni Kwotum, zachowuje RLS, tenant scope, onboarding i logout, a na
+  mobile przechodzi w dostępne karty bez poziomego overflow.
+
 - Jasna powierzchnia aktywnej pozycji sidebara kończy się teraz 16 px przed
   prawą krawędzią w wariancie rozwiniętym. W zwiniętym zaczyna się równo z
   lewym brzegiem bez zaokrąglenia, a prawy skos kończy się 10 px przed prawym

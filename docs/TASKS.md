@@ -2617,6 +2617,28 @@ zakończenie aktywnej pozycji. Pseudo-element nie jest już wydłużany do prawe
 krawędzi w expanded; osobny crop collapsed zachowuje pełną lewą krawędź i
 prawy skos wewnątrz raila. Test E2E mierzy oba kontrakty osobno.
 
+## Etap 12ZN — finalny wybór organizacji Kwotum
+
+- [x] Zablokować zaakceptowaną referencję 1536 × 1024 px i jej SHA-256.
+- [x] Odtworzyć header 80 px, lewą kolumnę 484 px, oś listy 934 px,
+      wyszukiwarkę 376 × 50 px oraz wiersz 111 px.
+- [x] Użyć aktualnego logo i zielonej palety Kwotum bez kopiowania
+      przykładowych firm, domen, ról i aktywności z obrazu.
+- [x] Zachować auth, RLS, tenant scope, role `owner/admin/sales`, redirect
+      onboardingu i działający logout.
+- [x] Dodać działające wyszukiwanie po nazwie/slugu oraz osobne stany braku
+      członkostwa i braku wyników.
+- [x] Przekształcić tabelaryczny desktop w dostępne karty mobile bez zmiany
+      kolejności DOM i bez poziomego overflow.
+- [x] Dodać unit, E2E geometrii, klawiaturę, axe, before/after, overlay i diff.
+
+**Gate 2026-08-13:** dokładny E2E 1536 × 1024 potwierdza header 80 px, panel
+484 px, wyszukiwarkę 376 × 50 px, listę 934 px, header listy 62 px i wiersz
+111 px. Mobile 390 × 844 ma 0 px overflow i zerową liczbę naruszeń axe.
+Visual QA osiągnęło 19/20. Pierwszy test wykrył zbyt niski kontrast trzech
+etykiet mobile; poprawiono go i powtórzono test bez wyłączeń. Raport:
+`docs/PANEL_ORGANIZATION_PICKER_FINAL_2026-08-13.md`.
+
 ## Etap 13 — Produkcja
 
 ### Etap 13A — staging i infrastruktura
