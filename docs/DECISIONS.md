@@ -1457,3 +1457,34 @@ Finalny zaakceptowany crop zwiniętego wariantu, 236 × 200 px, SHA-256
 `a35d9b646ed18fc1d85c23c01e8ee5da6f4a697011b652051cd43a942360334d`,
 doprecyzowuje wyjątek: po collapse jasna powierzchnia zaczyna się równo z lewą
 krawędzią raila, bez lewego zaokrąglenia, a prawy skos pozostaje wewnątrz.
+
+## ADR-046: finalny ekran wyboru organizacji oparty o aktywne członkostwo
+
+**Status:** accepted dla Etapu 12ZN na podstawie zaakceptowanej referencji
+1536 × 1024 z 2026-08-13
+
+**Decyzja:** trasa `/panel` używa odrębnej kompozycji wyboru organizacji:
+globalnego headera 80 px, lewego panelu 484 px oraz prawego obszaru z działającą
+wyszukiwarką i tabelarycznymi wierszami. Referencyjny fiolet zostaje zmapowany
+na aktualną zieleń Kwotum, a znak na logo V3. Firmy, domeny, role, statusy i
+daty widoczne na obrazie nie są kopiowane.
+
+Źródłem wierszy pozostają wyłącznie aktywne `organization_members` bieżącego
+użytkownika i nieusunięte `organizations` dostępne przez istniejące RLS.
+Wyświetlana rola jest mapą istniejących `owner/admin/sales`, a status wynika z
+członkostwa. Ostatnia aktywność pozostaje najnowszym dostępnym timestampem leada
+albo procesu; proces jest odczytywany tylko dla Ownera/Admina. Wyszukiwanie
+`GET ?q=` filtruje już pobraną tenantową listę po nazwie i slugu, bez nowego
+publicznego endpointu. Cały wiersz jest jednym linkiem do `/panel/[id]`.
+
+**Dlaczego:** poprzednia szeroka karta z metrykami i dwoma CTA nie odpowiadała
+zaakceptowanej hierarchii. Nowa referencja rozstrzyga geometrię i prezentację,
+ale zgodnie z `UI_SCREEN_SPEC.md` nie może tworzyć przykładowych organizacji,
+nowych ról ani dodatkowych uprawnień.
+
+**Konsekwencje:** liczba wierszy zależy od realnych członkostw, więc produkcja
+nie jest sztucznie dopełniana do pięciu pozycji z obrazu. Istniejący redirect
+Ownera/Admina do onboardingu pojedynczej organizacji bez procesu i serwerowy
+logout pozostają bez zmian. Poniżej 70 rem intro przechodzi nad listę; poniżej
+46 rem wiersz staje się kartą z tą samą kolejnością DOM. Rollback przywraca
+poprzedni JSX i CSS bez migracji, zmiany danych ani preferencji użytkownika.

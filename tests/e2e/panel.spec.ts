@@ -12,10 +12,7 @@ const artifactRoot = process.env.PANEL_E2E_ARTIFACT_ROOT
   ? path.resolve(process.env.PANEL_E2E_ARTIFACT_ROOT)
   : path.resolve("artifacts/visual-qa");
 const artifactDirectory = path.join(artifactRoot, "12a-panel-reconstruction/actual");
-const organizationPickerArtifactDirectory = path.join(
-  artifactRoot,
-  "12m-panel-shell/organization-picker-kwotum",
-);
+const organizationPickerArtifactDirectory = path.join(artifactRoot, "12zn-organization-picker");
 const processArtifactDirectory = path.join(artifactRoot, "12n-process-list");
 const leadDetailArtifactDirectory = path.join(artifactRoot, "12o-lead-detail-responsive");
 const templateArtifactDirectory = path.join(artifactRoot, "12zc-template-library-override");
@@ -97,60 +94,99 @@ test.describe("panel reference reconstruction", () => {
 
   test("organization picker follows the accepted Kwotum composition", async ({ page }) => {
     await mkdir(organizationPickerArtifactDirectory, { recursive: true });
-    await page.setViewportSize({ height: 1_152, width: 2_048 });
+    await page.setViewportSize({ height: 1_024, width: 1_536 });
     await page.goto("/panel");
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Wybierz organizację" }),
     ).toBeVisible();
-    const card = page.locator(".organization-list > li").first();
-    const summary = card.getByRole("list", { name: /Podsumowanie organizacji/ });
-    await expect(summary.getByRole("listitem")).toHaveCount(3);
-    await expect(card.getByRole("link", { name: "Otwórz panel" })).toHaveAttribute(
-      "href",
-      `/panel/${organizationId}`,
-    );
-
+    await expect(page.getByRole("heading", { level: 2, name: "Twoje organizacje" })).toBeVisible();
+    const organizationLink = page
+      .getByRole("list", { name: "Dostępne organizacje" })
+      .getByRole("link")
+      .first();
+    await expect(organizationLink).toContainText("Właściciel");
+    await expect(organizationLink).toContainText("Aktywna");
+    await expect(organizationLink).toHaveAttribute("href", `/panel/${organizationId}`);
     const desktop = await page.evaluate(() => {
       const bounds = (selector: string) => {
         const rect = document.querySelector<HTMLElement>(selector)?.getBoundingClientRect();
         if (!rect) throw new Error(`Brak elementu ${selector}.`);
-        return { height: rect.height, width: rect.width };
+        return { height: rect.height, left: rect.left, top: rect.top, width: rect.width };
       };
       return {
-        avatar: bounds(".organization-list__identity > span"),
-        card: bounds(".organization-list > li"),
-        content: bounds(".organization-picker__content"),
         header: bounds(".organization-picker__header"),
+        intro: bounds(".organization-picker__intro"),
+        list: bounds(".organization-list"),
+        listHeader: bounds(".organization-list__header"),
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-        primaryAction: bounds(".organization-actions__primary"),
-        secondaryAction: bounds(".organization-actions__secondary"),
+        row: bounds(".organization-list__row"),
+        search: bounds(".organization-picker__search"),
+        workspace: bounds(".organization-picker__workspace"),
       };
     });
 
-    expect(desktop.header.height).toBeGreaterThanOrEqual(101);
-    expect(desktop.header.height).toBeLessThanOrEqual(104);
-    expect(desktop.content.width).toBeGreaterThanOrEqual(1_258);
-    expect(desktop.content.width).toBeLessThanOrEqual(1_262);
-    expect(desktop.card.height).toBeGreaterThanOrEqual(230);
-    expect(desktop.card.height).toBeLessThanOrEqual(236);
-    expect(desktop.avatar.width).toBeGreaterThanOrEqual(76);
-    expect(desktop.avatar.width).toBeLessThanOrEqual(80);
-    expect(desktop.primaryAction.height).toBeGreaterThanOrEqual(59);
-    expect(desktop.primaryAction.width).toBeGreaterThanOrEqual(174);
-    expect(desktop.secondaryAction.height).toBeGreaterThanOrEqual(59);
-    expect(desktop.secondaryAction.width).toBeGreaterThanOrEqual(127);
+    expect(desktop.header.height).toBeGreaterThanOrEqual(79);
+    expect(desktop.header.height).toBeLessThanOrEqual(81);
+    expect(desktop.intro.width).toBeGreaterThanOrEqual(483);
+    expect(desktop.intro.width).toBeLessThanOrEqual(485);
+    expect(desktop.workspace.left).toBeGreaterThanOrEqual(483);
+    expect(desktop.workspace.left).toBeLessThanOrEqual(485);
+    expect(desktop.search.width).toBeGreaterThanOrEqual(375);
+    expect(desktop.search.width).toBeLessThanOrEqual(377);
+    expect(desktop.search.height).toBeGreaterThanOrEqual(49);
+    expect(desktop.search.height).toBeLessThanOrEqual(51);
+    expect(desktop.list.width).toBeGreaterThanOrEqual(932);
+    expect(desktop.list.width).toBeLessThanOrEqual(935);
+    expect(desktop.listHeader.height).toBeGreaterThanOrEqual(61);
+    expect(desktop.listHeader.height).toBeLessThanOrEqual(63);
+    expect(desktop.row.height).toBeGreaterThanOrEqual(110);
+    expect(desktop.row.height).toBeLessThanOrEqual(112);
     expect(desktop.overflow).toBeLessThanOrEqual(1);
 
     await page.screenshot({
       animations: "disabled",
-      path: path.join(organizationPickerArtifactDirectory, "after-desktop-2048x1152.png"),
+      path: path.join(organizationPickerArtifactDirectory, "after-desktop-1536x1024.png"),
     });
 
+    await organizationLink.focus();
+    await expect(organizationLink).toBeFocused();
+
+    const search = page.getByRole("searchbox", { name: "Szukaj organizacji" });
+    await search.fill("organizacja-ktorej-nie-ma");
+    await search.press("Enter");
+    await expect(page).toHaveURL(/\/panel\?q=organizacja-ktorej-nie-ma$/);
+    await expect(page.getByText("Brak wyników", { exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Wyczyść wyszukiwanie" })).toHaveAttribute(
+      "href",
+      "/panel",
+    );
+
+    for (const viewport of [
+      { height: 800, width: 320 },
+      { height: 812, width: 375 },
+      { height: 932, width: 430 },
+      { height: 1_024, width: 768 },
+      { height: 768, width: 1_024 },
+      { height: 800, width: 1_280 },
+      { height: 900, width: 1_440 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto("/panel");
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Wybierz organizację" }),
+      ).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        ),
+      ).toBeLessThanOrEqual(1);
+    }
+
     await page.setViewportSize({ height: 844, width: 390 });
-    await expect(card).toBeVisible();
-    await expect(card.getByRole("link", { name: "Otwórz panel" })).toBeVisible();
-    await expect(card.getByRole("link", { name: /Procesy|Leady/ })).toBeVisible();
+    await page.goto("/panel");
+    await expect(organizationLink).toBeVisible();
+    await expect(organizationLink).toContainText("Ostatnia aktywność");
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

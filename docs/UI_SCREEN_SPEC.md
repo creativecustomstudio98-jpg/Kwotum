@@ -56,6 +56,16 @@ zachowują własne kompozycje do czasu osobnego etapu.
 
 ## Najnowsze nadpisania wizualne
 
+### Wybór organizacji
+
+Zaakceptowany obraz z 2026-08-13 zastępuje starszą kompozycję wyłącznie na
+`/panel`: header 80 px, lewy panel informacyjny 484 px oraz prawa lista z
+wyszukiwarką i kolumnami organizacja/rola/status/aktywność. Paleta i znak są
+aktualne dla Kwotum. Firmy, domeny, role, statusy i daty z referencji nie są
+danymi produktu; ekran pokazuje wyłącznie aktywne członkostwa użytkownika i
+nie rozszerza tenant scope. Cały wiersz jest linkiem, a mobile zmienia go w
+kartę zachowując kolejność DOM.
+
 ### Builder desktop
 
 Najnowszy załącznik ustala: około 80 px zielonego raila, wspólny toolbar,

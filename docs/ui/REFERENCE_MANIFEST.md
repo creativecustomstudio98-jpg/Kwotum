@@ -356,3 +356,19 @@ collapsed, 236 × 200 px, SHA-256
 ustala jasną powierzchnię równo z lewym brzegiem, bez lewego zaokrąglenia, oraz
 prawy skos kończący się 10 px przed prawym brzegiem raila. Wymiary 256/72 px i
 pozostały kontrakt P1 nie zmieniają się.
+
+## Finalny wybór organizacji Kwotum — 2026-08-13
+
+| Plik                                                                                   | Rozmiar     | SHA-256                                                            |
+| -------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------ |
+| `docs/ui/organization-picker-kwotum-final/reference/organization-picker-1536x1024.png` | 1536 × 1024 | `572cb0009eb74051e97c37578ae9b11bbfa5c3c1381140272874380852eb1810` |
+
+Referencja zastępuje decyzję 12M-Y wyłącznie dla uwierzytelnionej trasy
+`/panel`. Ustala header 80 px, lewą kolumnę 484 px, prawą oś treści około
+934 px, wyszukiwarkę 376 × 50 px, nagłówek listy 62 px oraz wiersz 111 px.
+Kolor fioletowy zostaje zastąpiony paletą zieleni Kwotum, a znak — aktualnym
+logo V3. Przykładowe firmy, domeny, role, statusy i daty nie są kopiowane;
+obowiązują rzeczywiste członkostwa, RLS, tenant scope i dane aktywności.
+Szczegółowy kontrakt i wynik odbioru opisują ADR-046,
+`ui/organization-picker-kwotum-final/README.md` oraz
+`ui/organization-picker-kwotum-final/VISUAL_QA_REPORT.md`.

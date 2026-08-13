@@ -271,6 +271,23 @@ różnice treści wynikają z realnego procesu i nowszej decyzji o marce Kwotum.
 Oddzielnej referencji mobile nie dostarczono, dlatego nie przyznano pełnych
 4 punktów za pixel fidelity transformacji mobilnej.
 
+## Etap 12ZN — finalny wybór organizacji Kwotum
+
+- zakres: `/panel` po uwierzytelnieniu;
+- referencja: 1536 × 1024, SHA-256
+  `572cb0009eb74051e97c37578ae9b11bbfa5c3c1381140272874380852eb1810`;
+- kontrakt: header 80 px, intro 484 px, lista 932–935 px, search 376 × 50 px,
+  nagłówek listy 62 px i wiersz 111 px;
+- dane: wyłącznie aktywne członkostwa, organizacje i ostatnia aktywność
+  dostępne przez uwierzytelnionego klienta oraz RLS;
+- mobile: 390 × 844, karta zachowująca kolejność DOM, maksymalnie 1 px
+  tolerancji overflow i axe bez naruszeń;
+- artefakty: `artifacts/visual-qa/12zn-organization-picker/`;
+- wynik: **PASS, 19/20**; osobnej referencji mobile nie dostarczono.
+
+E2E dodatkowo sprawdza działający submit wyszukiwarki, pusty wynik i href
+wiersza. Fikcyjne dane z obrazu nie mogą być kopiowane dla zmniejszenia diffu.
+
 ## Etap 12X — interakcje i walidacja buildera
 
 - zakres: kolejność pytań i inspektor walidacji na

@@ -1,10 +1,14 @@
-export function formatActiveProcessCount(count: number): string {
-  return `${count} ${polishCount(count, "aktywny proces", "aktywne procesy", "aktywnych procesów")}`;
-}
+import type { OrganizationMemberRole, OrganizationMemberStatus } from "@wyceno/database";
 
-export function formatAttentionLeadCount(count: number): string {
-  return `${count} ${polishCount(count, "lead do obsługi", "leady do obsługi", "leadów do obsługi")}`;
-}
+export type OrganizationRolePresentation = Readonly<{
+  description: string;
+  label: string;
+}>;
+
+export type OrganizationStatusPresentation = Readonly<{
+  label: string;
+  tone: "active" | "invited" | "suspended";
+}>;
 
 export function latestIsoDate(values: ReadonlyArray<string | null | undefined>): string | null {
   const timestamps = values.flatMap((value) => {
@@ -26,20 +30,78 @@ export function formatLastActivity(
   const activity = new Date(value);
   if (!Number.isFinite(activity.getTime())) return "Brak aktywności";
 
-  const today = dayKey(now, timeZone);
-  const yesterday = dayKey(new Date(now.getTime() - 24 * 60 * 60 * 1_000), timeZone);
-  const activityDay = dayKey(activity, timeZone);
+  const dayDistance = calendarDayDistance(activity, now, timeZone);
+  const time = new Intl.DateTimeFormat("pl-PL", {
+    hour: "2-digit",
+    hour12: false,
+    minute: "2-digit",
+    timeZone,
+  }).format(activity);
 
-  if (activityDay === today) return "Ostatnia aktywność dzisiaj";
-  if (activityDay === yesterday) return "Ostatnia aktywność wczoraj";
+  if (dayDistance === 0) return `Dzisiaj, ${time}`;
+  if (dayDistance === 1) return `Wczoraj, ${time}`;
+  if (dayDistance > 1 && dayDistance <= 30) {
+    return `${dayDistance} ${polishCount(dayDistance, "dzień temu", "dni temu", "dni temu")}, ${time}`;
+  }
 
-  return `Ostatnia aktywność ${new Intl.DateTimeFormat("pl-PL", {
+  return `${new Intl.DateTimeFormat("pl-PL", {
     day: "numeric",
     month: "short",
     timeZone,
   })
     .format(activity)
-    .replace(".", "")}`;
+    .replace(".", "")}, ${time}`;
+}
+
+export function organizationRolePresentation(
+  role: OrganizationMemberRole,
+): OrganizationRolePresentation {
+  switch (role) {
+    case "owner":
+      return { description: "Pełny dostęp", label: "Właściciel" };
+    case "admin":
+      return { description: "Pełny dostęp", label: "Administrator" };
+    case "sales":
+      return { description: "Obsługa leadów", label: "Sprzedaż" };
+  }
+}
+
+export function organizationStatusPresentation(
+  status: OrganizationMemberStatus,
+): OrganizationStatusPresentation {
+  switch (status) {
+    case "active":
+      return { label: "Aktywna", tone: "active" };
+    case "invited":
+      return { label: "Oczekująca", tone: "invited" };
+    case "suspended":
+      return { label: "Wstrzymana", tone: "suspended" };
+  }
+}
+
+export function normalizeOrganizationSearch(value: string | undefined): string {
+  return value?.trim().replace(/\s+/g, " ").slice(0, 120) ?? "";
+}
+
+export function organizationMatchesSearch(
+  organization: Readonly<{ name: string; slug: string }>,
+  query: string,
+): boolean {
+  if (!query) return true;
+  const normalizedQuery = query.toLocaleLowerCase("pl-PL");
+  return [organization.name, organization.slug].some((value) =>
+    value.toLocaleLowerCase("pl-PL").includes(normalizedQuery),
+  );
+}
+
+function calendarDayDistance(activity: Date, now: Date, timeZone: string): number {
+  const [activityYear, activityMonth, activityDay] = dayKey(activity, timeZone)
+    .split("-")
+    .map(Number);
+  const [nowYear, nowMonth, nowDay] = dayKey(now, timeZone).split("-").map(Number);
+  const activityUtc = Date.UTC(activityYear ?? 0, (activityMonth ?? 1) - 1, activityDay ?? 1);
+  const nowUtc = Date.UTC(nowYear ?? 0, (nowMonth ?? 1) - 1, nowDay ?? 1);
+  return Math.round((nowUtc - activityUtc) / (24 * 60 * 60 * 1_000));
 }
 
 function dayKey(value: Date, timeZone: string): string {
