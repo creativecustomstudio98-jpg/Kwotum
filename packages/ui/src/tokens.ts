@@ -47,6 +47,24 @@ export const marketingColorTokens = {
   success: "#15964A",
 } as const;
 
+export const panelSidebarTokens = {
+  widthExpanded: "256px",
+  widthCollapsed: "72px",
+  background: "#0D2B24",
+  text: "#EEF2EF",
+  textMuted: "#C8D3CC",
+  textSubtle: "#91A39A",
+  label: "#8CD79E",
+  line: "rgb(221 228 218 / 14%)",
+  hover: "rgb(255 255 255 / 5.5%)",
+  activeBackground: "#DDE4DA",
+  activeText: "#10382D",
+  focus: "#8CD79E",
+  status: "#8BDD9A",
+  accountBackground: "rgb(255 255 255 / 2.5%)",
+  accountBorder: "rgb(221 228 218 / 16%)",
+} as const;
+
 export const spacingTokens = {
   0: "0",
   1: "0.25rem",

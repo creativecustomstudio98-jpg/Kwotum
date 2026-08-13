@@ -14,6 +14,13 @@ const inter = localFont({
   weight: "100 900",
 });
 
+const instrumentSans = localFont({
+  display: "swap",
+  src: "./fonts/instrument-sans/InstrumentSansVariable.woff2",
+  variable: "--wy-font-instrument-sans",
+  weight: "400 700",
+});
+
 export const metadata: Metadata = {
   description:
     "Kwotum porządkuje zapytania klientów, kwalifikuje leady i wskazuje następny krok sprzedażowy.",
@@ -35,7 +42,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="pl">
-      <body className={inter.variable}>{children}</body>
+      <body className={`${inter.variable} ${instrumentSans.variable}`}>{children}</body>
     </html>
   );
 }

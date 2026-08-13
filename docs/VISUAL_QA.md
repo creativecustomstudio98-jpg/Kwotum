@@ -489,3 +489,18 @@ klawiaturą, forced colors, hostile host CSS oraz retry. Stub providera
 potwierdza zero wywołań submit po wygasłym tokenie i dokładnie jeden submit po
 drugim tokenie. Rzeczywista interaktywna ramka pozostaje elementem UAT na
 docelowych hostach Cloudflare.
+
+## Finalny sidebar Kwotum P1
+
+- zakres: wspólny desktopowy sidebar i reakcja app shellu;
+- referencja: `docs/ui/sidebar-kwotum-p1/reference/sidebar-kwotum.png`,
+  863 × 1822 px, SHA-256
+  `ea188a170b984ae7554d94baefd62913175e657d9bfd0595ad7a02d321efbe87`;
+- kontrolne viewporty: 1440 × 1024, 1280 × 800, 1024 × 768 i mobile
+  390 × 844;
+- geometria: dokładnie 256 px rozwinięty i 72 px zwinięty, 100dvh oraz brak
+  poziomego overflow;
+- dostępność: klawiatura, tooltipy, Escape z powrotem fokusu, reduced motion i
+  izolowany axe WCAG A/AA;
+- wynik: **PASS, 19/20**; szczegóły i jawne odstępstwo krótkiego viewportu
+  zapisuje `docs/ui/sidebar-kwotum-p1/VISUAL_QA_REPORT.md`.

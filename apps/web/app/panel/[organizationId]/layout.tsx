@@ -24,7 +24,7 @@ export default async function OrganizationPanelLayout({
     {
       href: `/panel/${organizationId}`,
       icon: "dashboard" as const,
-      label: "Dashboard",
+      label: "Przegląd",
       mobileLabel: "Start",
       mobilePlacement: "primary" as const,
     },
