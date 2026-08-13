@@ -53,12 +53,14 @@ export function PanelNavigation({
     getServerSidebarPreference,
   );
   const organizationRoot = items.find((item) => item.icon === "dashboard")?.href ?? pathname;
+  const helpHref = `${organizationRoot}/pomoc`;
   const { primary: mobilePrimaryItems, secondary: mobileSecondaryItems } =
     splitMobileNavigationItems(items);
   const mobileNavigationHidden = isMobilePanelDetailPath(pathname, organizationRoot);
   const settingsItem = mobileSecondaryItems.find((item) => item.icon === "settings");
   const moreActive =
     pathname === notificationsHref ||
+    pathname === helpHref ||
     pathname === `${organizationRoot}/prywatnosc` ||
     pathname === `${organizationRoot}/start` ||
     mobileSecondaryItems.some((item) =>
@@ -286,8 +288,10 @@ export function PanelNavigation({
               <span className="panel-rail__label">Powiadomienia</span>
             </Link>
             <Link
+              aria-current={pathname === helpHref ? "page" : undefined}
+              className={pathname === helpHref ? "is-active" : undefined}
               data-sidebar-tooltip="Pomoc"
-              href="/jak-dziala"
+              href={helpHref}
               title={collapsed ? "Pomoc" : undefined}
             >
               <span aria-hidden="true" className="panel-rail__nav-icon">
@@ -499,12 +503,17 @@ export function PanelNavigation({
                 <strong>Powiadomienia</strong>
                 <PanelIcon name="chevron-right" />
               </Link>
-              <Link href="/jak-dziala" onClick={() => setMoreOpen(false)}>
+              <Link
+                aria-current={pathname === helpHref ? "page" : undefined}
+                className={pathname === helpHref ? "is-active" : undefined}
+                href={helpHref}
+                onClick={() => setMoreOpen(false)}
+              >
                 <span>
                   <PanelNavigationIcon name="help" />
                 </span>
                 <strong>Pomoc i instrukcje</strong>
-                <PanelIcon name="external" />
+                <PanelIcon name="chevron-right" />
               </Link>
             </nav>
           </section>
