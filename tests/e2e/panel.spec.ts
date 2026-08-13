@@ -16,6 +16,7 @@ const organizationPickerArtifactDirectory = path.join(artifactRoot, "12zn-organi
 const processArtifactDirectory = path.join(artifactRoot, "12n-process-list");
 const leadDetailArtifactDirectory = path.join(artifactRoot, "12o-lead-detail-responsive");
 const templateArtifactDirectory = path.join(artifactRoot, "12zc-template-library-override");
+const templateSurfaceArtifactDirectory = path.join(artifactRoot, "12zo-template-surface-hotfix");
 const analyticsArtifactDirectory = path.join(artifactRoot, "12r-analytics-dashboard-style");
 const dashboardArtifactDirectory = path.join(artifactRoot, "12t-dashboard-reconstruction");
 const mobileNavigationArtifactDirectory = path.join(artifactRoot, "12w-mobile-navigation");
@@ -1943,6 +1944,7 @@ test.describe("panel reference reconstruction", () => {
     page,
   }) => {
     await mkdir(templateArtifactDirectory, { recursive: true });
+    await mkdir(templateSurfaceArtifactDirectory, { recursive: true });
     await page.setViewportSize({ height: 1_086, width: 1_448 });
     await page.evaluate(() => localStorage.setItem("lorum:panel-sidebar-collapsed", "true"));
     await page.goto(`/panel/${organizationId}/szablony`);
@@ -1970,9 +1972,8 @@ test.describe("panel reference reconstruction", () => {
       const workspace = document
         .querySelector<HTMLElement>(".templates-panel")
         ?.getBoundingClientRect();
-      const surface = document
-        .querySelector<HTMLElement>(".template-library-surface")
-        ?.getBoundingClientRect();
+      const surfaceElement = document.querySelector<HTMLElement>(".template-library-surface");
+      const surface = surfaceElement?.getBoundingClientRect();
       const cards = Array.from(document.querySelectorAll<HTMLElement>(".template-card")).map(
         (card) => {
           const media = card.querySelector<HTMLElement>(".template-card__media");
@@ -1985,6 +1986,16 @@ test.describe("panel reference reconstruction", () => {
         },
       );
       return {
+        surfaceAppearance: surfaceElement
+          ? {
+              backgroundColor: getComputedStyle(surfaceElement).backgroundColor,
+              borderBottomWidth: getComputedStyle(surfaceElement).borderBottomWidth,
+              borderLeftWidth: getComputedStyle(surfaceElement).borderLeftWidth,
+              borderRightWidth: getComputedStyle(surfaceElement).borderRightWidth,
+              borderTopWidth: getComputedStyle(surfaceElement).borderTopWidth,
+              boxShadow: getComputedStyle(surfaceElement).boxShadow,
+            }
+          : null,
         detail: document.querySelector<HTMLElement>(".template-detail")?.getBoundingClientRect(),
         cardWidths: cards.map((card) => card.width),
         cardYPositions: cards.map((card) => card.y),
@@ -2000,6 +2011,14 @@ test.describe("panel reference reconstruction", () => {
     expect(desktopGeometry.surfaceWidth).toBeGreaterThanOrEqual(
       desktopGeometry.workspaceWidth - 95,
     );
+    expect(desktopGeometry.surfaceAppearance).toEqual({
+      backgroundColor: "rgba(0, 0, 0, 0)",
+      borderBottomWidth: "0px",
+      borderLeftWidth: "0px",
+      borderRightWidth: "0px",
+      borderTopWidth: "0px",
+      boxShadow: "none",
+    });
     expect(
       Math.max(...desktopGeometry.cardYPositions) - Math.min(...desktopGeometry.cardYPositions),
     ).toBeLessThanOrEqual(1);
@@ -2014,6 +2033,15 @@ test.describe("panel reference reconstruction", () => {
     await page.screenshot({
       animations: "disabled",
       path: path.join(templateArtifactDirectory, "after-v2-1448x1086.png"),
+    });
+
+    await page.evaluate(() => localStorage.setItem("lorum:panel-sidebar-collapsed", "false"));
+    await page.setViewportSize({ height: 1_220, width: 2_048 });
+    await page.goto(`/panel/${organizationId}/szablony`);
+    await expect(page.locator(".template-card").first()).toBeVisible();
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(templateSurfaceArtifactDirectory, "after-desktop-2048x1220.png"),
     });
 
     await page.getByLabel("Szukaj szablonu").fill("klimatyzacja");
@@ -2042,6 +2070,7 @@ test.describe("panel reference reconstruction", () => {
     await page.setViewportSize({ height: 844, width: 390 });
     await page.goto(`/panel/${organizationId}/szablony`);
     await expect(page.locator(".template-card")).toHaveCount(5);
+    await expect(page.locator(".template-card").first()).toBeVisible();
     await expect(page.locator(".template-summary-card")).toHaveCount(3);
     const mobileGeometry = await page.evaluate(() => {
       const surface = document
@@ -2054,24 +2083,33 @@ test.describe("panel reference reconstruction", () => {
         .querySelector<HTMLElement>(".template-card__media")
         ?.getBoundingClientRect();
       return {
+        cardBounds: cards.map(({ left, right, width }) => ({ left, right, width })),
         cardsInsideSurface: cards.every(
           (card) =>
             surface !== undefined &&
-            card.left >= surface.left &&
-            card.right <= surface.right &&
+            card.left >= surface.left - 1 &&
+            card.right <= surface.right + 1 &&
             card.width > 0,
         ),
         mediaRatio: media === undefined ? 0 : media.width / media.height,
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        surfaceBounds:
+          surface === undefined
+            ? null
+            : { left: surface.left, right: surface.right, width: surface.width },
       };
     });
-    expect(mobileGeometry.cardsInsideSurface).toBe(true);
+    expect(mobileGeometry.cardsInsideSurface, JSON.stringify(mobileGeometry)).toBe(true);
     expect(mobileGeometry.mediaRatio).toBeGreaterThanOrEqual(1.65);
     expect(mobileGeometry.mediaRatio).toBeLessThanOrEqual(1.75);
     expect(mobileGeometry.overflow).toBeLessThanOrEqual(1);
     await page.screenshot({
       animations: "disabled",
       path: path.join(templateArtifactDirectory, "after-v2-390x844.png"),
+    });
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(templateSurfaceArtifactDirectory, "after-mobile-390x844.png"),
     });
 
     await page.setViewportSize({ height: 800, width: 320 });

@@ -2639,6 +2639,23 @@ Visual QA osiągnęło 19/20. Pierwszy test wykrył zbyt niski kontrast trzech
 etykiet mobile; poprawiono go i powtórzono test bez wyłączeń. Raport:
 `docs/PANEL_ORGANIZATION_PICKER_FINAL_2026-08-13.md`.
 
+## Etap 12ZO — pojedyncza powierzchnia biblioteki szablonów
+
+- [x] Zablokować zaakceptowany zrzut produkcji 3338 × 1962 px jako korektę
+      wyłącznie zewnętrznej powierzchni trasy szablonów.
+- [x] Usunąć klasę karty z kontenera całej biblioteki bez naruszania nagłówka,
+      filtrów, KPI, kart szablonów i podglądu.
+- [x] Zastosować ten sam kontrakt do stanów loading i error.
+- [x] Dodać regresję E2E dla przezroczystego tła, zerowego obramowania i braku
+      cienia zewnętrznej powierzchni.
+- [x] Potwierdzić desktop 2048 × 1220, mobile 390 × 844, axe, overflow i pełne
+      bramki jakości.
+
+**Gate:** ekran ma jedną powierzchnię workspace; `.template-library-surface`
+nie może tworzyć własnego tła, obramowania ani cienia. Wewnętrzne karty
+pozostają rozdzielone zgodnie z biblioteką 12ZC-T. Zakres nie zmienia danych,
+akcji, tenant scope, sidebara ani geometrii pozostałych ekranów.
+
 ## Etap 13 — Produkcja
 
 ### Etap 13A — staging i infrastruktura

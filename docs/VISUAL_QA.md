@@ -288,6 +288,21 @@ Oddzielnej referencji mobile nie dostarczono, dlatego nie przyznano pełnych
 E2E dodatkowo sprawdza działający submit wyszukiwarki, pusty wynik i href
 wiersza. Fikcyjne dane z obrazu nie mogą być kopiowane dla zmniejszenia diffu.
 
+## Etap 12ZO — pojedyncza powierzchnia biblioteki szablonów
+
+- zakres: zewnętrzny kontener `/panel/[organizationId]/szablony`;
+- źródło korekty: zaakceptowany zrzut produkcji 3338 × 1962 px, SHA-256
+  `b3ebc842faab96619ee12a562638ee4bd2f53a417bae53f5e1d29b6850e90ff6`;
+- kontrolny desktop: 2048 × 1220; mobile: 390 × 844;
+- kontrakt: `.template-library-surface` jest przezroczysty, bez obramowania i
+  cienia; toolbar, KPI, karty i detal zachowują własne powierzchnie;
+- stany loading i error dziedziczą ten sam płaski kontener;
+- artefakty: `artifacts/visual-qa/12zo-template-surface-hotfix/`.
+
+Ta korekta nadpisuje starszą referencję 12ZC-T wyłącznie w regionie
+zewnętrznej karty. Nie zmienia jej kontraktu funkcjonalnego ani wewnętrznej
+geometrii biblioteki.
+
 ## Etap 12X — interakcje i walidacja buildera
 
 - zakres: kolejność pytań i inspektor walidacji na

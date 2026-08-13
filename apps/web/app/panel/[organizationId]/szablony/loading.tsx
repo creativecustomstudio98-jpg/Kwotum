@@ -4,7 +4,7 @@ export default function TemplatesLoading() {
   return (
     <main aria-busy="true" className="panel-workspace templates-panel">
       <div className="panel-page">
-        <section className="panel-card template-library-surface">
+        <section className="template-library-surface">
           <header className="template-library-heading">
             <div>
               <h1>Szablony branżowe</h1>

@@ -6,6 +6,11 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Biblioteka szablonów nie jest już osadzona w dodatkowej białej karcie.
+  Nagłówek, filtry, KPI, karty i podgląd leżą bezpośrednio na powierzchni
+  workspace; ten sam układ obowiązuje w stanach loading i error. Funkcje,
+  dane, wewnętrzne obramowania oraz responsywność pozostają bez zmian.
+
 - Ekran `/panel` odwzorowuje finalną referencję wyboru organizacji: header
   80 px, lewy panel informacyjny, działającą wyszukiwarkę oraz tabelaryczne
   wiersze z rzeczywistą rolą, statusem i ostatnią aktywnością. Używa aktualnego
