@@ -32,6 +32,19 @@
   `aa72922aafcc0dc18f36ec1d805b0212057dabe8b9d5b8b57f67035aea1b826d`;
 - licencja: SIL Open Font License 1.1, zachowana obok fontu jako `OFL.txt`.
 
+## Korekta wag 12ZP
+
+Review produkcji z 2026-08-13 zachowuje Instrument Sans i całą geometrię P1,
+ale usuwa arbitralne, optycznie zbyt ciężkie wagi. Runtime używa wyłącznie
+centralnych tokenów:
+
+- marka: 600;
+- etykiety grup, aktywna pozycja, avatar i nazwa konta: 500;
+- organizacja, zwykłe pozycje, utilities i opis organizacji: 400.
+
+Korekta nie zmienia rozmiarów tekstu, wierszy 48 px, ikon, kolorów,
+active clip-path ani wariantu collapsed.
+
 ## Visual QA
 
 Artefakty znajdują się w `artifacts/visual-qa/sidebar-kwotum-p1/` dla
@@ -39,3 +52,6 @@ Artefakty znajdują się w `artifacts/visual-qa/sidebar-kwotum-p1/` dla
 Pełne rendery, cropy, znormalizowane overlaye/diffy, pomiary, axe, klawiatura,
 persistence i reduced motion zostały odebrane z wynikiem 19/20. Szczegóły:
 `VISUAL_QA_REPORT.md`.
+
+Dodatkowy crop po korekcie wag znajduje się w
+`artifacts/visual-qa/12zp-panel-typography/after-sidebar-256x1024.png`.

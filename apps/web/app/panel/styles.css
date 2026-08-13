@@ -98,7 +98,7 @@
   overflow: hidden;
   color: var(--kw-sidebar-text);
   font-size: 22px;
-  font-weight: 650;
+  font-weight: var(--wy-font-weight-semibold);
   letter-spacing: -0.025em;
   line-height: 26px;
   text-overflow: ellipsis;
@@ -168,7 +168,7 @@
   margin: 0;
   color: var(--kw-sidebar-label);
   font-size: 10px;
-  font-weight: 650;
+  font-weight: var(--wy-font-weight-medium);
   letter-spacing: 0.09em;
   line-height: 14px;
   text-transform: uppercase;
@@ -188,7 +188,7 @@
   overflow: hidden;
   color: var(--kw-sidebar-text);
   font-size: 16px;
-  font-weight: 500;
+  font-weight: var(--wy-font-weight-regular);
   letter-spacing: -0.01em;
   line-height: 22px;
   text-overflow: ellipsis;
@@ -252,7 +252,7 @@
   background: transparent;
   color: var(--kw-sidebar-text-muted);
   font-size: 15px;
-  font-weight: 520;
+  font-weight: var(--wy-font-weight-regular);
   line-height: 20px;
   text-decoration: none;
   transition:
@@ -286,7 +286,7 @@
 .panel-rail__section-items > a.is-active {
   background: transparent;
   color: var(--kw-sidebar-active-text);
-  font-weight: 640;
+  font-weight: var(--wy-font-weight-medium);
 }
 
 .panel-rail__section-items > a.is-active::before {
@@ -339,7 +339,7 @@
   background: transparent;
   color: var(--kw-sidebar-text-muted);
   font-size: 15px;
-  font-weight: 520;
+  font-weight: var(--wy-font-weight-regular);
   line-height: 20px;
   text-decoration: none;
   transition:
@@ -387,7 +387,7 @@
   background: var(--kw-sidebar-hover);
   color: var(--kw-sidebar-text);
   font-size: 14px;
-  font-weight: 620;
+  font-weight: var(--wy-font-weight-medium);
   line-height: 18px;
 }
 
@@ -407,14 +407,14 @@
 .panel-rail__account-copy strong {
   color: var(--kw-sidebar-text);
   font-size: 14px;
-  font-weight: 620;
+  font-weight: var(--wy-font-weight-medium);
   line-height: 18px;
 }
 
 .panel-rail__account-copy small {
   color: var(--kw-sidebar-label);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: var(--wy-font-weight-regular);
   line-height: 16px;
 }
 
@@ -464,7 +464,7 @@
   color: var(--kw-sidebar-text);
   font-family: var(--kw-sidebar-font);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: var(--wy-font-weight-medium);
   line-height: 16px;
   pointer-events: none;
   transform: translateY(-50%);
@@ -500,7 +500,7 @@
   color: var(--kw-sidebar-text);
   cursor: pointer;
   font-size: 13px;
-  font-weight: 550;
+  font-weight: var(--wy-font-weight-regular);
   line-height: 18px;
   text-align: left;
   text-decoration: none;

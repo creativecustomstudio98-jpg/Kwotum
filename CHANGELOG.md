@@ -6,6 +6,13 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Sidebar używa teraz spokojnych, systemowych wag 400/500/600 zamiast
+  arbitralnych wartości 520–650, bez zmiany geometrii, ikon i aktywnego skosu.
+  Stan małej próby analityki ma 32 px wewnętrznego marginesu na desktopie,
+  24 px na mobile oraz czytelniejszą hierarchię 16/14 px bez zbędnych linii i
+  przypadkowego łamania opisu. Dane, próg prywatności i treść komunikatu nie
+  uległy zmianie.
+
 - Biblioteka szablonów nie jest już osadzona w dodatkowej białej karcie.
   Nagłówek, filtry, KPI, karty i podgląd leżą bezpośrednio na powierzchni
   workspace; ten sam układ obowiązuje w stanach loading i error. Funkcje,

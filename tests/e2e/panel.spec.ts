@@ -33,6 +33,7 @@ const builderEstimationArtifactDirectory = path.join(artifactRoot, "12ze-self-se
 const builderContactArtifactDirectory = path.join(artifactRoot, "12zk-contact-builder");
 const webhookArtifactDirectory = path.join(artifactRoot, "12zf-webhook-v1");
 const sidebarP1ArtifactDirectory = path.join(artifactRoot, "sidebar-kwotum-p1");
+const panelTypographyArtifactDirectory = path.join(artifactRoot, "12zp-panel-typography");
 
 async function signIn(page: Page) {
   if (!organizationId || !panelEmail || !panelPassword) {
@@ -51,6 +52,29 @@ async function capture(page: Page, name: string) {
     animations: "disabled",
     path: path.join(artifactDirectory, `${name}.png`),
   });
+}
+
+async function mountAnalyticsPrivacyStateProbe(page: Page) {
+  await page.evaluate(() => {
+    document.querySelector('[data-testid="analytics-privacy-state-probe"]')?.remove();
+    const section = document.createElement("section");
+    const content = document.createElement("div");
+    const mark = document.createElement("strong");
+    const title = document.createElement("h3");
+    const description = document.createElement("p");
+    section.className = "panel-card analytics-privacy-state";
+    section.dataset.testid = "analytics-privacy-state-probe";
+    content.className = "wy-state";
+    mark.className = "wy-state__mark";
+    mark.textContent = "Brak danych";
+    title.textContent = "Za mało danych dla wykresów";
+    description.textContent =
+      "Zebrano 3 z 5 wymaganych sesji ze zgodą. Wróć po zebraniu większej próby albo wybierz dłuższy okres.";
+    content.append(mark, title, description);
+    section.append(content);
+    document.querySelector(".analytics-panel .panel-page")?.append(section);
+  });
+  return page.getByTestId("analytics-privacy-state-probe");
 }
 
 async function switchGeometry(input: Locator) {
@@ -207,12 +231,13 @@ test.describe("panel reference reconstruction", () => {
 
   test("shared Kwotum sidebar expands, collapses and persists across routes", async ({ page }) => {
     await mkdir(sidebarP1ArtifactDirectory, { recursive: true });
+    await mkdir(panelTypographyArtifactDirectory, { recursive: true });
     await page.setViewportSize({ height: 1_024, width: 1_440 });
     await page.goto(`/panel/${organizationId}`);
 
     const sidebar = page.locator("#panel-sidebar");
     await expect(sidebar).toHaveAttribute("data-collapsed", "false");
-    await expect(page.getByText("Kwotum", { exact: true })).toBeVisible();
+    await expect(sidebar.getByText("Kwotum", { exact: true })).toBeVisible();
     await expect(sidebar.getByRole("heading", { name: "Praca" })).toBeVisible();
     await expect(sidebar.getByRole("heading", { name: "Narzędzia" })).toBeVisible();
     await expect(sidebar.getByRole("heading", { name: "System" })).toBeVisible();
@@ -231,17 +256,45 @@ test.describe("panel reference reconstruction", () => {
       const styles = getComputedStyle(element);
       const active = element.querySelector<HTMLElement>('a[aria-current="page"]');
       const activeDecoration = active ? getComputedStyle(active, "::before") : null;
+      const regular = element.querySelector<HTMLElement>(
+        ".panel-rail__section-items > a:not(.is-active)",
+      );
+      const utility = element.querySelector<HTMLElement>(".panel-rail__utilities > a");
+      const sectionLabel = element.querySelector<HTMLElement>(".panel-rail__section-label");
+      const organization = element.querySelector<HTMLElement>(
+        ".panel-rail__organization-row strong",
+      );
+      const account = element.querySelector<HTMLElement>(".panel-rail__account-copy strong");
+      const brand = element.querySelector<HTMLElement>(".panel-rail__brand-name");
       return {
+        accountFontWeight: account ? getComputedStyle(account).fontWeight : "missing",
+        activeFontWeight: active ? getComputedStyle(active).fontWeight : "missing",
         backgroundColor: styles.backgroundColor,
         backgroundImage: styles.backgroundImage,
+        brandFontWeight: brand ? getComputedStyle(brand).fontWeight : "missing",
         boxShadow: styles.boxShadow,
         activeClipPath: activeDecoration?.clipPath ?? "none",
+        organizationFontWeight: organization
+          ? getComputedStyle(organization).fontWeight
+          : "missing",
+        regularFontWeight: regular ? getComputedStyle(regular).fontWeight : "missing",
+        sectionLabelFontWeight: sectionLabel
+          ? getComputedStyle(sectionLabel).fontWeight
+          : "missing",
+        utilityFontWeight: utility ? getComputedStyle(utility).fontWeight : "missing",
       };
     });
     expect(sidebarSurface).toMatchObject({
+      accountFontWeight: "500",
+      activeFontWeight: "500",
       backgroundColor: "rgb(13, 43, 36)",
       backgroundImage: "none",
+      brandFontWeight: "600",
       boxShadow: "none",
+      organizationFontWeight: "400",
+      regularFontWeight: "400",
+      sectionLabelFontWeight: "500",
+      utilityFontWeight: "400",
     });
     expect(sidebarSurface.activeClipPath).not.toBe("none");
     const activeTabGeometry = await sidebar
@@ -269,6 +322,10 @@ test.describe("panel reference reconstruction", () => {
     await sidebar.screenshot({
       animations: "disabled",
       path: path.join(sidebarP1ArtifactDirectory, "expanded-sidebar-256x1024.png"),
+    });
+    await sidebar.screenshot({
+      animations: "disabled",
+      path: path.join(panelTypographyArtifactDirectory, "after-sidebar-256x1024.png"),
     });
 
     await page.getByRole("button", { name: "Zwiń menu boczne" }).click();
@@ -2134,6 +2191,7 @@ test.describe("panel reference reconstruction", () => {
     page.on("pageerror", (error) => errors.push(error.message));
 
     await mkdir(analyticsArtifactDirectory, { recursive: true });
+    await mkdir(panelTypographyArtifactDirectory, { recursive: true });
     await page.setViewportSize({ height: 1_024, width: 1_536 });
     await page.goto(`/panel/${organizationId}/analityka?days=30`);
 
@@ -2208,6 +2266,55 @@ test.describe("panel reference reconstruction", () => {
       path: path.join(analyticsArtifactDirectory, "after-production-1536x-full.png"),
     });
 
+    const desktopPrivacyState = await mountAnalyticsPrivacyStateProbe(page);
+    await expect(desktopPrivacyState).toBeVisible();
+    const desktopPrivacyStyle = await desktopPrivacyState.evaluate((section) => {
+      const cardBounds = section.getBoundingClientRect();
+      const state = section.querySelector<HTMLElement>(".wy-state")!;
+      const mark = section.querySelector<HTMLElement>(".wy-state__mark")!;
+      const title = section.querySelector<HTMLElement>("h3")!;
+      const description = section.querySelector<HTMLElement>("p")!;
+      const stateStyle = getComputedStyle(state);
+      const titleStyle = getComputedStyle(title);
+      const descriptionStyle = getComputedStyle(description);
+      return {
+        descriptionFontSize: descriptionStyle.fontSize,
+        descriptionMarginBottom: descriptionStyle.marginBottom,
+        descriptionMaxWidth: descriptionStyle.maxWidth,
+        insetLeft: title.getBoundingClientRect().left - cardBounds.left,
+        markLineWidth: getComputedStyle(mark, "::before").width,
+        markWeight: getComputedStyle(mark).fontWeight,
+        stateBorderBottomWidth: stateStyle.borderBottomWidth,
+        stateBorderTopWidth: stateStyle.borderTopWidth,
+        stateMinHeight: stateStyle.minHeight,
+        statePaddingLeft: stateStyle.paddingLeft,
+        statePaddingRight: stateStyle.paddingRight,
+        titleFontSize: titleStyle.fontSize,
+        titleWeight: titleStyle.fontWeight,
+      };
+    });
+    expect(desktopPrivacyStyle).toMatchObject({
+      descriptionFontSize: "14px",
+      descriptionMarginBottom: "0px",
+      descriptionMaxWidth: "736px",
+      markLineWidth: "28px",
+      markWeight: "500",
+      stateBorderBottomWidth: "0px",
+      stateBorderTopWidth: "0px",
+      stateMinHeight: "176px",
+      statePaddingLeft: "32px",
+      statePaddingRight: "32px",
+      titleFontSize: "16px",
+      titleWeight: "600",
+    });
+    expect(desktopPrivacyStyle.insetLeft).toBeGreaterThanOrEqual(31);
+    expect(desktopPrivacyStyle.insetLeft).toBeLessThanOrEqual(33);
+    await desktopPrivacyState.screenshot({
+      animations: "disabled",
+      path: path.join(panelTypographyArtifactDirectory, "after-empty-state-1536.png"),
+    });
+    await desktopPrivacyState.evaluate((section) => section.remove());
+
     await page.getByRole("link", { name: "7 dni" }).press("Enter");
     await expect(page).toHaveURL(/analityka\?days=7$/);
     await expect(page.getByRole("link", { name: "7 dni" })).toHaveAttribute("aria-current", "page");
@@ -2216,6 +2323,27 @@ test.describe("panel reference reconstruction", () => {
     await page.setViewportSize({ height: 844, width: 390 });
     await page.goto(`/panel/${organizationId}/analityka?days=30`);
     await expect(page.locator(".metric-grid .metric-card")).toHaveCount(4);
+    const mobilePrivacyState = await mountAnalyticsPrivacyStateProbe(page);
+    await expect(mobilePrivacyState).toBeVisible();
+    const mobilePrivacyStyle = await mobilePrivacyState.evaluate((section) => {
+      const state = section.querySelector<HTMLElement>(".wy-state")!;
+      const stateStyle = getComputedStyle(state);
+      return {
+        minHeight: stateStyle.minHeight,
+        paddingLeft: stateStyle.paddingLeft,
+        paddingRight: stateStyle.paddingRight,
+      };
+    });
+    expect(mobilePrivacyStyle).toEqual({
+      minHeight: "0px",
+      paddingLeft: "24px",
+      paddingRight: "24px",
+    });
+    await mobilePrivacyState.screenshot({
+      animations: "disabled",
+      path: path.join(panelTypographyArtifactDirectory, "after-empty-state-390.png"),
+    });
+    await mobilePrivacyState.evaluate((section) => section.remove());
     const mobileGeometry = await page.evaluate(() => {
       const metrics = Array.from(
         document.querySelectorAll<HTMLElement>(".analytics-panel .metric-card"),
