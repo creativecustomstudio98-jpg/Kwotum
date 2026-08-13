@@ -561,3 +561,29 @@ docelowych hostach Cloudflare.
   izolowany axe WCAG A/AA;
 - wynik: **PASS, 19/20**; szczegóły i jawne odstępstwo krótkiego viewportu
   zapisuje `docs/ui/sidebar-kwotum-p1/VISUAL_QA_REPORT.md`.
+
+## Etap 12ZR — tenantowe centrum pomocy
+
+- zakres: `/panel/[organizationId]/pomoc` i mikroregion drugorzędnych akcji na
+  `/panel/[organizationId]/leady/[leadId]`;
+- referencja kompozycyjna Pomocy: zaakceptowany shell panelu P1 oraz płaska
+  anatomia istniejących ekranów ustawień i powiadomień z
+  `artifacts/visual-qa/12s-remaining-screens/after/`;
+- referencja mikroregionu leada: crop użytkownika 880 × 128 px, SHA-256
+  `bc03fb4756dc2764acb4188e8116e1b73febac7bbad4178f3227bddafc0aa231`;
+- kontrolne viewporty: 1536 × 1024 i 390 × 844;
+- artefakty: `artifacts/visual-qa/12zr-help-center/` oraz
+  `artifacts/visual-qa/12o-lead-detail-responsive/after-production-*.png`;
+- wynik: **PASS, 19/20**; kompletność 4, hierarchia i geometria 4, typografia
+  4, gęstość 4, transformacja mobile 3;
+- automatyczny gate: wyszukiwanie, klawiatura, capability-filter unit,
+  `aria-live`, native accordion, axe A/AA, brak poziomego overflow i środek
+  ikony względem tekstu ≤ 1 px. Zewnętrzna powierzchnia poradnika jest płaska:
+  przezroczysty wrapper bez obramowania i cienia na białym workspace.
+
+Pomoc nie ma jednej zaakceptowanej referencji pixel-perfect. Ocena nie używa
+fałszywego RMSE: odnosi hierarchię do dwóch wskazanych, istniejących ekranów
+panelu, a kompletność do rzeczywistych tras i capabilities. Mobile otrzymuje
+3/4, ponieważ jest udokumentowaną transformacją bez osobnego obrazu
+referencyjnego. Pierwszy audyt wykrył niewystarczający kontrast dwóch drobnych
+etykiet; po korekcie ponowny axe zakończył się bez naruszeń.

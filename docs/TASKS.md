@@ -2675,6 +2675,38 @@ akcji, tenant scope, sidebara ani geometrii pozostałych ekranów.
 tenant scope, treści komunikatów, mobilnej nawigacji ani geometrii sidebara.
 Artefakty: `artifacts/visual-qa/12zp-panel-typography/`.
 
+## Etap 12ZR — tenantowe centrum pomocy i geometria akcji leada
+
+- [x] Zinwentaryzować rzeczywiste trasy, operacje, role i non-goals panelu.
+- [x] Zastąpić link do marketingowego `/jak-dziala` wewnętrzną trasą
+      `/panel/[organizationId]/pomoc` na desktopie i mobile.
+- [x] Przygotować 19 instrukcji obejmujących start, leady, procesy, analitykę,
+      powiadomienia, WordPress, webhooki, administrację i diagnostykę.
+- [x] Filtrować poradnik tymi samymi capabilities co moduły panelu, bez
+      ujawniania Sprzedaży instrukcji do buildera, integracji i prywatności.
+- [x] Dodać działające wyszukiwanie z normalizacją polskich znaków, szybkie
+      ścieżki, spis treści oraz natywne sekcje `details/summary`.
+- [x] Zachować SSR pełnej dostępnej treści, tenant scope, noindex oraz stany
+      loading, error i pusty wynik bez fikcyjnego formularza wsparcia.
+- [x] Wycentrować ikonę i tekst wewnątrz obu drugorzędnych akcji szczegółów
+      leada bez zmiany działania dialogów i serwerowego zapisu zadań.
+- [x] Dodać unit ról/wyszukiwania oraz E2E wyszukiwarki, klawiatury, nawigacji,
+      geometrii ikon, desktop/mobile, overflow i axe WCAG A/AA.
+- [x] Usunąć dodatkową kartę Pomocy: poradnik leży bezpośrednio na białym
+      workspace bez własnego tła, obwódki i cienia; E2E pilnuje tej powierzchni.
+
+**Gate lokalny 2026-08-13:** 187 testów web przechodzi, lint i typecheck są
+zielone, a build monorepo kończy 16/16 z dynamiczną trasą pomocy. Izolowane
+scenariusze produkcyjnego standalone przechodzą 1/1 dla Pomocy i 1/1 dla
+szczegółów leada, wraz z cleanupem tenanta bez pozostałości. Audyt axe wykrył
+za jasne numery szybkich ścieżek i etykietę spisu treści; kontrast poprawiono i
+powtórzony test ma zero naruszeń. Desktop 1536 × 1024 i mobile 390 × 844 nie
+mają poziomego overflow. Środki ikon i tekstu obu akcji leada różnią się o nie
+więcej niż 1 px. Raport: `PANEL_HELP_CENTER_FINAL_2026-08-13.md`; artefakty:
+`artifacts/visual-qa/12zr-help-center/` i istniejący etap
+`artifacts/visual-qa/12o-lead-detail-responsive/`. Etap nie zmienia API, bazy,
+RLS, modelu ról ani nie stanowi samodzielnej zgody na deployment.
+
 ## Etap 13 — Produkcja
 
 ### Etap 13A — staging i infrastruktura

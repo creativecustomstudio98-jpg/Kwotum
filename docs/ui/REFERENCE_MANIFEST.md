@@ -85,6 +85,7 @@ semantycznego React/Next.js i wspólnych tokenów `packages/ui`.
 | Y     | wybór organizacji Kwotum            | szeroki header, oś 1260 px i pozioma karta z realnym podsumowaniem; mobile zachowuje jedną kolumnę                     |
 | Z     | operacyjna obsługa leada            | zwarta prawa kolumna: status, właściciel, priorytet, kontakt, notatki i zadania; wyłącznie z prawdziwym zapisem        |
 | AA    | webhook v1 w panelu                 | dziedziczy wyłącznie anatomię Integracji 12S; treść, stany i bezpieczeństwo określają ADR-034 oraz `WEBHOOKS.md`       |
+| AD    | tenantowe centrum pomocy            | płaska anatomia panelu i instrukcje filtrowane capability; bez fikcyjnego kanału wsparcia                              |
 
 Oryginały panelowe A/C/F są dostępne w `apps/web/public/panel/`, a D w
 `references/product-app-board.png`; zostały zablokowane 2026-07-27:
@@ -315,6 +316,26 @@ Nie dziedziczy treści WordPressa, statystyk ani kontrolek. Dane, role, stany,
 one-time secret, retry i dead letter wynikają wyłącznie z ADR-034 i
 `WEBHOOKS.md`. Finalne viewporty, overlay i różnice zapisuje
 `artifacts/visual-qa/12zf-webhook-v1/diff.md`.
+
+Decyzja AD nie pochodzi z osobnego obrazu Pomocy. Jej konkretnym źródłem
+geometrii jest zaakceptowany shell sidebara P1 oraz płaska anatomia dwóch
+istniejących ekranów panelu:
+
+- `artifacts/visual-qa/12s-remaining-screens/after/organization-settings-1536x1024.png`,
+  SHA-256 `af0e83d101f559587ba060072a20a56429102fcca4606001685c88f40f135766`;
+- `artifacts/visual-qa/12s-remaining-screens/after/notifications-1536x1024.png`,
+  SHA-256 `3a03d77daddeb13f4ce363c6007c21419e0f54b1823f2c1f568d599c38d2215a`.
+
+Referencje ustalają białą ciągłą powierzchnię, hairline'y, spokojną typografię
+i brak warstwowania kart. Korekta właściciela z 2026-08-13 doprecyzowuje, że
+sam wrapper Pomocy nie może mieć własnego tła, obwódki ani cienia; linie są
+dozwolone tylko jako separatory rzeczywistych sekcji treści. Nie tworzą
+modułów ani danych. Treść Pomocy wynika
+wyłącznie z aktywnych tras, capabilities i non-goals. Dostarczony crop akcji
+leada 880 × 128 px, SHA-256
+`bc03fb4756dc2764acb4188e8116e1b73febac7bbad4178f3227bddafc0aa231`,
+nadpisuje tylko wyrównanie ikon względem tekstu w przyciskach „Zaplanuj
+kontakt” i „Utwórz zadanie”; nie zmienia ich rozmiaru ani zachowania.
 
 Decyzja AB pochodzi z dostarczonego i zaakceptowanego przez właściciela znaku
 Kwotum z 2026-08-11. Zastępuje poprzedni symbol we wszystkich powierzchniach

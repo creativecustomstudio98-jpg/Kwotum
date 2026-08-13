@@ -65,6 +65,7 @@ zatwierdza funkcji spoza `SCOPE.md`.
 | Obrazy referencyjne             | `ui/REFERENCE_MANIFEST.md`                              | `ui/UI_REFERENCE_INDEX.md`, `ui/REFERENCE_IMAGE_PROTOCOL.md`                                             |
 | Finalny sidebar Kwotum          | `ui/sidebar-kwotum-p1/README.md`                        | `ui/sidebar-kwotum-p1/VISUAL_QA_REPORT.md`, ADR-045                                                      |
 | Finalny wybór organizacji       | `ui/organization-picker-kwotum-final/README.md`         | `ui/organization-picker-kwotum-final/VISUAL_QA_REPORT.md`, ADR-046                                       |
+| Tenantowe centrum pomocy        | `PANEL_HELP_CENTER_FINAL_2026-08-13.md`                 | `UI_SCREEN_SPEC.md`, `VISUAL_QA.md`, `AUTHORIZATION.md`                                                  |
 | Marka Kwotum                    | `DECISIONS.md` (ADR-033)                                | `ui/kwotum-brand-v1/`, `_migration/LORUM_BRAND_IDENTIFIER_MATRIX.md`                                     |
 | Rebranding podstron             | `ui/marketing-subpages-v1/MASTER_REBRAND_PLAN.md`       | `ui/marketing-subpages-v1/ROUTE_AND_SECTION_AUDIT.md`, `ui/marketing-subpages-v1/DESIGN_ARCHITECTURE.md` |
 | Plan prac                       | `TASKS.md`                                              | `ROADMAP.md`, `RELEASE_CHECKLIST.md`                                                                     |

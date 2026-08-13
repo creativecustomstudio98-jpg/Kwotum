@@ -6,6 +6,19 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Pozycja „Pomoc” prowadzi teraz do wewnętrznego, tenantowego poradnika panelu
+  zamiast na stronę marketingową. Centrum pomocy obejmuje 19 instrukcji o
+  rzeczywistych funkcjach Kwotum, wyszukiwanie bez rozróżniania polskich
+  znaków, szybkie ścieżki i dostępne klawiaturą sekcje. Zakres treści jest
+  filtrowany według roli i capabilities, więc Sprzedaż nie widzi instrukcji
+  administracyjnych, buildera ani integracji. Widoki loading, error, desktop i
+  mobile zachowują noindex, tenant scope oraz brak fikcyjnych kanałów wsparcia.
+  Poradnik leży bezpośrednio na białej powierzchni workspace, bez dodatkowej
+  karty, wewnętrznego tła, obwódki i cienia. Separatory pozostają wyłącznie
+  między rzeczywistymi sekcjami treści.
+  W szczegółach leada ikony akcji „Zaplanuj kontakt” i „Utwórz zadanie” są
+  teraz geometrycznie wyśrodkowane z tekstem.
+
 - Sidebar używa teraz spokojnych, systemowych wag 400/500/600 zamiast
   arbitralnych wartości 520–650, bez zmiany geometrii, ikon i aktywnego skosu.
   Stan małej próby analityki ma 32 px wewnętrznego marginesu na desktopie,
