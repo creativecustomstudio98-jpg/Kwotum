@@ -97,3 +97,13 @@ collapsed, 236 × 200 px, SHA-256
 `a35d9b646ed18fc1d85c23c01e8ee5da6f4a697011b652051cd43a942360334d`,
 ustala początek jasnej powierzchni równo z lewym brzegiem wąskiego raila, bez
 lewego zaokrąglenia, oraz prawy skos kończący się 10 px przed prawym brzegiem.
+
+## Korekta typografii 12ZP — 2026-08-13
+
+Nowszy review produkcji wskazał, że wagi 520/620/640/650 dają ciężki,
+szablonowy efekt. Zostały zastąpione centralnymi tokenami 400/500/600:
+zwykła nawigacja, organizacja i utilities mają 400; aktywna pozycja, etykiety
+grup i konto mają 500; marka ma 600. E2E mierzy wartości computed style i
+ponownie potwierdza geometrię 256/72 px oraz oba warianty aktywnej powierzchni.
+Crop `after-sidebar-256x1024.png` znajduje się w
+`artifacts/visual-qa/12zp-panel-typography/`.

@@ -2656,6 +2656,25 @@ nie może tworzyć własnego tła, obramowania ani cienia. Wewnętrzne karty
 pozostają rozdzielone zgodnie z biblioteką 12ZC-T. Zakres nie zmienia danych,
 akcji, tenant scope, sidebara ani geometrii pozostałych ekranów.
 
+## Etap 12ZP — spokojniejsza typografia panelu
+
+- [x] Zablokować zaakceptowany crop produkcyjnego stanu „Brak danych”
+      1136 × 456 px i jego SHA-256.
+- [x] Zastąpić arbitralne wagi 520/550/620/640/650 w sidebarze centralnymi
+      tokenami 400/500/600 bez zmiany jego geometrii, ikon ani aktywnego skosu.
+- [x] Nadać stanowi małej próby analityki rzeczywisty inset 32 px na desktopie
+      i 24 px na mobile oraz uporządkować hierarchię 16/14 px.
+- [x] Usunąć z tego stanu zbędne wewnętrzne linie, nadmierną minimalną wysokość
+      i przypadkowe zawężenie opisu, zachowując komunikat oraz próg prywatności.
+- [x] Dodać regresję computed-style i visual QA dla sidebara oraz stanu pustego
+      w desktopowym i mobilnym buildzie produkcyjnym.
+
+**Gate 2026-08-13:** izolowany Playwright przeszedł 2/2, potwierdzając sidebar
+256 px z wagami 400/500/600, stan desktop 32 px / 16 px / 14 px oraz stan mobile
+24 px bez poziomego overflow. Zakres nie zmienia danych, logiki analityki,
+tenant scope, treści komunikatów, mobilnej nawigacji ani geometrii sidebara.
+Artefakty: `artifacts/visual-qa/12zp-panel-typography/`.
+
 ## Etap 13 — Produkcja
 
 ### Etap 13A — staging i infrastruktura

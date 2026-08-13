@@ -303,6 +303,31 @@ Ta korekta nadpisuje starszą referencję 12ZC-T wyłącznie w regionie
 zewnętrznej karty. Nie zmienia jej kontraktu funkcjonalnego ani wewnętrznej
 geometrii biblioteki.
 
+## Etap 12ZP — spokojniejsza typografia panelu
+
+- zakres: desktopowy sidebar oraz stan małej próby na
+  `/panel/[organizationId]/analityka`;
+- źródło korekty stanu pustego: zaakceptowany crop produkcji 1136 × 456 px,
+  SHA-256
+  `1b90189a221d164a2e9ea92d141ec5d0cfdff1c50c2a8383d553c94eb8903070`;
+- pomiar `before`: karta 968 × 226 px, `.wy-state` bez poziomego insetu,
+  nagłówek 18,72 px, opis 16 px i maksymalna szerokość 544 px;
+- kontrakt `after` desktop: inset 32 px, minimum 176 px, etykieta 12/500,
+  nagłówek 16/600, opis 14/400 o `max-width: 736px`, bez wewnętrznego
+  `border-block`;
+- kontrakt `after` mobile: inset 24 px i naturalna wysokość;
+- sidebar: marka 600, etykiety grup i aktywna pozycja 500, organizacja,
+  pozycje zwykłe, utilities i opis organizacji 400;
+- bez zmian: 256/72 px, 48 px wiersza, ikony, kolory, active clip-path,
+  routing, focus, persistence i dolna nawigacja mobile;
+- artefakty: `artifacts/visual-qa/12zp-panel-typography/`;
+- automatyczny gate: Playwright 2/2, desktop 1536 × 1024, mobile 390 × 844,
+  computed styles, build produkcyjny i cleanup tenanta bez pozostałości.
+
+Render stanu pustego w teście jest kontrolowaną powierzchnią QA z tym samym
+markupem `StateContent` i produkcyjnym CSS. Fixture analityki celowo zawiera
+wystarczającą próbę, więc sonda nie zmienia danych ani progu prywatności.
+
 ## Etap 12X — interakcje i walidacja buildera
 
 - zakres: kolejność pytań i inspektor walidacji na

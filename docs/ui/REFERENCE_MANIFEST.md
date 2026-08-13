@@ -212,6 +212,16 @@ Nagłówek oraz wewnętrzne powierzchnie toolbaru, KPI, kart i detalu pozostają
 bez zmian. Artefakty korekty znajdują się w
 `artifacts/visual-qa/12zo-template-surface-hotfix/`.
 
+Korekta 12ZP pochodzi z zaakceptowanego cropu produkcyjnego stanu małej próby
+1136 × 456 px, SHA-256
+`1b90189a221d164a2e9ea92d141ec5d0cfdff1c50c2a8383d553c94eb8903070`.
+Nadpisuje starszy kontrakt tylko dla `.analytics-privacy-state`: wprowadza
+poziomy inset 32 px na desktopie i 24 px na mobile, hierarchię 16/14 px oraz
+usuwa wewnętrzne linie. Ta sama korekta zastępuje arbitralne wagi sidebara
+centralnymi tokenami 400/500/600, bez zmiany zatwierdzonej geometrii P1,
+kolorów, ikon i aktywnego skosu. Dowody znajdują się w
+`artifacts/visual-qa/12zp-panel-typography/`.
+
 Decyzja U jest nowszą dyspozycją właściciela z 2026-07-29 i nadpisuje
 Decyzję S wyłącznie w hero trasy `/`. Desktop używa jednego fizycznego
 telefonu z demonstracyjnym ekranem procesu oraz elementami kwalifikacji
