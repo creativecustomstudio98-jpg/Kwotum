@@ -73,7 +73,7 @@ button {
   min-height: 560px;
 }
 
-.wyceno-shell--inline .wyceno-card {
+.wyceno-shell--inline-compact .wyceno-card {
   min-height: 0;
 }
 
@@ -329,7 +329,7 @@ button {
   order: 1;
 }
 
-.wyceno-shell--inline .wyceno-form {
+.wyceno-shell--inline-compact .wyceno-form {
   min-height: 0;
 }
 
@@ -477,7 +477,7 @@ button:disabled {
   gap: 10px;
 }
 
-.wyceno-shell--inline .wyceno-actions {
+.wyceno-shell--inline-compact .wyceno-actions {
   margin-top: 0;
   padding-top: 16px;
 }

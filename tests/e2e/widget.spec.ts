@@ -766,6 +766,7 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
     element.style.setProperty("--wyceno-widget-backdrop", "rgb(23 26 27 / 72%)");
     element.setAttribute("brand-name", "Fortez");
     element.setAttribute("brand-subtitle", "6 pytań · około 2 min");
+    element.setAttribute("inline-layout", "compact");
     element.setAttribute("mode", "inline");
   });
   const inlineCard = widget.locator(".wyceno-card");

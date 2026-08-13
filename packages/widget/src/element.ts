@@ -199,6 +199,10 @@ export class WycenoWidgetElement extends HTMLElement {
     return mode === "popup" || mode === "fullscreen" ? mode : "inline";
   }
 
+  get compactInline(): boolean {
+    return this.mode === "inline" && this.getAttribute("inline-layout") === "compact";
+  }
+
   get previewManifest(): WidgetManifest | null {
     return this.#previewManifest;
   }
@@ -240,7 +244,7 @@ export class WycenoWidgetElement extends HTMLElement {
       return;
     }
     const state = idleWidgetState();
-    const container = create("div", `wyceno-shell wyceno-shell--${this.mode}`);
+    const container = create("div", this.#shellClassName());
     container.append(this.#createLauncher());
     this.#shadow.querySelector(".wyceno-shell")?.remove();
     this.#shadow.append(container);
@@ -293,7 +297,7 @@ export class WycenoWidgetElement extends HTMLElement {
       return;
     }
     const dialogWasOpen = this.#dialog?.open === true;
-    const container = create("div", `wyceno-shell wyceno-shell--${this.mode}`);
+    const container = create("div", this.#shellClassName());
     if (this.mode === "inline") {
       container.append(this.#renderContent(state));
     } else {
@@ -1120,6 +1124,10 @@ export class WycenoWidgetElement extends HTMLElement {
     shell.append(alert);
     this.#shadow.append(shell);
     this.#dialog = null;
+  }
+
+  #shellClassName(): string {
+    return `wyceno-shell wyceno-shell--${this.mode}${this.compactInline ? " wyceno-shell--inline-compact" : ""}`;
   }
 }
 

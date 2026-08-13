@@ -6,8 +6,9 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
-- Tryb inline widgetu ma teraz naturalną wysokość zamiast pustej powierzchni
-  720 px. Akcja znajduje się bezpośrednio pod odpowiedziami, wymagane pytanie
+- Osadzenie inline z jawnym `inline-layout="compact"` ma naturalną wysokość
+  zamiast pustej powierzchni 720 px, bez zmiany pełnego hosted linku. Akcja
+  znajduje się bezpośrednio pod odpowiedziami, wymagane pytanie
   blokuje „Dalej” do chwili podania odpowiedzi, a krótka wskazówka potwierdza,
   kiedy można przejść dalej. Pierwszy ekran pokazuje liczbę pytań, a przycisk
   wizualnie zapowiada następne pytanie albo podsumowanie bez zmiany dostępnej

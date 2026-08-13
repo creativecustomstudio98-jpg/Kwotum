@@ -37,9 +37,11 @@ Kliknięcie otwiera natywny `dialog`, pokazuje stan „Uruchamiamy formularz…�
 dopiero wtedy tworzy albo wznawia sesję. `wyceno:ready` nadal oznacza gotowy
 manifest, a `wyceno:closed` zachowuje zwrot fokusu do launchera.
 
-Inline nie dziedziczy minimalnej wysokości pełnoekranowego procesu. Karta i
+Osadzenie inline może jawnie ustawić `inline-layout="compact"`. Tylko ten
+wariant nie dziedziczy minimalnej wysokości pełnoekranowego procesu: karta i
 formularz rosną wraz z treścią, a akcje pozostają bezpośrednio pod bieżącą
-odpowiedzią. Dla pytania wymaganego „Dalej” jest nieaktywne do chwili wybrania
+odpowiedzią. Hosted link i zwykły `mode="inline"` zachowują pełną powierzchnię.
+Dla pytania wymaganego „Dalej” jest nieaktywne do chwili wybrania
 lub wpisania odpowiedzi; wskazówka obok akcji wyjaśnia wymagany krok i po
 uzupełnieniu potwierdza gotowość. Nie stosujemy automatycznego przejścia po
 kliknięciu opcji, ponieważ użytkownik musi móc poprawić wybór przed zapisem,

@@ -2814,8 +2814,8 @@ zmienia procesu, API, sesji, tenant scope ani danych leada.
 - [x] Zablokować załącznik 3338 × 1962 i SHA-256
       `237a48fd339ae123fae6677348b84bf3362a4a727fe530951290a777c3401266`
       jako referencję problemu.
-- [x] Nadać inline naturalną wysokość i przenieść akcję bezpośrednio pod
-      odpowiedzi bez zmiany popupu/fullscreen.
+- [x] Nadać jawnemu `inline-layout="compact"` naturalną wysokość i przenieść
+      akcję bezpośrednio pod odpowiedzi bez zmiany popupu/fullscreen/hosted.
 - [x] Dodać jawne prowadzenie: liczba pytań, stan wymaganej odpowiedzi,
       potwierdzenie gotowości oraz wizualna zapowiedź następnego kroku.
 - [x] Zachować ręczne zatwierdzenie zamiast ryzykownego auto-advance.
