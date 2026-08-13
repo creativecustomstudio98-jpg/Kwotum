@@ -32,6 +32,7 @@ const builderOptionArtifactDirectory = path.join(artifactRoot, "12za-builder-opt
 const builderEstimationArtifactDirectory = path.join(artifactRoot, "12ze-self-service-estimation");
 const builderContactArtifactDirectory = path.join(artifactRoot, "12zk-contact-builder");
 const webhookArtifactDirectory = path.join(artifactRoot, "12zf-webhook-v1");
+const helpCenterArtifactDirectory = path.join(artifactRoot, "12zr-help-center");
 const sidebarP1ArtifactDirectory = path.join(artifactRoot, "sidebar-kwotum-p1");
 const panelTypographyArtifactDirectory = path.join(artifactRoot, "12zp-panel-typography");
 
@@ -1909,6 +1910,31 @@ test.describe("panel reference reconstruction", () => {
     await expect(operations.getByRole("button", { name: "Zaplanuj kontakt" })).toBeVisible();
     await expect(operations.getByRole("button", { name: "Utwórz zadanie" })).toBeVisible();
 
+    for (const label of ["Zaplanuj kontakt", "Utwórz zadanie"]) {
+      const alignment = await operations.getByRole("button", { name: label }).evaluate((button) => {
+        const content = button.querySelector<HTMLElement>(":scope > span");
+        const icon = content?.querySelector("svg");
+        const textNode = Array.from(content?.childNodes ?? []).find(
+          (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+        );
+        if (!content || !icon || !textNode) throw new Error("Brak treści przycisku akcji.");
+        const range = document.createRange();
+        range.selectNodeContents(textNode);
+        const iconBounds = icon.getBoundingClientRect();
+        const textBounds = range.getBoundingClientRect();
+        return {
+          alignItems: getComputedStyle(content).alignItems,
+          centerDelta: Math.abs(
+            iconBounds.top + iconBounds.height / 2 - (textBounds.top + textBounds.height / 2),
+          ),
+          display: getComputedStyle(content).display,
+        };
+      });
+      expect(alignment.display).toBe("flex");
+      expect(alignment.alignItems).toBe("center");
+      expect(alignment.centerDelta).toBeLessThanOrEqual(1);
+    }
+
     await operations.getByRole("button", { name: "Zaplanuj kontakt" }).click();
     const taskDialog = page.getByRole("dialog");
     await expect(taskDialog.getByRole("heading", { name: "Zaplanuj kontakt" })).toBeVisible();
@@ -1995,6 +2021,68 @@ test.describe("panel reference reconstruction", () => {
       .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
       .analyze();
     expect(accessibility.violations).toEqual([]);
+  });
+
+  test("help center explains only real, role-available panel features", async ({ page }) => {
+    await mkdir(helpCenterArtifactDirectory, { recursive: true });
+    await page.setViewportSize({ height: 1_024, width: 1_536 });
+    await page.goto(`/panel/${organizationId}/pomoc`);
+
+    await expect(page.getByRole("heading", { level: 1, name: "Pomoc" })).toBeVisible();
+    await expect(page.getByText("Zakres poradnika: Właściciel")).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Spis treści poradnika" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Leady i obsługa" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Procesy i formularze" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Integracje" })).toBeVisible();
+    await page.locator("#guide-webhooks summary").click();
+    await expect(page.getByRole("link", { name: "Otwórz webhooki" })).toHaveAttribute(
+      "href",
+      `/panel/${organizationId}/integracje/webhooki`,
+    );
+    await expect(page.getByRole("link", { name: "Pomoc" })).toHaveAttribute("aria-current", "page");
+
+    const search = page.getByRole("searchbox", { name: "Szukaj w poradniku" });
+    await search.fill("webhook");
+    await expect(page.getByText("1 wynik dla „webhook”")).toBeVisible();
+    await expect(page.locator(".help-category__guides details")).toHaveCount(1);
+    await expect(page.getByText("Endpoint, podpis HMAC, test połączenia")).toBeVisible();
+    await page.getByRole("button", { name: "Wyczyść wyszukiwanie" }).click();
+    await expect(page.getByText(/instrukcji dostępnych dla Twojej roli/)).toBeVisible();
+
+    const firstGuide = page.locator("#guide-first-launch");
+    await expect(firstGuide).toHaveAttribute("open", "");
+    await firstGuide.locator("summary").focus();
+    await page.keyboard.press("Enter");
+    await expect(firstGuide).not.toHaveAttribute("open", "");
+
+    const desktopOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(desktopOverflow).toBeLessThanOrEqual(1);
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(helpCenterArtifactDirectory, "after-desktop-1536x1024.png"),
+    });
+
+    const accessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(accessibility.violations).toEqual([]);
+
+    await page.setViewportSize({ height: 844, width: 390 });
+    await page.goto(`/panel/${organizationId}/pomoc`);
+    await expect(page.getByRole("heading", { level: 1, name: "Pomoc" })).toBeVisible();
+    await expect(page.getByRole("searchbox", { name: "Szukaj w poradniku" })).toBeVisible();
+    const mobileOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(mobileOverflow).toBeLessThanOrEqual(1);
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(helpCenterArtifactDirectory, "after-mobile-390x844.png"),
+    });
   });
 
   test("template library reproduces the rich reference with real filters and detail", async ({
@@ -2591,6 +2679,7 @@ test.describe("panel reference reconstruction", () => {
       exact: true,
       name: "Pomoc i instrukcje",
     });
+    await expect(helpLink).toHaveAttribute("href", `/panel/${organizationId}/pomoc`);
     await page.keyboard.press("Shift+Tab");
     await expect(helpLink).toBeFocused();
     await page.keyboard.press("Tab");

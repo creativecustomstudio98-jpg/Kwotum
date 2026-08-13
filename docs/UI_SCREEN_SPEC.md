@@ -52,6 +52,7 @@ zachowują własne kompozycje do czasu osobnego etapu.
 | Instalacja  | pełny bezstanowy preview, wysyłka hosted linku, historia, inline, popup, fullscreen, hosted, WordPress | kontrolki muszą wykonywać realne działania; preview nie tworzy sesji ani leada |
 | Integracje  | webhook i WordPress                                                                                    | sekrety tylko po stronie serwera                                               |
 | Ustawienia  | organizacja, zespół, branding, prywatność, retencja                                                    | autoryzacja serwerowa                                                          |
+| Pomoc       | wyszukiwanie, spis treści i instrukcje rzeczywistych modułów                                           | zakres filtrowany capability; bez fikcyjnego supportu                          |
 | Stany       | loading, empty, error, permission, stale, offline widget                                               | bez utraty kontekstu i danych                                                  |
 
 ## Najnowsze nadpisania wizualne
