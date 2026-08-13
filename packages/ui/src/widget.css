@@ -1,6 +1,6 @@
 :host {
   color: var(--wyceno-widget-text, #17211d);
-  color-scheme: light;
+  color-scheme: var(--wyceno-widget-color-scheme, light);
   display: block;
   font-family: var(
     --wyceno-widget-font-family,
@@ -41,7 +41,7 @@ button {
   --wyceno-border-strong: var(--wyceno-widget-border-strong, #b8c4bd);
   --wyceno-secondary-border: var(--wyceno-widget-secondary-border, var(--wyceno-border-strong));
   --wyceno-control-radius: var(--wyceno-widget-control-radius, 5px);
-  --wyceno-error: #b43a3f;
+  --wyceno-error: var(--wyceno-widget-error, #b43a3f);
   --wyceno-heading-font-family: var(--wyceno-widget-heading-font-family, inherit);
   --wyceno-heading-font-weight: var(--wyceno-widget-heading-font-weight, 760);
   --wyceno-heading-letter-spacing: var(--wyceno-widget-heading-letter-spacing, -0.045em);
@@ -75,6 +75,54 @@ button {
 
 .wyceno-shell--inline-compact .wyceno-card {
   min-height: 0;
+}
+
+.wyceno-shell--inline-integrated .wyceno-card {
+  border: 0;
+  overflow: visible;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.wyceno-shell--inline-integrated .wyceno-header {
+  min-height: 0;
+  padding: 0 0 10px;
+  border: 0;
+}
+
+.wyceno-shell--inline-integrated .wyceno-brand {
+  display: none;
+}
+
+.wyceno-shell--inline-integrated .wyceno-header-actions {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.wyceno-shell--inline-integrated .wyceno-sync {
+  text-align: left;
+}
+
+.wyceno-shell--inline-integrated .wyceno-progress-region,
+.wyceno-shell--inline-integrated .wyceno-stage {
+  width: 100%;
+}
+
+.wyceno-shell--inline-integrated .wyceno-progress-region {
+  padding-top: 0;
+}
+
+.wyceno-shell--inline-integrated .wyceno-stage {
+  padding: 28px 0 0;
+}
+
+.wyceno-shell--inline-integrated .wyceno-analytics {
+  margin: 26px 0 0;
+  padding: 16px 0 0;
+  border-width: 1px 0 0;
+  border-radius: 0;
+  order: 2;
+  background-color: transparent;
 }
 
 .wyceno-preview-notice {
@@ -415,6 +463,12 @@ textarea {
 
 textarea {
   min-height: 128px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--wyceno-muted);
+  opacity: 0.82;
 }
 
 button {
@@ -804,6 +858,10 @@ button:disabled {
     box-shadow: none;
   }
 
+  .wyceno-shell--inline-integrated .wyceno-card {
+    min-height: 0;
+  }
+
   .wyceno-header {
     min-height: 64px;
     padding: 11px 16px;
@@ -846,6 +904,15 @@ button:disabled {
     padding: 28px 16px calc(22px + env(safe-area-inset-bottom));
   }
 
+  .wyceno-shell--inline-integrated .wyceno-stage {
+    min-height: 0;
+    padding: 24px 0 0;
+  }
+
+  .wyceno-shell--inline-integrated .wyceno-progress-region {
+    width: 100%;
+  }
+
   .wyceno-introduction {
     margin-bottom: 18px;
   }
@@ -857,6 +924,10 @@ button:disabled {
 
   .wyceno-form {
     min-height: calc(100dvh - 230px);
+  }
+
+  .wyceno-shell--inline-integrated .wyceno-form {
+    min-height: 0;
   }
 
   .wyceno-choices,
@@ -884,6 +955,14 @@ button:disabled {
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--wyceno-border);
     background-color: var(--wyceno-surface);
+  }
+
+  .wyceno-shell--inline-integrated .wyceno-actions {
+    position: static;
+    margin: 0;
+    padding: 16px 0 0;
+    border-top: 0;
+    background-color: transparent;
   }
 
   .wyceno-actions button {

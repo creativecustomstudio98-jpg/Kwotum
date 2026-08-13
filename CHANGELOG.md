@@ -6,6 +6,13 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Jawny wariant `inline-layout="integrated"` osadza proces bez obcej karty,
+  powtórzonego logo i drugiego wprowadzenia. Zachowuje kompaktową wysokość,
+  status zapisu, progress i pełną semantykę formularza, a zgodę na zbiorczą
+  analitykę umieszcza po aktywnym pytaniu. Nowe role `color-scheme` i koloru
+  błędu pozwalają zbudować dostępny ciemny preset bez wpływu na domyślny wygląd
+  Kwotum, popup, fullscreen lub hosted link.
+
 - Osadzenie inline z jawnym `inline-layout="compact"` ma naturalną wysokość
   zamiast pustej powierzchni 720 px, bez zmiany pełnego hosted linku. Akcja
   znajduje się bezpośrednio pod odpowiedziami, wymagane pytanie

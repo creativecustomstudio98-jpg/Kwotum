@@ -2822,7 +2822,29 @@ zmienia procesu, API, sesji, tenant scope ani danych leada.
 - [x] Przejść E2E desktop/mobile, axe, overflow, pełny gate i visual QA:
       68 testów widgetu, 183 testy web, Chromium 1440/390, axe, build,
       format, lint, typecheck oraz skany SAST/secrets są zielone.
-- [ ] Wdrożyć widget przed zmianą strony Fortez, sprawdzić produkcję i rollback.
+- [x] Wdrożyć widget przed zmianą strony Fortez, sprawdzić produkcję i rollback.
+
+##### Korekta FTZ-05D — zintegrowana ciemna powierzchnia Fortez
+
+**Stan lokalny 2026-08-13 — CODE COMPLETE, RELEASE OPEN:** kolejny feedback z
+produkcyjnej sekcji pokazał, że mimo poprawnej ścieżki biały panel nadal
+wyglądał jak obca aplikacja wklejona na grafitowe tło. Zakres dotyczy wyłącznie
+prezentacji inline; nie zmienia procesu, API, sesji, danych leada ani hosted
+linku.
+
+- [x] Zablokować produkcyjny załącznik 3338 × 1962 i SHA-256
+      `237a48fd339ae123fae6677348b84bf3362a4a727fe530951290a777c3401266`
+      jako stan `before`.
+- [x] Dodać jawny `inline-layout="integrated"` bez karty, powtórzonego logo i
+      drugiego wprowadzenia, zachowując status zapisu oraz progress.
+- [x] Przenieść opcjonalną zgodę analityczną za aktywne pytanie w DOM i
+      wizualnie, bez zmiany jej znaczenia lub endpointu.
+- [x] Dodać ciemny, kontrastowy preset Fortez z kanciastymi kontrolkami,
+      pomarańczowym stanem wyboru i pełnym widokiem mobile.
+- [x] Pokryć wariant testem unit, Chromium 1440/390, axe i overflow; domyślny
+      inline, compact, popup, fullscreen i hosted pozostają bez zmian.
+- [ ] Przejść pełny gate, wdrożyć Kwotum przed minimalnym `index.html` Fortez,
+      wykonać produkcyjny UAT i zachować rollback.
 
 - [x] Ujawnić publiczny tytuł i wprowadzenie w builderze z limitami schematu.
 - [x] Rozdzielić walidację treści formularza od walidacji aktywnego pytania.

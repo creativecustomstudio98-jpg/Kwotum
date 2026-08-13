@@ -89,6 +89,30 @@ describe("wyceno-widget element", () => {
     expect(ready).toHaveBeenCalledOnce();
   });
 
+  it("renders an integrated inline process without duplicate branding or introduction", async () => {
+    const element = document.createElement("wyceno-widget");
+    element.setAttribute("inline-layout", "integrated");
+    element.setAttribute("public-id", testPublicId);
+    document.body.append(element);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    const shadow = element.shadowRoot;
+    const shell = shadow?.querySelector(".wyceno-shell");
+    const stage = shadow?.querySelector(".wyceno-stage");
+    const form = shadow?.querySelector(".wyceno-form");
+    const analytics = shadow?.querySelector(".wyceno-analytics");
+
+    expect(shell?.classList).toContain("wyceno-shell--inline-compact");
+    expect(shell?.classList).toContain("wyceno-shell--inline-integrated");
+    expect(shadow?.querySelector(".wyceno-introduction")).toBeNull();
+    expect(form).not.toBeNull();
+    expect(analytics).not.toBeNull();
+    expect(
+      stage && form && analytics ? [...stage.children].indexOf(analytics) : -1,
+    ).toBeGreaterThan(stage && form ? [...stage.children].indexOf(form) : Number.MAX_SAFE_INTEGER);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it("resolves the API from an explicit base or the renderer module origin", () => {
     expect(
       resolveWidgetApiBase(
