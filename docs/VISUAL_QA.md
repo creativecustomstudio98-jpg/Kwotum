@@ -328,6 +328,27 @@ Render stanu pustego w teście jest kontrolowaną powierzchnią QA z tym samym
 markupem `StateContent` i produkcyjnym CSS. Fixture analityki celowo zawiera
 wystarczającą próbę, więc sonda nie zmienia danych ani progu prywatności.
 
+## Etap 12ZQ — centrum integracji Kwotum
+
+- zakres: `/panel/[organizationId]/integracje/webhooki` oraz
+  `/panel/[organizationId]/integracje/wordpress`;
+- referencja: zaakceptowany ekran webhooków 2118 × 1510 px, SHA-256
+  `55b88b57d2037b13dfd948caefd55e64ebf09537538ea7173c6e7a5a417e3594`;
+- źródło: `docs/ui/integrations-kwotum-final/reference/webhooks-2118x1510.png`;
+- artefakty: `artifacts/visual-qa/12zq-integrations-navigation/`;
+- wynik: **PASS, 19/20**; kompletność 4, geometria 4, typografia 4, gęstość 4,
+  transformacja mobile 3;
+- desktop 1448 × 1086 zachowuje kolejność: nawigacja kanałów → cztery statusy
+  → operacje → historia, używając tylko rzeczywistych danych i akcji;
+- mobile 390 px składa statusy i operacje do jednej kolumny, a historię do
+  semantycznych kart bez poziomego overflow.
+
+Playwright sprawdza przełączanie Webhooki ↔ WordPress klawiaturą, rzeczywisty
+obrót one-time secret, blokadę testu dla niepublicznego DNS, cele 44 px,
+forced colors oraz axe WCAG A/AA. Brak osobnej referencji mobile pozostawia
+transformację na 3/4. Elementy widoczne na obrazie, których produkt nie ma
+(dokumentacja, filtr, ręczne odświeżanie i fikcyjne dostawy), nie są kopiowane.
+
 ## Etap 12X — interakcje i walidacja buildera
 
 - zakres: kolejność pytań i inspektor walidacji na

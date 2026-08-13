@@ -5,6 +5,7 @@ export type PanelIconName =
   | "arrow-left"
   | "arrow-right"
   | "attachment"
+  | "bolt"
   | "calendar"
   | "check"
   | "chevron-down"
@@ -17,6 +18,7 @@ export type PanelIconName =
   | "external"
   | "file"
   | "folder"
+  | "globe"
   | "help"
   | "info"
   | "integration"
@@ -32,6 +34,7 @@ export type PanelIconName =
   | "processes"
   | "preview"
   | "search"
+  | "send"
   | "settings"
   | "sort"
   | "star"
@@ -51,6 +54,7 @@ export function PanelIcon({
     attachment: (
       <path d="m20 11-8.5 8.5a5 5 0 0 1-7-7L14 3a3.5 3.5 0 0 1 5 5l-9.5 9.5a2 2 0 0 1-3-3L15 6" />
     ),
+    bolt: <path d="M13 2 5 14h6l-1 8 8-12h-6l1-8Z" />,
     calendar: (
       <>
         <rect height="16" rx="2" width="18" x="3" y="5" />
@@ -90,6 +94,12 @@ export function PanelIcon({
     ),
     folder: (
       <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2h8.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-11Z" />
+    ),
+    globe: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+      </>
     ),
     help: (
       <>
@@ -171,6 +181,12 @@ export function PanelIcon({
       <>
         <circle cx="11" cy="11" r="7" />
         <path d="m20 20-4-4" />
+      </>
+    ),
+    send: (
+      <>
+        <path d="m3 11 18-8-8 18-2.5-7.5L3 11Z" />
+        <path d="M10.5 13.5 21 3" />
       </>
     ),
     settings: (

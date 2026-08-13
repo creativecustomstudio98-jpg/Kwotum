@@ -4,8 +4,8 @@ import { Button, EmptyState } from "@wyceno/ui";
 
 export default function WebhookIntegrationError({ reset }: Readonly<{ reset: () => void }>) {
   return (
-    <main className="panel-workspace settings-panel">
-      <div className="panel-page">
+    <main className="panel-workspace integrations-panel webhook-panel">
+      <div className="panel-page integrations-workspace">
         <EmptyState
           action={<Button onClick={reset}>Ponów</Button>}
           description="Spróbuj ponownie. Sekrety endpointów nie są odczytywane ani zwracane przez ten ekran."

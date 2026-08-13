@@ -2675,6 +2675,34 @@ akcji, tenant scope, sidebara ani geometrii pozostałych ekranów.
 tenant scope, treści komunikatów, mobilnej nawigacji ani geometrii sidebara.
 Artefakty: `artifacts/visual-qa/12zp-panel-typography/`.
 
+## Etap 12ZQ — centrum integracji Kwotum
+
+- [x] Zablokować zaakceptowaną referencję webhooków 2118 × 1510 px i jej
+      SHA-256.
+- [x] Przenieść jej anatomię na rzeczywiste kanały Kwotum: Webhooki i
+      WordPress, bez fikcyjnych CRM, arkuszy, statystyk i martwych akcji.
+- [x] Dodać wspólną, dostępną klawiaturą nawigację wewnętrzną między kanałami.
+- [x] Przebudować Webhooki na cztery statusy, zarządzanie endpointami,
+      osobny test oraz semantyczną historię dostaw bez payloadu i PII.
+- [x] Przebudować WordPress na status połączeń, bezpieczny kontrakt tokenu,
+      rzeczywiste instalacje i istniejącą akcję generowania tokenu.
+- [x] Zachować capability `owner/admin`, tenant scope, SSRF/DNS guard,
+      one-time secret, loading, empty i error state.
+- [x] Naprawić jednorazowe wyniki tworzenia endpointu, testu i obrotu sekretu,
+      które były gubione przez natychmiastową rewalidację strony.
+- [x] Dodać test okna dostaw 24 h oraz E2E desktop/mobile dla nawigacji,
+      działań, axe, forced colors i braku overflow.
+
+**Gate lokalny 2026-08-13:** produkcyjny standalone i izolowany scenariusz
+Playwright przechodzą 1/1 na 1448 × 1086 i 390 × full. Test potwierdza obrót
+sekretu, negatywny przypadek niepublicznego DNS, przełączanie kanałów przez
+Enter, cele minimum 44 px, zero poziomego overflow i zero naruszeń axe.
+Pełny gate przechodzi: format, lint 8/8, typecheck 8/8, 330 testów unit,
+WordPress na WP 6.9.2/7.0.2 i PHP 8.5.2, pełne RLS/PostgreSQL, build 16/16 oraz
+skany SAST/secrets. Artefakty:
+`artifacts/visual-qa/12zq-integrations-navigation/`. Etap nie zmienia API,
+schematu bazy, RLS ani uprawnień i nie jest samodzielną zgodą na deployment.
+
 ## Etap 13 — Produkcja
 
 ### Etap 13A — staging i infrastruktura

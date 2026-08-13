@@ -316,7 +316,7 @@ try {
             .filter(Boolean)
         : [
             "12ze-self-service-estimation",
-            "12zf-webhook-v1",
+            "12zq-integrations-navigation",
             "12zk-contact-delivery-settings",
             "12zk-contact-builder",
           ];
