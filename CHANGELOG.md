@@ -6,6 +6,13 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Tryb inline widgetu ma teraz naturalną wysokość zamiast pustej powierzchni
+  720 px. Akcja znajduje się bezpośrednio pod odpowiedziami, wymagane pytanie
+  blokuje „Dalej” do chwili podania odpowiedzi, a krótka wskazówka potwierdza,
+  kiedy można przejść dalej. Pierwszy ekran pokazuje liczbę pytań, a przycisk
+  wizualnie zapowiada następne pytanie albo podsumowanie bez zmiany dostępnej
+  nazwy i obsługi klawiaturą.
+
 - Osadzony widget ma teraz ograniczony, wielokrotnego użytku kontrakt brandingu
   wnętrza bez osłabiania Shadow DOM: tekstową nazwę i podtytuł, same-origin
   HTTP(S) logo z bezpiecznym fallbackiem oraz allowlistowane role

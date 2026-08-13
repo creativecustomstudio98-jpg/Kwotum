@@ -73,6 +73,10 @@ button {
   min-height: 560px;
 }
 
+.wyceno-shell--inline .wyceno-card {
+  min-height: 0;
+}
+
 .wyceno-preview-notice {
   margin: 0;
   padding: 10px 14px;
@@ -325,6 +329,10 @@ button {
   order: 1;
 }
 
+.wyceno-shell--inline .wyceno-form {
+  min-height: 0;
+}
+
 fieldset {
   margin: 0;
   padding: 0;
@@ -417,6 +425,11 @@ button {
   font-weight: 700;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
 .wyceno-primary,
 .wyceno-launcher {
   border: 1px solid var(--wyceno-accent);
@@ -462,6 +475,31 @@ button {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.wyceno-shell--inline .wyceno-actions {
+  margin-top: 0;
+  padding-top: 16px;
+}
+
+.wyceno-step-guidance {
+  min-height: 1.35rem;
+  margin: 14px 0 0;
+  color: var(--wyceno-muted);
+  font-size: 12px;
+}
+
+.wyceno-step-guidance.is-ready {
+  color: var(--wyceno-text);
+  font-weight: 700;
+}
+
+.wyceno-primary-detail {
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .wyceno-actions .wyceno-secondary:first-child {

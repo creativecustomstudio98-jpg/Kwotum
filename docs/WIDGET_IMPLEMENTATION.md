@@ -37,6 +37,14 @@ Kliknięcie otwiera natywny `dialog`, pokazuje stan „Uruchamiamy formularz…�
 dopiero wtedy tworzy albo wznawia sesję. `wyceno:ready` nadal oznacza gotowy
 manifest, a `wyceno:closed` zachowuje zwrot fokusu do launchera.
 
+Inline nie dziedziczy minimalnej wysokości pełnoekranowego procesu. Karta i
+formularz rosną wraz z treścią, a akcje pozostają bezpośrednio pod bieżącą
+odpowiedzią. Dla pytania wymaganego „Dalej” jest nieaktywne do chwili wybrania
+lub wpisania odpowiedzi; wskazówka obok akcji wyjaśnia wymagany krok i po
+uzupełnieniu potwierdza gotowość. Nie stosujemy automatycznego przejścia po
+kliknięciu opcji, ponieważ użytkownik musi móc poprawić wybór przed zapisem,
+a obsługa klawiaturą i czytnikiem ekranu pozostaje przewidywalna.
+
 `api-base` powinien jawnie wskazywać origin Kwotum w kodzie instalacyjnym.
 Renderer ma kompatybilny fallback do originu własnego modułu, dzięki czemu
 starszy cross-origin embed nie próbuje wywoływać API domeny gospodarza.

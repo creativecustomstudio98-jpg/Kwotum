@@ -2803,6 +2803,27 @@ ciemnym tekstem, kanciaste kontrolki i grafitowy backdrop.
 - [ ] Wdrożyć wersję Kwotum, następnie minimalną zmianę `index.html` Fortez,
       wykonać produkcyjny UAT i zachować natychmiastowy rollback.
 
+##### Korekta FTZ-05C — czytelna ścieżka inline Fortez
+
+**Stan lokalny 2026-08-13 — GOTOWE DO WDROŻENIA:** feedback z produkcyjnego
+embedu pokazał, że użytkownik nie widzi związku między wyborem odpowiedzi a
+odległą akcją „Dalej”. Wysokość pełnoekranowej karty zostawiała dużą pustą
+przestrzeń, a pasek porównania zasłaniał dół aktywnego formularza. Zakres nie
+zmienia procesu, API, sesji, tenant scope ani danych leada.
+
+- [x] Zablokować załącznik 3338 × 1962 i SHA-256
+      `237a48fd339ae123fae6677348b84bf3362a4a727fe530951290a777c3401266`
+      jako referencję problemu.
+- [x] Nadać inline naturalną wysokość i przenieść akcję bezpośrednio pod
+      odpowiedzi bez zmiany popupu/fullscreen.
+- [x] Dodać jawne prowadzenie: liczba pytań, stan wymaganej odpowiedzi,
+      potwierdzenie gotowości oraz wizualna zapowiedź następnego kroku.
+- [x] Zachować ręczne zatwierdzenie zamiast ryzykownego auto-advance.
+- [x] Przejść E2E desktop/mobile, axe, overflow, pełny gate i visual QA:
+      68 testów widgetu, 183 testy web, Chromium 1440/390, axe, build,
+      format, lint, typecheck oraz skany SAST/secrets są zielone.
+- [ ] Wdrożyć widget przed zmianą strony Fortez, sprawdzić produkcję i rollback.
+
 - [x] Ujawnić publiczny tytuł i wprowadzenie w builderze z limitami schematu.
 - [x] Rozdzielić walidację treści formularza od walidacji aktywnego pytania.
 - [x] Dodać regresję autosave/reload, klawiatury, axe, mobile i overflow.
