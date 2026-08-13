@@ -85,3 +85,15 @@ nie rozszerzano P1 na ich naprawę.
   glow, blur, tekstury, glass i cienia.
 - Przy wysokości 800/768 px środkowy obszar nawigacji przewija się, aby stopka
   pozostała przy dolnej krawędzi bez zmniejszania przekazanych wymiarów wierszy.
+
+## Hotfix prawego odstępu — 2026-08-13
+
+Nowszy zrzut review produkcji, 3338 × 1962 px, SHA-256
+`b08ac479744086b70850339e9a3b427dfb6509d443745887f91565989be55e4d`,
+wykazał nadmierne wydłużenie jasnego pseudo-elementu do prawej krawędzi.
+Korekta pozostawia aktywny link i focus bez zmian, ale kończy dekorację na
+prawej krawędzi linku, 16 px przed brzegiem expanded. Drugi zaakceptowany crop
+collapsed, 236 × 200 px, SHA-256
+`a35d9b646ed18fc1d85c23c01e8ee5da6f4a697011b652051cd43a942360334d`,
+ustala początek jasnej powierzchni równo z lewym brzegiem wąskiego raila, bez
+lewego zaokrąglenia, oraz prawy skos kończący się 10 px przed prawym brzegiem.

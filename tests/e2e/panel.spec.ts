@@ -221,9 +221,9 @@ test.describe("panel reference reconstruction", () => {
           railRight: railBounds?.right ?? 0,
         };
       });
-    expect(activeTabGeometry.decorationRight).toBe(-16);
+    expect(activeTabGeometry.decorationRight).toBe(0);
     expect(
-      Math.abs(activeTabGeometry.linkRight + 16 - activeTabGeometry.railRight),
+      Math.abs(activeTabGeometry.railRight - activeTabGeometry.linkRight - 16),
     ).toBeLessThanOrEqual(1);
     await page.screenshot({
       animations: "disabled",
@@ -249,8 +249,27 @@ test.describe("panel reference reconstruction", () => {
         const railBounds = document
           .querySelector<HTMLElement>("#panel-sidebar")
           ?.getBoundingClientRect();
-        return { linkRight: linkBounds.right, railRight: railBounds?.right ?? 0 };
+        const decoration = getComputedStyle(element, "::before");
+        return {
+          decorationLeft: Number.parseFloat(decoration.left),
+          decorationRight: Number.parseFloat(decoration.right),
+          decorationRadius: decoration.borderRadius,
+          linkLeft: linkBounds.left,
+          linkRight: linkBounds.right,
+          railLeft: railBounds?.left ?? 0,
+          railRight: railBounds?.right ?? 0,
+        };
       });
+    expect(collapsedActiveGeometry.decorationLeft).toBe(-10);
+    expect(collapsedActiveGeometry.decorationRight).toBe(0);
+    expect(collapsedActiveGeometry.decorationRadius).toBe("0px");
+    expect(
+      Math.abs(
+        collapsedActiveGeometry.linkLeft +
+          collapsedActiveGeometry.decorationLeft -
+          collapsedActiveGeometry.railLeft,
+      ),
+    ).toBeLessThanOrEqual(1);
     expect(
       Math.abs(collapsedActiveGeometry.linkRight + 10 - collapsedActiveGeometry.railRight),
     ).toBeLessThanOrEqual(1);

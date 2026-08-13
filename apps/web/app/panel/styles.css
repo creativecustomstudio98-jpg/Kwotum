@@ -263,7 +263,7 @@
 .panel-rail__section-items > a::before {
   position: absolute;
   z-index: -1;
-  inset: 0 -16px 0 0;
+  inset: 0;
   border-radius: 7px 0 0 7px;
   background: transparent;
   clip-path: polygon(
@@ -588,7 +588,8 @@
 }
 
 .panel-rail[data-collapsed="true"] .panel-rail__section-items > a::before {
-  inset: 0 -10px 0 0;
+  inset: 0 0 0 -10px;
+  border-radius: 0;
 }
 
 .panel-rail[data-collapsed="true"] .panel-rail__label,

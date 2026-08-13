@@ -346,3 +346,13 @@ Obowiązuje 256 px w stanie rozwiniętym, 72 px w zwiniętym, płaskie tło
 Nie zmienia routingu, capabilities, tenant scope ani mobilnej dolnej nawigacji.
 Szczegółowy kontrakt i wynik odbioru opisują ADR-045,
 `ui/sidebar-kwotum-p1/README.md` i `ui/sidebar-kwotum-p1/VISUAL_QA_REPORT.md`.
+
+Nowszy zaakceptowany zrzut produkcyjny z 2026-08-13, 3338 × 1962 px, SHA-256
+`b08ac479744086b70850339e9a3b427dfb6509d443745887f91565989be55e4d`,
+nadpisuje referencję P1 wyłącznie w prawym zakończeniu aktywnej pozycji.
+Powierzchnia ma zachować 16 px prawego odstępu w expanded. Finalny crop
+collapsed, 236 × 200 px, SHA-256
+`a35d9b646ed18fc1d85c23c01e8ee5da6f4a697011b652051cd43a942360334d`,
+ustala jasną powierzchnię równo z lewym brzegiem, bez lewego zaokrąglenia, oraz
+prawy skos kończący się 10 px przed prawym brzegiem raila. Wymiary 256/72 px i
+pozostały kontrakt P1 nie zmieniają się.

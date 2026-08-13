@@ -2602,12 +2602,20 @@ od 320 px do 1536 px. W runtime nie pozostały odwołania do poprzedniego
 - [x] Sprawdzić klawiaturę, tooltipy, reduced motion, axe, app shell i geometrię
       buildera.
 - [x] Uzyskać co najmniej 18/20 w Visual QA i zachować artefakty odbiorowe.
+- [x] Skorygować aktywną powierzchnię po review produkcji: zachować prawy
+      odstęp 16 px w wariancie rozwiniętym; w zwiniętym zacząć równo z lewym
+      brzegiem bez zaokrąglenia i zakończyć prawy skos 10 px przed krawędzią.
 
 **Gate P1 2026-08-13:** sidebar ma 256/72 px i 100dvh, a app shell korzysta z
 jednego `--kw-sidebar-width`. Visual QA osiągnęło 19/20; desktop 1440/1280/1024
 oraz mobile 390 nie mają poziomego overflow. Izolowany scenariusz Playwright
 potwierdza axe, klawiaturę, focus return, persistence i reduced motion.
 P2 rebrandingu panelu nie należy do tego release'u.
+
+**Hotfix P1 2026-08-13:** zaakceptowany zrzut produkcji nadpisał wyłącznie
+zakończenie aktywnej pozycji. Pseudo-element nie jest już wydłużany do prawej
+krawędzi w expanded; osobny crop collapsed zachowuje pełną lewą krawędź i
+prawy skos wewnątrz raila. Test E2E mierzy oba kontrakty osobno.
 
 ## Etap 13 — Produkcja
 
