@@ -48,7 +48,6 @@ export async function createWebhookEndpointAction(
   }
   try {
     const result = await createWebhookEndpoint(organizationId.data, url.data, requestId.data);
-    revalidatePath(`/panel/${organizationId.data}/integracje/webhooki`);
     return {
       endpointUrl: result.endpoint.url,
       error: null,
@@ -80,7 +79,6 @@ export async function rotateWebhookSecretAction(
       identifiers.data.endpointId,
       identifiers.data.requestId,
     );
-    revalidatePath(`/panel/${identifiers.data.organizationId}/integracje/webhooki`);
     return {
       error: null,
       requestId: crypto.randomUUID(),
@@ -108,7 +106,6 @@ export async function enqueueWebhookTestAction(
       identifiers.data.endpointId,
       identifiers.data.requestId,
     );
-    revalidatePath(`/panel/${identifiers.data.organizationId}/integracje/webhooki`);
     return {
       deliveryId: result.deliveryId,
       error: null,

@@ -6,6 +6,15 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Webhooki i WordPress tworzą teraz jedno centrum integracji z wewnętrzną
+  nawigacją, czterema statusami oraz wspólną, płaską hierarchią operacyjną.
+  Webhooki mają osobny test endpointu i semantyczną historię dostaw, a
+  WordPress pokazuje rzeczywiste połączenia oraz bezpieczny generator tokenu.
+  Nie dodano fikcyjnych CRM, arkuszy, statystyk ani martwych filtrów. Przy
+  okazji naprawiono wyniki akcji tworzenia endpointu, testu i obrotu sekretu,
+  które wcześniej mogły zostać utracone przez natychmiastową rewalidację
+  strony.
+
 - Sidebar używa teraz spokojnych, systemowych wag 400/500/600 zamiast
   arbitralnych wartości 520–650, bez zmiany geometrii, ikon i aktywnego skosu.
   Stan małej próby analityki ma 32 px wewnętrznego marginesu na desktopie,

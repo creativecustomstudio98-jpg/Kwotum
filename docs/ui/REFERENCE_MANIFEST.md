@@ -85,6 +85,7 @@ semantycznego React/Next.js i wspólnych tokenów `packages/ui`.
 | Y     | wybór organizacji Kwotum            | szeroki header, oś 1260 px i pozioma karta z realnym podsumowaniem; mobile zachowuje jedną kolumnę                     |
 | Z     | operacyjna obsługa leada            | zwarta prawa kolumna: status, właściciel, priorytet, kontakt, notatki i zadania; wyłącznie z prawdziwym zapisem        |
 | AA    | webhook v1 w panelu                 | dziedziczy wyłącznie anatomię Integracji 12S; treść, stany i bezpieczeństwo określają ADR-034 oraz `WEBHOOKS.md`       |
+| AC    | centrum integracji Kwotum           | wspólna anatomia Webhooki/WordPress z realnymi danymi i akcjami; nadpisuje AA tylko w geometrii i hierarchii           |
 
 Oryginały panelowe A/C/F są dostępne w `apps/web/public/panel/`, a D w
 `references/product-app-board.png`; zostały zablokowane 2026-07-27:
@@ -315,6 +316,17 @@ Nie dziedziczy treści WordPressa, statystyk ani kontrolek. Dane, role, stany,
 one-time secret, retry i dead letter wynikają wyłącznie z ADR-034 i
 `WEBHOOKS.md`. Finalne viewporty, overlay i różnice zapisuje
 `artifacts/visual-qa/12zf-webhook-v1/diff.md`.
+
+Decyzja AC pochodzi z zaakceptowanego przez właściciela ekranu webhooków
+2118 × 1510 px z 2026-08-13, SHA-256
+`55b88b57d2037b13dfd948caefd55e64ebf09537538ea7173c6e7a5a417e3594`.
+Nadpisuje decyzję AA wyłącznie dla hierarchii i geometrii centrum integracji:
+wewnętrznej nawigacji kanałów, czterech statusów, podziału operacji oraz
+historii. Ten sam język obejmuje istniejącą trasę WordPress. Obraz nie
+zatwierdza fikcyjnego endpointu, dostaw, dokumentacji, filtrów, odświeżania,
+CRM ani Google Sheets. Runtime pokazuje wyłącznie rzeczywiste endpointy,
+połączenia WordPress, statusy i działające akcje zgodne z `WEBHOOKS.md` oraz
+`WORDPRESS_PLUGIN.md`; nie zmienia tenant scope, capabilities, API ani RLS.
 
 Decyzja AB pochodzi z dostarczonego i zaakceptowanego przez właściciela znaku
 Kwotum z 2026-08-11. Zastępuje poprzedni symbol we wszystkich powierzchniach

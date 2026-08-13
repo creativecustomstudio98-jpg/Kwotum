@@ -31,7 +31,7 @@ const builderSectionArtifactDirectory = path.join(artifactRoot, "12z-builder-sec
 const builderOptionArtifactDirectory = path.join(artifactRoot, "12za-builder-options/after");
 const builderEstimationArtifactDirectory = path.join(artifactRoot, "12ze-self-service-estimation");
 const builderContactArtifactDirectory = path.join(artifactRoot, "12zk-contact-builder");
-const webhookArtifactDirectory = path.join(artifactRoot, "12zf-webhook-v1");
+const integrationCenterArtifactDirectory = path.join(artifactRoot, "12zq-integrations-navigation");
 const sidebarP1ArtifactDirectory = path.join(artifactRoot, "sidebar-kwotum-p1");
 const panelTypographyArtifactDirectory = path.join(artifactRoot, "12zp-panel-typography");
 
@@ -2501,8 +2501,8 @@ test.describe("panel reference reconstruction", () => {
     });
 
     await page.goto(`/panel/${organizationId}/integracje/wordpress`);
-    await expect(page.getByRole("heading", { level: 1, name: "Integracje" })).toBeVisible();
-    await expect(page.getByRole("heading", { level: 2, name: "WordPress" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "WordPress" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Połączone strony" })).toBeVisible();
     await capture(page, "wordpress-1536x1024");
 
     await page.goto(`/panel/${organizationId}/prywatnosc`);
@@ -2718,7 +2718,7 @@ test.describe("panel reference reconstruction", () => {
         path: `/panel/${organizationId}/powiadomienia`,
       },
       {
-        heading: "Integracje",
+        heading: "WordPress",
         name: "integrations",
         path: `/panel/${organizationId}/integracje/wordpress`,
       },
@@ -2773,7 +2773,7 @@ test.describe("panel reference reconstruction", () => {
     await expect(page.locator(".installation-code code")).not.toContainText("token=");
 
     await page.goto(`/panel/${organizationId}/integracje/wordpress`);
-    const integrationsGrid = page.locator(".integrations-primary-grid").last();
+    const integrationsGrid = page.locator(".wordpress-operations-grid").last();
     await expect(integrationsGrid).toBeVisible();
     const integrationGeometry = await integrationsGrid.evaluate((grid) => {
       const cards = Array.from(grid.querySelectorAll<HTMLElement>(":scope > .panel-card")).map(
@@ -2786,7 +2786,8 @@ test.describe("panel reference reconstruction", () => {
     });
     expect(integrationGeometry.workspaceWidth).toBeGreaterThanOrEqual(panelContentWidth - 49);
     expect(integrationGeometry.workspaceWidth).toBeLessThanOrEqual(panelContentWidth);
-    expect(Math.max(...integrationGeometry.cardHeights)).toBeLessThanOrEqual(310);
+    expect(integrationGeometry.cardHeights).toHaveLength(2);
+    expect(Math.min(...integrationGeometry.cardHeights)).toBeGreaterThanOrEqual(240);
 
     await page.setViewportSize({ height: 900, width: 1_440 });
     for (const screen of screens) {
@@ -2878,10 +2879,12 @@ test.describe("panel reference reconstruction", () => {
     expect(errors).toEqual([]);
   });
 
-  test("owner manages the webhook and reviews PII-free delivery states", async ({ page }) => {
+  test("owner navigates real integrations and reviews PII-free delivery states", async ({
+    page,
+  }) => {
     await Promise.all([
-      mkdir(path.join(webhookArtifactDirectory, "desktop"), { recursive: true }),
-      mkdir(path.join(webhookArtifactDirectory, "mobile"), { recursive: true }),
+      mkdir(path.join(integrationCenterArtifactDirectory, "desktop"), { recursive: true }),
+      mkdir(path.join(integrationCenterArtifactDirectory, "mobile"), { recursive: true }),
     ]);
     const errors: string[] = [];
     page.on("console", (message) => {
@@ -2896,7 +2899,17 @@ test.describe("panel reference reconstruction", () => {
     await page.setViewportSize({ height: 1_086, width: 1_448 });
     await page.goto(webhookUrl);
     await expect(page.getByRole("heading", { level: 1, name: "Webhooki" })).toBeVisible();
-    await expect(page.getByText("https://hooks.partner.pl/kwotum/leads")).toBeVisible();
+    const integrationNavigation = page.getByRole("navigation", { name: "Kanały integracji" });
+    await expect(integrationNavigation).toBeVisible();
+    await expect(
+      integrationNavigation.getByRole("link", { exact: true, name: "Webhooki" }),
+    ).toHaveAttribute("aria-current", "page");
+    await expect(page.locator(".integration-overview__item")).toHaveCount(4);
+    await expect(
+      page
+        .getByRole("region", { exact: true, name: "Endpointy" })
+        .getByText("https://hooks.partner.pl/kwotum/leads", { exact: true }),
+    ).toBeVisible();
     await expect(page.getByText("Dostarczono", { exact: true })).toBeVisible();
     await expect(page.getByText("Ponowienie", { exact: true })).toBeVisible();
     await expect(
@@ -2912,13 +2925,13 @@ test.describe("panel reference reconstruction", () => {
     await page.screenshot({
       animations: "disabled",
       fullPage: true,
-      path: path.join(webhookArtifactDirectory, "desktop", "webhook-1448x-full.png"),
+      path: path.join(integrationCenterArtifactDirectory, "desktop", "webhook-1448x-full.png"),
     });
 
     const rotate = page.getByRole("button", { exact: true, name: "Obróć sekret" });
-    page.once("dialog", (dialog) => {
+    page.once("dialog", async (dialog) => {
       expect(dialog.message()).toContain("Odbiorca musi zacząć używać nowego sekretu");
-      void dialog.accept();
+      await dialog.accept();
     });
     await rotate.focus();
     await page.keyboard.press("Enter");
@@ -2928,6 +2941,38 @@ test.describe("panel reference reconstruction", () => {
       .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
       .analyze();
     expect(desktopAccessibility.violations).toEqual([]);
+
+    const wordpressLink = integrationNavigation.getByRole("link", {
+      exact: true,
+      name: "WordPress",
+    });
+    await wordpressLink.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("heading", { level: 1, name: "WordPress" })).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Kanały integracji" })
+        .getByRole("link", { exact: true, name: "WordPress" }),
+    ).toHaveAttribute("aria-current", "page");
+    await expect(page.locator(".integration-overview__item")).toHaveCount(4);
+    await expect(page.locator(".wordpress-operations-grid > .panel-card")).toHaveCount(2);
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(integrationCenterArtifactDirectory, "desktop", "wordpress-1448x-full.png"),
+    });
+    await page
+      .getByRole("navigation", { name: "Kanały integracji" })
+      .getByRole("link", { exact: true, name: "Webhooki" })
+      .press("Enter");
+    await expect(page).toHaveURL(webhookUrl);
+
+    await page.getByRole("button", { exact: true, name: "Wyślij test" }).click();
+    await expect(
+      page
+        .getByRole("alert")
+        .getByText("Test nie został zaplanowany. Sprawdź publiczny DNS endpointu."),
+    ).toBeVisible({ timeout: 15_000 });
 
     await page.setViewportSize({ height: 844, width: 390 });
     await expect(page.getByRole("button", { name: /menu boczne/ })).toBeHidden();
@@ -2943,12 +2988,35 @@ test.describe("panel reference reconstruction", () => {
     await page.screenshot({
       animations: "disabled",
       fullPage: true,
-      path: path.join(webhookArtifactDirectory, "mobile", "webhook-390x-full.png"),
+      path: path.join(integrationCenterArtifactDirectory, "mobile", "webhook-390x-full.png"),
     });
     const mobileAccessibility = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
       .analyze();
     expect(mobileAccessibility.violations).toEqual([]);
+
+    await page
+      .getByRole("navigation", { name: "Kanały integracji" })
+      .getByRole("link", { exact: true, name: "WordPress" })
+      .click();
+    await expect(page.getByRole("heading", { level: 1, name: "WordPress" })).toBeVisible();
+    await expect(page.locator(".integration-overview__item")).toHaveCount(4);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(integrationCenterArtifactDirectory, "mobile", "wordpress-390x-full.png"),
+    });
+    const wordpressMobileAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(wordpressMobileAccessibility.violations).toEqual([]);
+
+    await page.goto(webhookUrl);
 
     await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
     await page.setViewportSize({ height: 800, width: 320 });

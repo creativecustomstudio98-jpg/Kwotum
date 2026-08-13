@@ -17,18 +17,20 @@ export function WebhookEndpointForm({
   };
   const [state, action, pending] = useActionState(createWebhookEndpointAction, initialState);
   return (
-    <section className="panel-card webhook-card" aria-labelledby="webhook-create-title">
-      <div className="panel-card__header">
-        <div>
-          <h2 id="webhook-create-title">Dodaj endpoint</h2>
-          <p>Publiczny HTTPS, port 443, bez query, credentiali i redirectów.</p>
-        </div>
+    <div className="webhook-endpoint-create">
+      <div className="webhook-endpoint-create__copy">
+        <strong id="webhook-create-title">Dodaj endpoint</strong>
+        <span>Publiczny HTTPS na porcie 443, bez query, credentiali i redirectów.</span>
       </div>
-      <form action={action} className="webhook-endpoint-form">
+      <form
+        action={action}
+        aria-labelledby="webhook-create-title"
+        className="webhook-endpoint-form"
+      >
         <input name="organizationId" type="hidden" value={organizationId} />
         <input name="requestId" type="hidden" value={state.requestId} />
         <label>
-          <span>URL odbiorcy</span>
+          <span className="integration-visually-hidden">URL odbiorcy</span>
           <input
             autoComplete="url"
             name="url"
@@ -38,7 +40,7 @@ export function WebhookEndpointForm({
           />
         </label>
         <Button disabled={pending} type="submit">
-          {pending ? "Sprawdzam DNS…" : "Dodaj bezpieczny webhook"}
+          {pending ? "Sprawdzam DNS…" : "Dodaj endpoint"}
         </Button>
       </form>
       {state.error ? (
@@ -50,9 +52,12 @@ export function WebhookEndpointForm({
         <div className="webhook-secret-result" role="status">
           <strong>Skopiuj teraz — sekret nie jest zapisany i nie pojawi się po odświeżeniu</strong>
           <code>{state.secret}</code>
-          <span>Endpoint: {state.endpointUrl}</span>
+          <span>
+            Endpoint {state.endpointUrl} jest aktywny. Po zapisaniu sekretu odśwież widok, aby
+            pojawił się na liście.
+          </span>
         </div>
       ) : null}
-    </section>
+    </div>
   );
 }
