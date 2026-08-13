@@ -203,6 +203,15 @@ i istniejącej akcji tworzenia tenantowego draftu. Zablokowana referencja,
 stan przed i dowody znajdują się w
 `artifacts/visual-qa/12zc-template-library-override/`.
 
+Korekta 12ZO pochodzi z zaakceptowanego zrzutu produkcji 3338 × 1962 px,
+SHA-256
+`b3ebc842faab96619ee12a562638ee4bd2f53a417bae53f5e1d29b6850e90ff6`.
+Nadpisuje Decyzję T wyłącznie dla zewnętrznej powierzchni trasy szablonów:
+cała biblioteka nie może być dodatkową białą kartą z ramką i cieniem.
+Nagłówek oraz wewnętrzne powierzchnie toolbaru, KPI, kart i detalu pozostają
+bez zmian. Artefakty korekty znajdują się w
+`artifacts/visual-qa/12zo-template-surface-hotfix/`.
+
 Decyzja U jest nowszą dyspozycją właściciela z 2026-07-29 i nadpisuje
 Decyzję S wyłącznie w hero trasy `/`. Desktop używa jednego fizycznego
 telefonu z demonstracyjnym ekranem procesu oraz elementami kwalifikacji

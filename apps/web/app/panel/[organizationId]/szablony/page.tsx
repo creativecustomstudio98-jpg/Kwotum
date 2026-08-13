@@ -33,10 +33,7 @@ export default async function TemplatesPage({
   return (
     <main className="panel-workspace templates-panel">
       <div className="panel-page">
-        <section
-          aria-labelledby="template-library-title"
-          className="panel-card template-library-surface"
-        >
+        <section aria-labelledby="template-library-title" className="template-library-surface">
           <header className="template-library-heading">
             <nav aria-label="Ścieżka nawigacji">
               <Link href={`/panel/${organizationId}/procesy`}>Procesy</Link>
