@@ -7,6 +7,7 @@ test.beforeAll(async () => {
   await mkdir("artifacts/visual-qa/12s-remaining-screens/after", { recursive: true });
   await mkdir("artifacts/visual-qa/13b-ftz03b-turnstile", { recursive: true });
   await mkdir("artifacts/visual-qa/13f-widget-branding/after", { recursive: true });
+  await mkdir("artifacts/visual-qa/13g-widget-inline-guidance/after", { recursive: true });
 });
 
 const publicId = "f0000000-0000-4000-8000-000000000001";
@@ -757,4 +758,70 @@ test("popup is isolated from hostile host CSS and returns focus on close", async
 
   await widget.getByRole("button", { name: "Zamknij formularz" }).click();
   await expect(launcher).toBeFocused();
+
+  await page.setViewportSize({ height: 1000, width: 1440 });
+  await widget.evaluate((element) => {
+    element.style.setProperty("--wyceno-widget-primary", "#ff6a13");
+    element.style.setProperty("--wyceno-widget-primary-hover", "#ff7a2d");
+    element.style.setProperty("--wyceno-widget-backdrop", "rgb(23 26 27 / 72%)");
+    element.setAttribute("brand-name", "Fortez");
+    element.setAttribute("brand-subtitle", "6 pytań · około 2 min");
+    element.setAttribute("inline-layout", "compact");
+    element.setAttribute("mode", "inline");
+  });
+  const inlineCard = widget.locator(".wyceno-card");
+  const inlinePrimary = widget.getByRole("button", { name: "Dalej" });
+  await expect(inlineCard).toBeVisible();
+  await expect(inlinePrimary).toBeDisabled();
+  await expect(widget.getByText("Wybierz lub wpisz odpowiedź, aby przejść dalej.")).toBeVisible();
+  await widget.getByRole("radio").first().check();
+  await expect(inlinePrimary).toBeEnabled();
+  await expect(widget.getByText("Gotowe — przejdź do następnego kroku.")).toBeVisible();
+  const inlineGeometry = await inlineCard.evaluate((card) => {
+    const actions = card.querySelector<HTMLElement>(".wyceno-actions");
+    const choices = card.querySelector<HTMLElement>(".wyceno-choices");
+    if (!actions || !choices) throw new Error("Missing inline guidance controls");
+    const actionsRect = actions.getBoundingClientRect();
+    const choicesRect = choices.getBoundingClientRect();
+    return {
+      actionGap: Math.round(actionsRect.top - choicesRect.bottom),
+      cardHeight: Math.round(card.getBoundingClientRect().height),
+      horizontalOverflow: card.scrollWidth - card.clientWidth,
+    };
+  });
+  expect(inlineGeometry.actionGap).toBeLessThanOrEqual(64);
+  expect(inlineGeometry.cardHeight).toBeLessThan(720);
+  expect(inlineGeometry.horizontalOverflow).toBe(0);
+  await page.screenshot({
+    animations: "disabled",
+    fullPage: false,
+    path: "artifacts/visual-qa/13g-widget-inline-guidance/after/widget-inline-guidance-1440.png",
+  });
+
+  await page.setViewportSize({ height: 844, width: 390 });
+  await inlinePrimary.scrollIntoViewIfNeeded();
+  const inlineMobileGeometry = await inlineCard.evaluate((card) => {
+    const actions = card.querySelector<HTMLElement>(".wyceno-actions");
+    const guidance = card.querySelector<HTMLElement>(".wyceno-step-guidance");
+    if (!actions || !guidance) throw new Error("Missing mobile inline guidance controls");
+    const actionsRect = actions.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    return {
+      actionsInsideCard: actionsRect.left >= cardRect.left && actionsRect.right <= cardRect.right,
+      cardOverflow: card.scrollWidth - card.clientWidth,
+      guidanceOverflow: guidance.scrollWidth - guidance.clientWidth,
+    };
+  });
+  expect(inlineMobileGeometry).toEqual({
+    actionsInsideCard: true,
+    cardOverflow: 0,
+    guidanceOverflow: 0,
+  });
+  const inlineAccessibility = await new AxeBuilder({ page }).include("wyceno-widget").analyze();
+  expect(inlineAccessibility.violations).toEqual([]);
+  await page.screenshot({
+    animations: "disabled",
+    fullPage: false,
+    path: "artifacts/visual-qa/13g-widget-inline-guidance/after/widget-inline-guidance-390x844.png",
+  });
 });

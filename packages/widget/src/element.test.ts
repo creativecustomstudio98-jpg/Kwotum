@@ -72,6 +72,20 @@ describe("wyceno-widget element", () => {
     expect(shadow?.querySelector(".wyceno-brand-mark")?.getAttribute("aria-hidden")).toBe("true");
     expect(shadow?.textContent).toContain("<img src=x onerror=alert(1)>");
     expect(shadow?.querySelectorAll('input[type="radio"]')).toHaveLength(2);
+    expect(shadow?.textContent).toContain("Krótki dobór · 3 pytań");
+
+    const next = shadow?.querySelector<HTMLButtonElement>('.wyceno-actions button[type="submit"]');
+    const firstChoice = shadow?.querySelector<HTMLInputElement>('input[type="radio"]');
+    expect(next?.disabled).toBe(true);
+    expect(shadow?.querySelector(".wyceno-step-guidance")?.textContent).toBe(
+      "Wybierz lub wpisz odpowiedź, aby przejść dalej.",
+    );
+    firstChoice?.click();
+    expect(next?.disabled).toBe(false);
+    expect(shadow?.querySelector(".wyceno-step-guidance")?.textContent).toBe(
+      "Gotowe — przejdź do następnego kroku.",
+    );
+    expect(next?.textContent).toBe("DalejNastępne pytanie");
     expect(ready).toHaveBeenCalledOnce();
   });
 

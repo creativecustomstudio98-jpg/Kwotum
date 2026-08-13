@@ -199,6 +199,10 @@ export class WycenoWidgetElement extends HTMLElement {
     return mode === "popup" || mode === "fullscreen" ? mode : "inline";
   }
 
+  get compactInline(): boolean {
+    return this.mode === "inline" && this.getAttribute("inline-layout") === "compact";
+  }
+
   get previewManifest(): WidgetManifest | null {
     return this.#previewManifest;
   }
@@ -240,7 +244,7 @@ export class WycenoWidgetElement extends HTMLElement {
       return;
     }
     const state = idleWidgetState();
-    const container = create("div", `wyceno-shell wyceno-shell--${this.mode}`);
+    const container = create("div", this.#shellClassName());
     container.append(this.#createLauncher());
     this.#shadow.querySelector(".wyceno-shell")?.remove();
     this.#shadow.append(container);
@@ -293,7 +297,7 @@ export class WycenoWidgetElement extends HTMLElement {
       return;
     }
     const dialogWasOpen = this.#dialog?.open === true;
-    const container = create("div", `wyceno-shell wyceno-shell--${this.mode}`);
+    const container = create("div", this.#shellClassName());
     if (this.mode === "inline") {
       container.append(this.#renderContent(state));
     } else {
@@ -485,7 +489,9 @@ export class WycenoWidgetElement extends HTMLElement {
     const stage = create("div", "wyceno-stage");
     if (state.history.length === 0 && state.status === "active") {
       const introduction = create("div", "wyceno-introduction");
-      introduction.append(create("p", "wyceno-eyebrow", "Pierwszy krok"));
+      introduction.append(
+        create("p", "wyceno-eyebrow", `Krótki dobór · ${manifest.steps.length} pytań`),
+      );
       introduction.append(create("h1", undefined, manifest.title));
       introduction.append(create("p", "wyceno-intro", manifest.intro));
       stage.append(introduction);
@@ -967,6 +973,9 @@ export class WycenoWidgetElement extends HTMLElement {
     if (state.errorMessage) error.textContent = state.errorMessage;
     fieldset.append(error);
 
+    const guidance = create("p", "wyceno-step-guidance");
+    guidance.id = `wyceno-guidance-${step.key}`;
+
     const actions = create("div", "wyceno-actions");
     if (state.history.length > 0) {
       const back = create("button", "wyceno-secondary", "Wstecz");
@@ -986,16 +995,44 @@ export class WycenoWidgetElement extends HTMLElement {
       unknown.addEventListener("click", () => this.#submitAnswer("__unknown__"));
       actions.append(unknown);
     }
-    const next = create("button", "wyceno-primary", "Dalej");
+    const next = create("button", "wyceno-primary");
     next.type = "submit";
+    next.setAttribute("aria-describedby", guidance.id);
+    next.append(create("span", undefined, "Dalej"));
+    const nextDetail = create(
+      "span",
+      "wyceno-primary-detail",
+      state.manifest?.steps.at(-1)?.key === step.key ? "Podsumowanie" : "Następne pytanie",
+    );
+    nextDetail.setAttribute("aria-hidden", "true");
+    next.append(nextDetail);
     actions.append(next);
 
-    form.append(fieldset, actions);
+    const refreshGuidance = (): void => {
+      const answer = this.#readAnswer(form, step);
+      const hasAnswer = Array.isArray(answer) ? answer.length > 0 : answer !== null;
+      next.disabled = step.required && !hasAnswer;
+      guidance.classList.toggle("is-ready", hasAnswer);
+      guidance.textContent = hasAnswer
+        ? "Gotowe — przejdź do następnego kroku."
+        : step.allowUnknown
+          ? "Wybierz odpowiedź albo użyj opcji „Nie wiem”."
+          : step.required
+            ? step.type === "multiple_choice"
+              ? "Wybierz co najmniej jedną odpowiedź."
+              : "Wybierz lub wpisz odpowiedź, aby przejść dalej."
+            : "Odpowiedz albo pomiń to pytanie.";
+    };
+
+    form.append(fieldset, guidance, actions);
+    form.addEventListener("input", refreshGuidance);
+    form.addEventListener("change", refreshGuidance);
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       const answer = this.#readAnswer(form, step);
       this.#submitAnswer(answer);
     });
+    refreshGuidance();
     return form;
   }
 
@@ -1087,6 +1124,10 @@ export class WycenoWidgetElement extends HTMLElement {
     shell.append(alert);
     this.#shadow.append(shell);
     this.#dialog = null;
+  }
+
+  #shellClassName(): string {
+    return `wyceno-shell wyceno-shell--${this.mode}${this.compactInline ? " wyceno-shell--inline-compact" : ""}`;
   }
 }
 
