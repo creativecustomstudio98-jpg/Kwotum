@@ -6,6 +6,13 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Desktopowy sidebar panelu Kwotum ma teraz finalną geometrię 256/72 px,
+  płaskie tło `#0d2b24`, lokalny Instrument Sans, grupy Praca/Narzędzia/System
+  oraz aktywną zakładkę z dwoma prawymi ścięciami. Zachowano routing,
+  capabilities, tenant scope, mobilną nawigację i dotychczasowy klucz
+  preferencji zwinięcia; usunięto gradienty, poświaty, glass i fikcyjny stan
+  nieprzeczytanych powiadomień.
+
 - Jawny wariant `inline-layout="integrated"` osadza proces bez obcej karty,
   powtórzonego logo i drugiego wprowadzenia. Zachowuje kompaktową wysokość,
   status zapisu, progress i pełną semantykę formularza, a zgodę na zbiorczą

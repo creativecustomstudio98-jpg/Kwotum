@@ -1303,7 +1303,7 @@
   min-width: 0;
 }
 
-@container (min-width: 75.5rem) {
+@container (min-width: 74.5rem) {
   .flow-builder__grid {
     grid-template-columns:
       minmax(16.25rem, 20rem)
@@ -1318,7 +1318,7 @@
   }
 }
 
-@container (max-width: 75.49rem) {
+@container (max-width: 74.49rem) {
   .panel-workspace--builder {
     height: auto;
     min-height: 100dvh;

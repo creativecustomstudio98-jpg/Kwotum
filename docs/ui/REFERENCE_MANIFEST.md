@@ -333,3 +333,16 @@ przez master prompt a odtwarzalnymi pakietami źródłowymi:
 
 Cztery dodatkowe kopie plansz z `ui/references/` usunięto 2026-07-28. Pakiety
 źródłowe zachowują oryginalną strukturę dla odtwarzalności.
+
+## Finalny sidebar Kwotum P1 — 2026-08-13
+
+| Plik                                                     | Rozmiar    | SHA-256                                                            |
+| -------------------------------------------------------- | ---------- | ------------------------------------------------------------------ |
+| `docs/ui/sidebar-kwotum-p1/reference/sidebar-kwotum.png` | 863 × 1822 | `ea188a170b984ae7554d94baefd62913175e657d9bfd0595ad7a02d321efbe87` |
+
+Referencja zastępuje decyzję X wyłącznie w regionie desktopowego sidebara.
+Obowiązuje 256 px w stanie rozwiniętym, 72 px w zwiniętym, płaskie tło
+`#0d2b24`, Instrument Sans oraz aktywna zakładka z dwoma prawymi ścięciami.
+Nie zmienia routingu, capabilities, tenant scope ani mobilnej dolnej nawigacji.
+Szczegółowy kontrakt i wynik odbioru opisują ADR-045,
+`ui/sidebar-kwotum-p1/README.md` i `ui/sidebar-kwotum-p1/VISUAL_QA_REPORT.md`.

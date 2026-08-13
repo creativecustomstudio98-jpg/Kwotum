@@ -108,6 +108,24 @@
   --wy-color-focus: #087047;
   --wy-shadow-sm: 0 1px 2px rgb(0 59 37 / 3%);
   --wy-shadow-md: 0 4px 14px rgb(0 59 37 / 4%);
+  --kw-sidebar-width-expanded: 256px;
+  --kw-sidebar-width-collapsed: 72px;
+  --kw-sidebar-bg: #0d2b24;
+  --kw-sidebar-text: #eef2ef;
+  --kw-sidebar-text-muted: #c8d3cc;
+  --kw-sidebar-text-subtle: #91a39a;
+  --kw-sidebar-label: #8cd79e;
+  --kw-sidebar-line: rgb(221 228 218 / 14%);
+  --kw-sidebar-hover: rgb(255 255 255 / 5.5%);
+  --kw-sidebar-active-bg: #dde4da;
+  --kw-sidebar-active-text: #10382d;
+  --kw-sidebar-focus: #8cd79e;
+  --kw-sidebar-status: #8bdd9a;
+  --kw-sidebar-account-bg: rgb(255 255 255 / 2.5%);
+  --kw-sidebar-account-border: rgb(221 228 218 / 16%);
+  --kw-sidebar-font:
+    var(--wy-font-instrument-sans, "Instrument Sans"), var(--wy-font-inter, "Inter"), ui-sans-serif,
+    system-ui, sans-serif;
 }
 
 .wy-marketing-v7-theme {

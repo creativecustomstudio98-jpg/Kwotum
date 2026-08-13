@@ -15,10 +15,10 @@ const navigationPaths: Partial<Record<PanelIconName, React.ReactNode>> = {
   ),
   dashboard: (
     <>
-      <rect height="6.5" rx="1.75" width="7" x="3.5" y="3.5" />
-      <rect height="10.5" rx="1.75" width="7" x="13.5" y="3.5" />
-      <rect height="10.5" rx="1.75" width="7" x="3.5" y="13.5" />
-      <rect height="6.5" rx="1.75" width="7" x="13.5" y="17.5" />
+      <rect height="6.5" rx="1.5" width="6.5" x="3.5" y="3.5" />
+      <rect height="6.5" rx="1.5" width="6.5" x="14" y="3.5" />
+      <rect height="6.5" rx="1.5" width="6.5" x="3.5" y="14" />
+      <rect height="6.5" rx="1.5" width="6.5" x="14" y="14" />
     </>
   ),
   help: (
@@ -30,9 +30,7 @@ const navigationPaths: Partial<Record<PanelIconName, React.ReactNode>> = {
   ),
   integration: (
     <>
-      <path d="M9.35 14.65 7.7 16.3a3.55 3.55 0 0 1-5-5l3-3a3.55 3.55 0 0 1 5 0" />
-      <path d="m14.65 9.35 1.65-1.65a3.55 3.55 0 1 1 5 5l-3 3a3.55 3.55 0 0 1-5 0" />
-      <path d="m8.5 15.5 7-7" />
+      <path d="M8.5 3.5H5.75A2.25 2.25 0 0 0 3.5 5.75V9h2a2.5 2.5 0 0 1 0 5h-2v4.25a2.25 2.25 0 0 0 2.25 2.25H10v-2a2.5 2.5 0 0 1 5 0v2h3.25a2.25 2.25 0 0 0 2.25-2.25V14h-2a2.5 2.5 0 0 1 0-5h2V5.75a2.25 2.25 0 0 0-2.25-2.25H15v2a2.5 2.5 0 0 1-5 0v-2H8.5Z" />
     </>
   ),
   leads: (
@@ -56,7 +54,6 @@ const navigationPaths: Partial<Record<PanelIconName, React.ReactNode>> = {
     <>
       <path d="M18.5 10.5a6.5 6.5 0 0 0-13 0c0 5.15-2.25 5.75-2.25 7.5h17.5c0-1.75-2.25-2.35-2.25-7.5Z" />
       <path d="M9.75 21h4.5" />
-      <circle cx="18.5" cy="5" r="2.25" />
     </>
   ),
   privacy: (
@@ -67,11 +64,11 @@ const navigationPaths: Partial<Record<PanelIconName, React.ReactNode>> = {
   ),
   processes: (
     <>
-      <rect height="5.5" rx="1.65" width="6.5" x="3" y="3.5" />
-      <rect height="5.5" rx="1.65" width="6.5" x="14.5" y="15" />
-      <circle cx="17.75" cy="6.25" r="2.75" />
-      <circle cx="6.25" cy="17.75" r="2.75" />
-      <path d="M9.5 6.25h5.5M6.25 9v6M9 17.75h5.5" />
+      <circle cx="6" cy="5" r="2.5" />
+      <circle cx="6" cy="18.5" r="2.5" />
+      <circle cx="18" cy="18.5" r="2.5" />
+      <path d="M6 7.5V16M8.5 18.5h7M16.25 16.75 14 14.5" />
+      <circle cx="13" cy="13.5" r="1.5" />
     </>
   ),
   settings: (

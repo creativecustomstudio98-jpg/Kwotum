@@ -2591,6 +2591,24 @@ E2E przechodzi 34/34 dla marketingu oraz 8/8 dla wspólnego shellu na viewportac
 od 320 px do 1536 px. W runtime nie pozostały odwołania do poprzedniego
 `Logoicon.svg`.
 
+## Etap 12ZM — finalny sidebar Kwotum
+
+- [x] Zablokować zaakceptowaną referencję 863 × 1822 px i jej SHA-256.
+- [x] Przebudować istniejący desktopowy sidebar do dokładnych 256/72 px.
+- [x] Zastosować płaskie tło, Instrument Sans i centralne tokeny bez efektów
+      glass, gradientów, blur oraz cieni.
+- [x] Zachować routing, capabilities, tenant scope, mobilną nawigację i klucz
+      `lorum:panel-sidebar-collapsed`.
+- [x] Sprawdzić klawiaturę, tooltipy, reduced motion, axe, app shell i geometrię
+      buildera.
+- [x] Uzyskać co najmniej 18/20 w Visual QA i zachować artefakty odbiorowe.
+
+**Gate P1 2026-08-13:** sidebar ma 256/72 px i 100dvh, a app shell korzysta z
+jednego `--kw-sidebar-width`. Visual QA osiągnęło 19/20; desktop 1440/1280/1024
+oraz mobile 390 nie mają poziomego overflow. Izolowany scenariusz Playwright
+potwierdza axe, klawiaturę, focus return, persistence i reduced motion.
+P2 rebrandingu panelu nie należy do tego release'u.
+
 ## Etap 13 — Produkcja
 
 ### Etap 13A — staging i infrastruktura

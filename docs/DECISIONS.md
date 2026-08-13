@@ -1403,3 +1403,42 @@ jest nieważna i nie uruchamia pobrania. Popup ma strukturalny slot nagłówka d
 statusu i przycisku zamknięcia, dzięki czemu kontrolki nie nachodzą na siebie.
 Migracja nie jest potrzebna; rollback polega na usunięciu nowych atrybutów i
 zmiennych z embedu oraz cofnięciu wersji widgetu.
+
+## ADR-045: finalny sidebar Kwotum 256/72 i lokalny Instrument Sans
+
+**Status:** accepted dla etapu P1 rebrandingu panelu na podstawie
+zaakceptowanej referencji i specyfikacji właściciela z 2026-08-13
+
+**Decyzja:** wspólny desktopowy sidebar `/panel/[organizationId]` pozostaje
+jednym komponentem z capability-gated konfiguracją, ale przyjmuje płaski język
+Kwotum: 256 px w stanie rozwiniętym, 72 px w stanie zwiniętym, tło `#0d2b24`,
+trzy nazwane grupy oraz jasną aktywną zakładkę dochodzącą do prawej krawędzi i
+zakończoną dwoma ścięciami. Nie używa gradientu, poświaty, blur, tekstury,
+cienia ani powierzchni glass. App shell ma jedno źródło szerokości
+`--kw-sidebar-width`; trasy i ekrany nie otrzymują lokalnych `margin-left`.
+
+Tokeny `--kw-sidebar-*` są ograniczonym, semantycznym kontraktem komponentu
+zdefiniowanym centralnie w `packages/ui`. Istniejące role `--wy-*` nadal sterują
+pozostałymi powierzchniami. Aktywna pozycja zachowuje fokus na nieprzyciętym
+linku, a kształt tworzy pseudo-element. Collapse zachowuje techniczny klucz
+`lorum:panel-sidebar-collapsed` wymagany przez ADR-033. Poniżej 56 rem nadal
+działa dotychczasowa mobilna dolna nawigacja i dialog „Więcej”.
+
+Sidebar używa lokalnego Instrument Sans Variable przez `next/font/local` bez
+CDN. Plik pochodzi z repozytorium `Instrument/instrument-sans`, commit
+`7fa22308a3d0c94ee2b3cd537a1196b65db34a3e`, jest objęty SIL OFL 1.1 i ma
+SHA-256 `aa72922aafcc0dc18f36ec1d805b0212057dabe8b9d5b8b57f67035aea1b826d`.
+Font jest aktywowany wyłącznie w sidebarze; pozostały interfejs pozostaje poza
+zakresem P1.
+
+**Dlaczego:** wcześniejszy wariant 240/78 używał radialnych świateł,
+dekoracyjnych gradientów, półprzezroczystych powierzchni i cieni, przez co był
+sprzeczny z zaakceptowanym kierunkiem Kwotum. Nowa referencja rozstrzyga
+charakter marki i dokładną geometrię obu stanów bez rozszerzania funkcji.
+
+**Konsekwencje:** testy shellu i buildera przyjmują 256/72 px oraz ponownie
+mierzą dostępny workspace. Nazwa `Dashboard` zmienia się na `Przegląd`
+wyłącznie w nawigacji; istniejąca trasa organizacji pozostaje bez zmian.
+Serwerowe źródła organizacji, profilu, capabilities, auth i tenant scope nie są
+modyfikowane. Rollback usuwa font i tokeny P1, przywraca 240/78 oraz poprzedni
+CSS, nie dotykając danych ani preferencji użytkownika.

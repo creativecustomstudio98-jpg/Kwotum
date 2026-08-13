@@ -63,6 +63,7 @@ zatwierdza funkcji spoza `SCOPE.md`.
 | Responsive                      | `RESPONSIVE_LAYOUT.md`                                  | `ui/RESPONSIVE_LAYOUT_INTEGRITY.md`                                                                      |
 | Visual QA                       | `VISUAL_QA.md`                                          | `panel-visual-qa.md`, `QA_PLAN.md`, `ACCESSIBILITY.md`                                                   |
 | Obrazy referencyjne             | `ui/REFERENCE_MANIFEST.md`                              | `ui/UI_REFERENCE_INDEX.md`, `ui/REFERENCE_IMAGE_PROTOCOL.md`                                             |
+| Finalny sidebar Kwotum          | `ui/sidebar-kwotum-p1/README.md`                        | `ui/sidebar-kwotum-p1/VISUAL_QA_REPORT.md`, ADR-045                                                      |
 | Marka Kwotum                    | `DECISIONS.md` (ADR-033)                                | `ui/kwotum-brand-v1/`, `_migration/LORUM_BRAND_IDENTIFIER_MATRIX.md`                                     |
 | Rebranding podstron             | `ui/marketing-subpages-v1/MASTER_REBRAND_PLAN.md`       | `ui/marketing-subpages-v1/ROUTE_AND_SECTION_AUDIT.md`, `ui/marketing-subpages-v1/DESIGN_ARCHITECTURE.md` |
 | Plan prac                       | `TASKS.md`                                              | `ROADMAP.md`, `RELEASE_CHECKLIST.md`                                                                     |

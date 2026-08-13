@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const organizationId = process.env.PANEL_E2E_ORGANIZATION_ID;
@@ -34,6 +34,7 @@ const builderOptionArtifactDirectory = path.join(artifactRoot, "12za-builder-opt
 const builderEstimationArtifactDirectory = path.join(artifactRoot, "12ze-self-service-estimation");
 const builderContactArtifactDirectory = path.join(artifactRoot, "12zk-contact-builder");
 const webhookArtifactDirectory = path.join(artifactRoot, "12zf-webhook-v1");
+const sidebarP1ArtifactDirectory = path.join(artifactRoot, "sidebar-kwotum-p1");
 
 async function signIn(page: Page) {
   if (!organizationId || !panelEmail || !panelPassword) {
@@ -168,21 +169,101 @@ test.describe("panel reference reconstruction", () => {
   });
 
   test("shared Kwotum sidebar expands, collapses and persists across routes", async ({ page }) => {
-    await page.setViewportSize({ height: 1_024, width: 1_536 });
+    await mkdir(sidebarP1ArtifactDirectory, { recursive: true });
+    await page.setViewportSize({ height: 1_024, width: 1_440 });
     await page.goto(`/panel/${organizationId}`);
 
     const sidebar = page.locator("#panel-sidebar");
     await expect(sidebar).toHaveAttribute("data-collapsed", "false");
     await expect(page.getByText("Kwotum", { exact: true })).toBeVisible();
+    await expect(sidebar.getByRole("heading", { name: "Praca" })).toBeVisible();
+    await expect(sidebar.getByRole("heading", { name: "Narzędzia" })).toBeVisible();
+    await expect(sidebar.getByRole("heading", { name: "System" })).toBeVisible();
+    await expect(sidebar.getByRole("link", { name: "Przegląd", exact: true })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
     await expect
       .poll(() => sidebar.evaluate((element) => element.getBoundingClientRect().width))
-      .toBeGreaterThanOrEqual(238);
+      .toBeGreaterThanOrEqual(255);
+    await expect
+      .poll(() => sidebar.evaluate((element) => element.getBoundingClientRect().width))
+      .toBeLessThanOrEqual(257);
+
+    const sidebarSurface = await sidebar.evaluate((element) => {
+      const styles = getComputedStyle(element);
+      const active = element.querySelector<HTMLElement>('a[aria-current="page"]');
+      const activeDecoration = active ? getComputedStyle(active, "::before") : null;
+      return {
+        backgroundColor: styles.backgroundColor,
+        backgroundImage: styles.backgroundImage,
+        boxShadow: styles.boxShadow,
+        activeClipPath: activeDecoration?.clipPath ?? "none",
+      };
+    });
+    expect(sidebarSurface).toMatchObject({
+      backgroundColor: "rgb(13, 43, 36)",
+      backgroundImage: "none",
+      boxShadow: "none",
+    });
+    expect(sidebarSurface.activeClipPath).not.toBe("none");
+    const activeTabGeometry = await sidebar
+      .getByRole("link", { name: "Przegląd", exact: true })
+      .evaluate((element) => {
+        const linkBounds = element.getBoundingClientRect();
+        const railBounds = document
+          .querySelector<HTMLElement>("#panel-sidebar")
+          ?.getBoundingClientRect();
+        const decoration = getComputedStyle(element, "::before");
+        return {
+          decorationRight: Number.parseFloat(decoration.right),
+          linkRight: linkBounds.right,
+          railRight: railBounds?.right ?? 0,
+        };
+      });
+    expect(activeTabGeometry.decorationRight).toBe(-16);
+    expect(
+      Math.abs(activeTabGeometry.linkRight + 16 - activeTabGeometry.railRight),
+    ).toBeLessThanOrEqual(1);
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(sidebarP1ArtifactDirectory, "expanded-1440x1024.png"),
+    });
+    await sidebar.screenshot({
+      animations: "disabled",
+      path: path.join(sidebarP1ArtifactDirectory, "expanded-sidebar-256x1024.png"),
+    });
 
     await page.getByRole("button", { name: "Zwiń menu boczne" }).click();
     await expect(sidebar).toHaveAttribute("data-collapsed", "true");
     await expect
       .poll(() => sidebar.evaluate((element) => element.getBoundingClientRect().width))
-      .toBeLessThanOrEqual(80);
+      .toBeLessThanOrEqual(73);
+    await expect
+      .poll(() => sidebar.evaluate((element) => element.getBoundingClientRect().width))
+      .toBeGreaterThanOrEqual(71);
+    const collapsedActiveGeometry = await sidebar
+      .getByRole("link", { name: "Przegląd", exact: true })
+      .evaluate((element) => {
+        const linkBounds = element.getBoundingClientRect();
+        const railBounds = document
+          .querySelector<HTMLElement>("#panel-sidebar")
+          ?.getBoundingClientRect();
+        return { linkRight: linkBounds.right, railRight: railBounds?.right ?? 0 };
+      });
+    expect(
+      Math.abs(collapsedActiveGeometry.linkRight + 10 - collapsedActiveGeometry.railRight),
+    ).toBeLessThanOrEqual(1);
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(sidebarP1ArtifactDirectory, "collapsed-1440x1024.png"),
+    });
+    await sidebar.screenshot({
+      animations: "disabled",
+      path: path.join(sidebarP1ArtifactDirectory, "collapsed-sidebar-72x1024.png"),
+    });
+    await sidebar.getByRole("link", { name: "Leady", exact: true }).focus();
+    await expect(page.getByRole("tooltip", { name: "Leady" })).toBeVisible();
     await expect
       .poll(() => page.evaluate(() => localStorage.getItem("lorum:panel-sidebar-collapsed")))
       .toBe("true");
@@ -191,6 +272,70 @@ test.describe("panel reference reconstruction", () => {
     await expect(sidebar).toHaveAttribute("data-collapsed", "true");
     await page.getByRole("button", { name: "Rozwiń menu boczne" }).press("Enter");
     await expect(sidebar).toHaveAttribute("data-collapsed", "false");
+
+    const accountMenuButton = sidebar.getByRole("button", { name: "Otwórz menu konta" });
+    await accountMenuButton.focus();
+    await accountMenuButton.press("Enter");
+    await expect(page.getByRole("region", { name: "Menu konta" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("region", { name: "Menu konta" })).toBeHidden();
+    await expect(accountMenuButton).toBeFocused();
+
+    const reducedMotion = await page.evaluate(() => ({
+      rail: Number.parseFloat(
+        getComputedStyle(document.querySelector<HTMLElement>("#panel-sidebar")!).transitionDuration,
+      ),
+      shell: Number.parseFloat(
+        getComputedStyle(document.querySelector<HTMLElement>(".panel-app-shell")!)
+          .transitionDuration,
+      ),
+    }));
+    expect(reducedMotion.rail).toBeLessThanOrEqual(0.000_01);
+    expect(reducedMotion.shell).toBeLessThanOrEqual(0.000_01);
+    const sidebarAccessibility = await new AxeBuilder({ page })
+      .include("#panel-sidebar")
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(sidebarAccessibility.violations).toEqual([]);
+
+    const responsiveMeasurements: Array<Record<string, number | string>> = [];
+    for (const viewport of [
+      { height: 800, label: "1280x800", width: 1_280 },
+      { height: 768, label: "1024x768", width: 1_024 },
+    ]) {
+      await page.setViewportSize({ height: viewport.height, width: viewport.width });
+      await page.goto(`/panel/${organizationId}`);
+      await expect(sidebar).toHaveAttribute("data-collapsed", "false");
+      responsiveMeasurements.push(
+        await page.evaluate((label) => {
+          const rail = document.querySelector<HTMLElement>("#panel-sidebar");
+          return {
+            documentOverflow:
+              document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            label,
+            railHeight: rail?.getBoundingClientRect().height ?? 0,
+            railWidth: rail?.getBoundingClientRect().width ?? 0,
+          };
+        }, viewport.label),
+      );
+      await page.screenshot({
+        animations: "disabled",
+        path: path.join(sidebarP1ArtifactDirectory, `expanded-${viewport.label}.png`),
+      });
+      await page.getByRole("button", { name: "Zwiń menu boczne" }).click();
+      await expect(sidebar).toHaveAttribute("data-collapsed", "true");
+      await page.screenshot({
+        animations: "disabled",
+        path: path.join(sidebarP1ArtifactDirectory, `collapsed-${viewport.label}.png`),
+      });
+      await page.getByRole("button", { name: "Rozwiń menu boczne" }).click();
+    }
+
+    await writeFile(
+      path.join(sidebarP1ArtifactDirectory, "measurements.json"),
+      `${JSON.stringify(responsiveMeasurements, null, 2)}\n`,
+      "utf8",
+    );
 
     await page.goto(`/panel/${organizationId}/leady`);
     await expect(page.getByRole("heading", { level: 1, name: "Leady" })).toBeVisible();
@@ -207,6 +352,10 @@ test.describe("panel reference reconstruction", () => {
       "aria-current",
       "page",
     );
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(sidebarP1ArtifactDirectory, "mobile-390x844.png"),
+    });
     await expect
       .poll(() =>
         page.evaluate(
@@ -648,14 +797,14 @@ test.describe("panel reference reconstruction", () => {
       };
     });
 
-    expect(desktop.rail.width).toBeGreaterThanOrEqual(77);
-    expect(desktop.rail.width).toBeLessThanOrEqual(79);
+    expect(desktop.rail.width).toBeGreaterThanOrEqual(71);
+    expect(desktop.rail.width).toBeLessThanOrEqual(73);
     expect(desktop.toolbar.height).toBeGreaterThanOrEqual(84);
     expect(desktop.toolbar.height).toBeLessThanOrEqual(86);
     expect(desktop.questions.width).toBeGreaterThanOrEqual(359);
     expect(desktop.questions.width).toBeLessThanOrEqual(361);
-    expect(desktop.preview.width).toBeGreaterThanOrEqual(580);
-    expect(desktop.preview.width).toBeLessThanOrEqual(584);
+    expect(desktop.preview.width).toBeGreaterThanOrEqual(586);
+    expect(desktop.preview.width).toBeLessThanOrEqual(590);
     expect(desktop.inspector.width).toBeGreaterThanOrEqual(427);
     expect(desktop.inspector.width).toBeLessThanOrEqual(429);
     expect(desktop.card.width).toBeGreaterThanOrEqual(463);
@@ -687,14 +836,14 @@ test.describe("panel reference reconstruction", () => {
       .poll(() =>
         page.locator("#panel-sidebar").evaluate((element) => element.getBoundingClientRect().width),
       )
-      .toBeGreaterThanOrEqual(238);
+      .toBeGreaterThanOrEqual(255);
     await expect
       .poll(() =>
         page
           .locator(".flow-builder__preview")
           .evaluate((element) => element.getBoundingClientRect().width),
       )
-      .toBeGreaterThanOrEqual(527);
+      .toBeGreaterThanOrEqual(510);
 
     const expanded = await page.evaluate(() => {
       const rect = (selector: string) => {
@@ -714,7 +863,8 @@ test.describe("panel reference reconstruction", () => {
     });
 
     expect(expanded.questions.width).toBeGreaterThanOrEqual(319);
-    expect(expanded.preview.width).toBeGreaterThanOrEqual(527);
+    expect(expanded.preview.width).toBeGreaterThanOrEqual(510);
+    expect(expanded.preview.width).toBeLessThanOrEqual(514);
     expect(expanded.inspector.width).toBeGreaterThanOrEqual(359);
     expect(expanded.inspector.right).toBeLessThanOrEqual(1_449);
     expect(expanded.identity.right).toBeLessThanOrEqual(expanded.saveState.left);
@@ -2045,8 +2195,8 @@ test.describe("panel reference reconstruction", () => {
       };
     });
     expect(shellGeometry.documentOverflow).toBeLessThanOrEqual(1);
-    expect(shellGeometry.railWidth).toBeGreaterThanOrEqual(238);
-    expect(shellGeometry.railWidth).toBeLessThanOrEqual(242);
+    expect(shellGeometry.railWidth).toBeGreaterThanOrEqual(255);
+    expect(shellGeometry.railWidth).toBeLessThanOrEqual(257);
     expect(shellGeometry.topbarHeight).toBeGreaterThanOrEqual(86);
     expect(shellGeometry.topbarHeight).toBeLessThanOrEqual(90);
 
@@ -2062,7 +2212,7 @@ test.describe("panel reference reconstruction", () => {
     );
     await expect
       .poll(() => sidebar.evaluate((element) => element.getBoundingClientRect().width))
-      .toBeLessThanOrEqual(80);
+      .toBeLessThanOrEqual(73);
     await expect
       .poll(() => page.evaluate(() => localStorage.getItem("lorum:panel-sidebar-collapsed")))
       .toBe("true");
@@ -2077,7 +2227,7 @@ test.describe("panel reference reconstruction", () => {
     await expect(sidebar).toHaveAttribute("data-collapsed", "false");
     await expect
       .poll(() => sidebar.evaluate((element) => element.getBoundingClientRect().width))
-      .toBeGreaterThanOrEqual(238);
+      .toBeGreaterThanOrEqual(255);
     await expect(page.getByRole("row")).toHaveCount(9);
     await expect(page.getByRole("link", { exact: true, name: "Nowy lead" })).toHaveAttribute(
       "href",
