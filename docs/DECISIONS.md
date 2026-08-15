@@ -1488,3 +1488,153 @@ Ownera/Admina do onboardingu pojedynczej organizacji bez procesu i serwerowy
 logout pozostają bez zmian. Poniżej 70 rem intro przechodzi nad listę; poniżej
 46 rem wiersz staje się kartą z tą samą kolejnością DOM. Rollback przywraca
 poprzedni JSX i CSS bez migracji, zmiany danych ani preferencji użytkownika.
+
+## ADR-047: podstrona produktu zgodna z systemem landing page V7
+
+**Status:** accepted dla korekty R2.V7 na podstawie porównania zaakceptowanej
+strony głównej i odrzuconej kompozycji `/produkt` z 2026-08-15
+
+**Decyzja:** `/produkt` używa dokładnie tego samego systemu wizualnego V7 co
+zaakceptowana strona główna: `wy-marketing-v7-theme`, chłodnego canvasu,
+dwukolumnowego hero copy + proof, pigułkowej etykiety, nagłówka z kontrolowanym
+podziałem bold/regular, sygnałowego raila oraz wycentrowanych nagłówków
+rozdziałów. Strona nie korzysta z ogólnego template'u `marketing-page-hero`,
+szerokich białych pasów ani naprzemiennego układu tekst/screenshot.
+
+Narracja obejmuje cztery etapy: konfigurację, doświadczenie klienta, gotowy
+lead i granicę decyzji. Trzy rozdziały produktowe mają po jednej dominującej
+scenie z rzeczywistym ekranem aplikacji i jednym krótkim railem dowodów.
+Screenshoty pochodzą wyłącznie z repozytoryjnych artefaktów visual QA, używają
+danych demonstracyjnych i są podpisane jako demonstracyjne. Nie wolno
+zastępować ich wygenerowaną ilustracją ani syntetyczną makietą panelu.
+
+Desktop i mobile używają osobnych kadrów tego samego zadania. Telefon nie
+pomniejsza desktopowego panelu: pokazuje rzeczywisty mobilny widok edytora,
+wyniku i szczegółów leada. Tła radialne, pigułki, promienie, obramowania i cienie
+są dozwolone wyłącznie w formie oraz intensywności już zaakceptowanej na home
+V7 i używają wspólnych tokenów z `packages/ui`. Sekcja odpowiedzialności jest
+jasnym, ograniczonym panelem zamiast pełnoszerokościowego ciemnego pasa.
+Forced-colors mapuje powierzchnie na `Canvas/CanvasText`.
+
+**Dlaczego:** płaska korekta redakcyjna usunęła cechy template'u, ale stworzyła
+drugi, odrębny język strony: zbyt białe szerokie pasy, doklejone screenshoty,
+ciężki ciemny blok i inny rytm typografii. Właściciel wskazał brak dopasowania
+do strony głównej. V7 jest istniejącym, zaakceptowanym źródłem geometrii i
+hierarchii, dlatego podstrona ma być jego rozwinięciem, a nie kolejnym stylem.
+
+**Konsekwencje:** zmiana nie dotyka API, auth, tenant scope, RLS, pricingu,
+scoringu, widgetu ani danych. Publiczne assety są statycznymi, bezpiecznie
+przyciętymi kopiami syntetycznych renderów QA; nie zawierają prywatnych notatek,
+adresów e-mail ani danych organizacji pilotażowej. Testy R2 mierzą sześć
+viewportów, brak overflow, właściwy kadr desktop/mobile, działające CTA,
+klawiaturę, axe i forced-colors. Visual QA zestawia `/produkt` bezpośrednio z
+zaakceptowanym pełnym renderem home V7 w 1440/390 px. Rollback przywraca
+poprzedni `page.tsx` i moduł CSS; nie wymaga migracji.
+
+## ADR-048: `/jak-dziala` jako ciągła historia procesu w systemie V7
+
+**Status:** accepted dla korekty R3.V7 na podstawie zaakceptowanej strony
+głównej i podstrony `/produkt` z 2026-08-15
+
+**Decyzja:** `/jak-dziala` używa systemu marketingowego V7 i opowiada jeden
+ciągły proces zamiast składać trasę z niezależnych, równorzędnych kart. Hero
+pokazuje rzeczywisty wynik klienta i rzeczywisty rekord leada po dwóch stronach
+jawnej granicy serwera. Sześć etapów jest widocznych od początku w jednym railu,
+a dalsza narracja ma trzy rozdziały po dwa etapy: przygotowanie i publikacja,
+sesja i wynik oraz przekazanie kontaktu i decyzja firmy.
+
+Każdy rozdział ma jedną dominującą scenę z prawdziwego ekranu produktu oraz
+krótki zapis właściciela, działania i rezultatu. Numeracja jest globalna 01–06;
+nie resetuje się w rozdziałach. Desktop i mobile używają osobnych kadrów tego
+samego zadania. Assety pochodzą z zatwierdzonego zestawu `/produkt`, zawierają
+wyłącznie dane demonstracyjne i nie są generowaną makietą interfejsu.
+
+Model bezpieczeństwa pozostaje jedną zintegrowaną powierzchnią z trzema
+niezależnymi warstwami: aplikacją i API, PostgreSQL z RLS oraz prywatnym
+storage. Nie używa certyfikatów, gwarancji ani stwierdzeń o stuprocentowym
+bezpieczeństwie. Finał strony pozostaje jasny i prowadzi wyłącznie do
+istniejących tras `/branze` oraz `/logowanie`. Cała treść jest dostępna bez
+JavaScriptu; wcześniejsze mobilne `details` nie są potrzebne, ponieważ krótka
+treść etapów i właściwy ekran tworzą jedną kolejność czytania.
+
+**Dlaczego:** poprzedni R3 był technicznie poprawny, lecz wizualnie należał do
+innego systemu niż zaakceptowane home V7 i `/produkt`: powtarzał wiele kart,
+ciemny blok outcome oraz lokalne wzorce progressive disclosure. Właściciel po
+akceptacji `/produkt` wskazał `/jak-dziala` jako następny ekran do dopasowania.
+Nowa kompozycja zachowuje kompletność informacji, ale podporządkowuje ją jednej
+historii i rzeczywistym powierzchniom produktu.
+
+**Konsekwencje:** zmiana nie dotyka API, auth, tenant scope, RLS, pricingu,
+scoringu, widgetu ani danych. Sześć dedykowanych zestawów E2E mierzy treść,
+kolejność sekcji, prawidłowe kadry, brak overflow, tryb bez JavaScriptu,
+forced-colors i axe na 320–1536 px. Minimalny tekst pozostaje co najmniej 12 px.
+Rollback przywraca poprzedni `page.tsx`, CSS i testy R3; nie wymaga migracji.
+
+## ADR-049: `/branze` jako redakcyjny indeks pięciu realnych kontekstów
+
+**Status:** accepted dla lokalnej korekty R7.V7; finalny odbiór wizualny
+właściciela pozostaje otwarty
+
+**Decyzja:** `/branze` używa systemu marketingowego V7 i pozostaje wejściem do
+pięciu istniejących tras branżowych. Hero zestawia te zastosowania na jednej
+panoramie z istniejącego, repozytoryjnego assetu. Następna sekcja pozwala
+przełączać branżę w jednym redakcyjnym układzie fotografia + opis + trzy
+prawdziwe pytania. Pełny indeks poniżej zawsze renderuje wszystkie pięć nazw,
+opisów, pytań i linków także bez JavaScriptu.
+
+Interaktywny moduł nie może imitować dashboardu ani osobnego produktu. Nie
+używa score, demonstracyjnej tabeli leada, badge'y statusu, schematu procesu,
+kart zagnieżdżonych w kartach ani syntetycznych rysunków interfejsu. Pierwszy
+lokalny wariant oparty na takim układzie został jawnie odrzucony i usunięty.
+Wybrany wariant ma jedną dominującą fotografię, ciemną powierzchnię tekstową i
+cienką nawigację pięciu branż. Zakładki obsługują strzałki, Home i End, a
+każda prowadzi do istniejącej trasy szczegółowej.
+
+**Dlaczego:** wcześniejsza strona była technicznie poprawna, ale rozpoczynała
+się pseudo-panelem, a pierwszy wariant V7 powtórzył błąd jako trzykolumnowy
+mini-dashboard. Oba rozwiązania konkurowały z treścią i wyglądały jak
+uniwersalny szablon SaaS. Redakcyjny układ pozwala porównać realne różnice
+między usługami bez udawania nowej funkcji produktu.
+
+**Konsekwencje:** nie zmieniają się API, auth, tenant scope, RLS, pricing,
+scoring, widget, model danych ani pięć tras szczegółowych. Nie dodano nowej
+zależności ani wygenerowanego obrazu. Asset branżowy pozostaje statyczny i nie
+zawiera danych klientów. Testy R7.V7 mierzą osiem viewportów 320–1536 px,
+minimalny tekst 12 px, brak overflow, działanie linków, klawiaturę, axe,
+forced-colors i wersję bez JavaScriptu. Rollback przywraca poprzedni `page.tsx`,
+moduł CSS i test R7.1; migracja nie jest potrzebna.
+
+## ADR-050: `/dla-agencji` jako jedna historia przekazania procesu i danych
+
+**Status:** accepted dla lokalnej korekty R5.V7; finalny odbiór wizualny
+właściciela pozostaje otwarty
+
+**Decyzja:** `/dla-agencji` używa systemu marketingowego V7 i prowadzi przez
+jedną kolejność: model wdrożenia, granicę danych, izolację widgetu i następny
+krok. Hero pokazuje rzeczywisty ekran panelu Kwotum, a kolejne rozdziały
+używają istniejących kadrów edytora procesu, szczegółu leada i wyniku widgetu.
+Nie powstają osobne mini-dashboardy, fikcyjne osoby ani kontrolki bez działania.
+
+Właścicielem leadów pozostaje organizacja klienta. Macierz Owner/Admin/Sales
+odtwarza rzeczywisty kontrakt uprawnień, a opis granicy danych zachowuje trzy
+warstwy kontroli: aktywną organizację, serwerowy `TenantContext` oraz RLS.
+Agencja nie otrzymuje dostępu tylko dlatego, że wdraża proces. Sekcja widgetu
+opisuje natywny element, mały loader, własne style i wąski kontrakt zdarzeń.
+Shadow DOM jest przedstawiony wyłącznie jako izolacja CSS, a nie granica
+bezpieczeństwa JavaScriptu.
+
+**Dlaczego:** wcześniejsze etapy R5.1–R5.4 były poprawne funkcjonalnie i
+bezpieczne, ale składały trasę z czterech niezależnych proofów należących do
+starszego systemu wizualnego. Beżowe powierzchnie, tablicowy plan, imitacja
+panelu ról i code-native makieta strony z widgetem wyglądały jak zestaw
+uniwersalnych sekcji SaaS. Nowa kompozycja zachowuje wszystkie kontrakty, lecz
+przenosi je do jednej redakcyjnej narracji zgodnej z zaakceptowanymi home V7,
+`/produkt`, `/jak-dziala` i `/branze`.
+
+**Konsekwencje:** zmiana nie dotyka API, auth, tenant scope, RLS, modelu danych,
+pricingu, scoringu ani runtime widgetu. Nie dodano zależności ani danych
+klientów; użyte assety zawierają wyłącznie dane demonstracyjne. Unified gate
+R5.V7 mierzy osiem viewportów 320–1536 px, prawdziwą macierz ról, brak overflow,
+minimum 12 px tekstu, klawiaturę, axe, forced-colors i kompletność treści bez
+JavaScriptu. Rollback przywraca poprzedni `page.tsx`, cztery komponenty R5,
+ich moduły CSS i testy R5.1–R5.4; migracja nie jest potrzebna.
