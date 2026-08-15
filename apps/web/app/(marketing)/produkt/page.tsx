@@ -42,11 +42,11 @@ export default function ProductPage() {
         <div className={styles.heroGrid}>
           <div className={styles.heroCopy}>
             <p className={styles.eyebrow}>Produkt Kwotum</p>
-            <h1 id="product-title">
+            <h1 className="wy-marketing-heading-1" id="product-title">
               <strong>Od pierwszego pytania</strong>
               <span>do leada gotowego do rozmowy</span>
             </h1>
-            <p className={styles.heroDescription}>
+            <p className={`${styles.heroDescription} wy-marketing-lead`}>
               Jeden proces prowadzi klienta, porządkuje odpowiedzi i przekazuje firmie kompletny
               kontekst zapytania — bez przepisywania danych między formularzem, pocztą i arkuszem.
             </p>
@@ -158,7 +158,7 @@ export default function ProductPage() {
       >
         <header className={styles.sectionHeading}>
           <p className={styles.eyebrow}>Zakres odpowiedzialności</p>
-          <h2 id="responsibility-title">
+          <h2 className="wy-marketing-heading-2" id="responsibility-title">
             <strong>System porządkuje decyzję.</strong>
             <span>Nie podejmuje jej za firmę</span>
           </h2>
@@ -173,7 +173,7 @@ export default function ProductPage() {
             <span className={styles.responsibilityNumber}>01</span>
             <div>
               <p>Odpowiada Kwotum</p>
-              <h3>Porządkuje i wyjaśnia</h3>
+              <h3 className="wy-marketing-heading-3">Porządkuje i wyjaśnia</h3>
               <ul>
                 <li>
                   <CheckGlyph /> prowadzi proces i zapisuje odpowiedzi,
@@ -191,7 +191,7 @@ export default function ProductPage() {
             <span className={styles.responsibilityNumber}>02</span>
             <div>
               <p>Odpowiada firma</p>
-              <h3>Weryfikuje i decyduje</h3>
+              <h3 className="wy-marketing-heading-3">Weryfikuje i decyduje</h3>
               <ul>
                 <li>
                   <CheckGlyph /> ustala pytania i kryteria kwalifikacji,
@@ -223,8 +223,10 @@ export default function ProductPage() {
           </div>
           <div className={styles.finalCopy}>
             <p className={styles.eyebrow}>Następny krok</p>
-            <h2 id="product-cta-title">Zobacz cały proces na konkretnym przykładzie.</h2>
-            <p>
+            <h2 className="wy-marketing-heading-2" id="product-cta-title">
+              Zobacz cały proces na konkretnym przykładzie.
+            </h2>
+            <p className="wy-marketing-lead">
               Przejdź od pierwszego pytania klienta do informacji, które otrzymuje firma po wysłaniu
               formularza.
             </p>
@@ -333,8 +335,10 @@ function ProductChapter({
     >
       <header className={styles.sectionHeading}>
         <p className={styles.eyebrow}>{eyebrow}</p>
-        <h2 id={titleId}>{heading}</h2>
-        <p>{description}</p>
+        <h2 className="wy-marketing-heading-2" id={titleId}>
+          {heading}
+        </h2>
+        <p className="wy-marketing-lead">{description}</p>
       </header>
 
       <figure className={styles.productStage} data-product-screen>

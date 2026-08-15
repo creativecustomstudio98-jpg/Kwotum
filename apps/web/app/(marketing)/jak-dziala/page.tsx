@@ -115,10 +115,10 @@ export default function HowItWorksPage() {
         <div className={styles.heroGrid}>
           <div className={styles.heroCopy} data-how-hero-copy>
             <p className={styles.eyebrow}>Jak działa Kwotum</p>
-            <h1 id="how-it-works-title">
+            <h1 className="wy-marketing-heading-1" id="how-it-works-title">
               <strong>Klient przechodzi proces.</strong> <span>Firma podejmuje decyzję</span>
             </h1>
-            <p className={styles.heroDescription}>
+            <p className={`${styles.heroDescription} wy-marketing-lead`}>
               Kwotum prowadzi klienta przez właściwe pytania, potwierdza wynik na serwerze i
               przekazuje firmie uporządkowany kontekst — bez automatycznego podejmowania decyzji
               handlowej.
@@ -227,7 +227,7 @@ export default function HowItWorksPage() {
       >
         <header className={styles.sectionHeading}>
           <p className={styles.eyebrow}>Bezpieczeństwo procesu</p>
-          <h2 id="security-model-title">
+          <h2 className="wy-marketing-heading-2" id="security-model-title">
             <strong>Jedne dane.</strong> <span>Trzy niezależne bariery dostępu</span>
           </h2>
           <p>
@@ -258,7 +258,7 @@ export default function HowItWorksPage() {
                   <p>
                     0{index + 1} · {layer.label}
                   </p>
-                  <h3>{layer.title}</h3>
+                  <h3 className="wy-marketing-heading-3">{layer.title}</h3>
                 </div>
                 <p>{layer.description}</p>
                 <dl>
@@ -391,8 +391,10 @@ function JourneyChapter({
     >
       <header className={styles.sectionHeading}>
         <p className={styles.eyebrow}>{eyebrow}</p>
-        <h2 id={titleId}>{heading}</h2>
-        <p>{description}</p>
+        <h2 className="wy-marketing-heading-2" id={titleId}>
+          {heading}
+        </h2>
+        <p className="wy-marketing-lead">{description}</p>
       </header>
 
       <div className={styles.chapterBody}>
@@ -402,8 +404,8 @@ function JourneyChapter({
               <span className={styles.stageNumber}>{String(startAt + index).padStart(2, "0")}</span>
               <div>
                 <p>{step.actor}</p>
-                <h3>{step.title}</h3>
-                <p>{step.description}</p>
+                <h3 className="wy-marketing-heading-3">{step.title}</h3>
+                <p className="wy-marketing-body">{step.description}</p>
                 <footer>
                   <span>Rezultat</span>
                   <strong>{step.result}</strong>
@@ -452,10 +454,10 @@ function HowFinalCta() {
         </div>
         <div className={styles.finalCopy}>
           <p className={styles.eyebrow}>Następny krok</p>
-          <h2 id="how-final-cta-title">
+          <h2 className="wy-marketing-heading-2" id="how-final-cta-title">
             Wybierz branżę. <span>Zobacz właściwy brief.</span>
           </h2>
-          <p>
+          <p className="wy-marketing-lead">
             Mechanizm pozostaje ten sam. Zmieniają się pytania, dane wejściowe i kontekst potrzebny
             firmie przed pierwszą rozmową.
           </p>
@@ -475,7 +477,9 @@ function HowFinalCta() {
           data-how-overview
         >
           <p>Stały rdzeń procesu</p>
-          <h3 id="how-overview-title">Wspólny mechanizm. Branżowy kontekst.</h3>
+          <h3 className="wy-marketing-heading-3" id="how-overview-title">
+            Wspólny mechanizm. Branżowy kontekst.
+          </h3>
           <dl>
             <div>
               <dt>Proces</dt>

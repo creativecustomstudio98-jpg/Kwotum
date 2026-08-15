@@ -38,10 +38,10 @@ export default function IndustriesPage() {
         <div className={styles.heroGrid}>
           <div className={styles.heroCopy} data-industries-hero-copy>
             <p className={styles.eyebrow}>Procesy dopasowane do branży</p>
-            <h1 id="industries-hero-title">
+            <h1 className="wy-marketing-heading-1" id="industries-hero-title">
               <strong>Meble to nie remont.</strong> <span>Brief też nie powinien być ten sam.</span>
             </h1>
-            <p className={styles.heroDescription}>
+            <p className={`${styles.heroDescription} wy-marketing-lead`}>
               Każda usługa wymaga innych danych przed pierwszą rozmową. Kwotum zachowuje wspólny,
               bezpieczny mechanizm, ale zaczyna od pytań właściwych dla konkretnego zakresu.
             </p>
@@ -90,10 +90,10 @@ export default function IndustriesPage() {
       >
         <header className={styles.sectionHeading}>
           <p className={styles.eyebrow}>Porównaj procesy</p>
-          <h2 id="industries-compare-title">
+          <h2 className="wy-marketing-heading-2" id="industries-compare-title">
             <strong>Wspólny silnik.</strong> <span>Inny zakres danych.</span>
           </h2>
-          <p>
+          <p className="wy-marketing-lead">
             Przełącz branżę i zobacz, jak zmieniają się pytania, ścieżka oraz zawartość
             przykładowego leada. Mechanizm publikacji i kwalifikacji pozostaje ten sam.
           </p>
@@ -113,11 +113,11 @@ export default function IndustriesPage() {
         <header className={styles.indexHeading}>
           <div>
             <p className={styles.eyebrow}>Pięć zastosowań</p>
-            <h2 id="industries-index-title">
+            <h2 className="wy-marketing-heading-2" id="industries-index-title">
               <strong>Wybierz usługę.</strong> <span>Zobacz pełny przykład.</span>
             </h2>
           </div>
-          <p>
+          <p className="wy-marketing-lead">
             Każda trasa pokazuje właściwe pytania, demonstracyjny brief i granice wyniku dla
             konkretnego typu realizacji.
           </p>
@@ -207,10 +207,10 @@ function IndustriesFinalCta() {
         </div>
         <div className={styles.finalCopy}>
           <p className={styles.eyebrow}>Własny proces</p>
-          <h2 id="industries-final-title">
+          <h2 className="wy-marketing-heading-2" id="industries-final-title">
             Branża ustala pytania. <span>Ty zachowujesz decyzję.</span>
           </h2>
-          <p>
+          <p className="wy-marketing-lead">
             Gotowy kontekst jest punktem startowym. Pytania, reguły i następny krok możesz dopasować
             do rzeczywistej oferty firmy.
           </p>
@@ -230,7 +230,9 @@ function IndustriesFinalCta() {
           data-industries-overview
         >
           <p>Stały rdzeń procesu</p>
-          <h3 id="industries-overview-title">Różne usługi. Ten sam standard danych.</h3>
+          <h3 className="wy-marketing-heading-3" id="industries-overview-title">
+            Różne usługi. Ten sam standard danych.
+          </h3>
           <dl>
             <div>
               <dt>Pytania</dt>

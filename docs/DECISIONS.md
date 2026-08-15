@@ -1638,3 +1638,31 @@ R5.V7 mierzy osiem viewportów 320–1536 px, prawdziwą macierz ról, brak over
 minimum 12 px tekstu, klawiaturę, axe, forced-colors i kompletność treści bez
 JavaScriptu. Rollback przywraca poprzedni `page.tsx`, cztery komponenty R5,
 ich moduły CSS i testy R5.1–R5.4; migracja nie jest potrzebna.
+
+## ADR-051: jedna responsywna skala typografii dla marketingu
+
+**Status:** accepted dla korekty przekrojowej R12.T z 2026-08-15
+
+**Decyzja:** wszystkie publiczne trasy marketingowe korzystają z jednej skali
+treści zdefiniowanej w `packages/ui`: H1 ma 60/48/42 px, H2 48/40/36 px, H3
+20/20/18 px, opis sekcji 18/17/16 px, a tekst podstawowy 16 px odpowiednio dla
+desktopu, tabletu i mobile. Wspólne role mają klasy
+`wy-marketing-heading-1/2/3`, `wy-marketing-lead`, `wy-marketing-body` i
+`wy-marketing-kicker`; lokalne moduły odpowiadają za kompozycję, kolor i
+odstępy, ale nie definiują ponownie rozmiaru tych ról.
+
+Nagłówki wewnątrz demonstracyjnych ekranów produktu, formularzy, rekordów
+leada i innych code-native proofów nie dziedziczą skali strony. Są elementami
+pokazywanego interfejsu i zachowują własną, mniejszą hierarchię UI. Wyjątek nie
+obejmuje redakcyjnych kart, nagłówków sekcji ani CTA.
+
+**Dlaczego:** audyt działających tras wykazał H1 od około 48 do 75 px, H2 od
+około 17 do 64 px i różne rozmiary opisów w zależności od lokalnego arkusza.
+Powodowało to zmianę hierarchii między podstronami i wzmacniało wrażenie
+składania serwisu z niezależnych szablonów.
+
+**Konsekwencje:** nowy gate przechodzi przez 21 tras w 1440, 1024 i 390 px,
+sprawdza dokładny computed font-size każdej wspólnej roli, brak nieoznaczonych
+nagłówków treści i brak poziomego overflow. Zmiana nie dotyka copy, API, auth,
+tenant scope, danych ani runtime widgetu. Rollback usuwa wspólne role i ich
+przypisania; nie wymaga migracji.

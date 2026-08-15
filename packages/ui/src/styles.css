@@ -51,6 +51,17 @@
   --wy-type-display-sm: 2.5rem;
   --wy-type-display-md: 3.25rem;
   --wy-type-display-lg: 4rem;
+  --wy-marketing-type-h1: 3.75rem;
+  --wy-marketing-type-h2: 3rem;
+  --wy-marketing-type-h3: 1.25rem;
+  --wy-marketing-type-lead: 1.125rem;
+  --wy-marketing-type-body: 1rem;
+  --wy-marketing-type-kicker: 0.75rem;
+  --wy-marketing-leading-h1: 1.02;
+  --wy-marketing-leading-h2: 1.06;
+  --wy-marketing-leading-h3: 1.2;
+  --wy-marketing-leading-lead: 1.62;
+  --wy-marketing-leading-body: 1.62;
   --wy-leading-tight: 1.08;
   --wy-leading-heading: 1.18;
   --wy-leading-body: 1.55;
@@ -253,6 +264,39 @@ a {
 
 .wy-heading-md {
   font-size: var(--wy-type-title-md);
+}
+
+.marketing-main .wy-marketing-heading-1.wy-marketing-heading-1 {
+  font-size: var(--wy-marketing-type-h1);
+  letter-spacing: -0.055em;
+  line-height: var(--wy-marketing-leading-h1);
+}
+
+.marketing-main .wy-marketing-heading-2.wy-marketing-heading-2 {
+  font-size: var(--wy-marketing-type-h2);
+  letter-spacing: -0.045em;
+  line-height: var(--wy-marketing-leading-h2);
+}
+
+.marketing-main .wy-marketing-heading-3.wy-marketing-heading-3 {
+  font-size: var(--wy-marketing-type-h3);
+  letter-spacing: -0.025em;
+  line-height: var(--wy-marketing-leading-h3);
+}
+
+.marketing-main .wy-marketing-lead.wy-marketing-lead {
+  font-size: var(--wy-marketing-type-lead);
+  line-height: var(--wy-marketing-leading-lead);
+}
+
+.marketing-main .wy-marketing-body.wy-marketing-body {
+  font-size: var(--wy-marketing-type-body);
+  line-height: var(--wy-marketing-leading-body);
+}
+
+.marketing-main .wy-marketing-kicker.wy-marketing-kicker {
+  font-size: var(--wy-marketing-type-kicker);
+  line-height: 1.35;
 }
 
 .wy-body-lg {
@@ -1065,6 +1109,23 @@ a {
   margin-top: 0.375rem;
   color: var(--wy-color-text-secondary);
   line-height: var(--wy-leading-copy);
+}
+
+@media (max-width: 64rem) {
+  :root {
+    --wy-marketing-type-h1: 3rem;
+    --wy-marketing-type-h2: 2.5rem;
+    --wy-marketing-type-lead: 1.0625rem;
+  }
+}
+
+@media (max-width: 48rem) {
+  :root {
+    --wy-marketing-type-h1: 2.625rem;
+    --wy-marketing-type-h2: 2.25rem;
+    --wy-marketing-type-h3: 1.125rem;
+    --wy-marketing-type-lead: 1rem;
+  }
 }
 
 @media (max-width: 52rem) {

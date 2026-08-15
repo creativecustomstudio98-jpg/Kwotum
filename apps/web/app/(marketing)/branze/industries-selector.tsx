@@ -97,8 +97,8 @@ export function IndustriesSelector() {
           <p>
             0{activeIndex + 1} <span>/ 05</span>
           </p>
-          <h3>{activeIndustry.name}</h3>
-          <p>{activeIndustry.description}</p>
+          <h3 className="wy-marketing-heading-3">{activeIndustry.name}</h3>
+          <p className="wy-marketing-body">{activeIndustry.description}</p>
 
           <div className={styles.selectorQuestions}>
             <small>Proces zaczyna od</small>

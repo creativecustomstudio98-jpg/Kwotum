@@ -89,11 +89,11 @@ export default function AgencyPage() {
         <div className={styles.heroGrid}>
           <div className={styles.heroCopy} data-agency-hero-copy>
             <p className={styles.eyebrow}>Dla agencji</p>
-            <h1 id="agency-hero-title">
+            <h1 className="wy-marketing-heading-1" id="agency-hero-title">
               <strong>Wdrażacie proces.</strong>
               <span>Klient zarządza leadami.</span>
             </h1>
-            <p className={styles.heroDescription}>
+            <p className={`${styles.heroDescription} wy-marketing-lead`}>
               Agencja projektuje pytania, konfiguruje proces i publikuje go na stronie. Firma
               otrzymuje kompletne zapytania we własnej organizacji — bez automatycznego dostępu
               wykonawcy do leadów.
@@ -173,8 +173,8 @@ export default function AgencyPage() {
                 <span className={styles.stepNumber}>0{index + 1}</span>
                 <div>
                   <p>{stage.label}</p>
-                  <h3>{stage.title}</h3>
-                  <span>{stage.description}</span>
+                  <h3 className="wy-marketing-heading-3">{stage.title}</h3>
+                  <span className="wy-marketing-body">{stage.description}</span>
                   <small>
                     Rezultat <strong>{stage.result}</strong>
                   </small>
@@ -233,7 +233,7 @@ export default function AgencyPage() {
           <div className={styles.accessProof} data-agency-access-proof>
             <div className={styles.accessHeading}>
               <p>Aktywna organizacja klienta</p>
-              <h3>Uprawnienia wynikają z członkostwa</h3>
+              <h3 className="wy-marketing-heading-3">Uprawnienia wynikają z członkostwa</h3>
               <span>Owner · Admin · Sales</span>
             </div>
 
@@ -291,11 +291,11 @@ export default function AgencyPage() {
         <div className={styles.isolationGrid} data-agency-isolation-proof>
           <div className={styles.isolationCopy}>
             <p className={styles.darkEyebrow}>Izolacja interfejsu</p>
-            <h2 id="agency-isolation-title">
+            <h2 className="wy-marketing-heading-2" id="agency-isolation-title">
               <strong>Motyw klienta zostaje na zewnątrz.</strong>
               <span>Widget zachowuje własny interfejs.</span>
             </h2>
-            <p>
+            <p className="wy-marketing-lead">
               Natywny element korzysta z własnego arkusza wewnątrz Shadow DOM. Globalny CSS strony
               nie zmienia kontrolek formularza, ale Shadow DOM nie jest granicą bezpieczeństwa dla
               JavaScriptu hosta.
@@ -389,8 +389,10 @@ function SectionHeading({
   return (
     <header className={styles.sectionHeading}>
       <p className={styles.eyebrow}>{eyebrow}</p>
-      <h2 id={id}>{title}</h2>
-      <p>{description}</p>
+      <h2 className="wy-marketing-heading-2" id={id}>
+        {title}
+      </h2>
+      <p className="wy-marketing-lead">{description}</p>
     </header>
   );
 }
@@ -477,10 +479,10 @@ function AgencyFinalCta() {
         </div>
         <div className={styles.finalCopy}>
           <p className={styles.eyebrow}>Następny krok</p>
-          <h2 id="agency-final-title">
+          <h2 className="wy-marketing-heading-2" id="agency-final-title">
             Wdrażaj proces. <span>Nie przejmuj danych klienta.</span>
           </h2>
-          <p>
+          <p className="wy-marketing-lead">
             Zobacz pięć realnych kontekstów branżowych i wybierz właściwy punkt startowy do
             wspólnego warsztatu z firmą.
           </p>
