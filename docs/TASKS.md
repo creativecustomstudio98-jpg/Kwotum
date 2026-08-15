@@ -1891,6 +1891,11 @@ to wyłącznie M4 — przykładowy lead; M4 nie został rozpoczęty.
 - [x] R2.2: przebudować mapę produktu wokół jednego rekordu leada.
 - [x] R2.3: przebudować granice produktu jako kontrakt odpowiedzialności.
 - [x] R2.4: przebudować finalne CTA i overview produktu.
+- [x] R2.R: wycofać odrzucone proofy typu AI-template z całego `/produkt`
+      i zastąpić je redakcyjną narracją opartą na rzeczywistych ekranach
+      desktop/mobile.
+- [x] R2.V7: dopasować cały `/produkt` do zaakceptowanego systemu home V7,
+      zachowując rzeczywiste ekrany zamiast syntetycznych proofów.
 - [x] R3.1: przebudować hero `/jak-dziala` z jawną mapą zaufania.
 - [x] R3.2: przebudować kroki 1–3 `/jak-dziala` jako jawny kontrakt procesu.
 - [x] R3.3: przebudować kroki 4–6 `/jak-dziala` jako jawny outcome flow.
@@ -1916,6 +1921,11 @@ to wyłącznie M4 — przykładowy lead; M4 nie został rozpoczęty.
 - [~] R5.4: przebudować izolację widgetu od CSS strony hosta jako mały,
   code-native proof zgodny z rzeczywistym Shadow DOM; implementacja i gate
   są zamknięte, etap oczekuje na odbiór właściciela.
+- [x] R5.V7: dopasować całą trasę `/dla-agencji` do zaakceptowanego systemu
+      home V7, zachowując rzeczywistą macierz ról, tenant scope i kontrakt
+      izolacji widgetu bez pseudo-paneli.
+- [x] R7.V7: przebudować całą trasę `/branze` w systemie home V7, usunąć
+      odrzucony pseudo-dashboard i zachować pięć prawdziwych tras branżowych.
 - [ ] R5.5–R11: przebudowywać jedną trasę i jedną sekcję naraz zgodnie z
       `docs/ui/marketing-subpages-v1/MASTER_REBRAND_PLAN.md`.
 - [ ] R12: wykonać globalną kontrolę SEO, linków, dostępności, responsive,
@@ -1995,6 +2005,34 @@ pełne testy, lint, typecheck i build 39 tras są zielone. Raport i artefakty:
 `artifacts/visual-qa/marketing-subpages-v1/r2-4/`. Trasa `/produkt` ma
 ukończone R2.1–R2.4. Następny dozwolony etap to wyłącznie R3.1 — hero i mapa
 zaufania `/jak-dziala`; R3.1 nie został rozpoczęty.
+
+**Korekta R2.R 2026-08-14:** właściciel produktu odrzucił wcześniejszy R2 oraz
+pierwszą próbę korekty jako nadal generatywny szablon. Cały `/produkt`
+został przebudowany na płaską, redakcyjną narrację z jednym rzeczywistym
+ekranem aplikacji na rozdział: panel, builder, widok wyniku i rekord leada.
+Desktop i mobile używają osobnych, mechanicznie przyciętych kadrów z danych
+demonstracyjnych; nie użyto wygenerowanych ilustracji ani atrap interfejsu.
+Usunięto numerowane mapy, pseudotabele, powtarzalne karty, gradienty i sztuczne
+overview. CTA prowadzą wyłącznie do istniejących tras, forced-colors używa
+`Canvas/CanvasText`, a wszystkie kolory strony pochodzą z tokenów
+`packages/ui`. Dedykowane E2E przechodzą 30/30 na 1440/1024/768/430/390/320
+px, axe i klawiatura są zielone, brak overflow, lint/typecheck przechodzą po
+8/8, web ma 184/184 unit, RLS i WordPress przechodzą, a build monorepo 16/16
+oraz finalny build web są zielone. ADR-047, raport i visual QA:
+`docs/ui/marketing-subpages-v1/PRODUCT_EDITORIAL_RECOVERY_2026-08-14.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r2-recovery/`. Korekta nie
+wdraża strony na produkcję i nie zmienia kolejności dalszych etapów.
+
+**Korekta R2.V7 2026-08-15:** porównanie R2.R z zaakceptowaną stroną główną
+wykazało, że płaska narracja nadal tworzyła osobny język wizualny. `/produkt`
+został więc przebudowany na ten sam system V7: chłodny canvas, hero copy +
+zintegrowana scena prawdziwego panelu, kontrolowany podział bold/regular,
+sygnałowy rail, wycentrowane rozdziały oraz ograniczone powierzchnie zamiast
+białych pasów i ciężkiej ciemnej sekcji. Zachowano osobne, rzeczywiste kadry
+desktop/mobile i podpisy danych demonstracyjnych. Dedykowane E2E przechodzą
+30/30 na 1440/1024/768/430/390/320 px, axe, forced-colors, klawiatura i brak
+overflow są zielone. ADR-047 i raport zostały zaktualizowane; korekta nie
+zmienia funkcji, API, tenant scope ani danych i nie wdraża strony.
 
 **Status R3.1 2026-08-02:** tekstowy hero `/jak-dziala` zastąpiła code-native
 mapa przeglądarka → serwer → panel. Centralna karta wskazuje serwer jako źródło
@@ -2078,6 +2116,20 @@ Raport i artefakty:
 `artifacts/visual-qa/marketing-subpages-v1/r3-c/`. Etap R3 jest zamknięty.
 Następny dozwolony etap to wyłącznie R4.1 — hero `/cennik`; nie został
 rozpoczęty.
+
+**Korekta R3.V7 2026-08-15:** po akceptacji `/produkt` właściciel wskazał
+`/jak-dziala` jako następną podstronę do dopasowania do strony głównej. Trasa
+została przebudowana na ten sam system V7: hero z rzeczywistym wynikiem klienta
+i rekordem leada, rail sześciu etapów, trzy rozdziały po dwa kroki z globalną
+numeracją 01–06 oraz jedna zintegrowana powierzchnia bezpieczeństwa. Usunięto
+powtarzalny układ kart, ciężki ciemny blok i mobilne `details`; cała historia
+pozostaje dostępna bez JavaScriptu. Desktop i mobile używają właściwych kadrów
+tych samych demonstracyjnych ekranów co zaakceptowany `/produkt`. Dedykowany
+gate przechodzi 42/42 na 1536/1440/1280/1024/768/430/390/320 px, axe,
+forced-colors, minimalny tekst 12 px i brak overflow są zielone. ADR-048,
+raport i visual QA: `docs/ui/marketing-subpages-v1/HOW_V7_RECOVERY_2026-08-15.md`
+oraz `artifacts/visual-qa/marketing-subpages-v1/r3-home-aligned/`. Korekta nie
+zmienia funkcji, API, tenant scope ani danych i nie wdraża strony.
 
 **Status R4.1 2026-08-03:** tekstowe hero `/cennik` zastąpiła code-native mapa
 kwalifikacji wdrożenia. Trzy rekordy oddzielają proces, sposób publikacji i
@@ -2218,6 +2270,40 @@ shell + home 86/86, rzeczywisty test agresywnego CSS widgetu 1/1, unit 177/177,
 RLS i WordPress PASS, a lint/typecheck/build po 8/8. R5.5 i R7 pozostają
 zamrożone do jawnej decyzji właściciela. Raport:
 `docs/ui/marketing-subpages-v1/R5_4_AGENCY_ISOLATION_REPORT.md`.
+
+**Korekta R5.V7 2026-08-15 — LOCAL COMPLETE, OWNER REVIEW OPEN:** cała trasa
+`/dla-agencji` została połączona w jedną narrację zgodną z home V7. Cztery
+wcześniejsze, niezależne pseudo-panele zastąpiły rzeczywiste kadry panelu,
+edytora procesu, szczegółu leada i wyniku widgetu oraz redakcyjne opisy
+odpowiedzialności. Zachowano prawdziwą macierz Owner/Admin/Sales, zasadę braku
+domyślnego dostępu agencji, trzy warstwy tenant scope i jawne ograniczenie
+Shadow DOM do izolacji CSS. Dedykowany gate przechodzi 15/15 na
+1536/1440/1280/1024/768/430/390/320 px; klawiatura, axe, forced-colors,
+minimum 12 px tekstu, brak overflow i kompletna wersja bez JavaScriptu są
+zielone. ADR-050, raport i visual QA:
+`docs/ui/marketing-subpages-v1/AGENCY_V7_RECOVERY_2026-08-15.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r5-home-aligned/`. Zmiana nie dotyka
+API, auth, tenant scope, RLS, danych ani runtime widgetu i nie wdraża strony.
+Pełne lint i typecheck przechodzą 8/8, unit 22/22 zadań (web 184/184), RLS,
+WordPress i oba skany bezpieczeństwa są PASS, a build przechodzi 16/16 i
+generuje 42 trasy.
+
+**Korekta R7.V7 2026-08-15 — LOCAL COMPLETE, OWNER REVIEW OPEN:** cała trasa
+`/branze` została dopasowana do zaakceptowanego systemu home V7. Hero pokazuje
+pięć realnych kontekstów na jednej panoramie, a indeks prowadzi do istniejących
+tras mebli, ogrodzeń, stron internetowych, klimatyzacji i remontów. Pierwszy
+wariant porównania został odrzucony przez właściciela jako ciężki mini-dashboard
+i usunięty. Finalny wariant używa jednej dużej fotografii, spokojnego ciemnego
+opisu oraz dyskretnej nawigacji zakładkowej; nie ma score, pseudotabeli ani
+syntetycznej makiety panelu. Cała treść pięciu branż pozostaje dostępna bez
+JavaScriptu w redakcyjnym indeksie. Dedykowany gate przechodzi 13/13 na
+1536/1440/1280/1024/768/430/390/320 px, klawiatura, axe, forced-colors,
+minimalny tekst 12 px i brak overflow są zielone. ADR-049, raport i visual QA:
+`docs/ui/marketing-subpages-v1/INDUSTRIES_V7_RECOVERY_2026-08-15.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r7-home-aligned/`. Zmiana nie dotyka
+API, auth, tenant scope, RLS ani danych. Pełne lint i typecheck przechodzą 8/8,
+unit 22/22 zadań (web 184/184), RLS, WordPress i skany bezpieczeństwa są PASS,
+a build przechodzi 16/16 i generuje 42 trasy. Etap nie wdraża strony.
 
 - [x] Wskazać immutable commit SHA i wyniki jako bazę Etapu 12ZE.
 
