@@ -62,8 +62,8 @@ export default async function IndustryDetailPage({ params }: IndustryPageProps) 
         <div className="marketing-page-hero__grid">
           <div className="marketing-page-hero__copy">
             <p className="wy-kicker marketing-eyebrow">{industry.eyebrow}</p>
-            <h1>{industry.title}</h1>
-            <p>{industry.description}</p>
+            <h1 className="wy-marketing-heading-1">{industry.title}</h1>
+            <p className="wy-marketing-lead">{industry.description}</p>
           </div>
           <aside className="marketing-page-hero__aside">
             <strong>Wynik orientacyjny</strong>
@@ -79,7 +79,9 @@ export default async function IndustryDetailPage({ params }: IndustryPageProps) 
         <div className="marketing-container marketing-grid marketing-grid--two">
           <div>
             <p className="wy-kicker marketing-eyebrow">Problem wejściowy</p>
-            <h2>Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?</h2>
+            <h2 className="wy-marketing-heading-2">
+              Dlaczego zwykłe pole „opisz zlecenie” nie wystarcza?
+            </h2>
           </div>
           <div>
             <p>{industry.challenge}</p>
@@ -92,8 +94,10 @@ export default async function IndustryDetailPage({ params }: IndustryPageProps) 
         <div className="marketing-container marketing-industry-demo">
           <div>
             <p className="wy-kicker marketing-eyebrow">Fragment demo</p>
-            <h2>Zobacz, jak pytanie staje się częścią briefu.</h2>
-            <p>
+            <h2 className="wy-marketing-heading-2">
+              Zobacz, jak pytanie staje się częścią briefu.
+            </h2>
+            <p className="wy-marketing-lead">
               Demo działa lokalnie, nie zapisuje odpowiedzi i nie oblicza ceny. Pokazuje sposób
               prowadzenia klienta oraz wynik operacyjny dla firmy.
             </p>
@@ -110,13 +114,15 @@ export default async function IndustryDetailPage({ params }: IndustryPageProps) 
         <div className="marketing-container">
           <div className="marketing-section__heading">
             <p className="wy-kicker marketing-eyebrow">Zakres pytań</p>
-            <h2>Pięć obszarów do uporządkowania przed kontaktem.</h2>
+            <h2 className="wy-marketing-heading-2">
+              Pięć obszarów do uporządkowania przed kontaktem.
+            </h2>
           </div>
           <div className="marketing-grid">
             {industry.questions.map((question, index) => (
               <article className="marketing-card marketing-card--dark" key={question}>
                 <span className="marketing-card__number">0{index + 1}</span>
-                <h3>{question}</h3>
+                <h3 className="wy-marketing-heading-3">{question}</h3>
               </article>
             ))}
           </div>
@@ -127,8 +133,12 @@ export default async function IndustryDetailPage({ params }: IndustryPageProps) 
         <div className="marketing-container marketing-grid marketing-grid--two">
           <div>
             <p className="wy-kicker marketing-eyebrow">Syntetyczny przykład leada</p>
-            <h2>Co firma może zobaczyć po ukończeniu procesu.</h2>
-            <p>To dane demonstracyjne, nie prawdziwy klient ani obietnica wyniku sprzedażowego.</p>
+            <h2 className="wy-marketing-heading-2">
+              Co firma może zobaczyć po ukończeniu procesu.
+            </h2>
+            <p className="wy-marketing-lead">
+              To dane demonstracyjne, nie prawdziwy klient ani obietnica wyniku sprzedażowego.
+            </p>
           </div>
           <dl className="marketing-definition-list">
             {industry.sampleBrief.map((item) => (
@@ -145,7 +155,7 @@ export default async function IndustryDetailPage({ params }: IndustryPageProps) 
         <div className="marketing-container">
           <div className="marketing-section__heading">
             <p className="wy-kicker marketing-eyebrow">Wdrożenie</p>
-            <h2>Od syntetycznego szablonu do procesu firmy.</h2>
+            <h2 className="wy-marketing-heading-2">Od syntetycznego szablonu do procesu firmy.</h2>
           </div>
           <div className="marketing-grid">
             {industry.implementation.map((step, index) => (
@@ -162,7 +172,7 @@ export default async function IndustryDetailPage({ params }: IndustryPageProps) 
         <div className="marketing-container">
           <div className="marketing-section__heading">
             <p className="wy-kicker marketing-eyebrow">FAQ</p>
-            <h2>Pytania o zakres i wynik.</h2>
+            <h2 className="wy-marketing-heading-2">Pytania o zakres i wynik.</h2>
           </div>
           <Faq items={industry.faq} />
         </div>

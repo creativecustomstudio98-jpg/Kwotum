@@ -87,7 +87,8 @@ test.describe("marketing product V7 hero", () => {
       expect(Math.min(...geometry.actions.map((action) => action.height))).toBeGreaterThanOrEqual(
         44,
       );
-      expect(geometry.h1?.fontSize ?? 0).toBeGreaterThanOrEqual(viewport.width <= 430 ? 40 : 48);
+      const expectedH1Size = viewport.width <= 768 ? 42 : viewport.width <= 1024 ? 48 : 60;
+      expect(geometry.h1?.fontSize ?? 0).toBe(expectedH1Size);
 
       if (viewport.width <= 430) {
         expect(

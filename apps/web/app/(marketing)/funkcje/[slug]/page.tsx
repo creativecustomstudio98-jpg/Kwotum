@@ -61,8 +61,8 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
         <div className="marketing-page-hero__grid">
           <div className="marketing-page-hero__copy">
             <p className="wy-kicker marketing-eyebrow">{feature.eyebrow}</p>
-            <h1>{feature.title}</h1>
-            <p>{feature.description}</p>
+            <h1 className="wy-marketing-heading-1">{feature.title}</h1>
+            <p className="wy-marketing-lead">{feature.description}</p>
           </div>
           <aside className="marketing-page-hero__aside">
             <strong>Funkcja produkcyjna</strong>
@@ -78,13 +78,13 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
         <div className="marketing-container">
           <div className="marketing-section__heading">
             <p className="wy-kicker marketing-eyebrow">Rezultat</p>
-            <h2>Co ta funkcja zmienia w obsłudze zapytania.</h2>
+            <h2 className="wy-marketing-heading-2">Co ta funkcja zmienia w obsłudze zapytania.</h2>
           </div>
           <div className="marketing-grid">
             {feature.benefits.map((benefit, index) => (
               <article className="marketing-card" key={benefit}>
                 <span className="marketing-card__number">0{index + 1}</span>
-                <h3>{benefit}</h3>
+                <h3 className="wy-marketing-heading-3">{benefit}</h3>
               </article>
             ))}
           </div>
@@ -95,7 +95,7 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
         <div className="marketing-container marketing-grid marketing-grid--two">
           <div>
             <p className="wy-kicker marketing-eyebrow">Przepływ</p>
-            <h2>Trzy kroki bez ukrytej automatyzacji.</h2>
+            <h2 className="wy-marketing-heading-2">Trzy kroki bez ukrytej automatyzacji.</h2>
           </div>
           <ol className="marketing-list">
             {feature.steps.map((step) => (
@@ -109,7 +109,9 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
         <div className="marketing-container">
           <div className="marketing-section__heading">
             <p className="wy-kicker marketing-eyebrow">Granice i zabezpieczenia</p>
-            <h2>Kontrola jest częścią funkcji, nie dopiskiem.</h2>
+            <h2 className="wy-marketing-heading-2">
+              Kontrola jest częścią funkcji, nie dopiskiem.
+            </h2>
           </div>
           <div className="marketing-grid">
             {feature.safeguards.map((safeguard) => (

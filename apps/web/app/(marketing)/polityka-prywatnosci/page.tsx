@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       <Breadcrumbs items={[{ href: "/", label: "Start" }, { label: "Informacja prywatności" }]} />
       <header>
         <p className="wy-kicker marketing-eyebrow">Wersja {AUTH_PRIVACY_VERSION}</p>
-        <h1>Informacja prywatności dla konta Kwotum</h1>
+        <h1 className="wy-marketing-heading-1">Informacja prywatności dla konta Kwotum</h1>
         <p>
           To techniczny zakres informacji dla wersji walidacyjnej. Dane administratora, kontakt
           prywatności i finalna lista podmiotów przetwarzających muszą zostać uzupełnione przed
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
         </p>
       </header>
       <section>
-        <h2>Dane konta</h2>
+        <h2 className="wy-marketing-heading-2">Dane konta</h2>
         <p>
           Rejestracja przetwarza adres e-mail, imię i nazwisko, nazwę organizacji, wersję
           zaakceptowanych dokumentów oraz techniczne dane sesji. Hasło obsługuje Supabase Auth i nie
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
         </p>
       </section>
       <section>
-        <h2>Cel i dostęp</h2>
+        <h2 className="wy-marketing-heading-2">Cel i dostęp</h2>
         <p>
           Dane są potrzebne do uwierzytelnienia, utworzenia profilu i kontrolowanego przypisania
           pierwszej organizacji. Dostęp do danych organizacji jest ograniczony rolą, tenant scope i
@@ -38,7 +38,7 @@ export default function PrivacyPage() {
         </p>
       </section>
       <section>
-        <h2>Google</h2>
+        <h2 className="wy-marketing-heading-2">Google</h2>
         <p>
           Wybranie Google rozpoczyna zewnętrzne uwierzytelnienie. Kwotum otrzymuje dane profilu
           zwrócone przez providera, ale utworzenie organizacji nadal wymaga świadomego podania jej
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
         </p>
       </section>
       <section>
-        <h2>Prawa i retencja</h2>
+        <h2 className="wy-marketing-heading-2">Prawa i retencja</h2>
         <p>
           Mechanizmy eksportu, usunięcia, retencji i legal hold są ograniczone uprawnieniami Ownera.
           Formalny kanał realizacji praw osoby musi zostać wskazany przed publicznym startem.

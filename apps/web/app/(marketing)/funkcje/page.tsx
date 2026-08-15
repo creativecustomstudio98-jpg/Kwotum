@@ -18,8 +18,10 @@ export default function FeaturesPage() {
         <div className="marketing-page-hero__grid">
           <div className="marketing-page-hero__copy">
             <p className="wy-kicker marketing-eyebrow">Funkcje</p>
-            <h1>Funkcje podporządkowane jakości następnego kroku.</h1>
-            <p>
+            <h1 className="wy-marketing-heading-1">
+              Funkcje podporządkowane jakości następnego kroku.
+            </h1>
+            <p className="wy-marketing-lead">
               Każda funkcja pomaga zebrać, potwierdzić albo przekazać kontekst. Nie dodajemy
               kontrolek bez realnego działania.
             </p>
@@ -33,7 +35,7 @@ export default function FeaturesPage() {
               <span>0{index + 1}</span>
               <div>
                 <p className="wy-kicker marketing-eyebrow">{feature.eyebrow}</p>
-                <h2>{feature.title}</h2>
+                <h2 className="wy-marketing-heading-2">{feature.title}</h2>
               </div>
               <p>{feature.description}</p>
               <ArrowIcon />

@@ -33,8 +33,10 @@ export default function PricingPage() {
 
           <header className="pricing-simple-hero__heading">
             <p className="wy-kicker marketing-eyebrow">Przejrzysty model współpracy</p>
-            <h1 id="pricing-title">Najpierw pilotaż. Potem świadoma decyzja.</h1>
-            <p>
+            <h1 className="wy-marketing-heading-1" id="pricing-title">
+              Najpierw pilotaż. Potem świadoma decyzja.
+            </h1>
+            <p className="wy-marketing-lead">
               Nie publikujemy sztucznych pakietów. Zaczynamy od jednego rzeczywistego procesu,
               ustalamy zakres wdrożenia i dopiero wtedy przygotowujemy indywidualną wycenę.
             </p>
@@ -55,7 +57,7 @@ export default function PricingPage() {
                 </span>
                 <div>
                   <p className="wy-kicker marketing-eyebrow">Program pilotażowy</p>
-                  <h2>Wdrożenie z ustalonym zakresem</h2>
+                  <h2 className="wy-marketing-heading-2">Wdrożenie z ustalonym zakresem</h2>
                 </div>
                 <span className="pricing-simple-card__status">Dostępne teraz</span>
               </header>
@@ -99,7 +101,7 @@ export default function PricingPage() {
                 </span>
                 <div>
                   <p className="wy-kicker marketing-eyebrow">Self-service</p>
-                  <h2>Model w trakcie walidacji</h2>
+                  <h2 className="wy-marketing-heading-2">Model w trakcie walidacji</h2>
                 </div>
                 <span className="pricing-simple-card__status">W walidacji</span>
               </header>
@@ -152,8 +154,10 @@ export default function PricingPage() {
       >
         <div>
           <p className="wy-kicker marketing-eyebrow">Następny krok</p>
-          <h2 id="pricing-next-title">Zobacz proces, zanim porozmawiamy o zakresie.</h2>
-          <p>
+          <h2 className="wy-marketing-heading-2" id="pricing-next-title">
+            Zobacz proces, zanim porozmawiamy o zakresie.
+          </h2>
+          <p className="wy-marketing-lead">
             Przejdź przez architekturę Kwotum albo zaloguj się do istniejącej organizacji. Nie ma tu
             fikcyjnego formularza kontaktowego.
           </p>

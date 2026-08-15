@@ -1930,6 +1930,9 @@ to wyłącznie M4 — przykładowy lead; M4 nie został rozpoczęty.
       `docs/ui/marketing-subpages-v1/MASTER_REBRAND_PLAN.md`.
 - [ ] R12: wykonać globalną kontrolę SEO, linków, dostępności, responsive,
       prawdziwości copy, wydajności i bezpieczny cleanup legacy.
+- [x] R12.T: ujednolicić H1, H2, H3, opisy sekcji i tekst podstawowy na
+      wszystkich publicznych trasach przez centralne tokeny `packages/ui`,
+      zachowując osobną typografię wewnętrznych proofów produktu.
 
 **Status R0 2026-08-02:** audyt objął 19 tras i 38 renderów. Wszystkie zwracają
 HTTP 200, nie zgłaszają błędów konsoli/pageerror i nie mają poziomego overflow.
@@ -2304,6 +2307,21 @@ minimalny tekst 12 px i brak overflow są zielone. ADR-049, raport i visual QA:
 API, auth, tenant scope, RLS ani danych. Pełne lint i typecheck przechodzą 8/8,
 unit 22/22 zadań (web 184/184), RLS, WordPress i skany bezpieczeństwa są PASS,
 a build przechodzi 16/16 i generuje 42 trasy. Etap nie wdraża strony.
+
+**Korekta R12.T 2026-08-15 — LOCAL COMPLETE, OWNER REVIEW OPEN:** wspólna
+responsywna skala H1/H2/H3, opisów sekcji i tekstu podstawowego została
+przeniesiona do `packages/ui` i podpięta do 21 publicznych tras. Desktop używa
+60/48/20 px, tablet 48/40/20 px, a mobile 42/36/18 px dla H1/H2/H3; lead ma
+18/17/16 px. Typografia demonstracyjnych ekranów panelu, widgetu i rekordów
+leada pozostaje celowo odrębna. Dedykowany Playwright wykonuje 63 pomiary
+route × viewport i potwierdza dokładne wartości, brak nieoznaczonych nagłówków
+treści oraz brak poziomego overflow. Pełny pakiet marketingowy przechodzi
+200/200, a pięć wzorców wizualnych przechodzi również w przypiętym obrazie
+Linux Playwright. Format, lint i typecheck przechodzą 8/8, a build przechodzi
+16/16 i generuje 42 trasy. ADR-051 i raport:
+`docs/ui/marketing-subpages-v1/TYPOGRAPHY_SYSTEM_2026-08-15.md`. Etap nie
+zmienia copy, API, auth, tenant scope, danych ani runtime widgetu i nie wdraża
+strony.
 
 - [x] Wskazać immutable commit SHA i wyniki jako bazę Etapu 12ZE.
 
