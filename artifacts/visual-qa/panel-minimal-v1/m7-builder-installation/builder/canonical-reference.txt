@@ -1,0 +1,8 @@
+Primary reference: ../../../../../docs/ui/panel-minimal-v1/reference/panel-dashboard-primary-1199x842.png
+SHA-256: 824df7d47e16d9114ae66990a0d02e91f4954ce1ba7b5d1c4d180fea84aed6e1
+Measured role: one white canvas, aligned operational regions, restrained separators, compact professional typography and sparse brand colour.
+Regional segmented-control reference: ../../../../../docs/ui/panel-minimal-v1/reference/panel-segmented-control-direction-798x144.png
+SHA-256: 9c085accf0f15fb8e721b99de1b7e76c4bfc0f035ff01c8b60288cd85b45bf3e
+Regional role only: one long track, adjacent options and one softly filled active pill; the dark background, glow, labels and palette are excluded.
+Target viewports: 1448x1086 desktop, 768x1024 tablet and 390x844 mobile, plus the responsive matrix in measurements.json.
+Protected state: authenticated tenant with flow:read and flow:update; autosave, validation, conflicts, undo/redo, preview, publication and immutable versions remain functional.

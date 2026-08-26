@@ -11,25 +11,49 @@ const consentProofSchema = z
 
 export const leadContactSchema = z
   .object({
-    email: z.string().trim().toLowerCase().pipe(z.email().max(254)),
+    email: z.string().trim().toLowerCase().pipe(z.email().max(254)).optional(),
     name: z.string().trim().min(2).max(120).optional(),
     phone: z
       .string()
       .trim()
       .regex(/^\+?[0-9 ()-]{7,30}$/)
       .optional(),
+    preferredContactChannel: z.enum(["email", "phone"]).optional(),
+    preferredContactWindow: z.enum(["morning", "afternoon", "evening"]).optional(),
   })
-  .strict();
+  .strict()
+  .refine((contact) => contact.email !== undefined || contact.phone !== undefined, {
+    message: "Podaj co najmniej jeden kanał kontaktu.",
+  })
+  .refine(
+    (contact) =>
+      contact.preferredContactChannel === undefined ||
+      contact[contact.preferredContactChannel] !== undefined,
+    {
+      message: "Preferowany kanał musi zawierać dane kontaktowe.",
+      path: ["preferredContactChannel"],
+    },
+  );
 
 export const submitWidgetLeadRequestSchema = z
   .object({
+    challengeToken: z.string().min(1).max(2048),
     contact: leadContactSchema,
     fileIds: z.array(z.uuid()).max(5),
     marketingEmailConsent: consentProofSchema.nullable(),
     mutationId: z.uuid(),
     privacyNotice: consentProofSchema,
   })
-  .strict();
+  .strict()
+  .superRefine((request, context) => {
+    if (request.marketingEmailConsent !== null && request.contact.email === undefined) {
+      context.addIssue({
+        code: "custom",
+        message: "Zgoda marketingowa e-mail wymaga adresu e-mail.",
+        path: ["marketingEmailConsent"],
+      });
+    }
+  });
 
 export const submitWidgetLeadResponseSchema = z
   .object({

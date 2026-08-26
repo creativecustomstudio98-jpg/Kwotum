@@ -1,0 +1,284 @@
+{
+  "accessibilityViolations": 0,
+  "desktop": {
+    "actions": {
+      "bottom": 56,
+      "height": 46,
+      "left": 835.8125,
+      "right": 1432,
+      "top": 10,
+      "width": 596.1875
+    },
+    "areaTabs": {
+      "bottom": 116,
+      "height": 52,
+      "left": 88,
+      "right": 1432,
+      "top": 64,
+      "width": 1344
+    },
+    "builder": {
+      "bottom": 1086,
+      "height": 1086,
+      "left": 72,
+      "right": 1448,
+      "top": 0,
+      "width": 1376
+    },
+    "grid": {
+      "bottom": 1086,
+      "height": 960,
+      "left": 72,
+      "right": 1448,
+      "top": 126,
+      "width": 1376
+    },
+    "identity": {
+      "bottom": 54,
+      "height": 42,
+      "left": 88,
+      "right": 684.1875,
+      "top": 12,
+      "width": 596.1875
+    },
+    "inspector": {
+      "bottom": 1086,
+      "height": 959,
+      "left": 1108,
+      "right": 1448,
+      "top": 127,
+      "width": 340
+    },
+    "functionalTextBelowMinimum": [],
+    "minimumFunctionalText": 12,
+    "overflow": 0,
+    "preview": {
+      "bottom": 1086,
+      "height": 959,
+      "left": 392,
+      "right": 1108,
+      "top": 127,
+      "width": 716
+    },
+    "questions": {
+      "bottom": 1086,
+      "height": 959,
+      "left": 72,
+      "right": 392,
+      "top": 127,
+      "width": 320
+    },
+    "rail": {
+      "bottom": 1086,
+      "height": 1086,
+      "left": 0,
+      "right": 72,
+      "top": 0,
+      "width": 72
+    },
+    "saveState": {
+      "bottom": 42.296875,
+      "height": 18.59375,
+      "left": 700.1875,
+      "right": 819.8125,
+      "top": 23.703125,
+      "width": 119.625
+    },
+    "toolbar": {
+      "bottom": 64,
+      "height": 64,
+      "left": 72,
+      "right": 1448,
+      "top": 0,
+      "width": 1376
+    }
+  },
+  "expanded": {
+    "actions": {
+      "left": 927.8125,
+      "right": 1432,
+      "width": 504.1875
+    },
+    "grid": {
+      "left": 256,
+      "right": 1448,
+      "width": 1192
+    },
+    "identity": {
+      "left": 272,
+      "right": 776.1875,
+      "width": 504.1875
+    },
+    "inspector": {
+      "left": 1108,
+      "right": 1448,
+      "width": 340
+    },
+    "overflow": 0,
+    "preview": {
+      "left": 576,
+      "right": 1108,
+      "width": 532
+    },
+    "questions": {
+      "left": 256,
+      "right": 576,
+      "width": 320
+    },
+    "saveState": {
+      "left": 792.1875,
+      "right": 911.8125,
+      "width": 119.625
+    }
+  },
+  "forcedColorsFocusOutline": 3,
+  "responsiveMatrix": [
+    {
+      "height": 844,
+      "width": 320,
+      "minimumSegmentTarget": 44,
+      "overflow": 0,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 844,
+      "width": 375,
+      "minimumSegmentTarget": 44,
+      "overflow": 0,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 844,
+      "width": 430,
+      "minimumSegmentTarget": 44,
+      "overflow": 0,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 1024,
+      "width": 768,
+      "minimumSegmentTarget": null,
+      "overflow": 0,
+      "reflowEquivalentTo200Percent": true
+    },
+    {
+      "height": 900,
+      "width": 1024,
+      "minimumSegmentTarget": 44,
+      "overflow": 0,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 900,
+      "width": 1280,
+      "minimumSegmentTarget": 44,
+      "overflow": 0,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 1024,
+      "width": 1536,
+      "minimumSegmentTarget": 44,
+      "overflow": 0,
+      "reflowEquivalentTo200Percent": false
+    }
+  ],
+  "segmented": {
+    "area": {
+      "activeAfterContent": "none",
+      "activeAfterDisplay": "inline",
+      "activeAfterHeight": 0,
+      "activeAfterWidth": 0,
+      "activeBackgroundColor": "color(srgb 0.9 0.923137 0.91451)",
+      "activeBorderBottomWidth": 0,
+      "activeBorderRadius": 9,
+      "activeBoxShadow": "none",
+      "activeHeight": 44,
+      "horizontalGaps": [4, 4, 4],
+      "inactiveBackgroundColor": "rgba(0, 0, 0, 0)",
+      "itemCount": 4,
+      "itemHeights": [44, 44, 44, 44],
+      "itemsInsideTrack": true,
+      "itemWidths": [331, 331, 331, 331],
+      "rowSpread": 0,
+      "trackBackgroundImage": "none",
+      "trackBorderRadius": 12,
+      "trackBoxShadow": "none",
+      "trackHeight": 52,
+      "trackOverflowX": "visible",
+      "trackWidth": 1344
+    },
+    "experience": {
+      "activeAfterContent": "none",
+      "activeAfterDisplay": "block",
+      "activeAfterHeight": 0,
+      "activeAfterWidth": 0,
+      "activeBackgroundColor": "color(srgb 0.9 0.923137 0.91451)",
+      "activeBorderBottomWidth": 0,
+      "activeBorderRadius": 9,
+      "activeBoxShadow": "none",
+      "activeHeight": 114.328125,
+      "horizontalGaps": [4],
+      "inactiveBackgroundColor": "rgba(0, 0, 0, 0)",
+      "itemCount": 2,
+      "itemHeights": [114.328125, 114.328125],
+      "itemsInsideTrack": true,
+      "itemWidths": [137.5, 137.5],
+      "rowSpread": 0,
+      "trackBackgroundImage": "none",
+      "trackBorderRadius": 12,
+      "trackBoxShadow": "none",
+      "trackHeight": 122.328125,
+      "trackOverflowX": "visible",
+      "trackWidth": 287
+    },
+    "mobileArea": {
+      "activeAfterContent": "none",
+      "activeAfterDisplay": "inline",
+      "activeAfterHeight": 0,
+      "activeAfterWidth": 0,
+      "activeBackgroundColor": "color(srgb 0.9 0.923137 0.91451)",
+      "activeBorderBottomWidth": 0,
+      "activeBorderRadius": 9,
+      "activeBoxShadow": "none",
+      "activeHeight": 44,
+      "horizontalGaps": [4, 4, 4],
+      "inactiveBackgroundColor": "rgba(0, 0, 0, 0)",
+      "itemCount": 4,
+      "itemHeights": [44, 44, 44, 44],
+      "itemsInsideTrack": true,
+      "itemWidths": [86.5, 86.5, 86.5, 86.5],
+      "rowSpread": 0,
+      "trackBackgroundImage": "none",
+      "trackBorderRadius": 12,
+      "trackBoxShadow": "none",
+      "trackHeight": 52,
+      "trackOverflowX": "auto",
+      "trackWidth": 366
+    },
+    "mobilePane": {
+      "activeAfterContent": "none",
+      "activeAfterDisplay": "inline",
+      "activeAfterHeight": 0,
+      "activeAfterWidth": 0,
+      "activeBackgroundColor": "color(srgb 0.9 0.923137 0.91451)",
+      "activeBorderBottomWidth": 0,
+      "activeBorderRadius": 9,
+      "activeBoxShadow": "none",
+      "activeHeight": 44,
+      "horizontalGaps": [4, 4],
+      "inactiveBackgroundColor": "rgba(0, 0, 0, 0)",
+      "itemCount": 3,
+      "itemHeights": [44, 44, 44],
+      "itemsInsideTrack": true,
+      "itemWidths": [116.65625, 116.671875, 116.65625],
+      "rowSpread": 0,
+      "trackBackgroundImage": "none",
+      "trackBorderRadius": 12,
+      "trackBoxShadow": "none",
+      "trackHeight": 52,
+      "trackOverflowX": "visible",
+      "trackWidth": 366
+    }
+  }
+}

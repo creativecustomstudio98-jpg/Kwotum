@@ -86,11 +86,14 @@ const sqlLiteral = (value) => `'${String(value).replaceAll("'", "''")}'`;
 const suffix = `${Date.now()}-${randomBytes(4).toString("hex")}`;
 const email = `panel-e2e-${suffix}@example.test`;
 const password = randomBytes(32).toString("base64url");
-const organizationName = `Panel E2E ${suffix}`;
+const salesEmail = `panel-e2e-sales-${suffix}@example.test`;
+const salesPassword = randomBytes(32).toString("base64url");
+const organizationName = "Pracownia testowa — długa nazwa organizacji";
 const organizationSlug = `panel-e2e-${suffix}`;
 const artifactRoot = mkdtempSync(path.join(tmpdir(), "wyceno-panel-e2e-"));
 
 let organizationId;
+let salesUserId;
 let userId;
 
 async function removeFixture() {
@@ -180,21 +183,22 @@ async function removeFixture() {
     }
   }
 
-  if (userId) {
-    const { error } = await admin.auth.admin.deleteUser(userId);
-    if (error) cleanupErrors.push(`Użytkownik: ${error.message}`);
+  for (const fixtureUserId of [salesUserId, userId].filter(Boolean)) {
+    const { error } = await admin.auth.admin.deleteUser(fixtureUserId);
+    if (error) cleanupErrors.push(`Użytkownik ${fixtureUserId}: ${error.message}`);
   }
 
-  if (organizationId || userId) {
+  if (organizationId || userId || salesUserId) {
     try {
       const leftovers = query(`
         select
           (select count(*) from public.organizations where id = ${sqlLiteral(
             organizationId ?? "00000000-0000-0000-0000-000000000000",
           )}::uuid),
-          (select count(*) from auth.users where id = ${sqlLiteral(
-            userId ?? "00000000-0000-0000-0000-000000000000",
-          )}::uuid),
+          (select count(*) from auth.users where id in (
+            ${sqlLiteral(userId ?? "00000000-0000-0000-0000-000000000000")}::uuid,
+            ${sqlLiteral(salesUserId ?? "00000000-0000-0000-0000-000000000000")}::uuid
+          )),
           (select count(*) from storage.objects
             where bucket_id = 'tenant-private'
               and name like ${sqlLiteral(`${organizationId ?? "missing"}/%`)});
@@ -252,6 +256,36 @@ try {
     throw new Error("DATABASE_URL i lokalne Auth nie wskazują tego samego projektu Supabase.");
   }
 
+  const { data: createdSalesUser, error: createSalesUserError } = await admin.auth.admin.createUser(
+    {
+      email: salesEmail,
+      email_confirm: true,
+      password: salesPassword,
+      user_metadata: { display_name: "Sprzedawca testowy" },
+    },
+  );
+  if (createSalesUserError || !createdSalesUser.user) {
+    throw createSalesUserError ?? new Error("Supabase nie zwrócił użytkownika Sales.");
+  }
+  salesUserId = createdSalesUser.user.id;
+  query(`
+    insert into public.organization_members (
+      organization_id,
+      user_id,
+      role,
+      status,
+      invited_by,
+      joined_at
+    ) values (
+      ${sqlLiteral(organizationId)}::uuid,
+      ${sqlLiteral(salesUserId)}::uuid,
+      'sales',
+      'active',
+      ${sqlLiteral(userId)}::uuid,
+      now()
+    );
+  `);
+
   console.log("[panel-e2e] Tworzę syntetyczne dane tenantowe...");
   const seedOutput = run(
     process.execPath,
@@ -269,33 +303,37 @@ try {
     throw new Error("Seed nie zwrócił obu wymaganych procesów.");
   }
 
-  console.log("[panel-e2e] Uruchamiam 18 scenariuszy panelu i bezstanowy podgląd...");
-  run(
-    "pnpm",
-    [
-      "exec",
-      "playwright",
-      "test",
-      "tests/e2e/panel.spec.ts",
-      "tests/e2e/flow-preview-sharing.spec.ts",
-      "--workers=1",
-    ],
-    {
-      env: {
-        PANEL_E2E_EDITOR_FLOW_ID: fixture.editorFlowId,
-        PANEL_E2E_EMAIL: email,
-        PANEL_E2E_FLOW_ID: fixture.flowId,
-        PANEL_E2E_ORGANIZATION_ID: organizationId,
-        PANEL_E2E_PASSWORD: password,
-        PANEL_E2E_ARTIFACT_ROOT: artifactRoot,
-        PLAYWRIGHT_REUSE_EXISTING_SERVER: "false",
-        WEBHOOK_SIGNING_SECRET:
-          process.env.WEBHOOK_SIGNING_SECRET || "panel-e2e-webhook-signing-secret-32-characters",
-        WEBHOOK_WORKER_SECRET:
-          process.env.WEBHOOK_WORKER_SECRET || "panel-e2e-webhook-worker-secret-32-characters",
-      },
+  console.log("[panel-e2e] Uruchamiam panel, bezstanowy podgląd i publiczną bramę...");
+  const playwrightArguments = [
+    "exec",
+    "playwright",
+    "test",
+    "tests/e2e/panel.spec.ts",
+    "tests/e2e/flow-preview-sharing.spec.ts",
+    "tests/e2e/public-request-guard.spec.ts",
+    "--workers=1",
+  ];
+  if (process.env.PANEL_E2E_GREP) {
+    playwrightArguments.push("--grep", process.env.PANEL_E2E_GREP);
+  }
+  run("pnpm", playwrightArguments, {
+    env: {
+      PANEL_E2E_EDITOR_FLOW_ID: fixture.editorFlowId,
+      PANEL_E2E_EMAIL: email,
+      PANEL_E2E_FLOW_ID: fixture.flowId,
+      PANEL_E2E_ORGANIZATION_ID: organizationId,
+      PANEL_E2E_PASSWORD: password,
+      PANEL_E2E_PROCESS_COUNT: String(fixture.seededProcesses ?? 0),
+      PANEL_E2E_SALES_EMAIL: salesEmail,
+      PANEL_E2E_SALES_PASSWORD: salesPassword,
+      PANEL_E2E_ARTIFACT_ROOT: artifactRoot,
+      PLAYWRIGHT_REUSE_EXISTING_SERVER: "false",
+      WEBHOOK_SIGNING_SECRET:
+        process.env.WEBHOOK_SIGNING_SECRET || "panel-e2e-webhook-signing-secret-32-characters",
+      WEBHOOK_WORKER_SECRET:
+        process.env.WEBHOOK_WORKER_SECRET || "panel-e2e-webhook-worker-secret-32-characters",
     },
-  );
+  });
 } catch (error) {
   primaryError = error;
 } finally {
@@ -309,7 +347,12 @@ try {
   }
   if (!primaryError && process.env.PANEL_E2E_RETAIN_STAGE_ARTIFACTS === "1") {
     try {
-      for (const stage of ["12ze-self-service-estimation", "12zf-webhook-v1"]) {
+      const retainedStages = process.env.PANEL_E2E_RETAIN_STAGES
+        ? process.env.PANEL_E2E_RETAIN_STAGES.split(",")
+            .map((stage) => stage.trim())
+            .filter(Boolean)
+        : ["panel-minimal-v1"];
+      for (const stage of retainedStages) {
         const stageArtifactSource = path.join(artifactRoot, stage);
         const stageArtifactTarget = path.join(repositoryRoot, "artifacts/visual-qa", stage);
         if (!existsSync(stageArtifactSource)) {

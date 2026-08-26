@@ -38,12 +38,13 @@ Rozstrzygnięcie musi znaleźć się w podpisanej umowie dla konkretnego wdroże
 
 ## Rejestr dostawców
 
-| Dostawca        | Status w produkcie                                                        | Zakres                                           | Region/transfer                                                             | Wymagane działanie                                                |
-| --------------- | ------------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Supabase        | wymagany przez obecną architekturę, instancja produkcyjna niezatwierdzona | PostgreSQL, Auth, Storage i operacje platformowe | region projektu do wyboru; własny łańcuch podprocesorów i możliwe transfery | wybrać region, zaakceptować aktualną DPA, TIA/SCC i subprocesorów |
-| Resend          | adapter gotowy, produkcyjnie wyłączony                                    | adres odbiorcy, metadata i treść e-maila         | dostawca opisuje podstawowe operacje w USA                                  | zaakceptować DPA/TIA/subprocesorów albo wybrać innego dostawcę    |
-| Hosting Next.js | niewybrany                                                                | requesty aplikacji, logi techniczne, runtime     | TBD                                                                         | procurement, DPA, region, retencja logów                          |
-| ClamAV          | self-hosted w przyjętym wariancie                                         | bajty uploadu podczas skanu                      | ta sama zaufana infrastruktura                                              | nie wysyłać plików do publicznej usługi skanującej                |
+| Dostawca             | Status w produkcie                                                        | Zakres                                                    | Region/transfer                                                             | Wymagane działanie                                                |
+| -------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Supabase             | wymagany przez obecną architekturę, instancja produkcyjna niezatwierdzona | PostgreSQL, Auth, Storage i operacje platformowe          | region projektu do wyboru; własny łańcuch podprocesorów i możliwe transfery | wybrać region, zaakceptować aktualną DPA, TIA/SCC i subprocesorów |
+| Resend               | adapter gotowy, produkcyjnie wyłączony                                    | adres odbiorcy, metadata i treść e-maila                  | dostawca opisuje podstawowe operacje w USA                                  | zaakceptować DPA/TIA/subprocesorów albo wybrać innego dostawcę    |
+| Hosting Next.js      | niewybrany                                                                | requesty aplikacji, logi techniczne, runtime              | TBD                                                                         | procurement, DPA, region, retencja logów                          |
+| ClamAV               | self-hosted w przyjętym wariancie                                         | bajty uploadu podczas skanu                               | ta sama zaufana infrastruktura                                              | nie wysyłać plików do publicznej usługi skanującej                |
+| Cloudflare Turnstile | adapter FTZ-03B gotowy, produkcyjnie nieskonfigurowany                    | token, IP, TLS fingerprint, User-Agent, site key i origin | globalna usługa i łańcuch podprocesorów dostawcy                            | zaakceptować DPA, Privacy Addendum, SCC/TIA i listę podprocesorów |
 
 Aktualna DPA Supabase z 1 czerwca 2026 wymienia podprocesorów w Schedule 3,
 zobowiązania ochronne i 30-dniowe powiadomienie o zmianach
@@ -56,6 +57,13 @@ Resend publikuje DPA z SCC i 14-dniowym powiadomieniem o zmianach
 [lista podprocesorów](https://resend.com/legal/subprocessors) była
 zaktualizowana 15 lipca 2026 i obejmuje dostawców w USA. Aktywacja Resend
 wymaga osobnej decyzji o transferze; sama obecność adaptera nie jest zgodą.
+
+Cloudflare publikuje osobny
+[Turnstile Privacy Addendum](https://www.cloudflare.com/turnstile-privacy-policy/)
+oraz [Customer DPA v6.4](https://cf-assets.www.cloudflare.com/slt3lc6tev37/1TTgT35GoUNlKZYGuKWBFy/4e7dfc8cf402419a9b1cf624291fc69f/cloudflare_customer_dpa-v6.4_april_3_2026.pdf).
+Przed wpisaniem kluczy produkcyjnych należy zachować datę i wersję obu
+dokumentów, ocenić transfer oraz listę podprocesorów; testowe wdrożenie kodu nie
+upoważnia do przesyłania ruchu osób rzeczywistych.
 
 ## Checklist review prawnego i procurement
 

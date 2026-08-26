@@ -29,9 +29,13 @@ export function RegisterForm() {
             <span>Przejdź do logowania</span>
             <AuthIcon name="arrow" />
           </Link>
-          <Link className="auth-google-button" href="/rejestracja">
+          <button
+            className="auth-google-button"
+            onClick={() => window.location.reload()}
+            type="button"
+          >
             Użyj innego adresu
-          </Link>
+          </button>
         </div>
       </div>
     );

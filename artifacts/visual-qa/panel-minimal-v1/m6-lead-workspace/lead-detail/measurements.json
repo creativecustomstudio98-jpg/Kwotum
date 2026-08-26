@@ -1,0 +1,262 @@
+{
+  "accessibilityViolations": 0,
+  "desktop": {
+    "articleWidth": 1280,
+    "documentBeforeRail": true,
+    "documentWidth": 864,
+    "gridTemplateColumns": "864px 320px",
+    "overflow": 0,
+    "railLeft": 1184,
+    "railWidth": 320
+  },
+  "forcedColorsFocusOutline": 3,
+  "responsiveMatrix": [
+    {
+      "height": 800,
+      "width": 320,
+      "minimumPrimaryTarget": 44,
+      "sections": [
+        {
+          "id": "summary-panel",
+          "overflow": 0
+        },
+        {
+          "id": "answers-panel",
+          "overflow": 0
+        },
+        {
+          "id": "files-panel",
+          "overflow": 0
+        },
+        {
+          "id": "history-panel",
+          "overflow": 0
+        }
+      ],
+      "stacked": true
+    },
+    {
+      "height": 812,
+      "width": 375,
+      "minimumPrimaryTarget": 44,
+      "sections": [
+        {
+          "id": "summary-panel",
+          "overflow": 0
+        },
+        {
+          "id": "answers-panel",
+          "overflow": 0
+        },
+        {
+          "id": "files-panel",
+          "overflow": 0
+        },
+        {
+          "id": "history-panel",
+          "overflow": 0
+        }
+      ],
+      "stacked": true
+    },
+    {
+      "height": 844,
+      "width": 390,
+      "minimumPrimaryTarget": 44,
+      "sections": [
+        {
+          "id": "summary-panel",
+          "overflow": 0
+        },
+        {
+          "id": "answers-panel",
+          "overflow": 0
+        },
+        {
+          "id": "files-panel",
+          "overflow": 0
+        },
+        {
+          "id": "history-panel",
+          "overflow": 0
+        }
+      ],
+      "stacked": true
+    },
+    {
+      "height": 932,
+      "width": 430,
+      "minimumPrimaryTarget": 44,
+      "sections": [
+        {
+          "id": "summary-panel",
+          "overflow": 0
+        },
+        {
+          "id": "answers-panel",
+          "overflow": 0
+        },
+        {
+          "id": "files-panel",
+          "overflow": 0
+        },
+        {
+          "id": "history-panel",
+          "overflow": 0
+        }
+      ],
+      "stacked": true
+    },
+    {
+      "height": 900,
+      "width": 720,
+      "minimumPrimaryTarget": null,
+      "sections": [
+        {
+          "id": "summary-panel",
+          "overflow": 0
+        },
+        {
+          "id": "answers-panel",
+          "overflow": 0
+        },
+        {
+          "id": "files-panel",
+          "overflow": 0
+        },
+        {
+          "id": "history-panel",
+          "overflow": 0
+        }
+      ],
+      "stacked": true
+    },
+    {
+      "height": 1024,
+      "width": 768,
+      "minimumPrimaryTarget": null,
+      "sections": [
+        {
+          "id": "summary-panel",
+          "overflow": 0
+        },
+        {
+          "id": "answers-panel",
+          "overflow": 0
+        },
+        {
+          "id": "files-panel",
+          "overflow": 0
+        },
+        {
+          "id": "history-panel",
+          "overflow": 0
+        }
+      ],
+      "stacked": true
+    },
+    {
+      "height": 768,
+      "width": 1024,
+      "minimumPrimaryTarget": null,
+      "sections": [
+        {
+          "id": "summary-panel",
+          "overflow": 0
+        },
+        {
+          "id": "answers-panel",
+          "overflow": 0
+        },
+        {
+          "id": "files-panel",
+          "overflow": 0
+        },
+        {
+          "id": "history-panel",
+          "overflow": 0
+        }
+      ],
+      "stacked": true
+    },
+    {
+      "height": 800,
+      "width": 1280,
+      "minimumPrimaryTarget": null,
+      "sections": [
+        {
+          "id": "summary-panel",
+          "overflow": 0
+        },
+        {
+          "id": "answers-panel",
+          "overflow": 0
+        },
+        {
+          "id": "files-panel",
+          "overflow": 0
+        },
+        {
+          "id": "history-panel",
+          "overflow": 0
+        }
+      ],
+      "stacked": false
+    },
+    {
+      "height": 900,
+      "width": 1440,
+      "minimumPrimaryTarget": null,
+      "sections": [
+        {
+          "id": "summary-panel",
+          "overflow": 0
+        },
+        {
+          "id": "answers-panel",
+          "overflow": 0
+        },
+        {
+          "id": "files-panel",
+          "overflow": 0
+        },
+        {
+          "id": "history-panel",
+          "overflow": 0
+        }
+      ],
+      "stacked": false
+    },
+    {
+      "height": 1024,
+      "width": 1536,
+      "minimumPrimaryTarget": null,
+      "sections": [
+        {
+          "id": "summary-panel",
+          "overflow": 0
+        },
+        {
+          "id": "answers-panel",
+          "overflow": 0
+        },
+        {
+          "id": "files-panel",
+          "overflow": 0
+        },
+        {
+          "id": "history-panel",
+          "overflow": 0
+        }
+      ],
+      "stacked": false
+    }
+  ],
+  "sticky": {
+    "bottom": 844,
+    "height": 69,
+    "position": "sticky",
+    "top": 775,
+    "viewportHeight": 844
+  }
+}

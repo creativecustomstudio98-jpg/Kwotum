@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   isMobilePanelDetailPath,
   isPanelNavigationItemActive,
+  isPanelNavigationItemCurrent,
   splitMobileNavigationItems,
   type PanelNavigationItem,
 } from "./panel-navigation-model";
@@ -53,6 +54,29 @@ describe("panel navigation model", () => {
       primary: items.slice(0, 2),
       secondary: items.slice(2),
     });
+  });
+
+  it("keeps a parent module visually active across independently routed sections", () => {
+    const integrationsRoot = `${organizationRoot}/integracje`;
+    expect(
+      isPanelNavigationItemActive(
+        `${integrationsRoot}/wordpress`,
+        `${integrationsRoot}/webhooki`,
+        organizationRoot,
+        [integrationsRoot],
+      ),
+    ).toBe(true);
+    expect(
+      isPanelNavigationItemActive(
+        `${organizationRoot}/leady`,
+        `${integrationsRoot}/webhooki`,
+        organizationRoot,
+        [integrationsRoot],
+      ),
+    ).toBe(false);
+    expect(
+      isPanelNavigationItemCurrent(`${integrationsRoot}/wordpress`, `${integrationsRoot}/webhooki`),
+    ).toBe(false);
   });
 
   it("hides global mobile navigation on lead details and process workspaces", () => {

@@ -1,10 +1,11 @@
-import { EmptyState, LinkButton } from "@wyceno/ui";
+import { EmptyState } from "@wyceno/ui";
 import type { Metadata } from "next";
 
 import { requireTenantContext } from "../../../../../lib/auth/tenant-context";
 import { getWebhookIntegration } from "../../../../../lib/webhooks/service";
 import { PanelIcon } from "../../../panel-icon";
 import { PanelPageHeader } from "../../../panel-page-header";
+import { IntegrationsNavigation } from "../../integrations-navigation";
 import { WebhookEndpointActions } from "./endpoint-actions";
 import { WebhookEndpointForm } from "./endpoint-form";
 
@@ -54,17 +55,13 @@ export default async function WebhookIntegrationPage({
   return (
     <main className="panel-workspace webhook-panel">
       <PanelPageHeader
-        eyebrow={organizationName}
-        title="Webhooki"
-        actions={
-          <LinkButton
-            href={`/panel/${organizationId}/integracje/wordpress`}
-            size="small"
-            variant="secondary"
-          >
-            Przejdź do WordPressa
-          </LinkButton>
-        }
+        breadcrumbs={[
+          { href: `/panel/${organizationId}`, label: "Przegląd" },
+          { label: "Integracje" },
+        ]}
+        description={`Bezpieczna wymiana zdarzeń organizacji ${organizationName}.`}
+        navigation={<IntegrationsNavigation />}
+        title="Integracje"
       />
       <div className="panel-page integrations-workspace">
         <div className="integrations-primary-grid">

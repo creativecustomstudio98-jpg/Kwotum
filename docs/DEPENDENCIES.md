@@ -1,6 +1,6 @@
 # Rejestr zależności
 
-**Weryfikacja:** 2026-08-09. Wersje są dokładne w manifestach i lockfile.
+**Weryfikacja:** 2026-08-26. Wersje są dokładne w manifestach i lockfile.
 Główne licencje runtime są MIT; natywny `sharp` oraz Playwright używają
 Apache-2.0, a axe MPL-2.0.
 
@@ -69,7 +69,7 @@ workspace wymusza:
 - `undici@7.29.0`;
 - `brace-expansion@5.0.9`;
 - `js-yaml@4.3.1`;
-- `nanoid@3.3.17`;
+- `nanoid@3.3.18` — poprawka GHSA-2v37-7h3g-55p8;
 - `postcss@8.5.26`.
 
 Override nie wyłącza audytu ani nie ignoruje advisory. Pełny gate sprawdza
@@ -93,7 +93,7 @@ za zaufany: frozen install ponownie sprawdza 543 wpisy względem polityk.
 
 Dokładne wyjątki z 2026-08-09:
 
-- `minimumReleaseAgeExclude`: `nanoid@3.3.17` i `postcss@8.5.26`, ponieważ są
+- `minimumReleaseAgeExclude`: `nanoid@3.3.18` i `postcss@8.5.26`, ponieważ są
   przypiętymi remediacjami znanych podatności nowszymi niż siedem dni;
 - `trustPolicyExclude`: `eslint-import-resolver-typescript@3.10.1` i
   `semver@6.3.1`, ponieważ istniejący lockfile zawiera te starsze wydania bez

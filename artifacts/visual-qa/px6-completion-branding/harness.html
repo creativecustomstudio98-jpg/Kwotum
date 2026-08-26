@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PX6 visual QA</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 40px;
+        background: #eef0ed;
+        color: #17211d;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+      .qa {
+        width: min(100%, 1180px);
+        margin: 0 auto;
+      }
+      .qa > header {
+        margin-bottom: 18px;
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .qa h1 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: -0.03em;
+      }
+      .qa p {
+        margin: 4px 0 0;
+        color: #66706a;
+        font-size: 12px;
+      }
+      .qa code {
+        padding: 5px 8px;
+        border: 1px solid #d5dad6;
+        background: #fff;
+        font-size: 10px;
+      }
+      wyceno-widget {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="qa">
+      <header>
+        <div>
+          <h1 id="qa-title">PX6</h1>
+          <p id="qa-note"></p>
+        </div>
+        <code>1440 × 1000 · production renderer · no legacy imagery</code>
+      </header>
+      <div id="widget-mount"></div>
+    </main>
+    <script type="module">
+      import { defineWycenoWidget } from "/packages/widget/dist/element.js";
+      defineWycenoWidget();
+      const state = new URL(location.href).searchParams.get("state") ?? "valid";
+      const manifest = {
+        challenge: null,
+        entryStepKey: "service",
+        experienceMode: "guided_brief",
+        intro: "Krótko opisz zakres. Otrzymasz uporządkowany wynik i jasny następny krok.",
+        manifestVersion: 3,
+        publicId: "f0000000-0000-4000-8000-000000000001",
+        publishedAt: "2026-08-25T16:00:00.000Z",
+        result: {
+          disclaimer: "Wynik jest orientacyjny i nie stanowi oferty.",
+          headline: "Zakres jest gotowy do konsultacji",
+          mode: "consultation",
+          nextStepLabel: "Przekaż dane do kontaktu",
+        },
+        rules: [],
+        snapshotHash: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        steps: [
+          {
+            allowUnknown: false,
+            description: "Wybierz najbliższy zakres.",
+            key: "service",
+            nextStepKey: "location",
+            options: [
+              {
+                key: "consultation",
+                label: "Konsultacja i wycena",
+                nextStepKey: "location",
+                overridesNextStep: false,
+                presentation: null,
+              },
+              {
+                key: "implementation",
+                label: "Pełna realizacja",
+                nextStepKey: "location",
+                overridesNextStep: false,
+                presentation: null,
+              },
+            ],
+            presentation: { variant: "default" },
+            required: true,
+            title: "Czego potrzebujesz?",
+            type: "single_choice",
+            validation: null,
+          },
+          {
+            allowUnknown: false,
+            description: null,
+            key: "location",
+            nextStepKey: null,
+            options: [],
+            presentation: { variant: "default" },
+            required: true,
+            title: "Gdzie ma być realizowana usługa?",
+            type: "location",
+            validation: null,
+          },
+        ],
+        title: "Wycena realizacji",
+      };
+      manifest.leadCapture = {
+        completionOrder: "result_then_contact",
+        contactPolicy: "email_required",
+        fields: {
+          name: "optional",
+          email: "required",
+          phone: "optional",
+          preferredContactChannel: "optional",
+          preferredContactWindow: "optional",
+        },
+        filesEnabled: false,
+        leadCaptureSchemaVersion: 3,
+        marketingEmailConsent: null,
+        privacyNotice: {
+          label: "Potwierdzam zapoznanie się z informacją o przetwarzaniu danych.",
+          policyUrl: null,
+          textHash: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          version: "privacy-v1",
+        },
+      };
+      manifest.result = { ...manifest.result, action: "capture_lead", resultSchemaVersion: 2 };
+      const title = document.querySelector("#qa-title");
+      const note = document.querySelector("#qa-note");
+      if (state === "valid") {
+        manifest.branding = {
+          accentColor: "#F4D35E",
+          accentTextColor: "#000000",
+          companyName: "Studio Forma",
+          logoUrl: null,
+        };
+        title.textContent = "Poprawny branding";
+        note.textContent =
+          "Nazwa firmy oddzielona od procesu, automatyczny ciemny tekst na jasnym akcencie.";
+      } else if (state === "invalid") {
+        title.textContent = "Błędny branding → bezpieczny fallback";
+        note.textContent =
+          "Niekanoniczny kolor i zewnętrzny URL nie docierają do renderera; widżet używa bazowego profilu.";
+      } else {
+        title.textContent = "Brak brandingu";
+        note.textContent = "Domyślna identyfikacja pozostaje czytelna i nie udaje marki klienta.";
+      }
+      const widget = document.createElement("wyceno-widget");
+      widget.setAttribute("preview", "");
+      widget.setAttribute("public-id", manifest.publicId);
+      widget.previewManifest = manifest;
+      document.querySelector("#widget-mount").append(widget);
+    </script>
+  </body>
+</html>

@@ -298,10 +298,9 @@ tras UI; zgodnie z zakazem atrap nie zostały sfabrykowane. Ręczny VoiceOver/NV
 na urządzeniach oraz dane terenowe Core Web Vitals pozostają bramkami
 publicznego release, nie tego lokalnego etapu.
 
-**Status ponownego otwarcia 2026-07-27 — referencyjna rekonstrukcja panelu:**
-cztery zaakceptowane obrazy z `apps/web/public/panel/` zostały zablokowane
-rozmiarem i SHA-256, rozcięte na ekrany i opisane w
-`panel-reference-audit.md`. Wspólny shell ma rail 78 px i topbar 85 px.
+**Status historyczny 2026-07-27 — referencyjna rekonstrukcja panelu:** cztery
+ówczesne obrazy zostały zablokowane rozmiarem i SHA-256, rozcięte na ekrany i
+użyte do rekonstrukcji. Wspólny shell miał rail 78 px i topbar 85 px.
 Dashboard, leady, pełny lead operacyjny, analityka, procesy, pięć szablonów,
 builder, WordPress i prywatność korzystają z realnych tenantowych danych,
 capabilities oraz istniejących server actions. Builder używa istniejącego
@@ -312,9 +311,9 @@ pionowe wykresy dashboardu/analityki oraz zwartą szerokość ustawień.
 
 Playwright przeszedł 2/2 scenariusze chronionego panelu z realnym logowaniem,
 publikacją, axe, kontrolą konsoli/HTTP i brakiem overflow dla 1448 × 1086,
-1536 × 1024, 768 × 1000, 390 × 844 i 430 × 932. Cropy, rendery, overlay 50%,
-difference i świadome odstępstwa opisuje `panel-visual-qa.md`. Nie zmieniono
-API, migracji, polityk RLS ani równoległego zakresu Etapu 12K.
+1536 × 1024, 768 × 1000, 390 × 844 i 430 × 932. Historyczne cropy, rendery i
+porównania zostały wycofane przez ADR-049; pełny zapis pozostaje w Git. Nie
+zmieniono API, migracji, polityk RLS ani równoległego zakresu Etapu 12K.
 `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` i formatowanie plików
 panelu przechodzą. Pełny `pnpm format:check` zatrzymują wyłącznie dwa
 równolegle zmieniane pliki marketingowe regulaminu i polityki prywatności,
@@ -470,8 +469,8 @@ zgoda na publiczny start pozostają bramkami Etapu 13.
 
 - [x] Zamrozić wszystkie trasy poza `/`, panel, widget, auth, API oraz
       współdzielone tokeny i odtworzyć wyłącznie stronę główną.
-- [x] Zastosować `public/Logoicon.svg` jako ikonę witryny i znak marki
-      obok nazwy Lorum w górnym pasku strony głównej.
+- [x] Zastosować ówczesny asset `public/Logoicon.svg` jako ikonę witryny i znak
+      marki obok nazwy Lorum. Asset został później wycofany przez brand V3.
 - [x] Zrekonstruować proporcje desktopowej referencji: niski header, hero
       copy → odpowiedzi → dokument leada, sześciopunktowy pasek danych oraz
       dolne porównanie z czterostopniowym procesem.
@@ -608,7 +607,8 @@ board 3; panel i pozostałe trasy pozostają zamrożone.
 
 **Status korekty hero 2026-07-27:** nowszy ekran Wyceno dołączony w rozmowie
 zastąpił starszą interpretację pierwszego folda zgodnie z protokołem
-`nowydesign.zip`. Hero zachowuje markę Lorum, ale odtwarza lekki układ
+historycznego pakietu V6, usuniętego po poprawnej ekstrakcji. Hero zachowuje
+markę Lorum, ale odtwarza lekki układ
 odpowiedzi → pojedynczy łącznik → kompaktowa karta leada oraz cztery korzyści
 zamiast pełnego dokumentu z ciemnym railem i sześciu pozycji danych. Dodano
 fotorealistyczny diptych kuchni bez osób i danych klienta, pięć baseline’ów
@@ -623,9 +623,10 @@ nie obejmuje wdrożenia; następnym etapem pozostaje landing board 3.
 **Status pełnego leada w hero 2026-07-27:** kolejny, jednoznaczny załącznik
 zastąpił kompaktową interpretację Etapu 12G. Hero ponownie pokazuje pełny
 dokument leada z ciemnym railem, wynikiem i uzasadnieniem, pięcioma polami,
-materiałami, następnym krokiem oraz akcjami. Rail i centralny węzeł korzystają
-z właściwego `Logoicon.svg`; Anna Kowalska ma fikcyjny, wygenerowany portret
-WebP, a sześć ikon pod hero odzyskało zielony kolor i jasne zielone tło.
+materiałami, następnym krokiem oraz akcjami. Rail i centralny węzeł korzystały
+z ówczesnego `Logoicon.svg`, później wycofanego przez brand V3; Anna Kowalska
+ma fikcyjny, wygenerowany portret WebP, a sześć ikon pod hero odzyskało zielony
+kolor i jasne zielone tło.
 Warianty 1440/1024/768/390/320 zachowują pełną ścieżkę bez poziomego overflow.
 Zakres pozostaje ograniczony do `/` i nie obejmuje deploymentu.
 
@@ -715,10 +716,11 @@ przez aplikację, testy ani aktywny manifest; cztery główne plansze pozostają
 brak broken links; pipeline projektu nie ma nowych błędów. Istniejące,
 niezwiązane zmiany worktree pozostają zachowane.
 
-**Ryzyka:** `Archiwum.zip` i `apps/web/Archiwum.zip` zawierają starsze snapshoty
-projektu, ale nie są dokładnymi duplikatami aktywnego drzewa. Ten etap ich nie
-usuwa bez osobnej decyzji właściciela. Unikalne artefakty visual QA i baseline'y
-Playwright pozostają nienaruszone.
+**Ryzyka historyczne:** dwa lokalne archiwa zawierały starsze snapshoty
+projektu i nie były dokładnymi duplikatami aktywnego drzewa. Nie usunięto ich
+w tym etapie; późniejszy audyt repozytorium przeniósł wskazane archiwum do
+Kosza. Unikalne artefakty visual QA i baseline'y Playwright pozostały
+nienaruszone.
 
 **Status gate’u 2026-07-28:** pięć historycznych raportów ma komunikat
 `ARCHIVED` i znajduje się w datowanym katalogu. Usunięto 24 661 473 bajty
@@ -731,6 +733,12 @@ PostgreSQL/RLS i WordPress oraz `pnpm build` przechodzą. Repozytoryjne
 `pnpm format:check` zatrzymują te same trzy niezwiązane pliki co w baseline:
 `polityka-prywatnosci/page.tsx`, `regulamin/page.tsx` i
 `panel/[organizationId]/page.tsx`. Ten etap ich nie modyfikował.
+
+> **Zapis historyczny panelu 12M–12ZL:** nazwa Lorum, geometrie 208/78 i
+> 240/78, stare obrazy, mikrotekst, topbary, sześć równorzędnych KPI oraz
+> wszystkie wizualne gate'y poniższych ukończonych etapów zostały zastąpione
+> przez ADR-049 i Etap 12ZM. Zachowane pozostają wyłącznie wyniki funkcjonalne,
+> bezpieczeństwa i dostępności. Kolejnej pracy nie wolno opierać na tym bloku.
 
 ## Etap 12M — wspólny, zwijany sidebar panelu Lorum
 
@@ -745,8 +753,8 @@ PostgreSQL/RLS i WordPress oraz `pnpm build` przechodzą. Repozytoryjne
       reduced motion i mobilną dolną nawigację.
 - [x] Dodać izolowany test E2E przejścia 208 → 78 → 208, persystencji między
       trasami i braku overflow na 390 px.
-- [x] Zapisać reference, before, after-v1/v2, overlay, difference i raport
-      w `artifacts/visual-qa/12m-panel-shell/sidebar/`.
+- [x] Zapisać ówczesne reference, before, after, overlay, difference i raport;
+      obrazy wycofano po przyjęciu ADR-049.
 
 **Gate:** dashboard, leady i pozostałe chronione route’y renderują ten sam
 komponent oraz tę samą geometrię; zmienia się wyłącznie aktywny link. Desktop
@@ -792,8 +800,8 @@ nie mają własnych kafelków, a uchwyt animuje wspólnie rail i treść. Live Q
 potwierdziło 240 px, 78 px, ukrycie raila i dolną nawigację przy 425 px oraz
 0 px overflow. Lint, typecheck, 85/85 testów web i build przechodzą. Izolowany
 Playwright pozostaje poprawnie pominięty bez sekretów `PANEL_E2E_*`; nie
-uruchomiono alternatywnego logowania ani atrap danych. Raport:
-`docs/PANEL_SIDEBAR_GLASS_2026-08-03.md`.
+uruchomiono alternatywnego logowania ani atrap danych. Raport i obrazy tej
+wersji zostały wycofane przez ADR-049; zachowano wynik historyczny.
 
 ### Korekta 12M-Y — referencyjny wybór organizacji Kwotum
 
@@ -814,14 +822,14 @@ uruchomiono alternatywnego logowania ani atrap danych. Raport:
 pokazuje realnie 1 aktywny proces, 37 leadów do obsługi i aktywność dzisiaj.
 Mobile przy aktywnym viewportcie 510 px ma 0 px overflow, trzy metadane oraz
 dwa równe przyciski. Lint, typecheck, 88/88 testów web i produkcyjny build 39
-tras przechodzą. Izolowany E2E pozostaje warunkowy na `PANEL_E2E_*`; raport i artefakty:
-`docs/PANEL_ORGANIZATION_PICKER_REFERENCE_2026-08-03.md` oraz
-`artifacts/visual-qa/12m-panel-shell/organization-picker-kwotum/`.
+tras przechodzą. Izolowany E2E pozostaje warunkowy na `PANEL_E2E_*`. Raport i
+obrazy starego kierunku zostały wycofane przez ADR-049; zachowano wynik
+funkcjonalny.
 
 ## Etap 12N — referencyjna lista Procesy / Formularze
 
-- [x] Wyciąć dokładny crop ekranu procesów z
-      `references/product-app-board.png` i zapisać jego kontrakt.
+- [x] Wyciąć dokładny crop ekranu procesów z ówczesnej planszy V6 i zapisać
+      jego kontrakt. Plansza została później wycofana przez ADR-049.
 - [x] Zamrozić pełny render `before` przy 1536 × 1024.
 - [x] Zastąpić ciężką tabelę zwartą listą pięciu pełnowierszowych linków.
 - [x] Zachować prawdziwe tenantowe nazwy, liczbę pytań, wersję, status, datę
@@ -835,8 +843,8 @@ tras przechodzą. Izolowany E2E pozostaje warunkowy na `PANEL_E2E_*`; raport i a
 - [x] Usunąć limit 78 rem i wykorzystać pełną szerokość obszaru roboczego.
 - [x] Zachować wspólny, zwijany sidebar Lorum i mobilną dolną nawigację.
 - [x] Sprawdzić 1536 × 1024 i 390 × 844, klawiaturę, WCAG oraz brak overflow.
-- [x] Zapisać reference, before, after-v1/v2, overlay, difference i raport
-      w `artifacts/visual-qa/12n-process-list/`.
+- [x] Zapisać ówczesne reference, before, after, overlay, difference i raport;
+      obrazy wycofano po przyjęciu ADR-049.
 
 **Gate:** `/panel/[organizationId]/procesy` używa pięciu zwartych wierszy bez
 klasycznego nagłówka tabeli; cały wiersz jest dostępnym linkiem do właściwego
@@ -869,8 +877,8 @@ portalu błędu.
 - [x] Usunąć mobilny overflow powodowany przez stałą szerokość materiałów.
 - [x] Zachować notatki, status, kontakt, odpowiedzi, pliki, historię i retencję.
 - [x] Sprawdzić desktop, mobile, kontrast, axe i działanie formularzy.
-- [x] Zapisać before, reference, after, overlay, difference i raport
-      w `artifacts/visual-qa/12o-lead-detail-responsive/`.
+- [x] Zapisać ówczesne before, reference, after, overlay, difference i raport;
+      obrazy wycofano po przyjęciu ADR-049.
 
 **Gate:** dokument leada ma 1280 px w workspace 1328 px, panel wyniku 916 px,
 a prawa kolumna 419 px przy 1536 × 1024. Na 390 × 844 dokument, wynik, prawa
@@ -896,8 +904,8 @@ problemy kontrastu zostały naprawione. Izolowany E2E i axe przechodzą 1/1.
 - [x] Dopasować tablet i mobile bez maskowania overflow.
 - [x] Ujednolicić loading oraz error state z właściwą powierzchnią.
 - [x] Sprawdzić produkcyjny desktop, 390 px, 320 px i axe.
-- [x] Zapisać before, reference, after-v1/v2, overlay, difference i raport
-      w `artifacts/visual-qa/12p-template-library/`.
+- [x] Zapisać ówczesne before, reference, after, overlay, difference i raport;
+      obrazy wycofano po przyjęciu ADR-049.
 
 **Gate:** przy 1536 × 1024 powierzchnia ma 1280 px w workspace 1328 px,
 wszystkie pięć kart ma wspólne `y`, około 240 px szerokości i obrazy 92 px.
@@ -970,8 +978,8 @@ formatowanie, a produkcyjny build landingu przeszedł.
 - [x] Ujednolicić loading i error state z nowym nagłówkiem oraz powierzchniami.
 - [x] Sprawdzić produkcyjny desktop, 390 px, 320 px, klawiaturę, axe i brak
       poziomego overflow.
-- [x] Zapisać reference, before, after-v1/v2, overlay, difference i raport
-      w `artifacts/visual-qa/12r-analytics-dashboard-style/`.
+- [x] Zapisać ówczesne reference, before, after, overlay, difference i raport;
+      obrazy wycofano po przyjęciu ADR-049.
 
 **Gate:** `/panel/[organizationId]/analityka` zachowuje wspólny sidebar Lorum,
 topbar 78 px i cztery karty KPI po 118 px przy 1536 × 1024. Wykres ma 30
@@ -1010,8 +1018,8 @@ błędów konsoli.
 
 ## Etap 12S — domknięcie pozostałych ekranów produktu
 
-- [x] Zbudować macierz tras, stanów, referencji i świadomych wyłączeń w
-      `REMAINING_SCREEN_PLAN_2026-07-29.md`.
+- [x] Zbudować historyczną macierz tras, stanów, referencji i świadomych
+      wyłączeń. Unikalny zakres ekranów przeniesiono do aktywnych specyfikacji.
 - [x] Zamrozić baseline integracji, prywatności, wyboru organizacji i widgetu
       przy 1536 px.
 - [x] Dodać realne ekrany ustawień organizacji, powiadomień, instalacji i
@@ -1030,8 +1038,9 @@ offline i popup. Macierz 1536/1440/1024/768/390/320 px nie wykazała overflow;
 768 px jest także efektywną szerokością kontroli przy 200% zoomie z 1536 px.
 Axe, reduced motion, forced colors, klawiatura, lint, typecheck, unit/RLS/
 WordPress, build, Prettier oraz lokalne skany SAST/sekretów przechodzą.
-Referencje, after, overlay i difference są w
-`artifacts/visual-qa/12s-remaining-screens/`.
+Historyczne dowody sześciu powierzchni panelu zostały usunięte przez ADR-049.
+W `artifacts/visual-qa/12s-remaining-screens/` zachowano wyłącznie osobne dowody
+auth i widgetu; wynik funkcjonalny panelu pozostaje zapisem tego etapu.
 
 Odświeżenie zewnętrznego audytu advisories npm nie zostało wykonane: sandbox
 zablokował DNS, a eskalacja została odrzucona, ponieważ wysłałaby metadane
@@ -1085,8 +1094,8 @@ główne karty 457/331/453 px, workspace 1313 px i zero overflow. Mobile
 priorytetyzuje uwagę, KPI 2 × 3 oraz najnowsze leady i mieści wszystkie pola
 bez poziomego przewijania. Produkcyjny Playwright desktop/mobile oraz axe
 przechodzą 1/1. Lint, typecheck, 103 testy unit, RLS, WordPress, format,
-lokalne skany bezpieczeństwa i build są zielone. Dowody znajdują się w
-`artifacts/visual-qa/12t-dashboard-reconstruction/`.
+lokalne skany bezpieczeństwa i build są zielone. Historyczne obrazy odbiorowe
+zostały wycofane przez ADR-049; wynik testów pozostaje zapisem etapu.
 
 ## Etap 12U — kontrakt profesjonalnego buildera v2
 
@@ -1193,8 +1202,8 @@ pozostaje zielony.
 - [x] Uwzględnić safe area, cele dotykowe, focus trap, Escape, focus return,
       blokadę tła, reduced motion i forced colors.
 - [x] Sprawdzić 320 / 390 / 430 / 768 px, axe, brak overflow i pełny pipeline.
-- [x] Zapisać reference, before, after-v1/v2, overlay, difference oraz raport
-      w `artifacts/visual-qa/12w-mobile-navigation/`.
+- [x] Zapisać ówczesne reference, before, after, overlay, difference i raport;
+      obrazy wycofano po przyjęciu ADR-049.
 
 **Gate podetapu:** mobilny panel nie pokazuje sidebara ani przewijanego paska.
 Biała nawigacja ma maksymalnie pięć równych pozycji, zawsze mieści się przy
@@ -1235,8 +1244,8 @@ w obu przebiegach.
       Ustawienia z bezpiecznym scrollem, touch targets i dolną nawigacją.
 - [x] Dodać automatyczne asercje geometrii, overflow, klawiatury i axe dla
       1448 / 768 / 390 px oraz sprawdzić długie polskie treści i zoom 200%.
-- [x] Zapisać `reference`, `before`, `after-v1/v2`, overlay, difference i
-      raport w `artifacts/visual-qa/12w-builder-geometry/`.
+- [x] Zapisać ówczesne `reference`, `before`, `after`, overlay, difference i
+      raport; obrazy wycofano po przyjęciu ADR-049.
 - [x] Uruchomić pełny pipeline, wykonać self-review i zapisać końcowy status.
 
 **Gate:** przy 1448 × 1086 i zwiniętym wspólnym sidebarze Lorum granice
@@ -1372,9 +1381,9 @@ Izolowany test przełącznika przeszedł 1/1, łączna regresja geometrii,
 interakcji i przełącznika buildera 3/3, a kanoniczny E2E 34 testy z 13
 warunkowymi pominięciami bez danych panelu. `format:check`, lint, typecheck,
 133 testy unit, PostgreSQL/RLS, WordPress, SAST, secret scan i build 39 tras są
-zielone. Pełny audyt funkcjonalnych braków buildera znajduje się w
-`BUILDER_COMPLETENESS_AUDIT_2026-07-29.md`; PASS 12Y nie oznacza ukończenia
-tych osobnych obszarów.
+zielone. PASS 12Y nie oznaczał ukończenia osobnych obszarów buildera; ich
+aktualny zakres wynika z `UI_SCREEN_SPEC.md`, wymagań domenowych i etapu M7 w
+`ui/panel-minimal-v1/README.md`.
 
 ## Etap 12Z — pełne zarządzanie sekcjami buildera
 
@@ -1606,8 +1615,8 @@ Format, lint 8/8, typecheck 8/8, 146 testów jednostkowych, PostgreSQL/RLS,
 WordPress, SAST, secret scan i build 8/8 z 39 trasami przechodzą. Etap 12ZD
 zsynchronizował test granic z rzeczywistym polem liczbowym fixture'u, poprawił
 semantykę i kontrast analityki oraz wymusił standalone zamiast zastanego
-`next dev`; pełny panel przechodzi 15/15. Końcowe artefakty znajdują się w
-`artifacts/visual-qa/12zc-template-library-override/`.
+`next dev`; pełny panel przechodzi 15/15. Końcowe obrazy tego kierunku zostały
+później wycofane przez ADR-049.
 
 ## Etap 12ZD — zamrożony baseline repozytorium
 
@@ -2372,8 +2381,8 @@ konieczne referencje, jest atomowa i możliwa do cofnięcia. Pełny Playwright
 przeszedł 18/18 na produkcyjnym standalone buildzie; obejmuje publikację,
 anulowanie destrukcyjnej zmiany, desktop 1448 px, mobile 390 px, reflow 320 px,
 klawiaturę, cele 44 px, axe, forced colors, brak błędów runtime i zero overflow.
-Syntetyczny tenant został usunięty bez pozostałości. Artefakty znajdują się w
-`artifacts/visual-qa/12ze-self-service-estimation/`.
+Syntetyczny tenant został usunięty bez pozostałości. Historyczne obrazy
+odbiorowe zostały później wycofane przez ADR-049.
 
 Pełny gate ma zielone: format, lint 8/8, typecheck 8/8, 185 testów unit,
 PostgreSQL/RLS z niezależnym przeliczeniem estymacji i negatywnymi przypadkami
@@ -2449,6 +2458,73 @@ pozostają zablokowane do schedulera, alertów i stagingowego UAT z Etapu 13A.
 regresyjne, UAT i protokół go/no-go. Żadne ceny fixture'ów ani reguły innego
 tenanta nie stają się niejawnie rekomendacją produkcyjną.
 
+**Stan częściowy 2026-08-10 — FORTEZ DISCOVERY COMPLETE, PILOT NO-GO:**
+wybrano Fortez jako pierwszego kandydata i wykonano aktualny audyt publicznej
+strony, mobile, kart produktów, formularza, analityki, CSP, sitemap oraz
+lokalnego źródła. Kontrakt w
+`pilots/FORTEZ_PILOT_DISCOVERY_2026-08-10.md` zachowuje obecny formularz,
+telefon i WhatsApp jako równoległy fallback oraz ogranicza pierwszy embed do
+osobnego popupu dla użytkowników, którzy nie znają modelu. Discovery wykryło
+dwie blokujące luki domenowe: telefon przy opcjonalnym e-mailu oraz niezależny
+od konta adres alertów. ADR-039 i lokalny Etap 12ZK zamykają obie luki w kodzie:
+schema v2, phone-first, tenantowa konfiguracja, forced RLS, alert z telefonem i
+testy negatywne. Pilot nadal pozostaje NO-GO do wdrożenia migracji, schedulera i
+alertów, warsztatu, DPA, UAT oraz podpisanego GO.
+
+## Etap 12ZK — polityka kontaktu i dostawa alertów pilota
+
+- [x] Zapisać ADR-039 z kompatybilnością snapshotów v1.
+- [x] Dodać `email_required` / `phone_required` i serwerową walidację
+      immutable snapshotu.
+- [x] Pozwolić na lead bez e-maila przy wymaganym telefonie, bez tworzenia
+      marketing consent ani potwierdzenia klienta.
+- [x] Dodać tenantowy adres alertów, audit bez PII, capability Owner/Admin i
+      forced RLS blokujące Sales, suspended i drugi tenant.
+- [x] Dodać telefon do e-maila firmy, webhooka, panelu i bezpiecznych fallbacków
+      prezentacyjnych.
+- [x] Uruchomić unit, typecheck oraz pełny `pnpm test:rls` na czystej bazie.
+- [ ] Zastosować migrację na staging/produkcji i wykonać syntetyczny UAT
+      rzeczywistej dostawy przed pierwszym prawdziwym leadem.
+
+**Gate lokalny 2026-08-10:** pełna historia migracji i RLS przechodzi, w tym
+phone-only submit, brak potwierdzenia klienta bez e-maila, adres snapshotowany w
+outboxie oraz odmowy Sales/suspended/drugiego tenanta. Format, lint, typecheck,
+unit/RLS/WordPress, build i izolowany E2E ustawień 1536/390 px są zielone;
+historyczny odbiór wyniósł 19/20, a obrazy wycofano przez ADR-049.
+Gate produkcyjny jest otwarty do wdrożenia, schedulera, monitoringu i
+syntetycznej dostawy.
+
+## Etap 12ZL — wdrożenie zaakceptowanego logo Kwotum V2
+
+- [x] Zablokować dostarczoną referencję i jej SHA-256 w manifeście UI.
+- [x] Zachować przezroczyste tło i światło litery Q oraz geometrię dokładnie
+      dostarczonego znaku.
+- [x] Przygotować transparentny master, faviconę i Apple touch icon.
+- [x] Podmienić znak w marketingu, demonstracjach produktu, auth, panelu i
+      metadanych bez zmiany tenantowego brandingu widgetu.
+- [x] Uprościć wybór organizacji do jednej jasnej płaszczyzny, centralnego
+      nagłówka, pojedynczych kart i jednej akcji bez fikcyjnych danych.
+- [x] Dodać logo do szablonów Supabase Auth oraz transakcyjnych e-maili HTML z
+      tekstowym fallbackiem nazwy.
+- [ ] Wykonać finalny visual QA 1536/390 px, e-mail render, lint, typecheck,
+      testy i build.
+
+**Gate:** runtime nie odwołuje się do poprzedniego `Logoicon.svg`, wszystkie
+produkcyjne warianty mają przezroczyste narożniki, a małe użycia zachowują
+czytelność bez overflow i regresji dostępności.
+
+**Status lokalny 2026-08-10:** web 142/142 i e-mail 18/18 przechodzą; lint,
+typecheck, build 16/16 oraz `git diff --check` są zielone. Zalogowany build
+potwierdził jedną warstwę kart, jedną akcję na organizację, brak błędów konsoli
+i brak poziomego overflow przy 390 px. Retencyjny E2E 1536/390 px pozostaje
+otwarty, ponieważ wymaga osobnej zgody na utworzenie i usunięcie lokalnego,
+syntetycznego użytkownika oraz organizacji przez service role.
+
+**Korekta znaku 2026-08-11:** właściciel wskazał dostarczony znak jako jedyny
+wariant dla favicony, marketingu, auth, panelu i wiadomości. Runtime zachowuje
+dotychczasowe wymiary komponentów, a sufiks `-v3` odcina cache wcześniejszego assetu;
+tenantowy branding formularza pozostaje bez zmian.
+
 ## Etap 12ZH — bezpieczny podgląd i wysłanie procesu
 
 - [x] Zapisać prompt wykonawczy i ADR-035 oddzielający bezstanowy preview od
@@ -2494,8 +2570,8 @@ jest zastosowana. Unit web 92/92, database 3/3, `pnpm test:rls`, lint,
 typecheck i build są zielone. Produkcyjny E2E Chromium przechodzi razem z
 axe, trwałością statusu/właściciela/priorytetu, notatką z autorem i datą,
 utworzeniem oraz zamknięciem zadania, historią i kontrolą reflow bez overflow
-dla 1536 × 1024 oraz 390 × 844. Dowody znajdują się w
-`artifacts/visual-qa/12zi-lead-operations/`.
+dla 1536 × 1024 oraz 390 × 844. Historyczne obrazy dowodowe zostały później
+wycofane przez ADR-049.
 
 ## Podetap 12ZJ — lokalny kontrakt runtime readiness
 
@@ -2519,6 +2595,238 @@ pakietach, w tym web 106/106, PostgreSQL/RLS, lint 8/8, typecheck 8/8 i build
 utworzenia stagingu ani nie zamyka żadnej zewnętrznej pozycji 13A; wejście do
 13A nadal wymaga ukończenia 12ZE–12ZG oraz decyzji infrastrukturalnych.
 
+## Etap 12ZM — minimalistyczny panel Kwotum V1
+
+Kanoniczny kontrakt i dokładne gate'y znajdują się w
+`ui/panel-minimal-v1/README.md`. Etapy są sekwencyjne; kolejny nie rozpoczyna
+się przed zamknięciem poprzedniego.
+
+- [x] M0: przeanalizować dwie nowe referencje, oddzielić instrukcję wizualną
+      od treści demonstracyjnej i zablokować rozmiary oraz SHA-256.
+- [x] M0: zinwentaryzować panel, fonty, tokeny, routing, capabilities, stany,
+      responsive oraz zachowania bezpieczeństwa bez zmiany runtime.
+- [x] M0: usunąć poprzednie referencje panelu, zastąpione raporty i historyczne
+      artefakty po utworzeniu odzyskiwalnej kopii.
+- [x] M0: przyjąć ADR-049, skonsolidować aktywną dokumentację i przygotować
+      bezpieczny plan M1–M10.
+- [x] M1: wdrożyć Instrument Sans w tenantowym `.wy-panel-theme` oraz jasny,
+      neutralny shell na centralnych tokenach, zachowując geometrię 256/72 i
+      zachowania P1.
+- [x] M2: ujednolicić pasek kontekstu, page intro, breadcrumbs i route-based
+      menu wewnętrzne ustawień oraz integracji.
+- [x] M3: przebudować wyłącznie dashboard przy zachowaniu zapytań, helperów,
+      progów prywatności i wszystkich realnych wartości.
+- [x] M4: ujednolicić współdzielone kontrolki i ich pełne stany.
+- [x] M5: przebudować tabele i listy leadów, procesów oraz szablonów.
+- [ ] M6: uporządkować workspace szczegółów leada.
+- [ ] M7: odświeżyć builder i instalację bez zmiany kontraktu domenowego.
+- [ ] M8: przenieść analitykę do nowego języka wizualnego.
+- [ ] M9: uporządkować ustawienia, integracje, onboarding i wybór organizacji.
+- [ ] M10: skonsolidować stany, usunąć zastąpiony CSS i zamknąć pełny gate.
+
+**Gate M0 2026-08-26:** referencja główna 1199 × 842 px ma SHA-256
+`824df7d47e16d9114ae66990a0d02e91f4954ce1ba7b5d1c4d180fea84aed6e1`, a
+pomocnicza 404 × 316 px ma SHA-256
+`2cd7db369c2233f08f77b497a2b2e54e5458bf840548c5ba6e791b48518e3b64`.
+Poprzednie materiały panelu nie są już aktywnym źródłem decyzji. Runtime nie
+został zmieniony; etap obejmuje wyłącznie reset referencji, dokumentację oraz
+nazwy przyszłych artefaktów testowych. M1 pozostaje osobnym, nierozpoczętym
+etapem.
+
+**Review M1 2026-08-26:** właściciel odrzucił pierwszy render. Sam jasny
+sidebar nie wystarcza: dashboard nadal ma konkurujące tła, nierówne osie,
+nadmiar kart i generyczne wykresy. M1 pozostaje otwarty do czasu wspólnej
+korekty widocznej powierzchni i nowego odbioru; M2 nie został rozpoczęty.
+
+**Korekta M1/M3 2026-08-26:** przygotowano nowego kandydata bez podwójnych teł,
+cieni, donutów, sparkline'ów i dekoracyjnych kart. Jeden biały canvas, wspólne
+osie, Instrument Sans, cztery KPI, grupowany trend, rail uwagi, tabela i
+płaskie przekroje korzystają z realnych danych. Dodano dokładny tenantowy
+agregat operacyjny z forced RLS zamiast limitowanej listy, poprawiono loader,
+empty states i realny overflow 320 px. Build 16/16, web unit 174/174, pełny
+panel E2E 20/20 i RLS przechodzą; fixture testowy pozostawia 0 rekordów.
+Odrzucone obrazy usunięto. M1 i M3 pozostają niezaznaczone do odbioru
+właściciela; M2 ani M4 nie zostały rozpoczęte.
+
+**Odbiór właściciela M1/M3 2026-08-26:** skorygowany kierunek został jawnie
+zaakceptowany jako właściwa baza dalszej pracy. Zamknięto bramki wizualne M1 i
+M3; odrzucony pierwszy render pozostaje wyłącznie historycznym wpisem, bez
+aktywnych artefaktów. Dozwolony następny etap to wyłącznie M2 — pasek
+kontekstu, page intro i nawigacja kontekstowa. M4 nie został rozpoczęty.
+
+**Gate M2 2026-08-26 — PASS techniczny, kandydat do odbioru:** ujednolicono
+54-pikselowy pasek kontekstu, tenantowe breadcrumbs, page intro oraz
+route-based menu Ustawień i Integracji. Zakładki powstają serwerowo według
+capabilities; ready/loading/error zachowują wspólny chrome, builder i lead
+detail pozostają izolowane. Mobile 320 px ma 0 overflow dokumentu, jeden
+przewijany rząd, cele 44 px i dokładnie jedną aktywną pozycję w arkuszu
+„Więcej”. Visual QA wynosi 19/20; axe i forced colors mają 0 naruszeń. Bazowy
+pełny panel E2E przeszedł 21/21, końcowy test M2 1/1, dwa dotknięte długie
+scenariusze 2/2, build 16/16 i web unit 178/178. Dodatkowy pełny rerun utracił
+jednorazowy fixture przy seryjnym retry; osobny cleanup potwierdził 0
+pozostałości. Raport:
+`artifacts/visual-qa/panel-minimal-v1/m2-context-navigation/diff.md`. M4 nie
+został rozpoczęty i pozostaje zablokowany do wizualnego odbioru M2.
+
+**Gate M4 2026-08-26 — PASS:** biblioteka `@wyceno/ui` ma jeden kontrakt
+Button/LinkButton, pól tekstowych, selecta, textarea, checkbox/radio, switcha,
+segmented control, tabs, menu i komunikatów. Stan ładowania przycisku zachowuje
+geometrię i poprawną nazwę dostępną; formularze Ustawień, Prywatności,
+WordPressa i webhooków używają wspólnych pól, komunikatów oraz 8-pikselowej
+geometrii zamiast lokalnych konkurencyjnych reguł. Builder pozostał poza
+zakresem. Testy UI przechodzą 38/38, końcowy E2E M4 1/1, axe i forced colors
+mają 0 naruszeń, a macierz 320/375/390/430/720/768/1024/1280/1440/1536 px ma
+0 overflow. Produkcyjny build przeszedł 16/16, a każdy fixture został usunięty
+bez pozostałości. Raport:
+`artifacts/visual-qa/panel-minimal-v1/m4-controls/diff.md`. Następny dozwolony
+etap to M5; listy, szczegół leada, builder i analityka nie zostały zmienione.
+
+**Gate M5 2026-08-26 — PASS:** Leady, Procesy i Szablony są trzema płaskimi,
+profesjonalnymi powierzchniami bez dekoracyjnych kart, mediów i podwójnych
+teł. Lista leadów używa dokładnego tenantowego countu, serwerowego zakresu
+strony i fixture'u 102 rekordów; produkcyjny serwis pokrywa 0/1/102, filtry
+oraz wyszukiwanie zachowują query params, a mobile jest osobnym `ul`. Lista
+procesów pobiera tylko stronę oraz przypisane do niej wersje, używa pełnych
+linków wiersza i przechodzi 0/1/109, ostatnią stronę oraz nazwy 160 znaków.
+Szablony mają allowlistowany stan URL odporny na Back/Forward/reload, jawne
+`flow:read`, fokusowany podgląd, negatywny test Sales oraz serwerowo kanoniczną
+nazwę i dokument nowego procesu; ich model pokrywa 0/1/101. Celowany E2E M5
+przeszedł 3/3, a pełna bramka panelu 23/23; axe ma 0 naruszeń, fokus forced
+colors 3 px, a macierz
+320/375/390/430/720/768/1024/1280/1440/1536 px ma 0 overflow. Każdy ekran
+uzyskał 19/20. Web unit przechodzi 192/192, UI 38/38, lint i
+typecheck 8/8, PostgreSQL/RLS, WordPress oraz build 16/16 są zielone; cleanup
+fixture'u pozostawił 0 rekordów. Raporty:
+`artifacts/visual-qa/panel-minimal-v1/m5-lists/`. Następny dozwolony etap to
+M6; workspace szczegółu leada nie został rozpoczęty.
+
+## Etap 12ZN — Adaptive Intake: szybki formularz, prowadzony brief i konfigurator
+
+Program jest prowadzony przez kanoniczny pakiet
+`docs/product-experience-v1/`. Nie zastępuje bramek produkcyjnych Etapu 13 i
+nie pozwala wdrażać nieskalibrowanych cen, scoringu ani rekomendacji produktu.
+
+### PX1 — discovery i kontrakt
+
+- [x] Wykonać audyt dokumentacji, kodu, widgetu, buildera, publicznej strony i
+      artefaktów visual QA.
+- [x] Przyjąć ADR-043: jeden bezpieczny silnik i trzy tryby doświadczenia:
+      `quick_form`, `guided_brief`, `visual_configurator`.
+- [x] Zdefiniować zasady list, kart tekstowych, ikon, zdjęć i fallbacków.
+- [x] Zdefiniować granice context/prefill, kontaktu, outcome, brandingu i
+      statusów walidacji szablonów.
+- [x] Utworzyć macierz odbioru, sekwencyjny runbook worktree, manifest każdego
+      etapu oraz profesjonalne prompty PX1–PX7.
+- [ ] Przeprowadzić minimum pięć wywiadów z firmami, w tym dwa z operatorami
+      leadów, oraz pięć testów klientów końcowych w trzech usługach.
+- [ ] Przeprowadzić warsztat Fortez i zatwierdzić osobne ścieżki „znam model”
+      oraz „potrzebuję doboru”.
+- [ ] Zmienić publiczne określenie pięciu szablonów ze „zweryfikowanych” na
+      uczciwy status `hypothesis`, dopóki nie istnieje dowód badań.
+
+**Stan 2026-08-25:** część dokumentacyjna PX1 jest ukończona, research pozostaje
+otwarty. Właściciel polecił kontynuację wyłącznie lokalną, dlatego model PX2
+został wdrożony ostrożnie w istniejącym worktree bez deployu. Właściciel
+następnie polecił przejść do kolejnego etapu; zgodnie z ADR-044 zaakceptowano
+przeniesienie rejestru assetów jako twardej bramy wejścia do PX4, bez uznawania
+brakującego kryterium za spełnione. Szczegóły zawiera
+`docs/product-experience-v1/PX2_IMPLEMENTATION_REPORT.md`.
+
+### PX2–PX7
+
+- [x] PX2: wersjonowany FlowDocument v3 i publiczny schema prezentacji bez
+      zmiany runtime.
+  - [x] FlowDocument v3, migrator v1/v2 → v3 i round-trip.
+  - [x] Zamknięte tryby, warianty, katalog ikon i referencja assetu UUID.
+  - [x] Niezależna walidacja PostgreSQL, publikacja historyczna i tenant scope.
+  - [x] Publiczny manifest v3 oraz parser runtime bez zmiany renderera.
+  - [x] Prywatny tenantowy rejestr assetów i kontrola własności przed
+        uruchomieniem `image_cards`.
+- [~] PX3: `quick_form` na istniejącym silniku sesji, zgód i submitu.
+  - [x] Maksymalnie 8 pytań, pierwsze pytanie jako wejście i wyłącznie liniowa
+        trasa bez reguł ani override'ów opcji.
+  - [x] Wybór trybu Owner/Admin, jasny konflikt i jawna, odwracalna akcja
+        linearyzacji bez automatycznego usuwania pytań.
+  - [x] Podgląd buildera korzysta z tego samego Web Componentu co hosted link.
+  - [x] Jednostronicowy renderer zachowuje odpowiedzi, fokusuje pierwszy błąd
+        i wysyła uporządkowaną kolejkę do istniejącego serwera wyceny.
+  - [x] PostgreSQL niezależnie blokuje błędny quick form; E2E obejmuje
+        1440/768/390/320, axe, klawiaturę, offline i retry.
+
+**Gate PX3 2026-08-25:** technicznie lokalnie zielony; odbiór wizualny
+właściciela pozostaje otwarty. Lint i typecheck przechodzą dla 8/8
+pakietów, 264/264 testy jednostkowe oraz pełny PostgreSQL/RLS są zielone,
+build kończy 16/16 z 41 trasami, a widget ma 23 014 B gzip przy budżecie
+92 160 B. Izolowany E2E quick form przechodzi na czterech viewportach bez
+overflow i naruszeń axe. Wcześniejszy generyczny render nie jest referencją;
+został nadpisany autorskim „żywym arkuszem briefu”: numerowanym rejestrem pytań,
+rytmem dokumentu, jedną osią i zgodą analityczną wyjętą z głównej ścieżki. Nie
+używa kart, cieni, badge'y, hero-layoutu ani starych zdjęć. Audyt i reguły są w
+`docs/product-experience-v1/PX3_VISUAL_AUDIT_AND_DIRECTION.md`. Kadry znajdują się w
+`artifacts/visual-qa/px3-quick-form/`; raport w
+`docs/product-experience-v1/PX3_IMPLEMENTATION_REPORT.md`. Bez deployu.
+
+- [x] PX4: karty tekstowe, ikony i kontrolowane media z pełnym visual QA.
+  - [x] Runtime `text_cards` rozdziela etykietę i opis oraz zachowuje natywną
+        semantykę wyboru bez obrazu i SVG.
+  - [x] Builder prezentacji i kompletność opisów każdej opcji.
+  - [x] Autorski, zamknięty katalog `icon_cards` bez dowolnego SVG.
+  - [x] Autorska, płaska kompozycja `visual_configurator` oraz visual QA
+        1440/390 z axe i regresją przewijania po zmianie kroku.
+  - [x] Tenantowy rejestr assetów, kontrola własności i publiczna projekcja.
+  - [x] `image_cards`, stabilny fallback, lazy-loading, CLS i visual QA.
+
+**Gate PX4 2026-08-25:** ukończony lokalnie. Nie korzysta ze starych zdjęć ani
+z wygenerowanych dekoracji produktu. Owner/Admin dodaje własny JPEG/PNG/WebP,
+który przechodzi sygnaturę, malware policy, limit pikseli, usunięcie metadanych
+i niezmienną normalizację WebP. RLS i triggery blokują drugi tenant oraz obcy
+UUID; publiczny widget nie poznaje ścieżki Storage. `image_cards` mają tekst,
+lazy loading, stałe 4:3, niekolorowy wybór i fallback bez CLS. Raport:
+`docs/product-experience-v1/PX4_IMPLEMENTATION_REPORT.md`. Bez deployu.
+
+- [x] PX5: tenantowy, typowany context/prefill host → sesja → lead.
+
+**Gate PX5 2026-08-25:** ukończony lokalnie. FlowDocument v3 zawiera
+wersjonowany, zamknięty `contextSchema`; serwer tworzy kanoniczny snapshot,
+blokuje zastrzeżone klucze i PII-like wartości oraz wymaga jednorazowego
+potwierdzenia przed odpowiedzią. Panel rozdziela kontekst od odpowiedzi, a
+WordPress przekazuje opcjonalny, bezpiecznie escapowany JSON. Lint i typecheck
+przechodzą dla 8/8 pakietów, 274/274 testy jednostkowe, pełny PostgreSQL/RLS,
+WordPress, security scan i build 16/16 są zielone. Osiem E2E widżetu, w tym PX5
+na 1440/390 z axe i kontrolą overflow, przechodzi. Widget ma 27 072 B gzip przy
+budżecie 92 160 B. Raport:
+`docs/product-experience-v1/PX5_IMPLEMENTATION_REPORT.md`. Bez deployu.
+
+- [x] PX6: wersjonowany kontakt, outcome i minimalny branding widgetu.
+
+**Gate PX6 2026-08-25:** ukończony lokalnie. FlowDocument v3 zapisuje jawną
+kolejność wynik → kontakt albo kontakt → wynik oraz zamknięte stany pięciu pól
+kontaktu. Result v2 rozróżnia zebranie leada i zakończenie bez formularza;
+serwer ponownie sprawdza outcome i nigdy nie publikuje score ani śladu reguł.
+Branding organizacji obejmuje wyłącznie nazwę, bezpieczny kolor z automatycznym
+kontrastem i opcjonalne tenantowe logo WebP pod same-origin URL. Lint,
+typecheck, 278 testów jednostkowych, pełny PostgreSQL/RLS i build 16/16 są
+zielone. Visual QA obejmuje poprawny branding, błędny manifest z fallbackiem
+oraz brak konfiguracji — bez starych zdjęć i dekoracyjnych assetów. Raport:
+`docs/product-experience-v1/PX6_IMPLEMENTATION_REPORT.md`. Bez deployu.
+
+- [ ] PX7: kontrolowany pilot Fortez i reprezentatywnej firmy usługowej z
+      fallbackiem oraz decyzją GO/ITERATE/NO-GO.
+
+**Readiness PX7 2026-08-25:** pakiet lokalny jest gotowy, lecz etap nie jest
+ukończony. Trzy konfiguracje `hypothesis` przechodzą kontrakt i nie zawierają
+starych zdjęć, ceny, scoringu ani rekomendacji produktu. Przygotowano macierz
+UAT, metryki bez PII, fallback i rollback. Decyzja dla prawdziwego ruchu:
+**NO-GO** z powodu braku immutable release SHA, stagingowego UAT, schedulerów i
+monitoringu, restore drill, DPA, finalnych treści, właścicieli obu firm i
+podpisanych akceptacji. Raport:
+`docs/pilots/PX7_PILOT_READINESS_AND_DECISION_2026-08-25.md`.
+
+**Gate programu:** każdy etap spełnia `ACCEPTANCE_MATRIX.md`, powstaje w osobnym
+worktree z zaakceptowanego commita poprzednika i kończy się raportem oraz STOP.
+Żaden wariant prezentacji nie może osłabić RLS, immutable versions, serwerowej
+kalkulacji, origin allowlist, rate limitu, Turnstile ani privacy proof.
+
 ## Etap 13 — Produkcja
 
 ### Etap 13A — staging i infrastruktura
@@ -2534,6 +2842,10 @@ Prawne zatwierdzenie dostawcy, testy w rzeczywistych klientach pocztowych oraz
 outbox aplikacji nadal pozostają otwarte. Pozycje poniżej pozostają otwarte,
 ponieważ nie skonfigurowano jeszcze prywatnego skanera malware, Turnstile,
 monitoringu i schedulerów, nie wykonano też restore/rollback drill.
+
+**Korekta lokalna 2026-08-25:** akcja „Użyj innego adresu” na ekranie po
+rejestracji zeruje stan formularza przez ponowne załadowanie trasy; nie jest już
+linkiem klientowym do tej samej trasy, który pozostawiał ekran potwierdzenia.
 
 - [ ] Wybrać hosting, region Supabase, provider e-mail, domeny, prywatny ClamAV,
       CDN/WAF, Turnstile i monitoring.
@@ -2553,6 +2865,41 @@ monitoringu i schedulerów, nie wykonano też restore/rollback drill.
       runbooki.
 - [ ] Wykonać log-redaction, zdalne skany, staging DAST, ręczny VoiceOver/NVDA,
       realne klienty e-mail i reprezentatywne hosty WordPress.
+
+#### Podetap FTZ-03A — origin allowlist i rozproszony limiter
+
+**Stan lokalny 2026-08-10:** podetap ukończony w kodzie i testach. Nie zamyka
+łącznej pozycji 13B; FTZ-03B jest już lokalnie zamknięte, lecz produkcyjny
+ClamAV pozostaje otwarty. Przed ruchem rzeczywistym migracja, sekret limitera,
+Turnstile i smoke nadal wymagają wdrożenia na docelowym środowisku.
+
+- [x] Zapisać ADR-040 i rollback dla serwerowej bramy publicznego API.
+- [x] Zastąpić wildcard dokładnym tenantowym CORS z `Vary: Origin`.
+- [x] Dodać atomowy limiter PostgreSQL per IP/origin/flow/session/org oraz
+      operację, bez surowego IP i z `Retry-After`.
+- [x] Odebrać `anon`/`authenticated` bezpośrednie RPC formularza i dopuścić
+      wyłącznie serwerową ścieżkę po pozytywnym guardzie.
+- [x] Dodać panel Owner/Admin do konfiguracji maksymalnie 10 originów procesu,
+      tenant scope, RLS i audyt.
+- [x] Pokryć SQL/TypeScript testami obcy origin, role, bypass RPC, 429,
+      niezależny fingerprint, fail-closed IP i brak wildcardu.
+- [x] FTZ-03B: wdrożyć adaptacyjny Turnstile i test retry/bypass.
+
+#### Podetap FTZ-03B — adaptacyjny Turnstile
+
+**Stan lokalny 2026-08-10:** implementacja i gate lokalny ukończone. Nie oznacza
+produkcyjnego GO: brakuje utworzenia managed widgetu Cloudflare, hostów
+`app.kwotum.pl` i Fortez, osobnych sekretów środowisk, prawnego zatwierdzenia
+dostawcy oraz smoke na rzeczywistym embedzie.
+
+- [x] Zapisać ADR-041 z fail-closed, rollbackiem i fallbackiem starego kanału.
+- [x] Dodać publiczny runtime config bez zapisu site key w snapshotcie procesu.
+- [x] Wykonać explicit/adaptive challenge dopiero przy finalnym submit po uploadzie.
+- [x] Wymusić Siteverify przed RPC oraz sprawdzić action, hostname i świeżość.
+- [x] Dodać timeout, bounded retry, idempotency key i brak logowania tokenu/IP.
+- [x] Pokryć brak tokenu, replay, host/action mismatch, expiry, outage i retry.
+- [x] Przejść Playwright mobile/desktop, axe, overflow i świeży token po retry.
+- [ ] Skonfigurować Cloudflare/Vercel, CSP Fortez i wykonać produkcyjny smoke.
 
 ### Etap 13C — rehearsal i release candidate
 

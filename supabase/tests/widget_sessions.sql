@@ -24,6 +24,18 @@ as $$
   where published.flow_id = 'f1000000-0000-4000-8000-000000000005';
 $$;
 
+create function test_support.widget_v3_public_id()
+returns uuid
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select published.public_id
+  from public.published_flows published
+  where published.flow_id = 'f1000000-0000-4000-8000-000000000008';
+$$;
+
 create function test_support.expire_widget_session(session_token text)
 returns void
 language sql
@@ -52,15 +64,17 @@ $$;
 
 revoke all on function test_support.widget_public_id() from public;
 revoke all on function test_support.widget_v2_public_id() from public;
+revoke all on function test_support.widget_v3_public_id() from public;
 revoke all on function test_support.expire_widget_session(text) from public;
 revoke all on function test_support.raw_widget_token_is_stored(text) from public;
-grant usage on schema test_support to anon;
-grant execute on function test_support.widget_public_id() to anon;
-grant execute on function test_support.widget_v2_public_id() to anon;
-grant execute on function test_support.expire_widget_session(text) to anon;
-grant execute on function test_support.raw_widget_token_is_stored(text) to anon;
+grant usage on schema test_support to anon, service_role;
+grant execute on function test_support.widget_public_id() to anon, service_role;
+grant execute on function test_support.widget_v2_public_id() to anon, service_role;
+grant execute on function test_support.widget_v3_public_id() to anon, service_role;
+grant execute on function test_support.expire_widget_session(text) to anon, service_role;
+grant execute on function test_support.raw_widget_token_is_stored(text) to anon, service_role;
 
-set role anon;
+set role service_role;
 
 do $$
 declare
@@ -74,6 +88,31 @@ begin
     or manifest ? 'snapshot'
   then
     raise exception 'public manifest is incomplete or leaks internal data: %', manifest;
+  end if;
+end;
+$$;
+
+do $$
+declare
+  manifest jsonb;
+begin
+  manifest := public.get_widget_manifest(test_support.widget_v3_public_id());
+
+  if manifest ->> 'manifestVersion' <> '3'
+    or manifest ->> 'experienceMode' <> 'visual_configurator'
+    or jsonb_array_length(manifest -> 'steps') <> 5
+    or manifest ? 'sections'
+    or manifest ? 'organizationId'
+    or (manifest #> '{steps,0}') ? 'sectionKey'
+    or manifest #>> '{steps,0,presentation,variant}' <> 'icon_cards'
+    or manifest #>> '{steps,0,options,0,presentation,icon}' <> 'check'
+    or manifest #> '{steps,1,options}' <> '[]'::jsonb
+  then
+    raise exception 'v3 manifest is incomplete or leaks internal data: %', manifest;
+  end if;
+
+  if octet_length(manifest::text) > 262144 then
+    raise exception 'v3 manifest exceeded the 256 KiB contract budget';
   end if;
 end;
 $$;
@@ -391,7 +430,7 @@ from public.published_flows published
 cross join generate_series(1, 120) as series(value)
 where published.public_id = test_support.widget_public_id();
 
-set role anon;
+set role service_role;
 do $$
 begin
   begin

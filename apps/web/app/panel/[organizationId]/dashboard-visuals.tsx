@@ -2,289 +2,225 @@ import type { CSSProperties } from "react";
 
 import type { DashboardBreakdown, DashboardDailyPoint } from "./dashboard-metrics";
 
-const chartWidth = 620;
-const chartHeight = 210;
-const chartPadding = { bottom: 28, left: 38, right: 12, top: 12 } as const;
-
-export function DashboardSparkline({
-  points,
-  tone = "green",
-}: Readonly<{ points: ReadonlyArray<number>; tone?: "blue" | "green" }>) {
-  const maximum = Math.max(...points, 1);
-  const width = 84;
-  const height = 34;
-  const polyline = points
-    .map((point, index) => {
-      const x = points.length <= 1 ? width / 2 : (index / (points.length - 1)) * width;
-      const y = height - 3 - (point / maximum) * (height - 8);
-      return `${x},${y}`;
-    })
-    .join(" ");
-
-  return (
-    <svg
-      aria-hidden="true"
-      className="dashboard-sparkline"
-      data-tone={tone}
-      viewBox={`0 0 ${width} ${height}`}
-    >
-      <polyline points={polyline} />
-    </svg>
-  );
-}
+const chartWidth = 760;
+const chartHeight = 300;
+const chartPadding = { bottom: 42, left: 50, right: 16, top: 20 } as const;
+const maximumAxisLabels = 7;
+const maximumYAxisLabels = 5;
 
 export function DashboardTrendChart({
   points,
 }: Readonly<{ points: ReadonlyArray<DashboardDailyPoint> }>) {
-  const maximum = Math.max(...points.map((point) => point.leads), 1);
-  const qualityMaximum = Math.max(maximum, ...points.map((point) => point.qualityLeads));
-  const allPoints = chartPoints(
-    points.map((point) => point.leads),
-    qualityMaximum,
-  );
-  const qualityPoints = chartPoints(
-    points.map((point) => point.qualityLeads),
-    qualityMaximum,
-  );
-  const chartBottom = chartHeight - chartPadding.bottom;
-  const areaPath = `M ${allPoints[0]?.x ?? chartPadding.left} ${chartBottom} ${allPoints
-    .map((point) => `L ${point.x} ${point.y}`)
-    .join(" ")} L ${allPoints.at(-1)?.x ?? chartWidth - chartPadding.right} ${chartBottom} Z`;
-  const horizontalGuides = Array.from({ length: 5 }, (_, index) => {
-    const ratio = index / 4;
-    return {
-      value: Math.round(qualityMaximum * (1 - ratio)),
-      y: chartPadding.top + ratio * (chartBottom - chartPadding.top),
-    };
-  });
+  const highestValue = Math.max(...points.flatMap((point) => [point.leads, point.qualityLeads]), 0);
 
-  return (
-    <div className="dashboard-chart">
-      <div className="dashboard-chart__legend" aria-hidden="true">
-        <span data-tone="green">Wszystkie leady</span>
-        <span data-tone="blue">Jakościowe (80+)</span>
-      </div>
-      <svg
-        aria-label={`Leady w czasie. ${points
-          .map((point) => `${point.label}: ${point.leads}, jakościowe: ${point.qualityLeads}`)
-          .join("; ")}`}
-        className="dashboard-trend-chart"
-        role="img"
-        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-      >
-        {horizontalGuides.map((guide) => (
-          <g key={guide.y}>
-            <line
-              className="dashboard-chart__grid"
-              x1={chartPadding.left}
-              x2={chartWidth - chartPadding.right}
-              y1={guide.y}
-              y2={guide.y}
-            />
-            <text className="dashboard-chart__axis" x={chartPadding.left - 8} y={guide.y + 3}>
-              {guide.value}
-            </text>
-          </g>
-        ))}
-        <path className="dashboard-trend-chart__area" d={areaPath} />
-        <polyline
-          className="dashboard-trend-chart__line is-all"
-          points={allPoints.map((point) => `${point.x},${point.y}`).join(" ")}
-        />
-        <polyline
-          className="dashboard-trend-chart__line is-quality"
-          points={qualityPoints.map((point) => `${point.x},${point.y}`).join(" ")}
-        />
-        {allPoints.map((point, index) =>
-          index % 5 === 0 || index === allPoints.length - 1 ? (
-            <text
-              className="dashboard-chart__axis dashboard-chart__axis--date"
-              key={points[index]?.isoDate}
-              textAnchor={index === 0 ? "start" : index === allPoints.length - 1 ? "end" : "middle"}
-              x={point.x}
-              y={chartHeight - 7}
-            >
-              {points[index]?.label}
-            </text>
-          ) : null,
-        )}
-      </svg>
-    </div>
-  );
-}
-
-export function DashboardEstimateChart({
-  points,
-}: Readonly<{ points: ReadonlyArray<DashboardDailyPoint> }>) {
-  const maximum = Math.max(...points.map((point) => point.estimateMinor), 1);
-  const chartBottom = chartHeight - chartPadding.bottom;
-  const chartTop = chartPadding.top;
-  const plotHeight = chartBottom - chartTop;
-  const plotWidth = chartWidth - chartPadding.left - chartPadding.right;
-  const step = plotWidth / points.length;
-  const barWidth = Math.max(5, Math.min(12, step * 0.48));
-  const horizontalGuides = Array.from({ length: 4 }, (_, index) => {
-    const ratio = index / 3;
-    return {
-      value: maximum * (1 - ratio),
-      y: chartTop + ratio * plotHeight,
-    };
-  });
-
-  return (
-    <svg
-      aria-label={`Minimalna wartość wycen według dnia. ${points
-        .map((point) => `${point.label}: ${formatCompactAmount(point.estimateMinor)}`)
-        .join("; ")}`}
-      className="dashboard-estimate-chart"
-      role="img"
-      viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-    >
-      {horizontalGuides.map((guide) => (
-        <g key={guide.y}>
-          <line
-            className="dashboard-chart__grid"
-            x1={chartPadding.left}
-            x2={chartWidth - chartPadding.right}
-            y1={guide.y}
-            y2={guide.y}
-          />
-          <text className="dashboard-chart__axis" x={chartPadding.left - 8} y={guide.y + 3}>
-            {formatCompactAmount(guide.value)}
-          </text>
-        </g>
-      ))}
-      {points.map((point, index) => {
-        const height = point.estimateMinor === 0 ? 0 : (point.estimateMinor / maximum) * plotHeight;
-        const x = chartPadding.left + index * step + (step - barWidth) / 2;
-        return (
-          <g key={point.isoDate}>
-            <rect
-              className="dashboard-estimate-chart__bar"
-              height={height}
-              rx={barWidth / 2}
-              width={barWidth}
-              x={x}
-              y={chartBottom - height}
-            />
-            {index % 5 === 0 || index === points.length - 1 ? (
-              <text
-                className="dashboard-chart__axis dashboard-chart__axis--date"
-                textAnchor={index === 0 ? "start" : index === points.length - 1 ? "end" : "middle"}
-                x={
-                  index === 0
-                    ? chartPadding.left
-                    : index === points.length - 1
-                      ? chartWidth - chartPadding.right
-                      : x + barWidth / 2
-                }
-                y={chartHeight - 7}
-              >
-                {point.label}
-              </text>
-            ) : null}
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-
-export function DashboardDonut({
-  centerLabel = "łącznie",
-  items,
-}: Readonly<{ centerLabel?: string; items: ReadonlyArray<DashboardBreakdown> }>) {
-  const total = items.reduce((sum, item) => sum + item.count, 0);
-
-  if (total === 0) {
+  if (points.length === 0 || highestValue === 0) {
     return (
       <div className="dashboard-compact-state">
-        <strong>Brak danych w tym okresie</strong>
-        <span>Wykres uzupełni się po zebraniu kolejnych rekordów.</span>
+        <strong>Brak leadów w tym okresie</strong>
+        <span>Trend pojawi się po zebraniu pierwszych zgłoszeń.</span>
       </div>
     );
   }
 
+  const scale = buildYAxisScale(highestValue);
+  const plotBottom = chartHeight - chartPadding.bottom;
+  const plotHeight = plotBottom - chartPadding.top;
+  const plotWidth = chartWidth - chartPadding.left - chartPadding.right;
+  const step = plotWidth / Math.max(points.length, 1);
+  const barWidth = Math.min(24, Math.max(4, step * 0.34));
+  const pairGap = Math.min(4, Math.max(2, step * 0.06));
+  const dateLabelIndexes = new Set(evenlySpacedIndexes(points.length, maximumAxisLabels));
+
   return (
-    <div className="dashboard-donut">
-      <div className="dashboard-donut__graphic">
-        <svg
-          aria-label={items
-            .map((item) => `${item.label}: ${item.count}, ${percent(item.shareBasisPoints)}`)
-            .join("; ")}
-          role="img"
-          viewBox="0 0 120 120"
-        >
-          <circle className="dashboard-donut__track" cx="60" cy="60" r="46" />
-          {items.map((item, index) => {
-            const share = (item.count / total) * 100;
-            const dashOffset = -items
-              .slice(0, index)
-              .reduce((offset, previous) => offset + (previous.count / total) * 100, 0);
-            return (
-              <circle
-                className="dashboard-donut__segment"
-                cx="60"
-                cy="60"
-                data-tone={index % 6}
-                key={item.key}
-                pathLength="100"
-                r="46"
-                strokeDasharray={`${Math.max(share - 0.8, 0)} ${100 - Math.max(share - 0.8, 0)}`}
-                strokeDashoffset={dashOffset}
-              />
-            );
-          })}
-        </svg>
-        <span>
-          <strong>{total}</strong>
-          <small>{centerLabel}</small>
+    <figure
+      aria-label="Wykres leadów. Na wąskim ekranie przewiń poziomo, aby zobaczyć wszystkie dni."
+      className="dashboard-chart"
+      tabIndex={0}
+    >
+      <div aria-label="Legenda wykresu" className="dashboard-chart__legend" role="list">
+        <span data-tone="neutral" role="listitem">
+          Wszystkie leady
+        </span>
+        <span data-tone="green" role="listitem">
+          Leady jakościowe (80+)
         </span>
       </div>
-      <ul className="dashboard-donut__legend">
-        {items.map((item, index) => (
-          <li key={item.key}>
-            <i aria-hidden="true" data-tone={index % 6} />
-            <span>{item.label}</span>
-            <strong>{item.count}</strong>
-            <small>{percent(item.shareBasisPoints)}</small>
-          </li>
-        ))}
-      </ul>
-    </div>
+
+      <p className="dashboard-chart__mobile-hint">Przesuń wykres, aby zobaczyć kolejne dni.</p>
+
+      <svg
+        aria-hidden="true"
+        className="dashboard-trend-chart"
+        focusable="false"
+        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+      >
+        {scale.ticks.map((tick) => {
+          const y = plotBottom - (tick / scale.maximum) * plotHeight;
+          return (
+            <g key={tick}>
+              <line
+                className="dashboard-chart__grid"
+                x1={chartPadding.left}
+                x2={chartWidth - chartPadding.right}
+                y1={y}
+                y2={y}
+              />
+              <text
+                className="dashboard-chart__axis"
+                style={{ fontSize: "11px" }}
+                textAnchor="end"
+                x={chartPadding.left - 10}
+                y={y + 4}
+              >
+                {formatCount(tick)}
+              </text>
+            </g>
+          );
+        })}
+
+        {points.map((point, index) => {
+          const groupCenter = chartPadding.left + index * step + step / 2;
+          const leadHeight = (point.leads / scale.maximum) * plotHeight;
+          const qualityHeight = (point.qualityLeads / scale.maximum) * plotHeight;
+
+          return (
+            <g key={point.isoDate}>
+              <title>{`${point.label}: ${point.leads} wszystkich leadów, ${point.qualityLeads} jakościowych`}</title>
+              <rect
+                className="dashboard-trend-chart__bar is-all"
+                height={leadHeight}
+                rx="2"
+                width={barWidth}
+                x={groupCenter - barWidth - pairGap / 2}
+                y={plotBottom - leadHeight}
+              />
+              <rect
+                className="dashboard-trend-chart__bar is-quality"
+                height={qualityHeight}
+                rx="2"
+                width={barWidth}
+                x={groupCenter + pairGap / 2}
+                y={plotBottom - qualityHeight}
+              />
+              {dateLabelIndexes.has(index) ? (
+                <text
+                  className="dashboard-chart__axis dashboard-chart__axis--date"
+                  style={{ fontSize: "11px" }}
+                  textAnchor="middle"
+                  x={groupCenter}
+                  y={chartHeight - 12}
+                >
+                  {point.label}
+                </text>
+              ) : null}
+            </g>
+          );
+        })}
+      </svg>
+
+      <figcaption className="wy-sr-only">
+        Dzienna liczba wszystkich leadów oraz leadów jakościowych z wynikiem co najmniej 80.
+      </figcaption>
+      <table className="wy-sr-only">
+        <caption>Dane przedstawione na wykresie trendu leadów</caption>
+        <thead>
+          <tr>
+            <th scope="col">Dzień</th>
+            <th scope="col">Wszystkie leady</th>
+            <th scope="col">Leady jakościowe (80+)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {points.map((point) => (
+            <tr key={point.isoDate}>
+              <th scope="row">
+                <time dateTime={point.isoDate}>{point.label}</time>
+              </th>
+              <td>{point.leads}</td>
+              <td>{point.qualityLeads}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </figure>
   );
 }
 
 export function DashboardHorizontalBreakdown({
   items,
 }: Readonly<{ items: ReadonlyArray<DashboardBreakdown> }>) {
-  const maximum = Math.max(...items.map((item) => item.count), 1);
+  if (items.length === 0) {
+    return (
+      <div className="dashboard-compact-state">
+        <strong>Brak danych w tym okresie</strong>
+        <span>Podział pojawi się po zebraniu kolejnych rekordów.</span>
+      </div>
+    );
+  }
 
   return (
     <ul className="dashboard-horizontal-breakdown">
-      {items.map((item) => (
-        <li key={item.key}>
-          <span>{item.label}</span>
-          <div aria-hidden="true">
-            <i style={{ "--dashboard-bar": `${(item.count / maximum) * 100}%` } as CSSProperties} />
-          </div>
-          <strong>{item.count}</strong>
-          <small>{percent(item.shareBasisPoints)}</small>
-        </li>
-      ))}
+      {items.map((item) => {
+        const share = Math.min(Math.max(item.shareBasisPoints / 100, 0), 100);
+        return (
+          <li key={item.key}>
+            <span>{item.label}</span>
+            <div aria-hidden="true">
+              <i style={{ "--dashboard-bar": `${share}%` } as CSSProperties} />
+            </div>
+            <strong>{item.count}</strong>
+            <span className="dashboard-horizontal-breakdown__share">
+              {percent(item.shareBasisPoints)}
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
-function chartPoints(values: ReadonlyArray<number>, maximum: number) {
-  const plotWidth = chartWidth - chartPadding.left - chartPadding.right;
-  const plotHeight = chartHeight - chartPadding.top - chartPadding.bottom;
-  return values.map((value, index) => ({
-    x:
-      chartPadding.left +
-      (values.length <= 1 ? plotWidth / 2 : (index / (values.length - 1)) * plotWidth),
-    y: chartPadding.top + plotHeight - (value / maximum) * plotHeight,
-  }));
+function buildYAxisScale(maximum: number): Readonly<{ maximum: number; ticks: number[] }> {
+  const safeMaximum = Math.max(Math.ceil(maximum), 1);
+
+  if (safeMaximum < maximumYAxisLabels) {
+    return {
+      maximum: safeMaximum,
+      ticks: Array.from({ length: safeMaximum + 1 }, (_, index) => index),
+    };
+  }
+
+  const step = niceCeiling(safeMaximum / (maximumYAxisLabels - 1));
+  const scaleMaximum = Math.ceil(safeMaximum / step) * step;
+  const intervalCount = Math.round(scaleMaximum / step);
+
+  return {
+    maximum: scaleMaximum,
+    ticks: Array.from({ length: intervalCount + 1 }, (_, index) => index * step),
+  };
+}
+
+function niceCeiling(value: number): number {
+  const magnitude = 10 ** Math.floor(Math.log10(value));
+  const normalized = value / magnitude;
+  const multiplier = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+  return multiplier * magnitude;
+}
+
+function evenlySpacedIndexes(length: number, maximumLabels: number): number[] {
+  if (length <= 0) return [];
+  if (length <= maximumLabels) return Array.from({ length }, (_, index) => index);
+
+  return [
+    ...new Set(
+      Array.from({ length: maximumLabels }, (_, index) =>
+        Math.round((index * (length - 1)) / (maximumLabels - 1)),
+      ),
+    ),
+  ];
+}
+
+function formatCount(value: number): string {
+  return new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 0 }).format(value);
 }
 
 function percent(value: number): string {
@@ -292,15 +228,4 @@ function percent(value: number): string {
     maximumFractionDigits: 0,
     style: "percent",
   }).format(value / 10_000);
-}
-
-function formatCompactAmount(valueMinor: number): string {
-  const value = valueMinor / 100;
-  if (value >= 1_000_000) {
-    return `${new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 1 }).format(value / 1_000_000)} mln`;
-  }
-  if (value >= 1_000) {
-    return `${new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 0 }).format(value / 1_000)}k`;
-  }
-  return String(Math.round(value));
 }

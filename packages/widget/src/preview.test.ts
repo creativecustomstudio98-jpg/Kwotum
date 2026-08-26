@@ -6,7 +6,7 @@ import { testManifest } from "./test-fixtures.js";
 describe("PreviewWidgetApi", () => {
   it("przechodzi proces bez sieci i zwraca syntetyczne potwierdzenie", async () => {
     const api = new PreviewWidgetApi(testManifest);
-    const created = await api.createSession(testManifest.publicId);
+    const created = await api.createSession(testManifest.publicId, {});
     const first = await api.saveAnswer({
       answer: "standard",
       expectedRevision: 0,
@@ -28,6 +28,7 @@ describe("PreviewWidgetApi", () => {
     await expect(api.getResult(created.token)).resolves.toMatchObject({ pricing: null });
     await expect(
       api.submitLead({
+        challengeToken: "preview-local",
         contact: { email: "preview@example.test" },
         fileIds: [],
         marketingEmailConsent: null,
@@ -40,7 +41,7 @@ describe("PreviewWidgetApi", () => {
 
   it("odrzuca zmianę z nieaktualną rewizją", async () => {
     const api = new PreviewWidgetApi(testManifest);
-    const created = await api.createSession(testManifest.publicId);
+    const created = await api.createSession(testManifest.publicId, {});
     await expect(
       api.saveAnswer({
         answer: "standard",

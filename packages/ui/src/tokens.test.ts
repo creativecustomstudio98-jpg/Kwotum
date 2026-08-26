@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { contrastRatio, relativeLuminance } from "./contrast";
-import { colorTokens, marketingColorTokens } from "./tokens";
+import { colorTokens, marketingColorTokens, panelColorTokens, panelSidebarTokens } from "./tokens";
 
 describe("tokeny kolorystyczne", () => {
   it.each([
@@ -52,5 +52,42 @@ describe("tokeny kolorystyczne", () => {
     ["zieleń / miękka powierzchnia", marketingColorTokens.brand, marketingColorTokens.brandSoft],
   ])("%s spełnia WCAG AA", (_name, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it.each([
+    ["tekst panelu / powierzchnia", panelColorTokens.textPrimary, panelColorTokens.surface],
+    [
+      "tekst drugorzędny panelu / powierzchnia",
+      panelColorTokens.textSecondary,
+      panelColorTokens.surface,
+    ],
+    ["tekst sidebara / sidebar", panelSidebarTokens.text, panelSidebarTokens.background],
+    [
+      "tekst wyciszony sidebara / sidebar",
+      panelSidebarTokens.textMuted,
+      panelSidebarTokens.background,
+    ],
+    ["label sidebara / sidebar", panelSidebarTokens.label, panelSidebarTokens.background],
+    ["label sidebara / hover", panelSidebarTokens.label, panelSidebarTokens.hover],
+    ["tekst subtelny sidebara / hover", panelSidebarTokens.textSubtle, panelSidebarTokens.hover],
+    ["focus panelu / powierzchnia", panelColorTokens.focus, panelColorTokens.surface],
+  ])("%s spełnia WCAG AA", (_name, foreground, background) => {
+    expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("utrzymuje wspólny neutralny kontrakt panelu i sidebara", () => {
+    expect(panelSidebarTokens.background).toBe(panelColorTokens.surfaceMuted);
+    expect(panelSidebarTokens.text).toBe(panelColorTokens.textPrimary);
+    expect(panelSidebarTokens.textMuted).toBe(panelColorTokens.textSecondary);
+    expect(panelSidebarTokens.line).toBe(panelColorTokens.border);
+    expect(panelSidebarTokens.focus).toBe(panelColorTokens.focus);
+    expect(panelSidebarTokens.widthExpanded).toBe("256px");
+    expect(panelSidebarTokens.widthCollapsed).toBe("72px");
+  });
+
+  it("utrzymuje kontrast 3:1 mocnej granicy kontrolek panelu", () => {
+    expect(
+      contrastRatio(panelColorTokens.borderStrong, panelColorTokens.surface),
+    ).toBeGreaterThanOrEqual(3);
   });
 });

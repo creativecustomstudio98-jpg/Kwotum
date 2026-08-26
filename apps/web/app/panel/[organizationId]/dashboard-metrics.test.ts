@@ -138,6 +138,43 @@ describe("dashboard metric comparisons", () => {
     expect(buildEstimateBreakdown(leads).map((bucket) => bucket.count)).toEqual([1, 0, 1, 0, 0]);
   });
 
+  it("shows an empty estimate state when there are no PLN estimates", () => {
+    expect(
+      buildEstimateBreakdown([
+        {
+          flowTitle: "Kuchnia",
+          priceCurrency: "EUR",
+          priceMaxMinor: 10_000,
+          priceMinMinor: 8_000,
+          score: 84,
+          status: "new",
+          submittedAt: "2026-07-28T09:00:00.000Z",
+        },
+      ]),
+    ).toEqual([]);
+  });
+
+  it("labels the 80 000 PLN boundary truthfully", () => {
+    const breakdown = buildEstimateBreakdown([
+      {
+        flowTitle: "Kuchnia",
+        priceCurrency: "PLN",
+        priceMaxMinor: 8_000_000,
+        priceMinMinor: 8_000_000,
+        score: 84,
+        status: "new",
+        submittedAt: "2026-07-28T09:00:00.000Z",
+      },
+    ]);
+
+    expect(breakdown.at(-1)).toMatchObject({
+      count: 1,
+      key: "above-80",
+      label: "80 000 zł i więcej",
+      shareBasisPoints: 10_000,
+    });
+  });
+
   it("flags only new leads and stale in-progress work for attention", () => {
     const now = new Date("2026-07-29T12:00:00.000Z").getTime();
     expect(isAttentionLead({ status: "new", submittedAt: "2026-07-29T11:00:00.000Z" }, now)).toBe(

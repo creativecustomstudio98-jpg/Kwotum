@@ -314,7 +314,7 @@ export const features = [
       "Formularz kwalifikacji klienta, który zbiera dane potrzebne do decyzji o kolejnym kroku i zapisuje uporządkowany lead.",
     eyebrow: "Kwalifikacja",
     safeguards: [
-      "E-mail jest jedynym wymaganym polem kontaktowym.",
+      "Proces wymaga skonfigurowanego kanału kontaktu: e-maila albo telefonu.",
       "Informacja prywatności i marketing są rozdzielone.",
       "Dane i pliki chroni tenantowe RLS.",
     ],

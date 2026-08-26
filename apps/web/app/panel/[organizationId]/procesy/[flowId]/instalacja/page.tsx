@@ -33,7 +33,7 @@ export default async function FlowInstallationPage({
   const appOrigin = new URL(process.env.APP_URL ?? "http://localhost:3000").origin;
 
   return (
-    <main className="panel-workspace installation-panel">
+    <main className="panel-workspace installation-panel installation-panel--m7">
       <PanelPageHeader
         actions={
           <LinkButton
@@ -44,12 +44,21 @@ export default async function FlowInstallationPage({
             Wróć do buildera
           </LinkButton>
         }
-        eyebrow={installation.organizationName}
+        breadcrumbs={[
+          { href: `/panel/${organizationId}/procesy`, label: "Procesy" },
+          {
+            href: `/panel/${organizationId}/procesy/${flowId}`,
+            label: installation.flowName,
+          },
+          { label: "Podgląd i udostępnianie" },
+        ]}
+        description={`Publikacja i instalacja procesu w organizacji ${installation.organizationName}.`}
         title="Podgląd i udostępnianie"
       />
       <div className="panel-page">
         {installation.publicId && installation.publishedAt ? (
           <InstallationPanel
+            allowedOrigins={installation.allowedOrigins}
             appOrigin={appOrigin}
             currentVersion={installation.currentVersion ?? 1}
             flowId={flowId}

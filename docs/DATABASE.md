@@ -22,12 +22,14 @@ UUID/ULID jako identyfikatory, `organization_id` na każdym rekordzie biznesowym
 - `flows` — stabilna tożsamość i bieżący draft JSONB z rewizją;
 - `flow_versions` — immutable snapshot ze statusem published/archived i
   SHA-256;
-- sekcje v2, kroki, opcje, reguły, typowane ograniczenia odpowiedzi i wynik są
+- sekcje v2/v3, kroki, opcje, reguły, typowane ograniczenia odpowiedzi i wynik są
   ograniczonym agregatem wewnątrz draftu; snapshoty v1 pozostają obsługiwane;
 - pricing, scoring i wariant wyniku Etapu 6 są małym, wersjonowanym agregatem
   `estimation` w draftcie/snapshotcie; motywy pozostają późniejszą domeną;
 - `published_flows` — nieprzewidywalny publiczny identyfikator → jedna konkretna
   wersja;
+- `flow_media_assets` — prywatny, tenantowy rejestr znormalizowanych i
+  niezmiennych obrazów kart, ze stanem `pending`/`ready`/`rejected`;
 - `email_templates`.
 
 Draft może być znormalizowany dla edycji, ale publikacja tworzy walidowany, kanoniczny snapshot z hashem. Historycznego snapshotu nie edytujemy.
@@ -54,6 +56,46 @@ odpowiedź ponownie egzekwuje te same domknięte zakresy tekstu, liczby i daty.
 Migracja jest forward-only. Rollback aplikacji musi zachować parser i runtime
 v2, może jedynie wyłączyć zapis nowych pól. Funkcji nie wolno usuwać, dopóki w
 bazie istnieje draft, wersja lub aktywna sesja przypięta do snapshotu v2.
+
+### Stan wdrożenia Etapu 12ZN / PX2
+
+Migracja `20260825000100_stage12zn_px2_flow_document_v3.sql` dodaje niezależną
+walidację `experienceMode` i zamkniętej prezentacji kroku/opcji. Nie tworzy
+drugiego modelu leada ani nie przepisuje snapshotów. Publiczny manifest v3
+ujawnia tylko tryb, wariant, krótki opis, allowlistowany klucz ikony oraz
+referencję assetu UUID z tekstem alternatywnym. Sekcje, tenant ID, pricing,
+scoring i prywatne metadata pozostają poza projekcją.
+
+Rollback aplikacji może wyłączyć zapis nowych v3, lecz zachowuje czytnik,
+walidator i manifest v3. Magazyn assetów oraz weryfikację tenantowej własności
+referencji wdraża PX4; sam kontrakt PX2 nadal nie rozwiązuje assetu do URL.
+
+### Stan wdrożenia Etapu 12ZP / PX4
+
+Migracja `20260825000300_stage12zp_px4_flow_media.sql` dodaje wymuszony RLS dla
+`flow_media_assets` i triggery sprawdzające wszystkie referencje obrazów przed
+zapisem draftu i immutable wersji. Asset musi istnieć, mieć stan `ready` i
+należeć do organizacji flow. Publiczny resolver service-role zwraca prywatną
+ścieżkę tylko wtedy, gdy dany UUID występuje w wersji wskazanego, aktualnie
+opublikowanego flow. Ścieżka nie trafia do snapshotu ani manifestu.
+
+Obiekt jest zapisywany w istniejącym bucketcie `tenant-private` po
+normalizacji do WebP. Po przyjęciu ruchu nie usuwamy tabeli, rekordów ani
+obiektów przywołanych przez historyczne snapshoty. Rollback aplikacji ukrywa
+upload i `image_cards`, zachowując publiczny odczyt już opublikowanych wersji;
+korekta schematu odbywa się nową migracją.
+
+### Stan wdrożenia Etapu 12ZO / PX3
+
+Migracja `20260825000200_stage12zo_px3_quick_form.sql` opakowuje istniejący
+walidator publikacji bez zmiany tabel, grantów ani modelu leada. Dla v3 w trybie
+`quick_form` niezależnie wymusza maksymalnie 8 pytań, pierwsze pytanie jako
+wejście, pustą listę reguł, liniowe przejścia i brak override'ów opcji.
+
+Test PostgreSQL publikuje poprawny quick form oraz odrzuca próbę walidacji i
+publikacji wariantu rozgałęzionego. Rollback aplikacji może ukryć wybór trybu,
+ale nie powinien usuwać walidatora, dopóki istnieje draft albo immutable
+snapshot quick form.
 
 ### Stan wdrożenia Etapu 12V
 
@@ -95,6 +137,8 @@ przypięty do tej samej wersji. Szczegóły: `docs/ESTIMATION_ENGINE.md`.
 - `consent_records` — typ, treść/hash wersji, timestamp i źródło;
 - `notifications` — tenantowy outbox ze snapshotem odbiorcy, wersją szablonu,
   statusem, blokadą i terminem retry;
+- `organization_notification_settings` — prywatny adres dostawy alertów
+  dostępny tylko Ownerowi/Adminowi;
 - `notification_delivery_attempts` — historia prób bez treści wiadomości;
 - `flow_invitations` — tenantowy outbox wysłania aktualnego hosted flow,
   przypięty do immutable wersji, autora i idempotency key;
@@ -111,7 +155,8 @@ przypięty do tej samej wersji. Szczegóły: `docs/ESTIMATION_ENGINE.md`.
 
 - unique membership `(organization_id, user_id)`;
 - jeden aktywny publiczny alias na flow;
-- lead wymaga `flow_version_id`;
+- lead wymaga `flow_version_id` oraz co najmniej jednego kanału: e-maila albo
+  telefonu;
 - `price_min <= price_max`, waluta ISO 4217;
 - odpowiedź jest unikalna dla `(session_id, step_id)` z wersjonowaniem zapisu;
 - eventy i submit przyjmują idempotency key;
@@ -134,16 +179,27 @@ status zmienia kontrolowana funkcja z historią i audit logiem. Szczegóły:
 ### Stan wdrożenia Etapu 8
 
 Migracja `20260725000300_stage8_notifications.sql` opakowuje RPC submitu tak,
-aby w tej samej transakcji dopisać dokładnie dwa rekordy outboxu. Unikalność
-`(lead_id, kind)` chroni retry przed duplikacją. Odbiorcą alertu v1 jest
-najstarszy aktywny Owner; brak odbiorcy tworzy jawny stan `failed`, zamiast
-gubić zdarzenie.
+aby w tej samej transakcji dopisać rekordy outboxu. Unikalność `(lead_id, kind)`
+chroni retry przed duplikacją. Pierwotnym odbiorcą alertu v1 był najstarszy
+aktywny Owner; ADR-039 i migracja Etapu 12ZK zastępują go tenantową
+konfiguracją, zachowując fallback dla niezmigrowanych organizacji. Brak
+odbiorcy tworzy jawny stan `failed`, zamiast gubić zdarzenie.
 
 Tabele mają wymuszone RLS. Aktywny członek widzi statusy wyłącznie swojego
 tenanta, ale nie ma bezpośredniego zapisu. Rola workera może wywołać tylko
 funkcje claim/complete/fail; claim stosuje `SKIP LOCKED`, lock token i odzyskuje
 próby zawieszone dłużej niż 15 minut. Każda próba trafia do osobnego rekordu.
 Szczegóły: `docs/NOTIFICATIONS.md`.
+
+### Stan wdrożenia Etapu 12ZK
+
+Migracja `20260810000100_stage12zk_contact_delivery.sql` dodaje wersjonowaną
+politykę `email_required` / `phone_required`, nullable `contact_email` z
+więzem co najmniej jednego kanału oraz `organization_notification_settings`.
+Polityka jest ponownie sprawdzana z immutable snapshotu w RPC submitu. Lead bez
+e-maila nie tworzy potwierdzenia klienta, lecz alert firmy zachowuje jego
+telefon. Owner/Admin zapisują odbiorcę przez audytowane RPC; Sales, zawieszone
+konto i drugi tenant są blokowani przez capability oraz forced RLS.
 
 ### Stan wdrożenia Etapu 12ZH
 
@@ -176,6 +232,31 @@ RLS, a audit zapisuje identyfikatory, enumy i terminy bez tytułu, opisu,
 notatki lub e-maila. Złożone tenantowe FK oraz `ON DELETE CASCADE` włączają
 zadania do legal hold, retencji i usunięcia wraz z leadem; eksport DSAR zawiera
 treść zadań. Migracja jest forward-only, a rollback UI nie usuwa danych.
+
+### Agregat operacyjny dashboardu
+
+Migracja `20260826000100_dashboard_operational_lead_overview.sql` dodaje
+`get_operational_lead_overview(target_organization_id, period_start,
+period_end)`.
+Funkcja liczy bezpośrednio z tenantowej tabeli `leads`, bez limitu listy panelu
+i bez mieszania tych danych z analityką sesji wymagającą zgody. Bieżący okres
+ma granice `[period_start, period_end)`, może obejmować najwyżej 90 dni, a
+poprzedni okres jest wyznaczany jako bezpośrednio sąsiadujący zakres tej samej
+długości.
+
+Wynik zawiera oba okresy, bieżące i poprzednie sumy leadów, leadów jakościowych
+(`score >= 80`), wycen w PLN oraz minimalnych wartości wycen. Dodatkowo zwraca
+pełną serię dzienną w UTC dla bieżącego okresu, podział statusów, pięć
+najaktywniejszych procesów i zamknięte przedziały minimalnej wyceny. Odpowiedź
+nie zawiera kontaktu, odpowiedzi klienta ani innych danych osobowych. Źródła
+ruchu pozostają częścią consentowej analityki `get_analytics_overview` i nie są
+przedstawiane jako źródła operacyjnych leadów.
+
+RPC działa jako `SECURITY INVOKER`, ponownie sprawdza aktywne członkostwo i
+zawsze filtruje `organization_id`; forced RLS tabeli `leads` pozostaje aktywne.
+Grant `EXECUTE` ma wyłącznie `authenticated`, a warstwa aplikacji dodatkowo
+wymaga capability `lead:read` i waliduje ścisły kontrakt odpowiedzi przez Zod.
+Obcy tenant oraz członek zawieszony otrzymują `no_data_found`.
 
 ### Stan wdrożenia Etapu 9
 
@@ -311,3 +392,51 @@ revocation bez dostępu do sekretu. Migracja Etapu 11 ma rollback przed
 wdrożeniem: wyłączyć trasy konektora, unieważnić aktywne credentiale, usunąć
 funkcje/policies, a następnie tabele w kolejności connections → install_tokens.
 Po wdrożeniu plik migracji jest niezmienny.
+
+## Publiczna brama formularza
+
+`public_flow_origins` przechowuje maksymalnie 10 dokładnych originów na proces,
+organizację i aktora zapisu. Tabela ma forced RLS: odczyt wyłącznie Owner/Admin,
+zapis wyłącznie przez `set_public_flow_origins`, z tenant scope i audit logiem.
+Nie przechowuje wildcardów, ścieżek, query ani credentiali; HTTP jest
+dopuszczony tylko dla loopbacku lokalnego.
+
+`app_private.public_request_buckets` przechowuje wyłącznie SHA-256 materiału
+kubełka, początek/expiry stałego okna i licznik. Surowy IP, origin, token sesji,
+flow ID i organization ID nie są kolumnami tej tabeli. Adres klienta trafia do
+funkcji już jako HMAC-SHA-256 obliczony server-side osobnym sekretem.
+`enforce_public_request_guard` rozpoznaje proces albo hash sesji, sprawdza exact
+origin i atomowo zużywa budżety IP/origin/flow/session/org. Funkcja oraz
+operacyjne RPC formularza są wykonywalne tylko dla `service_role`; `anon` i
+`authenticated` nie mogą ominąć Route Handlera. Panelowy podgląd manifestu ma
+osobne RPC Owner/Admin z tenant scope.
+
+Rollback FTZ-03A najpierw wycofuje ruch publiczny do bezpiecznej odpowiedzi 503
+albo usuwa embed. Nie wdrażamy starej aplikacji po odebraniu grantów `anon`.
+Awaryjna kompatybilność wymaga jawnej migracji naprawczej przywracającej granty
+na czas rollbacku aplikacji. Tabela originów zostaje konfiguracją audytową, a
+wygasłe kubełki można bezpiecznie usunąć; nie usuwa się danych biznesowych.
+
+# Snapshot kontekstu PX5
+
+`widget_sessions.context_snapshot` przechowuje kanoniczny, wersjonowany obiekt
+źródła i wartości; `context_confirmed_at` oraz pojedynczy mutation ID zamykają
+zmianę przed pierwszą odpowiedzią. `leads.context_snapshot` jest kopiowany
+triggerem z potwierdzonej sesji. Oba pola mają limit 8192 B i nie są publicznie
+czytelne. Funkcje tworzenia i potwierdzenia sesji są wykonywalne wyłącznie przez
+`service_role`; aplikacja nadal przechodzi przez origin guard i rate limit.
+
+# Kontakt i branding PX6
+
+`leads.preferred_contact_channel` oraz `preferred_contact_window` są zamkniętymi
+enumami logicznymi przechowywanymi obok danych kontaktowych. Funkcja submit
+sprawdza wymagania immutable `leadCapture` v3, zgodność kanału z faktycznie
+podanym e-mailem lub telefonem oraz outcome pozwalający utworzyć lead. Eksport
+v2 obejmuje obie preferencje, a usunięcie leada usuwa je razem z rekordem.
+
+`organizations` przechowuje opcjonalną nazwę publiczną, kolor akcentu, wyliczony
+kolor tekstu i FK do gotowego tenantowego assetu logo. Constraint ponownie
+wylicza kontrast deterministycznie. Zapis odbywa się przez audytowane RPC
+Ownera; RLS i sprawdzenie tenant scope blokują obcy asset. Publiczny resolver
+zwraca wyłącznie logo związane z aktywnym procesem, bez ścieżki Storage i bez
+możliwości podania dowolnego URL.

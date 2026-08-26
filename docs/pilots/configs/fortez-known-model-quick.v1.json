@@ -1,0 +1,108 @@
+{
+  "configVersion": 1,
+  "fallbackChannels": [
+    { "key": "phone", "mustRemainActive": true },
+    { "key": "whatsapp", "mustRemainActive": true },
+    { "key": "legacy_form", "mustRemainActive": true }
+  ],
+  "intendedCta": "Znam model",
+  "pilotKey": "fortez_known_model_quick",
+  "pilotStatus": "hypothesis",
+  "snapshot": {
+    "contextSchema": {
+      "fields": [
+        {
+          "key": "model",
+          "label": "Wybrany model",
+          "mode": "confirm",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "allowedValues": ["known_model"],
+          "key": "cta_source",
+          "label": "Źródło uruchomienia",
+          "mode": "system",
+          "required": true,
+          "systemValue": "known_model",
+          "type": "enum"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "entryStepKey": "zastosowanie",
+    "experienceMode": "quick_form",
+    "intro": "Model jest już wybrany. Uzupełnij trzy informacje potrzebne do sensownego kontaktu bez ponownego przechodzenia przez katalog.",
+    "leadCapture": {
+      "contactPolicy": "phone_required",
+      "filesEnabled": false,
+      "leadCaptureSchemaVersion": 2,
+      "privacyNotice": {
+        "label": "Potwierdzam zapoznanie się z informacją o przetwarzaniu danych.",
+        "textHash": "1111111111111111111111111111111111111111111111111111111111111111",
+        "version": "pilot-draft-not-approved"
+      }
+    },
+    "result": {
+      "action": "capture_lead",
+      "disclaimer": "To potwierdzenie przyjęcia zapytania, nie oferta ani potwierdzenie ceny, dostępności lub terminu.",
+      "headline": "Mamy model i podstawowy kontekst rozmowy",
+      "mode": "no_price",
+      "nextStepLabel": "Przekaż numer telefonu do kontaktu",
+      "resultSchemaVersion": 2
+    },
+    "rules": [],
+    "schemaVersion": 3,
+    "sections": [{ "key": "zapytanie", "title": "Krótkie zapytanie o model" }],
+    "steps": [
+      {
+        "allowUnknown": false,
+        "key": "zastosowanie",
+        "nextStepKey": "termin_zakupu",
+        "options": [
+          { "key": "dom_ogrod", "label": "Dom, ogród lub remont" },
+          { "key": "regularna_praca", "label": "Materiały i regularna praca" },
+          { "key": "maszyny", "label": "Maszyny, quad lub sprzęt" },
+          { "key": "motocykl", "label": "Motocykl" },
+          { "key": "lodz", "label": "Łódź lub skuter wodny" },
+          { "key": "inne", "label": "Inne zastosowanie" }
+        ],
+        "presentation": { "variant": "default" },
+        "required": true,
+        "sectionKey": "zapytanie",
+        "title": "Do czego najczęściej będzie używana przyczepa?",
+        "type": "single_choice"
+      },
+      {
+        "allowUnknown": true,
+        "key": "termin_zakupu",
+        "nextStepKey": "doprecyzowanie",
+        "options": [
+          { "key": "jak_najszybciej", "label": "Jak najszybciej" },
+          { "key": "do_miesiaca", "label": "W ciągu miesiąca" },
+          { "key": "pozniej", "label": "Później" },
+          { "key": "sprawdzam", "label": "Na razie sprawdzam możliwości" }
+        ],
+        "presentation": { "variant": "default" },
+        "required": false,
+        "sectionKey": "zapytanie",
+        "title": "Kiedy planowany jest zakup?",
+        "type": "single_choice"
+      },
+      {
+        "allowUnknown": true,
+        "description": "Opcjonalnie dopisz pytanie o konfigurację, wyposażenie lub sposób użytkowania.",
+        "key": "doprecyzowanie",
+        "nextStepKey": null,
+        "options": [],
+        "presentation": { "variant": "default" },
+        "required": false,
+        "sectionKey": "zapytanie",
+        "title": "Co warto doprecyzować przed kontaktem?",
+        "type": "long_text",
+        "validation": { "kind": "text_length", "maxLength": 800, "minLength": 0 }
+      }
+    ],
+    "title": "Zapytanie o wybrany model przyczepy"
+  }
+}

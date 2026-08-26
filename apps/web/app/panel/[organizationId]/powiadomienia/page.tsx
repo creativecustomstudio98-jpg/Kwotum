@@ -1,4 +1,3 @@
-import { hasCapability } from "@wyceno/database";
 import type { Metadata } from "next";
 
 import { requireTenantContext } from "../../../../lib/auth/tenant-context";
@@ -25,13 +24,16 @@ export default async function NotificationsPage({
 
   return (
     <main className="panel-workspace settings-panel notifications-panel">
-      <PanelPageHeader eyebrow={activity.organizationName} title="Powiadomienia" />
+      <PanelPageHeader
+        breadcrumbs={[
+          { href: `/panel/${organizationId}`, label: "Przegląd" },
+          { label: "Ustawienia" },
+        ]}
+        description="Reguły i historia systemowych wiadomości organizacji."
+        navigation={<SettingsNavigation />}
+        title="Ustawienia"
+      />
       <div className="panel-page settings-page">
-        <SettingsNavigation
-          active="notifications"
-          organizationId={organizationId}
-          showPrivacy={hasCapability(context, "privacy:manage")}
-        />
         <div className="settings-page__content">
           <section className="panel-card notification-rules" aria-labelledby="delivery-rules-title">
             <div className="panel-card__header">

@@ -38,13 +38,10 @@ export async function createFlowFromTemplateAction(
 ): Promise<FlowActionState> {
   const organizationId = String(formData.get("organizationId") ?? "");
   const templateSlug = String(formData.get("templateSlug") ?? "");
-  const templateName = String(formData.get("templateName") ?? "");
   let draftId: string;
   try {
     const context = await requireTenantContext(organizationId);
     const draft = await createFlowFromTemplate(context, {
-      name: templateName,
-      slug: `${templateSlug}-${crypto.randomUUID().slice(0, 8)}`,
       templateSlug,
     });
     draftId = draft.id;

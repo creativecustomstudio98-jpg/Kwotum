@@ -2,6 +2,18 @@ import { z } from "zod";
 
 const nonEmptySecret = z.string().trim().min(1);
 const workerSecret = z.string().min(32);
+const turnstileSiteKey = z
+  .string()
+  .trim()
+  .min(3)
+  .max(32)
+  .regex(/^[A-Za-z0-9_-]+$/);
+const turnstileSecretKey = z
+  .string()
+  .trim()
+  .min(3)
+  .max(2048)
+  .regex(/^[A-Za-z0-9_-]+$/);
 const emailFrom = z
   .string()
   .trim()
@@ -18,7 +30,7 @@ export const clientEnvSchema = z
     NEXT_PUBLIC_SUPABASE_ANON_KEY: nonEmptySecret.optional(),
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: nonEmptySecret.optional(),
     NEXT_PUBLIC_SUPABASE_URL: z.url().optional(),
-    NEXT_PUBLIC_TURNSTILE_SITE_KEY: nonEmptySecret.optional(),
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: turnstileSiteKey.optional(),
     NEXT_PUBLIC_WIDGET_ORIGIN: z.url(),
   })
   .strict();
@@ -38,11 +50,12 @@ export const serverEnvSchema = z
     MALWARE_SCAN_MODE: z.enum(["clamav", "disabled"]).optional(),
     NOTIFICATION_WORKER_SECRET: workerSecret.optional(),
     POSTHOG_HOST: z.url().optional(),
+    PUBLIC_RATE_LIMIT_SECRET: workerSecret.optional(),
     RESEND_API_KEY: nonEmptySecret.optional(),
     RETENTION_WORKER_SECRET: workerSecret.optional(),
     SENTRY_DSN: z.url().optional(),
     SUPABASE_SERVICE_ROLE_KEY: nonEmptySecret.optional(),
-    TURNSTILE_SECRET_KEY: nonEmptySecret.optional(),
+    TURNSTILE_SECRET_KEY: turnstileSecretKey.optional(),
     WEBHOOK_SIGNING_SECRET: workerSecret.optional(),
     WEBHOOK_WORKER_SECRET: workerSecret.optional(),
   })

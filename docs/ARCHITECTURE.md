@@ -43,6 +43,21 @@ wersje v1 nie są przepisywane. Manifest v2 pomija sekcje i udostępnia jedynie
 allowlistowane ograniczenie potrzebne rendererowi; PostgreSQL ponownie je
 egzekwuje przy zapisie odpowiedzi.
 
+Etap 12ZN/PX2 wprowadza `FlowDocument v3` w tym samym agregacie. Czytnik
+podnosi v1/v2 do v3 wyłącznie w pamięci; immutable snapshoty pozostają
+niezmienne. Zamknięty kontrakt opisuje jeden z trzech trybów doświadczenia oraz
+allowlistowaną prezentację kroku i opcji. Manifest v3 jest osobną projekcją
+bez sekcji i danych prywatnych. Renderer PX2 parsuje kontrakt, ale zachowuje
+dotychczasową kompozycję; quick form i wizualne karty należą do PX3/PX4.
+
+Etap 12ZP/PX4 utrzymuje obrazy poza agregatem flow. Snapshot przechowuje tylko
+UUID i tekst alternatywny, a prywatny tenantowy rejestr mapuje UUID na
+niezmienny obiekt WebP. Builder otrzymuje krótkotrwały signed URL wyłącznie do
+podglądu. Publiczny widget pobiera obraz przez tę samą originową trasę, która
+rozwiązuje wyłącznie referencję występującą w wersji danego opublikowanego
+flow. Triggery PostgreSQL pozostają ostateczną kontrolą własności przy zapisie
+i publikacji; sprawdzenie w UI nie jest kontrolą dostępu.
+
 Etap 8 rozszerza transakcję submitu o tenantowy outbox. Worker poza ścieżką
 żądania pobiera gotowe rekordy przez wąskie RPC z blokadą
 `FOR UPDATE SKIP LOCKED`, renderuje wersjonowany HTML/text i zapisuje historię

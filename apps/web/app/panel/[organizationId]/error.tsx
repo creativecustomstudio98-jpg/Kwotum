@@ -2,9 +2,16 @@
 
 import { Button, EmptyState } from "@wyceno/ui";
 
+import { PanelPageHeader } from "../panel-page-header";
+
 export default function DashboardError({ reset }: { reset: () => void }) {
   return (
     <main className="panel-workspace dashboard-panel">
+      <PanelPageHeader
+        breadcrumbs={[{ href: "/panel", label: "Organizacje" }, { label: "Przegląd" }]}
+        description="Przegląd najważniejszych danych i zadań w organizacji."
+        title="Przegląd"
+      />
       <div className="panel-page dashboard-page">
         <EmptyState
           action={

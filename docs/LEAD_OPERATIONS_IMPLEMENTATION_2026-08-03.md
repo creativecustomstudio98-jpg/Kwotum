@@ -83,9 +83,9 @@ Reacta.
   a odświeżenie RSC nie blokuje formularza ani zamknięcia dialogu;
 - notatka pokazuje autora i czas, zadanie można utworzyć, wykonać albo anulować,
   a historia scala wszystkie typy aktywności chronologicznie;
-- test E2E Chromium przechodzi z axe i geometrią dla 1536 × 1024 oraz
-  390 × 844; dowody po implementacji są w
-  `artifacts/visual-qa/12zi-lead-operations/`.
+- test E2E Chromium przechodził z axe i geometrią dla 1536 × 1024 oraz
+  390 × 844; historyczne obrazy dowodowe wycofano przez ADR-049, bez zmiany
+  wyniku funkcjonalnego.
 
 ## Poza etapem
 

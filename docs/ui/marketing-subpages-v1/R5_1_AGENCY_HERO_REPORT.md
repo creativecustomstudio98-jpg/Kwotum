@@ -39,11 +39,11 @@ wyprowadzono bezpośrednio z działającego panelu:
 - geometria, tabela, statusy i responsive:
   `apps/web/app/panel/styles.css` oraz
   `apps/web/app/panel/reference-fidelity.css`;
-- zasady wiarygodności artefaktów panelu: `docs/panel-visual-qa.md`.
+- zasady wiarygodności artefaktów panelu: `docs/VISUAL_QA.md`.
 
 Historyczny `actual/leads-1536x1024.png` nie został uznany za aktualny dowód,
-ponieważ `docs/panel-visual-qa.md` jawnie oznacza go jako nieaktualny po
-późniejszych korektach panelu.
+ponieważ pochodził z wycofanego zestawu referencji. ADR-049 usuwa ten materiał
+z aktywnych źródeł decyzji.
 
 ## Wykonana korekta
 

@@ -1,13 +1,25 @@
 "use client";
 
 import type { WidgetManifestContract } from "@wyceno/validation";
-import { useEffect, useRef, useState } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 
-type PreviewElement = HTMLElement & { previewManifest: WidgetManifestContract | null };
+type PreviewElement = HTMLElement & {
+  previewAssetUrls: Readonly<Record<string, string>>;
+  previewManifest: WidgetManifestContract | null;
+};
 
-export function FlowPreview({ manifest }: Readonly<{ manifest: WidgetManifestContract }>) {
+type PreviewDevice = "desktop" | "mobile";
+const previewDevices: readonly PreviewDevice[] = ["desktop", "mobile"];
+
+export function FlowPreview({
+  assetUrls = {},
+  manifest,
+}: Readonly<{
+  assetUrls?: Readonly<Record<string, string>>;
+  manifest: WidgetManifestContract;
+}>) {
   const host = useRef<HTMLDivElement>(null);
-  const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
+  const [device, setDevice] = useState<PreviewDevice>("desktop");
   const [loaderFailed, setLoaderFailed] = useState(false);
   const [restartKey, setRestartKey] = useState(0);
 
@@ -35,6 +47,7 @@ export function FlowPreview({ manifest }: Readonly<{ manifest: WidgetManifestCon
     widget.setAttribute("public-id", manifest.publicId);
     widget.setAttribute("mode", "inline");
     widget.setAttribute("preview", "");
+    widget.previewAssetUrls = assetUrls;
     widget.previewManifest = manifest;
     container.replaceChildren(widget);
     void customElements.whenDefined("wyceno-widget").then(() => {
@@ -48,7 +61,35 @@ export function FlowPreview({ manifest }: Readonly<{ manifest: WidgetManifestCon
       script?.removeEventListener("error", fail);
       container.replaceChildren();
     };
-  }, [manifest, restartKey]);
+  }, [assetUrls, manifest, restartKey]);
+
+  const handleDeviceKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!["ArrowDown", "ArrowLeft", "ArrowRight", "ArrowUp", "End", "Home"].includes(event.key)) {
+      return;
+    }
+
+    const currentDevice = event.currentTarget.dataset.previewDevice as PreviewDevice | undefined;
+    const currentIndex = currentDevice ? previewDevices.indexOf(currentDevice) : -1;
+    if (currentIndex < 0) return;
+
+    let nextIndex = currentIndex;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+      nextIndex = (currentIndex + 1) % previewDevices.length;
+    }
+    if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + previewDevices.length) % previewDevices.length;
+    }
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = previewDevices.length - 1;
+
+    const nextDevice = previewDevices[nextIndex];
+    if (!nextDevice) return;
+    event.preventDefault();
+    setDevice(nextDevice);
+    event.currentTarget.parentElement
+      ?.querySelector<HTMLButtonElement>(`[data-preview-device="${nextDevice}"]`)
+      ?.focus();
+  };
 
   return (
     <section className="flow-live-preview" aria-labelledby="flow-preview-title">
@@ -59,17 +100,27 @@ export function FlowPreview({ manifest }: Readonly<{ manifest: WidgetManifestCon
           <p>Ten sam renderer co w hosted linku, bez zapisu sesji, leadów i analityki.</p>
         </div>
         <div className="flow-live-preview__tools">
-          <div aria-label="Urządzenie podglądu" className="flow-live-preview__devices" role="group">
+          <div
+            aria-label="Urządzenie podglądu"
+            className="flow-live-preview__devices panel-segmented-track panel-segmented-track--compact"
+            role="group"
+          >
             <button
               aria-pressed={device === "desktop"}
+              data-preview-device="desktop"
               onClick={() => setDevice("desktop")}
+              onKeyDown={handleDeviceKeyDown}
+              tabIndex={device === "desktop" ? 0 : -1}
               type="button"
             >
               Desktop
             </button>
             <button
               aria-pressed={device === "mobile"}
+              data-preview-device="mobile"
               onClick={() => setDevice("mobile")}
+              onKeyDown={handleDeviceKeyDown}
+              tabIndex={device === "mobile" ? 0 : -1}
               type="button"
             >
               Telefon

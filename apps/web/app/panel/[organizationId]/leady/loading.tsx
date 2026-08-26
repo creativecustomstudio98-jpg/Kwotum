@@ -1,19 +1,22 @@
 import { Skeleton } from "@wyceno/ui";
 
+import { PanelTenantPageHeader } from "../../panel-tenant-page-header";
+
 export default function LeadsLoading() {
   return (
     <main aria-busy="true" className="panel-workspace lead-panel">
-      <header className="panel-topbar">
-        <div className="panel-topbar__context">
-          <div>
-            <p className="panel-topbar__eyebrow">Obsługa zapytań</p>
-            <h1>Leady</h1>
-          </div>
-        </div>
-      </header>
-      <div className="panel-page">
+      <PanelTenantPageHeader
+        currentLabel="Leady"
+        description="Lista zapytań i ich bieżący status obsługi."
+        title="Leady"
+      />
+      <section
+        aria-label="Ładowanie listy leadów"
+        className="record-list-surface lead-list-surface"
+      >
+        <div aria-hidden="true" className="record-loading-tabs" />
         <Skeleton label="Ładowanie leadów" lines={8} />
-      </div>
+      </section>
     </main>
   );
 }

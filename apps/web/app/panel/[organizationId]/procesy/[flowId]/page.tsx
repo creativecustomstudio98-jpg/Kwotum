@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { requireTenantContext } from "../../../../../lib/auth/tenant-context";
+import { listFlowMediaAssets } from "../../../../../lib/flows/media";
 import { getFlowDraft } from "../../../../../lib/flows/service";
 import { FlowBuilder } from "./flow-builder";
 
@@ -17,19 +18,24 @@ export default async function FlowBuilderPage({
   const { flowId, organizationId } = await params;
   const context = await requireTenantContext(organizationId);
   let flow;
+  let mediaAssets;
   try {
-    flow = await getFlowDraft(context, flowId);
+    [flow, mediaAssets] = await Promise.all([
+      getFlowDraft(context, flowId),
+      listFlowMediaAssets(context),
+    ]);
   } catch (error) {
     if (error instanceof AuthorizationError && error.code === "NOT_FOUND") notFound();
     throw error;
   }
 
   return (
-    <main className="panel-workspace panel-workspace--builder">
+    <main className="panel-workspace panel-workspace--builder panel-workspace--builder-m7">
       <FlowBuilder
         canPublish={hasCapability(context, "flow:publish")}
         flowId={flow.id}
         initialDocument={flow.document}
+        initialMediaAssets={mediaAssets}
         initialName={flow.name}
         initialRevision={flow.draftRevision}
         organizationId={organizationId}

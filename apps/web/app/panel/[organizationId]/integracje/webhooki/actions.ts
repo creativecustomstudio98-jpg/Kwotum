@@ -80,7 +80,8 @@ export async function rotateWebhookSecretAction(
       identifiers.data.endpointId,
       identifiers.data.requestId,
     );
-    revalidatePath(`/panel/${identifiers.data.organizationId}/integracje/webhooki`);
+    // The secret is a one-time response. Revalidating this route here can replace the
+    // action boundary before React presents it; the next navigation reads version data anew.
     return {
       error: null,
       requestId: crypto.randomUUID(),

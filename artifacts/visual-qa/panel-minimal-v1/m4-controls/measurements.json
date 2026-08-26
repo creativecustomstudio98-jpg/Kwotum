@@ -1,0 +1,75 @@
+{
+  "accessibilityViolations": 0,
+  "desktop": {
+    "borderRadius": 8,
+    "borderWidth": 1,
+    "height": 47.578125
+  },
+  "focus": {
+    "color": "rgb(8, 112, 71)",
+    "width": 2
+  },
+  "mobile": {
+    "documentOverflow": 0,
+    "switchTargetHeight": 65.28125
+  },
+  "responsiveMatrix": [
+    {
+      "height": 812,
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "height": 844,
+      "width": 390,
+      "overflow": 0
+    },
+    {
+      "height": 932,
+      "width": 430,
+      "overflow": 0
+    },
+    {
+      "height": 900,
+      "width": 720,
+      "overflow": 0
+    },
+    {
+      "height": 1024,
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "height": 768,
+      "width": 1024,
+      "overflow": 0
+    },
+    {
+      "height": 800,
+      "width": 1280,
+      "overflow": 0
+    },
+    {
+      "height": 1024,
+      "width": 1536,
+      "overflow": 0
+    }
+  ],
+  "switch": {
+    "borderRadius": 999,
+    "height": 24,
+    "knobHeight": 18,
+    "knobLeft": 2,
+    "knobTop": 2,
+    "knobTranslateX": 18,
+    "knobWidth": 18,
+    "minHeight": null,
+    "outlineStyle": "none",
+    "outlineWidth": 3,
+    "paddingBottom": 0,
+    "paddingLeft": 0,
+    "paddingRight": 0,
+    "paddingTop": 0,
+    "width": 42
+  }
+}

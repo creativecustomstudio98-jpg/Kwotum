@@ -16,6 +16,7 @@ import {
   type InputHTMLAttributes,
   type KeyboardEvent,
   type LabelHTMLAttributes,
+  type MouseEvent,
   type ReactElement,
   type ReactNode,
   type SelectHTMLAttributes,
@@ -30,6 +31,7 @@ type ButtonSize = "small" | "medium";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
+  loadingLabel?: string;
   size?: ButtonSize;
   variant?: ButtonVariant;
 }
@@ -37,10 +39,12 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
+      "aria-label": ariaLabel,
       children,
       className,
       disabled,
       loading = false,
+      loadingLabel = "Proszę czekać…",
       size = "medium",
       type = "button",
       variant = "primary",
@@ -51,13 +55,26 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       ref={ref}
       aria-busy={loading || undefined}
+      aria-label={loading ? loadingLabel : ariaLabel}
+      data-loading={loading || undefined}
       className={cx("wy-button", `wy-button--${variant}`, `wy-button--${size}`, className)}
       disabled={disabled || loading}
       type={type}
       {...props}
     >
-      {loading ? <span aria-hidden="true" className="wy-spinner" /> : null}
-      <span>{loading ? "Proszę czekać…" : children}</span>
+      <span
+        aria-hidden={loading || undefined}
+        className="wy-button__label"
+        data-hidden={loading || undefined}
+      >
+        {children}
+      </span>
+      {loading ? (
+        <span className="wy-button__loading">
+          <span aria-hidden="true" className="wy-spinner" />
+          <span>{loadingLabel}</span>
+        </span>
+      ) : null}
     </button>
   ),
 );
@@ -137,32 +154,40 @@ interface FieldControlProps {
 
 export interface FormFieldProps {
   children: ReactElement<FieldControlProps>;
+  className?: string;
   error?: string;
   hint?: string;
   id?: string;
   label: string;
   optional?: boolean;
+  success?: string;
 }
 
 export const FormField = ({
   children,
+  className,
   error,
   hint,
   id: providedId,
   label,
   optional = false,
+  success,
 }: FormFieldProps) => {
   const generatedId = useId();
   const id = providedId ?? generatedId;
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
-  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+  const successId = success && !error ? `${id}-success` : undefined;
+  const describedBy = [hintId, errorId, successId].filter(Boolean).join(" ") || undefined;
   const controlProps: FieldControlProps = { id };
   if (describedBy) controlProps["aria-describedby"] = describedBy;
   if (error) controlProps["aria-invalid"] = true;
 
   return (
-    <div className="wy-field">
+    <div
+      className={cx("wy-field", className)}
+      data-state={error ? "error" : success ? "success" : undefined}
+    >
       <label className="wy-field__label" htmlFor={id}>
         {label}
         {optional ? <span className="wy-field__optional">opcjonalne</span> : null}
@@ -174,6 +199,11 @@ export const FormField = ({
       ) : null}
       {cloneElement(children, controlProps)}
       {error ? <FieldError id={errorId}>{error}</FieldError> : null}
+      {success && !error ? (
+        <FieldMessage id={successId} tone="success">
+          {success}
+        </FieldMessage>
+      ) : null}
     </div>
   );
 };
@@ -183,10 +213,31 @@ export interface FieldErrorProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 export const FieldError = ({ children, className, ...props }: FieldErrorProps) => (
-  <span className={cx("wy-field__error", className)} {...props}>
+  <span className={cx("wy-field__message", "wy-field__message--error", className)} {...props}>
     <span aria-hidden="true">!</span>
     {children}
   </span>
+);
+
+export interface FieldMessageProps extends HTMLAttributes<HTMLParagraphElement> {
+  tone?: "neutral" | "success" | "error";
+}
+
+export const FieldMessage = ({
+  children,
+  className,
+  role,
+  tone = "neutral",
+  ...props
+}: FieldMessageProps) => (
+  <p
+    className={cx("wy-field__message", `wy-field__message--${tone}`, className)}
+    role={role ?? (tone === "error" ? "alert" : tone === "success" ? "status" : undefined)}
+    {...props}
+  >
+    {tone !== "neutral" ? <span aria-hidden="true">{tone === "success" ? "✓" : "!"}</span> : null}
+    {children}
+  </p>
 );
 
 interface ChoiceProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "onChange"> {
@@ -233,6 +284,236 @@ export const Radio = forwardRef<HTMLInputElement, ChoiceProps>((props, ref) => (
   <Choice ref={ref} type="radio" {...props} />
 ));
 Radio.displayName = "Radio";
+
+export interface SwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
+  description?: string;
+  label: string;
+}
+
+export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
+  ({ className, description, disabled, id: providedId, label, ...props }, ref) => {
+    const generatedId = useId();
+    const id = providedId ?? generatedId;
+    const labelId = `${id}-label`;
+    const descriptionId = description ? `${id}-description` : undefined;
+
+    return (
+      <label className={cx("wy-switch", disabled && "is-disabled", className)} htmlFor={id}>
+        <span className="wy-switch__copy">
+          <span className="wy-switch__label" id={labelId}>
+            {label}
+          </span>
+          {description ? (
+            <span className="wy-switch__description" id={descriptionId}>
+              {description}
+            </span>
+          ) : null}
+        </span>
+        <input
+          ref={ref}
+          aria-describedby={descriptionId}
+          aria-labelledby={labelId}
+          className="wy-switch__control"
+          disabled={disabled}
+          id={id}
+          role="switch"
+          type="checkbox"
+          {...props}
+        />
+      </label>
+    );
+  },
+);
+Switch.displayName = "Switch";
+
+export interface SegmentedControlItem {
+  disabled?: boolean;
+  label: string;
+  value: string;
+}
+
+export interface SegmentedControlProps {
+  items: readonly SegmentedControlItem[];
+  label: string;
+  onChange: (value: string) => void;
+  value: string;
+}
+
+export const SegmentedControl = ({ items, label, onChange, value }: SegmentedControlProps) => {
+  const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const move = (currentIndex: number, direction: 1 | -1) => {
+    for (let offset = 1; offset <= items.length; offset += 1) {
+      const index = (currentIndex + direction * offset + items.length) % items.length;
+      const item = items[index];
+      if (item && !item.disabled) {
+        onChange(item.value);
+        buttonRefs.current[index]?.focus();
+        return;
+      }
+    }
+  };
+
+  return (
+    <div aria-label={label} className="wy-segmented-control" role="group">
+      {items.map((item, index) => (
+        <button
+          key={item.value}
+          ref={(element) => {
+            buttonRefs.current[index] = element;
+          }}
+          aria-pressed={item.value === value}
+          disabled={item.disabled}
+          onClick={() => onChange(item.value)}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+              event.preventDefault();
+              move(index, 1);
+            } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+              event.preventDefault();
+              move(index, -1);
+            } else if (event.key === "Home") {
+              event.preventDefault();
+              const firstEnabled = items.findIndex((candidate) => !candidate.disabled);
+              const itemToActivate = items[firstEnabled];
+              if (itemToActivate) {
+                onChange(itemToActivate.value);
+                buttonRefs.current[firstEnabled]?.focus();
+              }
+            } else if (event.key === "End") {
+              event.preventDefault();
+              const lastEnabled = items.findLastIndex((candidate) => !candidate.disabled);
+              const itemToActivate = items[lastEnabled];
+              if (itemToActivate) {
+                onChange(itemToActivate.value);
+                buttonRefs.current[lastEnabled]?.focus();
+              }
+            }
+          }}
+          type="button"
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+export interface MenuItem {
+  disabled?: boolean;
+  id: string;
+  label: string;
+  onSelect: () => void;
+  tone?: "default" | "danger";
+}
+
+export interface MenuProps {
+  items: readonly MenuItem[];
+  label: string;
+}
+
+export const Menu = ({ items, label }: MenuProps) => {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const enabledIndices = items.flatMap((item, index) => (item.disabled ? [] : [index]));
+
+  const focusItem = (position: number) => {
+    if (enabledIndices.length === 0) return;
+    const normalized = (position + enabledIndices.length) % enabledIndices.length;
+    itemRefs.current[enabledIndices[normalized] ?? 0]?.focus();
+  };
+
+  const close = () => {
+    setOpen(false);
+    requestAnimationFrame(() => triggerRef.current?.focus());
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOutside = (event: Event) => {
+      if (event.target instanceof Node && !menuRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    document.addEventListener("focusin", closeOutside);
+    return () => {
+      document.removeEventListener("pointerdown", closeOutside);
+      document.removeEventListener("focusin", closeOutside);
+    };
+  }, [open]);
+
+  const onTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setOpen(true);
+      requestAnimationFrame(() => focusItem(0));
+    }
+  };
+
+  const onMenuKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const activeIndex = itemRefs.current.findIndex((item) => item === document.activeElement);
+    const activePosition = enabledIndices.indexOf(activeIndex);
+    if (event.key === "Escape") {
+      event.preventDefault();
+      close();
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      focusItem(activePosition + 1);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      focusItem(activePosition - 1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      focusItem(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      focusItem(-1);
+    }
+  };
+
+  return (
+    <div ref={menuRef} className="wy-menu">
+      <IconButton
+        ref={triggerRef}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        label={label}
+        onClick={() => setOpen((current) => !current)}
+        onKeyDown={onTriggerKeyDown}
+        size="small"
+      >
+        <span aria-hidden="true">•••</span>
+      </IconButton>
+      {open ? (
+        <div aria-label={label} className="wy-menu__surface" onKeyDown={onMenuKeyDown} role="menu">
+          {items.map((item, index) => (
+            <button
+              key={item.id}
+              ref={(element) => {
+                itemRefs.current[index] = element;
+              }}
+              className={cx(item.tone === "danger" && "is-danger")}
+              disabled={item.disabled}
+              onClick={(event: MouseEvent<HTMLButtonElement>) => {
+                event.preventDefault();
+                item.onSelect();
+                close();
+              }}
+              role="menuitem"
+              type="button"
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+};
 
 type Tone = "neutral" | "success" | "warning" | "error" | "info";
 

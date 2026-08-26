@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { organizationNameSchema } from "./service";
+import { leadAlertEmailSchema, organizationNameSchema } from "./service";
 
 describe("organizationNameSchema", () => {
   it("normalizuje poprawną nazwę organizacji", () => {
@@ -10,5 +10,15 @@ describe("organizationNameSchema", () => {
   it("odrzuca pustą i zbyt długą nazwę", () => {
     expect(organizationNameSchema.safeParse(" ").success).toBe(false);
     expect(organizationNameSchema.safeParse("x".repeat(121)).success).toBe(false);
+  });
+});
+
+describe("leadAlertEmailSchema", () => {
+  it("normalizuje poprawny adres alertów", () => {
+    expect(leadAlertEmailSchema.parse("  KONTAKT@EXAMPLE.COM ")).toBe("kontakt@example.com");
+  });
+
+  it("odrzuca niepoprawny adres", () => {
+    expect(leadAlertEmailSchema.safeParse("kontakt").success).toBe(false);
   });
 });

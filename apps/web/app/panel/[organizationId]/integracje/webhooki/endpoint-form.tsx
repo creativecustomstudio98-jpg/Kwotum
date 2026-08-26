@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@wyceno/ui";
+import { Button, FieldMessage, FormField, Input } from "@wyceno/ui";
 import { useActionState } from "react";
 
 import { createWebhookEndpointAction, type WebhookCreateActionState } from "./actions";
@@ -27,24 +27,23 @@ export function WebhookEndpointForm({
       <form action={action} className="webhook-endpoint-form">
         <input name="organizationId" type="hidden" value={organizationId} />
         <input name="requestId" type="hidden" value={state.requestId} />
-        <label>
-          <span>URL odbiorcy</span>
-          <input
+        <FormField id="webhook-endpoint-url" label="URL odbiorcy">
+          <Input
             autoComplete="url"
             name="url"
             placeholder="https://hooks.firma.pl/kwotum/leads"
             required
             type="url"
           />
-        </label>
-        <Button disabled={pending} type="submit">
-          {pending ? "Sprawdzam DNS…" : "Dodaj bezpieczny webhook"}
+        </FormField>
+        <Button loading={pending} loadingLabel="Sprawdzam DNS…" type="submit">
+          Dodaj bezpieczny webhook
         </Button>
       </form>
       {state.error ? (
-        <p className="lead-action-error" role="alert">
+        <FieldMessage className="webhook-endpoint-message" tone="error">
           {state.error}
-        </p>
+        </FieldMessage>
       ) : null}
       {state.secret ? (
         <div className="webhook-secret-result" role="status">

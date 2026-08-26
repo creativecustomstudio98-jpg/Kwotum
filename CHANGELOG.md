@@ -4,8 +4,137 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ## [Unreleased]
 
+### Fixed
+
+- Wspólny switch UI ma jawnie zablokowaną minimalną i maksymalną geometrię
+  42 × 24 px, dzięki czemu ogólne style formularzy nie mogą go rozciągnąć.
+- Dashboard liczy operacyjne KPI i 30-dniowe przekroje po stronie bazy bez
+  limitu listy, z tenant scope, forced RLS i osobnym progiem prywatności dla
+  źródeł sesji. Poprawiono też prawdziwe overflow przy 320 px w niewidocznej
+  tabeli wykresu oraz dwukolumnowym formularzu brandingu.
+- Tenantowe stany loading/error prowadzą teraz okruszkiem do właściwego
+  Przeglądu organizacji i zachowują ten sam nagłówek, menu oraz prawdziwą akcję
+  WordPressa. Mobilny arkusz „Więcej” nie oznacza już jednocześnie Prywatności
+  i nadrzędnych Ustawień jako aktywnych.
+- Obrót sekretu webhooka zachowuje jednorazową wartość w action state zamiast
+  tracić ją podczas natychmiastowej rewalidacji trasy.
+- Dwa wielowidokowe scenariusze panelu otrzymały realistyczny budżet 90 s;
+  wszystkie asercje geometrii, responsive i dostępności pozostały bez zmian.
+- Przywrócono edycję tytułu pytania w inspectorze buildera wraz z autosave,
+  walidacją i undo/redo; kontrola wysokości nie generuje już dwupikselowego
+  overflow.
+- Przycisk „Użyj innego adresu” po rejestracji ponownie otwiera pusty
+  formularz zamiast pozostawać na ekranie potwierdzenia e-mail.
+
 ### Changed
 
+- M5 przebudowuje listy Leadów, Procesów i Szablonów na płaskie powierzchnie
+  operacyjne bez dekoracyjnych kart, mediów i podwójnych teł. Leady oraz
+  procesy otrzymały tenantową paginację serwerową i stabilne sortowanie,
+  mobile używa jawnych list zadaniowych, a filtry szablonów są trwałym stanem
+  URL. Bezpośrednia trasa szablonów wymusza `flow:read`, a server action tworzy
+  proces wyłącznie z kanonicznej nazwy, sluga i dokumentu szablonu zamiast
+  ufać polom klienta.
+- M4 konsoliduje Button/LinkButton, pola, select, textarea, checkbox/radio,
+  switch, segmented control, tabs, menu i komunikaty w `@wyceno/ui`.
+  Formularze Ustawień, Prywatności, WordPressa i webhooków korzystają teraz z
+  jednego kontraktu geometrii, stanów loading/error/success, klawiatury i
+  forced colors; builder pozostaje świadomie odłożony do M7.
+- Skorygowany kandydat panelu używa jednego białego canvasu, neutralnego
+  sidebara, Instrument Sans, płaskich separatorów i oszczędnej zieleni.
+  Dashboard ma cztery KPI, jeden grupowany wykres 14 dni, rail uwagi, tabelę i
+  cztery proste przekroje bez cieni, donutów, sparkline'ów i dekoracyjnych
+  „kart AI”. Odrzucone rendery usunięto, a właściciel zaakceptował ten kierunek
+  jako bazę M1/M3.
+- M2 dodaje niski, 54-pikselowy pasek kontekstu, tenantowe breadcrumbs, osobny
+  page intro oraz capability-gated menu tras Ustawień i Integracji. Mobile ma
+  jeden przewijany rząd zakładek z celami 44 px, a builder i szczegół leada
+  zachowują własne workspace'y. Wyłączenie automatycznego prefetchu statycznych
+  linków panelu ogranicza spekulacyjne żądania RSC i stabilizuje autosave.
+- Panel otrzymuje nowy, minimalistyczny kontrakt M0–M10 oparty na dwóch
+  zablokowanych referencjach i ADR-049. Poprzednie obrazy panelu, zastąpione
+  raporty oraz nadmiarowe artefakty visual QA usunięto z aktywnego repozytorium
+  po utworzeniu odzyskiwalnej kopii; runtime panelu pozostaje bez zmian w M0.
+- PX7 otrzymuje lokalny, fail-closed pakiet gotowości pilota: trzy syntetyczne
+  konfiguracje Fortez quick/guided i firmy meblowej, automatyczną walidację
+  kontraktu, pomiar po osobnych flow bez PII, macierz UAT, obowiązkowy fallback,
+  rollback oraz rejestr decyzji. Nie użyto starych zdjęć ani wymyślonych
+  assetów. Z powodu braku stagingowego SHA, schedulerów, monitoringu, restore,
+  DPA, właścicieli firm i podpisanych akceptacji decyzja pozostaje NO-GO dla
+  prawdziwego ruchu.
+- PX6 dodaje wersjonowaną kolejność kontaktu, zamknięte pola i preferencje,
+  kontrolowane zakończenie oraz minimalny branding firmy z automatycznym
+  kontrastem i same-origin logo. Publiczny wynik nie ujawnia score ani trace,
+  a e-mail, webhook i eksport zachowują typowane preferencje. Visual QA nie
+  wykorzystuje starych zdjęć. Całość pozostaje lokalna.
+- PX5 dodaje lokalnie zamknięty, tenantowy context/prefill: własny edytor pól
+  `text`/`enum` i trybów informacyjny/potwierdzany/systemowy, exact-origin guard,
+  serwerowy snapshot sesji i leada, blokadę odpowiedzi przed potwierdzeniem oraz
+  osobną sekcję źródła na leadzie. Klucze ceny, score, routingu, tenanta i zgód,
+  a także PII-like wartości są odrzucane; analytics nie otrzymuje kontekstu.
+  Dotychczasowe osadzenia i shortcode WordPress pozostają zgodne, a opcjonalny
+  JSON produktu jest walidowany po obu stronach. UI jest płaskie, responsywne i
+  nie używa starych zdjęć. Całość pozostaje lokalna.
+- PX4 dostarcza lokalnie bezpieczne `text_cards` i `icon_cards`: builder wymaga
+  kompletnych opisów lub wyboru z zamkniętego katalogu ikon, a podgląd i
+  publiczna ścieżka korzystają z tego samego renderera. Konfigurator ma płaską,
+  autorską kompozycję bez hero, dekoracyjnych zdjęć i generycznych kart;
+  mobilna zmiana kroku przywraca początek pytania i fokus. Druga faza dodaje
+  prywatne, niezmienne zdjęcia firmy: normalizację JPEG/PNG/WebP do WebP bez
+  metadanych, tenantowe RLS i triggery referencji, publiczny resolver bez
+  ujawniania Storage oraz `image_cards` z lazy loadingiem, stałym 4:3 i
+  fallbackiem bez CLS. Całość pozostaje lokalna.
+- PX3 dodaje produkcyjny tryb `quick_form`: do 8 liniowych pytań na jednej
+  zwartej powierzchni, zachowanie danych i fokus pierwszego błędu, ten sam
+  serwer wyceny i leada oraz prawdziwy runtime w podglądzie buildera. Walidatory
+  TypeScript/PostgreSQL/manifest blokują rozgałęzienia; E2E obejmuje
+  1440/768/390/320, axe i offline retry. Zmiana pozostaje wyłącznie lokalna.
+- PX2 dodaje FlowDocument i manifest v3 z trzema trybami doświadczenia oraz
+  zamkniętą prezentacją kroku/opcji. Migrator v1/v2 → v3 działa wyłącznie w
+  pamięci, PostgreSQL niezależnie blokuje błędne warianty, ikony i referencje,
+  a publiczna projekcja nie ujawnia sekcji ani danych tenantowych. Widget
+  parsuje nowy kontrakt, ale świadomie zachowuje dotychczasowy wygląd; quick
+  form, render ikon i kontrolowane media pozostają etapami PX3/PX4.
+- Rozpoczęto program Adaptive Intake PX1–PX7. Kanoniczny pakiet definiuje jeden
+  bezpieczny silnik dla `quick_form`, `guided_brief` i
+  `visual_configurator`, zasady użycia list, kart, ikon i kontrolowanych mediów,
+  bezpieczny context/prefill, elastyczne zakończenie, branding oraz uczciwe
+  statusy walidacji szablonów. Dodano ADR-043, macierz odbioru, sekwencyjny
+  runbook i manifesty izolowanych worktree oraz osiem promptów wykonawczych z
+  twardymi gate'ami i zasadami anti-slop. Runtime nie został zmieniony; badania
+  PX1 i wszystkie etapy implementacyjne pozostają otwarte.
+- P1 etapowego rebrandingu zastępuje historyczny glass sidebar jednym,
+  płaskim sidebarem Kwotum 256/72 px z Instrument Sans, trzema grupami,
+  aktywną zakładką z dwoma prawymi ścięciami, rzeczywistymi danymi konta i
+  działającym menu. Routing, capabilities, tenant scope, mobile navigation i
+  `lorum:panel-sidebar-collapsed` pozostają zgodne wstecznie. Referencja jest
+  zablokowana SHA-256, a produkcyjny render przeszedł responsive, axe,
+  persistence i Visual QA 19/20 bez sztucznego stanu unread.
+- Rozpoczęto etapowy rebranding panelu Kwotum od zamkniętego audytu P0 bez
+  zmian wyglądu runtime. Nowy kontrakt mapuje app shell, sidebar, routing,
+  dane użytkownika i organizacji, fonty, ikony oraz centralne tokeny, oznacza
+  wcześniejszy kierunek glass jako historyczny i blokuje P1 do dostarczenia
+  zaakceptowanej referencji sidebaru z mierzalnym gate'em Visual QA.
+- Zastąpiono poprzedni symbol marki dokładnym znakiem Kwotum dostarczonym przez
+  właściciela. Ten sam wariant zasila teraz faviconę, Apple touch icon,
+  marketing, auth, panel, demonstracje i wiadomości; sufiks pliku `-v3` odcina
+  cache wcześniejszego assetu bez zmiany geometrii istniejących layoutów.
+- FTZ-03B dodaje adaptacyjny Cloudflare Turnstile do finalnego submitu leada:
+  explicit render z `interaction-only`, token pobierany po uploadzie,
+  obowiązkowe serwerowe Siteverify z action/hostname/freshness oraz fail-closed
+  dla replay, timeoutu, awarii providera i brakującej konfiguracji poza local.
+  Site key trafia tylko do runtime manifestu, sekret pozostaje na serwerze, a
+  token i surowy IP nie są utrwalane. Unit/route/Playwright potwierdzają brak
+  zapisu przed weryfikacją i świeży token po retry; konfiguracja Cloudflare,
+  Vercel, CSP Fortez, legal review i produkcyjny smoke nadal blokują pilot.
+- FTZ-03A zastępuje wildcard CORS dokładną tenantową allowlistą originów,
+  odcina bezpośredni dostęp `anon` i `authenticated` do RPC publicznego
+  formularza oraz dodaje serwerową bramę z atomowym limiterem PostgreSQL per
+  IP/origin/proces/sesję/organizację i operację. Surowe IP nie jest utrwalane,
+  odpowiedź `429` zawiera `Retry-After`, a panel Owner/Admin pozwala zapisać
+  maksymalnie 10 originów procesu. Migracja, rollback, RLS i testy negatywne
+  są gotowe lokalnie; wdrożenie sekretu, produkcyjny smoke i adaptacyjny
+  Turnstile pozostają blokadami rzeczywistego ruchu pilota.
 - Dodano wersjonowane, polskie szablony wszystkich sześciu przepływów
   Supabase Auth oraz testy pilnujące wymaganych zmiennych, braku aktywnej
   treści i domyślnego brandingu Supabase. Kontrakt produkcyjny wybiera osobną

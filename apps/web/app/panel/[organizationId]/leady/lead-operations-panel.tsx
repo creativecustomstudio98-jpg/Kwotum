@@ -38,6 +38,7 @@ export function LeadOperationsPanel({
   canAssign,
   canManageAllTasks,
   contactEmail,
+  contactPhone,
   currentUserId,
   leadId,
   notes,
@@ -47,7 +48,8 @@ export function LeadOperationsPanel({
 }: Readonly<{
   canAssign: boolean;
   canManageAllTasks: boolean;
-  contactEmail: string;
+  contactEmail: string | null;
+  contactPhone: string | null;
   currentUserId: string;
   leadId: string;
   notes: Notes;
@@ -55,6 +57,7 @@ export function LeadOperationsPanel({
   organizationId: string;
   status: LeadStatus;
 }>) {
+  const router = useRouter();
   const [closedTaskIds, setClosedTaskIds] = useState<ReadonlySet<string>>(() => new Set());
   const [localNotes, setLocalNotes] = useState<Notes>([]);
   const [localTasks, setLocalTasks] = useState<ReadonlyArray<LeadOperationTask>>([]);
@@ -69,8 +72,9 @@ export function LeadOperationsPanel({
         ...current.filter((currentNote) => currentNote.id !== note.id),
       ]);
       setLocalLastActivityAt(note.createdAt);
+      router.refresh();
     },
-    [operation.members],
+    [operation.members, router],
   );
 
   const handleTaskCreated = useCallback(
@@ -91,15 +95,20 @@ export function LeadOperationsPanel({
         ...current.filter((currentTask) => currentTask.id !== task.id),
       ]);
       setLocalLastActivityAt(task.createdAt);
+      router.refresh();
     },
-    [operation.members],
+    [operation.members, router],
   );
 
-  const handleTaskClosed = useCallback((taskId: string) => {
-    setLocalTasks((current) => current.filter((task) => task.id !== taskId));
-    setClosedTaskIds((current) => new Set(current).add(taskId));
-    setLocalLastActivityAt(new Date().toISOString());
-  }, []);
+  const handleTaskClosed = useCallback(
+    (taskId: string) => {
+      setLocalTasks((current) => current.filter((task) => task.id !== taskId));
+      setClosedTaskIds((current) => new Set(current).add(taskId));
+      setLocalLastActivityAt(new Date().toISOString());
+      router.refresh();
+    },
+    [router],
+  );
 
   const displayedNotes = [
     ...localNotes,
@@ -169,6 +178,27 @@ export function LeadOperationsPanel({
         </p>
       </section>
 
+      <section className="lead-operations__actions">
+        <div>
+          <LeadTaskDialog
+            currentUserId={currentUserId}
+            kind="contact"
+            leadId={leadId}
+            members={operation.members}
+            onCreated={handleTaskCreated}
+            organizationId={organizationId}
+          />
+          <LeadTaskDialog
+            currentUserId={currentUserId}
+            kind="task"
+            leadId={leadId}
+            members={operation.members}
+            onCreated={handleTaskCreated}
+            organizationId={organizationId}
+          />
+        </div>
+      </section>
+
       <section className="lead-operations__notes">
         <h2>Notatki</h2>
         <LeadNoteForm
@@ -203,9 +233,9 @@ export function LeadOperationsPanel({
         ) : null}
       </section>
 
-      {openTasks.length > 0 ? (
-        <section className="lead-operations__tasks">
-          <h2>Otwarte działania</h2>
+      <section className="lead-operations__tasks">
+        <h2>Otwarte działania</h2>
+        {openTasks.length > 0 ? (
           <ol>
             {openTasks.map((task) => (
               <li key={task.id}>
@@ -215,6 +245,7 @@ export function LeadOperationsPanel({
                   <small>
                     {formatDateTime(task.dueAt)} · {task.assignedToName}
                   </small>
+                  {task.description ? <p>{task.description}</p> : null}
                 </div>
                 {canManageAllTasks ||
                 task.assignedTo === currentUserId ||
@@ -229,36 +260,27 @@ export function LeadOperationsPanel({
               </li>
             ))}
           </ol>
-        </section>
-      ) : null}
+        ) : (
+          <p className="lead-operations__tasks-empty">Brak otwartych działań.</p>
+        )}
+      </section>
 
-      <section className="lead-operations__actions">
+      <div className="lead-operations__primary-action" data-sticky-action="true">
         {status === "new" ? (
           <LeadStartForm leadId={leadId} organizationId={organizationId} />
-        ) : (
-          <a className="lead-reference-primary-action" href={`mailto:${contactEmail}`}>
+        ) : contactEmail || contactPhone ? (
+          <a
+            className="lead-reference-primary-action"
+            href={contactEmail ? `mailto:${contactEmail}` : `tel:${contactPhone ?? ""}`}
+          >
             Skontaktuj się z klientem
           </a>
+        ) : (
+          <span aria-disabled="true" className="lead-reference-primary-action is-disabled">
+            Brak danych kontaktowych
+          </span>
         )}
-        <div>
-          <LeadTaskDialog
-            currentUserId={currentUserId}
-            kind="contact"
-            leadId={leadId}
-            members={operation.members}
-            onCreated={handleTaskCreated}
-            organizationId={organizationId}
-          />
-          <LeadTaskDialog
-            currentUserId={currentUserId}
-            kind="task"
-            leadId={leadId}
-            members={operation.members}
-            onCreated={handleTaskCreated}
-            organizationId={organizationId}
-          />
-        </div>
-      </section>
+      </div>
     </aside>
   );
 }
@@ -394,13 +416,17 @@ function LeadTaskDialog({
   const requestIdRef = useRef<HTMLInputElement>(null);
   const dueAtRef = useRef<HTMLInputElement>(null);
   const dueAtLocalRef = useRef<HTMLInputElement>(null);
+  const handledTaskIdRef = useRef<string | null>(null);
   const [state, action, pending] = useActionState(createLeadTaskAction, initialState);
   const headingId = useId();
   const isContact = kind === "contact";
 
   useEffect(() => {
-    if (!state.success) return;
-    if (state.createdTask) onCreated(state.createdTask);
+    if (!state.success || !state.createdTask || handledTaskIdRef.current === state.createdTask.id) {
+      return;
+    }
+    handledTaskIdRef.current = state.createdTask.id;
+    onCreated(state.createdTask);
     dialogRef.current?.close();
     formRef.current?.reset();
     if (requestIdRef.current) requestIdRef.current.value = "";
@@ -511,8 +537,12 @@ function LeadTaskCloseForm({
   taskId: string;
 }>) {
   const [state, action, pending] = useActionState(closeLeadTaskAction, initialState);
+  const handledTaskIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!state.success || !state.closedTaskId) return;
+    if (!state.success || !state.closedTaskId || handledTaskIdRef.current === state.closedTaskId) {
+      return;
+    }
+    handledTaskIdRef.current = state.closedTaskId;
     onClosed(state.closedTaskId);
   }, [onClosed, state]);
   return (

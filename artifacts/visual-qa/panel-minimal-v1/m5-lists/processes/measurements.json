@@ -1,0 +1,65 @@
+{
+  "accessibilityViolations": 0,
+  "desktop": {
+    "cardWidth": 1280,
+    "firstHeight": 64,
+    "gap": 0,
+    "overflow": 0,
+    "titleFontSize": 24,
+    "workspaceWidth": 1280
+  },
+  "forcedColorsFocusOutline": 3,
+  "responsiveMatrix": [
+    {
+      "height": 800,
+      "width": 320,
+      "overflow": 0
+    },
+    {
+      "height": 812,
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "height": 844,
+      "width": 390,
+      "overflow": 0
+    },
+    {
+      "height": 932,
+      "width": 430,
+      "overflow": 0
+    },
+    {
+      "height": 900,
+      "width": 720,
+      "overflow": 0
+    },
+    {
+      "height": 1024,
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "height": 768,
+      "width": 1024,
+      "overflow": 0
+    },
+    {
+      "height": 800,
+      "width": 1280,
+      "overflow": 0
+    },
+    {
+      "height": 900,
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "height": 1024,
+      "width": 1536,
+      "overflow": 0
+    }
+  ],
+  "total": 109
+}

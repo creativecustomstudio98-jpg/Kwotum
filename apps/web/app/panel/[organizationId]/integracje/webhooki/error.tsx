@@ -2,9 +2,18 @@
 
 import { Button, EmptyState } from "@wyceno/ui";
 
+import { PanelTenantPageHeader } from "../../../panel-tenant-page-header";
+import { IntegrationsNavigation } from "../../integrations-navigation";
+
 export default function WebhookIntegrationError({ reset }: Readonly<{ reset: () => void }>) {
   return (
-    <main className="panel-workspace settings-panel">
+    <main className="panel-workspace webhook-panel">
+      <PanelTenantPageHeader
+        currentLabel="Integracje"
+        description="Bezpieczna wymiana zdarzeń organizacji."
+        navigation={<IntegrationsNavigation />}
+        title="Integracje"
+      />
       <div className="panel-page">
         <EmptyState
           action={<Button onClick={reset}>Ponów</Button>}

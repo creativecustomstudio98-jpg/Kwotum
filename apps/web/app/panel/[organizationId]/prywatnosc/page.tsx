@@ -1,4 +1,3 @@
-import { hasCapability } from "@wyceno/database";
 import type { Metadata } from "next";
 
 import { requireTenantContext } from "../../../../lib/auth/tenant-context";
@@ -23,13 +22,16 @@ export default async function PrivacyPage({
   const policy = await getPrivacyPolicy(context);
   return (
     <main className="panel-workspace privacy-panel">
-      <PanelPageHeader eyebrow="Ustawienia" title="Dane i prywatność" />
+      <PanelPageHeader
+        breadcrumbs={[
+          { href: `/panel/${organizationId}`, label: "Przegląd" },
+          { label: "Ustawienia" },
+        ]}
+        description="Retencja, blokady prawne i granice danych organizacji."
+        navigation={<SettingsNavigation />}
+        title="Ustawienia"
+      />
       <div className="panel-page settings-page">
-        <SettingsNavigation
-          active="privacy"
-          organizationId={organizationId}
-          showPrivacy={hasCapability(context, "privacy:manage")}
-        />
         <div className="settings-page__content">
           <section className="panel-card privacy-summary" aria-labelledby="privacy-summary-title">
             <div>

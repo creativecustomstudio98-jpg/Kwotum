@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input } from "@wyceno/ui";
+import { Button, FieldMessage, FormField, Input } from "@wyceno/ui";
 import { useActionState } from "react";
 
 import { updateOrganizationAction, type OrganizationSettingsActionState } from "./actions";
@@ -30,8 +30,11 @@ export function OrganizationForm({
   return (
     <form action={action} className="organization-settings-form">
       <input name="organizationId" type="hidden" value={organizationId} />
-      <label className="settings-field" htmlFor="organization-name">
-        <span>Nazwa organizacji</span>
+      <FormField
+        hint="Ta nazwa jest widoczna w panelu i tenantowych komunikatach."
+        id="organization-name"
+        label="Nazwa organizacji"
+      >
         <Input
           defaultValue={name}
           disabled={!editable}
@@ -42,43 +45,32 @@ export function OrganizationForm({
           readOnly={!editable}
           required
         />
-        <small>Ta nazwa jest widoczna w panelu i tenantowych komunikatach.</small>
-      </label>
-      <label className="settings-field" htmlFor="organization-slug">
-        <span>Identyfikator obszaru</span>
+      </FormField>
+      <FormField
+        hint="Stabilny identyfikator techniczny nie zmienia się razem z nazwą."
+        id="organization-slug"
+        label="Identyfikator obszaru"
+      >
         <Input disabled id="organization-slug" readOnly value={slug} />
-        <small>Stabilny identyfikator techniczny nie zmienia się razem z nazwą.</small>
-      </label>
-      <label className="settings-field" htmlFor="organization-owner-email">
-        <span>Aktualne konto</span>
+      </FormField>
+      <FormField id="organization-owner-email" label="Aktualne konto">
         <Input
           disabled
           id="organization-owner-email"
           readOnly
           value={currentUserEmail ?? "Adres niedostępny"}
         />
-      </label>
-      <label className="settings-field" htmlFor="organization-role">
-        <span>Rola w organizacji</span>
+      </FormField>
+      <FormField id="organization-role" label="Rola w organizacji">
         <Input disabled id="organization-role" readOnly value={roleLabel(role)} />
-      </label>
+      </FormField>
       <div className="organization-settings-form__actions">
-        <Button disabled={!editable || pending} type="submit">
-          {pending ? "Zapisuję…" : "Zapisz zmiany"}
+        <Button disabled={!editable} loading={pending} loadingLabel="Zapisuję…" type="submit">
+          Zapisz zmiany
         </Button>
-        {!editable ? (
-          <p className="settings-form-status">Zmianę nazwy może zapisać właściciel.</p>
-        ) : null}
-        {state.error ? (
-          <p className="lead-action-error" role="alert">
-            {state.error}
-          </p>
-        ) : null}
-        {state.success ? (
-          <p className="lead-action-success" role="status">
-            {state.success}
-          </p>
-        ) : null}
+        {!editable ? <FieldMessage>Zmianę nazwy może zapisać właściciel.</FieldMessage> : null}
+        {state.error ? <FieldMessage tone="error">{state.error}</FieldMessage> : null}
+        {state.success ? <FieldMessage tone="success">{state.success}</FieldMessage> : null}
       </div>
     </form>
   );

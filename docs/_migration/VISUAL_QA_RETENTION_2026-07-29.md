@@ -1,5 +1,10 @@
 # Retencja artefaktów Visual QA — Etap 12ZD
 
+> **Aktualizacja po ADR-049:** ten raport zachowuje historyczny zapis pierwszej
+> retencji. Wymienione w nim referencje i artefakty panelu zostały wycofane
+> 2026-08-26; aktywną zasadę retencji opisuje `../VISUAL_QA.md`, a panel
+> `../ui/panel-minimal-v1/README.md`.
+
 **Data:** 2026-07-29  
 **Status:** PASS 2 COMPLETE  
 **Zakres:** dokładne duplikaty, odtwarzalny legacy output i zastąpione

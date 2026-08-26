@@ -25,7 +25,7 @@ trzecim, odrębnym kierunkiem.
 - `apps/web/app/panel/reference-fidelity.css`;
 - `apps/web/app/panel/panel-icon.tsx`;
 - `apps/web/app/panel/panel-navigation-icon.tsx`;
-- `docs/panel-visual-qa.md`.
+- `docs/VISUAL_QA.md`.
 
 ## Dziesięć zasadniczych różnic względem odrzuconej makiety
 

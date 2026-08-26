@@ -20,6 +20,10 @@
     "height": {
       "type": "number",
       "default": 720
+    },
+    "contextValues": {
+      "type": "string",
+      "default": ""
     }
   },
   "editorScript": "wyceno-connector-editor"

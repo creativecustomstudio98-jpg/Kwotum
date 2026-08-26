@@ -3,7 +3,12 @@ import type { ReactNode } from "react";
 
 import { requireTenantContext } from "../../../lib/auth/tenant-context";
 import { createClient } from "../../../lib/supabase/server";
+import {
+  integrationsNavigationItems,
+  settingsNavigationItems,
+} from "../panel-context-navigation-model";
 import { PanelNavigation } from "../panel-navigation";
+import { PanelTenantNavigationProvider } from "../panel-tenant-navigation-context";
 
 export default async function OrganizationPanelLayout({
   children,
@@ -24,7 +29,7 @@ export default async function OrganizationPanelLayout({
     {
       href: `/panel/${organizationId}`,
       icon: "dashboard" as const,
-      label: "Dashboard",
+      label: "Przegląd",
       mobileLabel: "Start",
       mobilePlacement: "primary" as const,
     },
@@ -59,6 +64,7 @@ export default async function OrganizationPanelLayout({
     ...(hasCapability(context, "webhook:manage") || hasCapability(context, "wordpress:manage")
       ? [
           {
+            activeHrefPrefixes: [`/panel/${organizationId}/integracje`],
             href: hasCapability(context, "webhook:manage")
               ? `/panel/${organizationId}/integracje/webhooki`
               : `/panel/${organizationId}/integracje/wordpress`,
@@ -68,17 +74,22 @@ export default async function OrganizationPanelLayout({
           },
         ]
       : []),
-    ...(hasCapability(context, "privacy:manage")
-      ? [
-          {
-            href: `/panel/${organizationId}/ustawienia`,
-            icon: "settings" as const,
-            label: "Ustawienia",
-            mobilePlacement: "secondary" as const,
-          },
-        ]
-      : []),
+    {
+      activeHrefPrefixes: [`/panel/${organizationId}/prywatnosc`],
+      href: `/panel/${organizationId}/ustawienia`,
+      icon: "settings" as const,
+      label: "Ustawienia",
+      mobilePlacement: "secondary" as const,
+    },
   ];
+
+  const settingsNavigation = settingsNavigationItems(organizationId, {
+    showPrivacy: hasCapability(context, "privacy:manage"),
+  });
+  const integrationsNavigation = integrationsNavigationItems(organizationId, {
+    showWebhooks: hasCapability(context, "webhook:manage"),
+    showWordPress: hasCapability(context, "wordpress:manage"),
+  });
 
   return (
     <div className="panel-app-shell wy-panel-theme">
@@ -86,9 +97,18 @@ export default async function OrganizationPanelLayout({
         items={items}
         notificationsHref={`/panel/${organizationId}/powiadomienia`}
         organizationName={organization?.name ?? "Organizacja"}
+        {...(hasCapability(context, "privacy:manage")
+          ? { privacyHref: `/panel/${organizationId}/prywatnosc` }
+          : {})}
         userName={profile?.display_name ?? organization?.name ?? "Użytkownik"}
       />
-      <div className="panel-app-content">{children}</div>
+      <PanelTenantNavigationProvider
+        integrations={integrationsNavigation}
+        organizationRoot={`/panel/${organizationId}`}
+        settings={settingsNavigation}
+      >
+        <div className="panel-app-content">{children}</div>
+      </PanelTenantNavigationProvider>
     </div>
   );
 }

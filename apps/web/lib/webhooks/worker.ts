@@ -12,7 +12,11 @@ import {
 } from "./transport";
 
 export type ClaimedWebhookDelivery =
-  Database["public"]["Functions"]["claim_webhook_delivery_batch"]["Returns"][number];
+  Database["public"]["Functions"]["claim_webhook_delivery_batch"]["Returns"][number] &
+    Readonly<{
+      preferred_contact_channel?: "email" | "phone" | null;
+      preferred_contact_window?: "morning" | "afternoon" | "evening" | null;
+    }>;
 
 export type WebhookAdapterResult = Readonly<
   | { outcome: "delivered"; responseStatus: number }
@@ -148,7 +152,7 @@ export function buildWebhookEnvelope(claim: ClaimedWebhookDelivery): WebhookEnve
     };
   }
   if (
-    claim.contact_email === null ||
+    (claim.contact_email === null && claim.contact_phone === null) ||
     claim.flow_title === null ||
     claim.lead_public_id === null ||
     claim.submitted_at === null
@@ -162,6 +166,8 @@ export function buildWebhookEnvelope(claim: ClaimedWebhookDelivery): WebhookEnve
           email: claim.contact_email,
           name: claim.contact_name,
           phone: claim.contact_phone,
+          preferred_channel: claim.preferred_contact_channel ?? null,
+          preferred_window: claim.preferred_contact_window ?? null,
         },
         estimate: buildEstimate(claim),
         flow_title: claim.flow_title,
@@ -175,7 +181,7 @@ export function buildWebhookEnvelope(claim: ClaimedWebhookDelivery): WebhookEnve
     occurred_at: claim.occurred_at,
     organization_id: claim.organization_id,
     type: "lead.created",
-    version: "2026-08-09",
+    version: "2026-08-25",
   };
 }
 
@@ -260,7 +266,26 @@ function databaseRepository(): WebhookRepository {
         worker_id: input.workerId,
       });
       if (error) throw new Error("Webhook claim failed.");
-      return data;
+      const publicIds = data.flatMap((claim) =>
+        claim.lead_public_id ? [claim.lead_public_id] : [],
+      );
+      const preferences = publicIds.length
+        ? await client
+            .from("leads")
+            .select("public_id, preferred_contact_channel, preferred_contact_window")
+            .in("public_id", publicIds)
+        : { data: [], error: null };
+      if (preferences.error) throw new Error("Webhook contact projection failed.");
+      const byLead = new Map(preferences.data.map((lead) => [lead.public_id, lead]));
+      return data.map((claim) => ({
+        ...claim,
+        preferred_contact_channel: claim.lead_public_id
+          ? (byLead.get(claim.lead_public_id)?.preferred_contact_channel ?? null)
+          : null,
+        preferred_contact_window: claim.lead_public_id
+          ? (byLead.get(claim.lead_public_id)?.preferred_contact_window ?? null)
+          : null,
+      }));
     },
     async fail(claim, input) {
       const { error } = await client.rpc("fail_webhook_delivery", {

@@ -9,6 +9,8 @@ import {
   type WidgetApiErrorCode,
   type WidgetAnalyticsEvent,
   type WidgetCalculatedResult,
+  type WidgetContextInput,
+  type WidgetContextValue,
   type WidgetSessionSnapshot,
   type WidgetSubmission,
 } from "./contracts.js";
@@ -16,7 +18,10 @@ import { parseWidgetManifest } from "./manifest.js";
 
 type ErrorEnvelope = { error?: { code?: unknown; message?: unknown } };
 
-function apiErrorCode(status: number): WidgetApiErrorCode {
+function apiErrorCode(status: number, providerCode?: unknown): WidgetApiErrorCode {
+  if (providerCode === "CHALLENGE_FAILED" || providerCode === "CHALLENGE_UNAVAILABLE") {
+    return "CHALLENGE";
+  }
   if (status === 404) return "NOT_FOUND";
   if (status === 409) return "CONFLICT";
   if (status === 410) return "EXPIRED";
@@ -39,7 +44,7 @@ async function requestJson(url: string, init?: RequestInit): Promise<unknown> {
   if (!response.ok) {
     const message =
       typeof body.error?.message === "string" ? body.error.message : "Żądanie nie powiodło się.";
-    throw new WidgetApiError(apiErrorCode(response.status), message);
+    throw new WidgetApiError(apiErrorCode(response.status, body.error?.code), message);
   }
   return body;
 }
@@ -61,19 +66,38 @@ export class HttpWidgetApi implements WidgetApi {
     );
   }
 
-  async createSession(publicId: string): Promise<CreatedWidgetSession> {
+  async createSession(
+    publicId: string,
+    context: WidgetContextInput,
+  ): Promise<CreatedWidgetSession> {
     const value = await requestJson(
       `${this.#baseUrl}/flows/${encodeURIComponent(publicId)}/sessions`,
-      { method: "POST", body: "{}" },
+      { method: "POST", body: JSON.stringify({ context }) },
     );
     if (!isRecord(value)) throw new WidgetApiError("UNAVAILABLE", "Nieprawidłowa odpowiedź API.");
     return {
+      context: requiredContext(value.context),
+      contextConfirmed: requiredBoolean(value, "contextConfirmed"),
       currentStepKey: requiredString(value, "currentStepKey"),
       expiresAt: requiredString(value, "expiresAt"),
       manifest: parseWidgetManifest(value.manifest),
       revision: requiredInteger(value, "revision"),
       token: requiredString(value, "token"),
     };
+  }
+
+  async confirmContext(input: {
+    mutationId: string;
+    token: string;
+    values: WidgetContextInput;
+  }): Promise<WidgetContextValue[]> {
+    const value = await requestJson(`${this.#baseUrl}/sessions/current/context`, {
+      body: JSON.stringify({ mutationId: input.mutationId, values: input.values }),
+      headers: { "X-Wyceno-Session": input.token },
+      method: "PUT",
+    });
+    if (!isRecord(value)) throw new WidgetApiError("UNAVAILABLE", "Nieprawidłowa odpowiedź API.");
+    return requiredContext(value.context);
   }
 
   async getResult(token: string): Promise<WidgetCalculatedResult> {
@@ -86,7 +110,19 @@ export class HttpWidgetApi implements WidgetApi {
       throw new WidgetApiError("UNAVAILABLE", "Nieprawidłowa odpowiedź API.");
     }
     return {
+      action:
+        value.action === "no_lead" || value.action === "capture_lead"
+          ? value.action
+          : "capture_lead",
       disclaimer: requiredString(value, "disclaimer"),
+      fallbackContactLabel:
+        value.fallbackContactLabel === null || value.fallbackContactLabel === undefined
+          ? null
+          : requiredString(value, "fallbackContactLabel"),
+      fallbackContactUrl:
+        value.fallbackContactUrl === null || value.fallbackContactUrl === undefined
+          ? null
+          : requiredString(value, "fallbackContactUrl"),
       headline: requiredString(value, "headline"),
       nextStepLabel: requiredString(value, "nextStepLabel"),
       pricing:
@@ -112,6 +148,8 @@ export class HttpWidgetApi implements WidgetApi {
     }
     return {
       answers: value.answers as WidgetSessionSnapshot["answers"],
+      context: requiredContext(value.context),
+      contextConfirmed: requiredBoolean(value, "contextConfirmed"),
       currentStepKey:
         value.currentStepKey === null ? null : requiredString(value, "currentStepKey"),
       expiresAt: requiredString(value, "expiresAt"),
@@ -162,6 +200,7 @@ export class HttpWidgetApi implements WidgetApi {
   async submitLead(input: SubmitLeadInput): Promise<WidgetSubmission> {
     const value = await requestJson(`${this.#baseUrl}/sessions/current/submit`, {
       body: JSON.stringify({
+        challengeToken: input.challengeToken,
         contact: input.contact,
         fileIds: input.fileIds,
         marketingEmailConsent: input.marketingEmailConsent,
@@ -213,7 +252,7 @@ export class HttpWidgetApi implements WidgetApi {
         typeof value.error?.message === "string"
           ? value.error.message
           : "Nie udało się przesłać pliku.";
-      throw new WidgetApiError(apiErrorCode(response.status), message);
+      throw new WidgetApiError(apiErrorCode(response.status, value.error?.code), message);
     }
     if (!isRecord(value)) throw new WidgetApiError("UNAVAILABLE", "Nieprawidłowa odpowiedź API.");
     return {
@@ -243,6 +282,46 @@ function requiredInteger(value: Record<string, unknown>, key: string): number {
     throw new WidgetApiError("UNAVAILABLE", "Nieprawidłowa odpowiedź API.");
   }
   return field;
+}
+
+function requiredBoolean(value: Record<string, unknown>, key: string): boolean {
+  const field = value[key];
+  if (typeof field !== "boolean") {
+    throw new WidgetApiError("UNAVAILABLE", "Nieprawidłowa odpowiedź API.");
+  }
+  return field;
+}
+
+function requiredContext(value: unknown): WidgetContextValue[] {
+  if (!Array.isArray(value) || value.length > 8) {
+    throw new WidgetApiError("UNAVAILABLE", "Nieprawidłowy kontekst sesji.");
+  }
+  return value.map((entry) => {
+    if (
+      !isRecord(entry) ||
+      typeof entry.key !== "string" ||
+      typeof entry.label !== "string" ||
+      (entry.mode !== "confirm" && entry.mode !== "informational") ||
+      (entry.type !== "enum" && entry.type !== "text") ||
+      !(
+        entry.allowedValues === null ||
+        (Array.isArray(entry.allowedValues) &&
+          entry.allowedValues.length <= 30 &&
+          entry.allowedValues.every((candidate) => typeof candidate === "string"))
+      ) ||
+      typeof entry.value !== "string"
+    ) {
+      throw new WidgetApiError("UNAVAILABLE", "Nieprawidłowy kontekst sesji.");
+    }
+    return {
+      allowedValues: entry.allowedValues as string[] | null,
+      key: entry.key,
+      label: entry.label,
+      mode: entry.mode,
+      type: entry.type,
+      value: entry.value,
+    };
+  });
 }
 
 function requiredPresentation(value: Record<string, unknown>): "exact" | "from" | "range" {

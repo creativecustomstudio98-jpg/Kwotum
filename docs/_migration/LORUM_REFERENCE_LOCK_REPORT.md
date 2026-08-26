@@ -1,5 +1,9 @@
 # Raport blokady referencji Lorum V6
 
+> **Aktualizacja po ADR-049:** hashy poniżej nie należy używać jako aktywnych
+> referencji panelu. Odpowiadające im obrazy zostały wycofane 2026-08-26; nowy
+> manifest znajduje się w `../ui/REFERENCE_MANIFEST.md`.
+
 **Data:** 2026-07-27
 
 ## Integralność wejścia

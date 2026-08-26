@@ -36,6 +36,13 @@ export type FlowListItem = Readonly<{
   updatedAt: string;
 }>;
 
+export type FlowListPage = Readonly<{
+  items: readonly FlowListItem[];
+  page: number;
+  pageCount: number;
+  total: number;
+}>;
+
 export type FlowDraftDetail = Readonly<{
   document: FlowDocument;
   draftRevision: number;
@@ -124,6 +131,81 @@ export async function listFlowDrafts(context: TenantContext): Promise<FlowListIt
   });
 }
 
+export async function listFlowDraftPage(
+  context: TenantContext,
+  input: Readonly<{ page: number; pageSize: number }>,
+): Promise<FlowListPage> {
+  assertCapability(context, "flow:read");
+  if (!Number.isSafeInteger(input.page) || input.page < 1) {
+    throw new Error("Nieprawidłowy numer strony procesów.");
+  }
+  if (!Number.isSafeInteger(input.pageSize) || input.pageSize < 1 || input.pageSize > 50) {
+    throw new Error("Nieprawidłowy rozmiar strony procesów.");
+  }
+
+  const supabase = await createClient();
+  const countResult = await supabase
+    .from("flows")
+    .select("id", { count: "exact", head: true })
+    .eq("organization_id", context.organizationId);
+  if (countResult.error) throw new Error("Nie udało się pobrać procesów.");
+
+  const total = countResult.count ?? 0;
+  const pageCount = Math.max(1, Math.ceil(total / input.pageSize));
+  const page = Math.min(input.page, pageCount);
+  const from = (page - 1) * input.pageSize;
+  const flowsResult = await supabase
+    .from("flows")
+    .select("id, name, slug, draft, draft_revision, updated_at")
+    .eq("organization_id", context.organizationId)
+    .order("updated_at", { ascending: false })
+    .order("id", { ascending: true })
+    .range(from, from + input.pageSize - 1);
+  if (flowsResult.error) throw new Error("Nie udało się pobrać procesów.");
+
+  const flowIds = flowsResult.data.map((flow) => flow.id);
+  const latestVersionByFlowId = new Map<
+    string,
+    Readonly<{ published_at: string | null; version_number: number }>
+  >();
+  if (flowIds.length > 0) {
+    const versionsResult = await supabase
+      .from("flow_versions")
+      .select("flow_id, version_number, published_at")
+      .eq("organization_id", context.organizationId)
+      .eq("status", "published")
+      .in("flow_id", flowIds)
+      .order("version_number", { ascending: false });
+    if (versionsResult.error) throw new Error("Nie udało się pobrać procesów.");
+    for (const version of versionsResult.data) {
+      if (!latestVersionByFlowId.has(version.flow_id)) {
+        latestVersionByFlowId.set(version.flow_id, version);
+      }
+    }
+  }
+
+  return {
+    items: flowsResult.data.map((flow) => {
+      const latestVersion = latestVersionByFlowId.get(flow.id);
+      const parsedDraft = storedFlowDocumentSchema.safeParse(flow.draft);
+      return {
+        draftRevision: flow.draft_revision,
+        id: flow.id,
+        latestPublishedAt: latestVersion?.published_at ?? null,
+        latestPublishedVersion: latestVersion?.version_number ?? null,
+        name: flow.name,
+        slug: flow.slug,
+        status: latestVersion ? "published" : "draft",
+        stepCount: parsedDraft.success ? parsedDraft.data.steps.length : 0,
+        updatedAt: flow.updated_at,
+      };
+    }),
+    page,
+    pageCount,
+    total,
+  };
+}
+
 export async function getFlowDraft(
   context: TenantContext,
   flowId: string,
@@ -198,8 +280,6 @@ export async function createFlowDraft(
 export async function createFlowFromTemplate(
   context: TenantContext,
   input: Readonly<{
-    name: string;
-    slug: string;
     templateSlug: string;
   }>,
 ): Promise<FlowDraftSummary> {
@@ -209,8 +289,8 @@ export async function createFlowFromTemplate(
   }
   return createFlowDraft(context, {
     document: structuredClone(template.snapshot),
-    name: input.name,
-    slug: input.slug,
+    name: template.name,
+    slug: `${template.slug}-${crypto.randomUUID().slice(0, 8)}`,
   });
 }
 

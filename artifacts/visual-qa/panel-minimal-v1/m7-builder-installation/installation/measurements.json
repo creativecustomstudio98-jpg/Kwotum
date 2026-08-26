@@ -1,0 +1,216 @@
+{
+  "accessibilityViolations": 0,
+  "desktop": {
+    "flatSurfaceShadows": ["none", "none", "none", "none", "none", "none", "none"],
+    "installationMain": {
+      "bottom": 2064.671875,
+      "left": 280,
+      "right": 1092,
+      "top": 1244.921875,
+      "width": 812
+    },
+    "installationSide": {
+      "bottom": 1675.609375,
+      "left": 1116,
+      "right": 1416,
+      "top": 1244.921875,
+      "width": 300
+    },
+    "minimumFunctionalText": 12,
+    "modeTrack": {
+      "bottom": 1498.953125,
+      "left": 280,
+      "right": 1092,
+      "top": 1418.953125,
+      "width": 812
+    },
+    "overflow": 0,
+    "preview": {
+      "bottom": 1069.328125,
+      "left": 280,
+      "right": 1072,
+      "top": 170,
+      "width": 792
+    },
+    "sharingPanel": {
+      "bottom": 1069.328125,
+      "left": 1096,
+      "right": 1416,
+      "top": 170,
+      "width": 320
+    }
+  },
+  "forcedColorsFocusOutline": 3,
+  "responsiveMatrix": [
+    {
+      "height": 800,
+      "width": 320,
+      "minimumModeTarget": 81.78125,
+      "overflow": 0,
+      "scrollableModeTrack": true,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 812,
+      "width": 375,
+      "minimumModeTarget": 81.78125,
+      "overflow": 0,
+      "scrollableModeTrack": true,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 844,
+      "width": 390,
+      "minimumModeTarget": 81.78125,
+      "overflow": 0,
+      "scrollableModeTrack": true,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 932,
+      "width": 430,
+      "minimumModeTarget": 81.78125,
+      "overflow": 0,
+      "scrollableModeTrack": true,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 1024,
+      "width": 768,
+      "minimumModeTarget": 72,
+      "overflow": 0,
+      "scrollableModeTrack": false,
+      "reflowEquivalentTo200Percent": true
+    },
+    {
+      "height": 768,
+      "width": 1024,
+      "minimumModeTarget": 72,
+      "overflow": 0,
+      "scrollableModeTrack": false,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 800,
+      "width": 1280,
+      "minimumModeTarget": 72,
+      "overflow": 0,
+      "scrollableModeTrack": false,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 900,
+      "width": 1440,
+      "minimumModeTarget": 72,
+      "overflow": 0,
+      "scrollableModeTrack": false,
+      "reflowEquivalentTo200Percent": false
+    },
+    {
+      "height": 1024,
+      "width": 1536,
+      "minimumModeTarget": 72,
+      "overflow": 0,
+      "scrollableModeTrack": false,
+      "reflowEquivalentTo200Percent": false
+    }
+  ],
+  "segmented": {
+    "desktopDevice": {
+      "activeAfterContent": "none",
+      "activeAfterDisplay": "inline",
+      "activeAfterHeight": 0,
+      "activeAfterWidth": 0,
+      "activeBackgroundColor": "color(srgb 0.9 0.923137 0.91451)",
+      "activeBorderBottomWidth": 0,
+      "activeBorderRadius": 7,
+      "activeBoxShadow": "none",
+      "activeHeight": 40,
+      "horizontalGaps": [3],
+      "inactiveBackgroundColor": "rgba(0, 0, 0, 0)",
+      "itemCount": 2,
+      "itemHeights": [40, 40],
+      "itemsInsideTrack": true,
+      "itemWidths": [69.859375, 64.015625],
+      "rowSpread": 0,
+      "trackBackgroundImage": "none",
+      "trackBorderRadius": 10,
+      "trackBoxShadow": "none",
+      "trackHeight": 46,
+      "trackOverflowX": "visible",
+      "trackWidth": 142.875
+    },
+    "desktopMode": {
+      "activeAfterContent": "none",
+      "activeAfterDisplay": "block",
+      "activeAfterHeight": 0,
+      "activeAfterWidth": 0,
+      "activeBackgroundColor": "color(srgb 0.9 0.923137 0.91451)",
+      "activeBorderBottomWidth": 0,
+      "activeBorderRadius": 9,
+      "activeBoxShadow": "none",
+      "activeHeight": 72,
+      "horizontalGaps": [4, 4, 4],
+      "inactiveBackgroundColor": "rgba(0, 0, 0, 0)",
+      "itemCount": 4,
+      "itemHeights": [72, 72, 72, 72],
+      "itemsInsideTrack": true,
+      "itemWidths": [198, 198, 198, 198],
+      "rowSpread": 0,
+      "trackBackgroundImage": "none",
+      "trackBorderRadius": 12,
+      "trackBoxShadow": "none",
+      "trackHeight": 80,
+      "trackOverflowX": "visible",
+      "trackWidth": 812
+    },
+    "mobileDevice": {
+      "activeAfterContent": "none",
+      "activeAfterDisplay": "inline",
+      "activeAfterHeight": 0,
+      "activeAfterWidth": 0,
+      "activeBackgroundColor": "color(srgb 0.9 0.923137 0.91451)",
+      "activeBorderBottomWidth": 0,
+      "activeBorderRadius": 7,
+      "activeBoxShadow": "none",
+      "activeHeight": 44,
+      "horizontalGaps": [3],
+      "inactiveBackgroundColor": "rgba(0, 0, 0, 0)",
+      "itemCount": 2,
+      "itemHeights": [44, 44],
+      "itemsInsideTrack": true,
+      "itemWidths": [69.859375, 64.015625],
+      "rowSpread": 0,
+      "trackBackgroundImage": "none",
+      "trackBorderRadius": 10,
+      "trackBoxShadow": "none",
+      "trackHeight": 50,
+      "trackOverflowX": "visible",
+      "trackWidth": 142.875
+    },
+    "mobileMode": {
+      "activeAfterContent": "none",
+      "activeAfterDisplay": "block",
+      "activeAfterHeight": 0,
+      "activeAfterWidth": 0,
+      "activeBackgroundColor": "color(srgb 0.9 0.923137 0.91451)",
+      "activeBorderBottomWidth": 0,
+      "activeBorderRadius": 9,
+      "activeBoxShadow": "none",
+      "activeHeight": 81.78125,
+      "horizontalGaps": [4, 4, 4],
+      "inactiveBackgroundColor": "rgba(0, 0, 0, 0)",
+      "itemCount": 4,
+      "itemHeights": [81.78125, 81.78125, 81.78125, 81.78125],
+      "itemsInsideTrack": false,
+      "itemWidths": [150, 150, 150, 150],
+      "rowSpread": 0,
+      "trackBackgroundImage": "none",
+      "trackBorderRadius": 12,
+      "trackBoxShadow": "none",
+      "trackHeight": 89.78125,
+      "trackOverflowX": "auto",
+      "trackWidth": 362
+    }
+  }
+}

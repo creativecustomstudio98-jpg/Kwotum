@@ -50,3 +50,14 @@ wtyczki dla każdej wspieranej pary; CI wykonuje go na PHP 8.3, 8.4 i 8.5.
   repozytorium i test na stagingu dla każdej pary macierzy;
 - aktualizuj małymi wersjami, zachowaj rollback do poprzedniego ZIP i nie zmieniaj
   formatu opcji bez migracji oraz testu powrotu.
+
+# Kontekst strony
+
+Shortcode pozostaje zgodny z dotychczasową postacią. Opcjonalnie może przekazać
+mały, tekstowy kontekst produktu:
+
+`[wyceno id="PUBLIC_ID" context='{"model":"M2"}']`
+
+Wtyczka odrzuca nieprawidłowy JSON, ponad osiem pól, klucze zastrzeżone oraz
+wartości wyglądające jak e-mail, URL lub numer telefonu. Serwer wykonuje
+niezależną walidację względem opublikowanej wersji procesu.

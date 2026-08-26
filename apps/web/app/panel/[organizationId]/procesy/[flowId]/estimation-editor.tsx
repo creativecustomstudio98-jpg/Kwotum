@@ -7,7 +7,7 @@ import {
   type FlowDocument,
   type FlowStep,
 } from "@wyceno/validation";
-import { type SetStateAction, useMemo, useState } from "react";
+import { type KeyboardEvent, type SetStateAction, useMemo, useState } from "react";
 
 import { PanelIcon } from "../../../panel-icon";
 
@@ -19,6 +19,12 @@ type ScoringRule = Estimation["scoring"]["rules"][number];
 type Currency = Estimation["pricing"]["currency"];
 
 const maximumMinorAmount = 9_000_000_000_000;
+const flowBuilderAreas = [
+  ["form", "Formularz"],
+  ["pricing", "Wycena"],
+  ["scoring", "Scoring"],
+  ["result", "Wynik"],
+] as const;
 const currencyCodes: readonly Currency[] = [
   "PLN",
   "EUR",
@@ -45,22 +51,19 @@ export function FlowBuilderAreaTabs({
   return (
     <div
       aria-label="Obszar konfiguracji procesu"
-      className={`flow-builder__area-tabs ${className}`.trim()}
+      className={`panel-segmented-track flow-builder__area-tabs ${className}`.trim()}
       role="tablist"
     >
-      {(
-        [
-          ["form", "Formularz"],
-          ["pricing", "Wycena"],
-          ["scoring", "Scoring"],
-          ["result", "Wynik"],
-        ] as const
-      ).map(([value, label]) => (
+      {flowBuilderAreas.map(([value, label], index) => (
         <button
+          aria-controls="builder-workspace-panel"
           aria-selected={area === value}
+          id={`builder-area-tab-${value}`}
           key={value}
           onClick={() => onChange(value)}
+          onKeyDown={(event) => handleAreaTabKeyDown(event, index, onChange)}
           role="tab"
+          tabIndex={area === value ? 0 : -1}
           type="button"
         >
           {label}
@@ -70,17 +73,39 @@ export function FlowBuilderAreaTabs({
   );
 }
 
+function handleAreaTabKeyDown(
+  event: KeyboardEvent<HTMLButtonElement>,
+  index: number,
+  onChange: (area: FlowBuilderArea) => void,
+) {
+  let nextIndex: number | null = null;
+  if (event.key === "ArrowRight") nextIndex = (index + 1) % flowBuilderAreas.length;
+  if (event.key === "ArrowLeft") {
+    nextIndex = (index - 1 + flowBuilderAreas.length) % flowBuilderAreas.length;
+  }
+  if (event.key === "Home") nextIndex = 0;
+  if (event.key === "End") nextIndex = flowBuilderAreas.length - 1;
+  if (nextIndex === null) return;
+
+  event.preventDefault();
+  const nextArea = flowBuilderAreas[nextIndex]?.[0];
+  if (!nextArea) return;
+  onChange(nextArea);
+  event.currentTarget.parentElement
+    ?.querySelectorAll<HTMLButtonElement>('[role="tab"]')
+    .item(nextIndex)
+    .focus();
+}
+
 export function EstimationEditorWorkspace({
   area,
   document,
   mobilePane,
-  onAreaChange,
   onDocumentChange,
 }: Readonly<{
   area: Exclude<FlowBuilderArea, "form">;
   document: FlowDocument;
   mobilePane: FlowBuilderPane;
-  onAreaChange: (area: FlowBuilderArea) => void;
   onDocumentChange: (update: SetStateAction<FlowDocument>, group?: string) => void;
 }>) {
   const estimation = document.estimation;
@@ -127,8 +152,8 @@ export function EstimationEditorWorkspace({
         }
         className={`flow-builder__questions estimation-builder__outline ${mobilePane === "questions" ? "is-mobile-active" : ""}`}
         data-layout-region="builder-questions"
+        id="builder-questions-panel"
       >
-        <FlowBuilderAreaTabs area={area} onChange={onAreaChange} />
         <div className="flow-builder__panel-heading">
           <div>
             <h2>{areaTitle(area)}</h2>
@@ -174,6 +199,7 @@ export function EstimationEditorWorkspace({
         aria-label="Podgląd wyniku procesu"
         className={`flow-builder__preview estimation-builder__preview ${mobilePane === "preview" ? "is-mobile-active" : ""}`}
         data-layout-region="builder-preview"
+        id="builder-preview-panel"
       >
         <div className="flow-builder__panel-heading">
           <div>
@@ -188,6 +214,7 @@ export function EstimationEditorWorkspace({
         aria-label={`Ustawienia: ${areaTitle(area)}`}
         className={`flow-builder__inspector estimation-builder__inspector ${mobilePane === "inspector" ? "is-mobile-active" : ""}`}
         data-layout-region="builder-inspector"
+        id="builder-inspector-panel"
       >
         <div className="flow-builder__panel-heading">
           <div>
@@ -1144,8 +1171,110 @@ function ResultSettings({
   document: FlowDocument;
   onDocumentChange: (update: SetStateAction<FlowDocument>, group?: string) => void;
 }>) {
+  const capture = document.leadCapture;
+  const fields =
+    capture?.leadCaptureSchemaVersion === 3
+      ? capture.fields
+      : {
+          email:
+            capture?.leadCaptureSchemaVersion === 2 && capture.contactPolicy === "phone_required"
+              ? ("optional" as const)
+              : ("required" as const),
+          name: "optional" as const,
+          phone:
+            capture?.leadCaptureSchemaVersion === 2 && capture.contactPolicy === "phone_required"
+              ? ("required" as const)
+              : ("optional" as const),
+          preferredContactChannel: "hidden" as const,
+          preferredContactWindow: "hidden" as const,
+        };
+  const upgradeCapture = (
+    nextFields = fields,
+    completionOrder: "result_then_contact" | "contact_then_result" = "result_then_contact",
+  ): NonNullable<FlowDocument["leadCapture"]> => ({
+    completionOrder,
+    fields: nextFields,
+    filesEnabled: capture?.filesEnabled ?? false,
+    leadCaptureSchemaVersion: 3,
+    ...(capture?.marketingEmailConsent
+      ? { marketingEmailConsent: capture.marketingEmailConsent }
+      : {}),
+    privacyNotice: capture?.privacyNotice ?? {
+      label: "Potwierdzam zapoznanie się z informacją o przetwarzaniu danych.",
+      textHash: "0".repeat(64),
+      version: "privacy-v1",
+    },
+  });
   return (
     <div className="estimation-settings result-settings">
+      <fieldset className="estimation-condition">
+        <legend>Przebieg zakończenia</legend>
+        <label>
+          <span>Kolejność</span>
+          <select
+            onChange={(event) => {
+              const completionOrder = event.currentTarget.value as
+                "result_then_contact" | "contact_then_result";
+              onDocumentChange((current) => ({
+                ...current,
+                leadCapture: upgradeCapture(fields, completionOrder),
+                result: { ...current.result, action: "capture_lead", resultSchemaVersion: 2 },
+              }));
+            }}
+            value={
+              capture?.leadCaptureSchemaVersion === 3
+                ? capture.completionOrder
+                : "result_then_contact"
+            }
+          >
+            <option value="result_then_contact">Wynik, potem kontakt</option>
+            <option value="contact_then_result">Kontakt, potem pełny wynik</option>
+          </select>
+          <small>Kolejność jest częścią publikowanej wersji procesu.</small>
+        </label>
+        <div className="result-contact-fields">
+          {(
+            [
+              ["name", "Imię"],
+              ["email", "E-mail"],
+              ["phone", "Telefon"],
+              ["preferredContactChannel", "Preferowany kanał"],
+              ["preferredContactWindow", "Pora kontaktu"],
+            ] as const
+          ).map(([key, label]) => (
+            <label key={key}>
+              <span>{label}</span>
+              <select
+                disabled={key === "email"}
+                onChange={(event) => {
+                  const nextFields = {
+                    ...fields,
+                    [key]: event.currentTarget.value as "hidden" | "optional" | "required",
+                  };
+                  onDocumentChange((current) => ({
+                    ...current,
+                    leadCapture: upgradeCapture(
+                      nextFields,
+                      capture?.leadCaptureSchemaVersion === 3
+                        ? capture.completionOrder
+                        : "result_then_contact",
+                    ),
+                    result: { ...current.result, action: "capture_lead", resultSchemaVersion: 2 },
+                  }));
+                }}
+                value={fields[key]}
+              >
+                <option value="hidden">Ukryte</option>
+                <option value="optional">Opcjonalne</option>
+                <option value="required">Wymagane</option>
+              </select>
+            </label>
+          ))}
+        </div>
+        <small>
+          E-mail pozostaje wymaganym kanałem dostawy. Preferencje są zamkniętymi wyborami.
+        </small>
+      </fieldset>
       <label>
         <span>Nagłówek wyniku</span>
         <input
@@ -1186,6 +1315,78 @@ function ResultSettings({
           Tryb „bez ceny” nie usuwa konfiguracji; publiczny wynik po prostu jej nie ujawnia.
         </small>
       </label>
+      <label>
+        <span>Działanie po wyniku</span>
+        <select
+          disabled={
+            capture?.leadCaptureSchemaVersion === 3 &&
+            capture.completionOrder === "contact_then_result"
+          }
+          onChange={(event) => {
+            const action = event.currentTarget.value as "capture_lead" | "no_lead";
+            onDocumentChange((current) => {
+              const result = { ...current.result };
+              delete result.fallbackContactLabel;
+              delete result.fallbackContactUrl;
+              return {
+                ...current,
+                result:
+                  action === "capture_lead"
+                    ? { ...result, action, resultSchemaVersion: 2 }
+                    : { ...current.result, action, resultSchemaVersion: 2 },
+              };
+            });
+          }}
+          value={document.result.action ?? "capture_lead"}
+        >
+          <option value="capture_lead">Pokaż formularz kontaktowy</option>
+          <option value="no_lead">Zakończ bez zbierania danych</option>
+        </select>
+        <small>
+          Wariant bez leada nie zapisuje danych kontaktowych. Prywatny score nie steruje tym
+          wyborem.
+        </small>
+      </label>
+      {document.result.action === "no_lead" ? (
+        <fieldset className="estimation-condition">
+          <legend>Awaryjny kontakt poza formularzem</legend>
+          <label>
+            <span>Etykieta CTA</span>
+            <input
+              maxLength={120}
+              onChange={(event) => {
+                const fallbackContactLabel = event.currentTarget.value;
+                onDocumentChange((current) => ({
+                  ...current,
+                  result: { ...current.result, fallbackContactLabel },
+                }));
+              }}
+              placeholder="Napisz do nas"
+              value={document.result.fallbackContactLabel ?? ""}
+            />
+          </label>
+          <label>
+            <span>Adres HTTPS</span>
+            <input
+              maxLength={500}
+              onChange={(event) => {
+                const fallbackContactUrl = event.currentTarget.value;
+                onDocumentChange((current) => ({
+                  ...current,
+                  result: { ...current.result, fallbackContactUrl },
+                }));
+              }}
+              placeholder="https://firma.pl/kontakt"
+              type="url"
+              value={document.result.fallbackContactUrl ?? ""}
+            />
+          </label>
+          <small>
+            Opcjonalny, prawdziwy następny krok. Tekst nie może obiecywać czasu odpowiedzi bez
+            odrębnej konfiguracji SLA.
+          </small>
+        </fieldset>
+      ) : null}
       <label>
         <span>Zastrzeżenie</span>
         <textarea

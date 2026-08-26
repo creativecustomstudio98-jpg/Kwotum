@@ -1,22 +1,40 @@
-import { flowTemplates } from "@wyceno/validation";
+import { assertCapability } from "@wyceno/database";
 import { LinkButton } from "@wyceno/ui";
+import { flowTemplates } from "@wyceno/validation";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { requireTenantContext } from "../../../../lib/auth/tenant-context";
+import { parseListPage } from "../../pagination-model";
 import { PanelIcon } from "../../panel-icon";
-import { TemplateLibrary, type TemplateLibraryItem } from "./template-library";
+import { PanelPageHeader } from "../../panel-page-header";
+import {
+  TemplateLibrary,
+  type TemplateLibraryFilters,
+  type TemplateLibraryItem,
+} from "./template-library";
 
 export const metadata: Metadata = { title: "Szablony branżowe" };
 export const dynamic = "force-dynamic";
 
+type TemplateSearchParams = {
+  category?: string | string[];
+  complexity?: string | string[];
+  page?: string | string[];
+  q?: string | string[];
+  sort?: string | string[];
+};
+
 export default async function TemplatesPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ organizationId: string }>;
+  searchParams: Promise<TemplateSearchParams>;
 }) {
   const { organizationId } = await params;
-  await requireTenantContext(organizationId);
+  const query = await searchParams;
+  const context = await requireTenantContext(organizationId);
+  assertCapability(context, "flow:read");
   const templates: readonly TemplateLibraryItem[] = flowTemplates.map((template) => ({
     description: template.description,
     industry: template.industry,
@@ -29,49 +47,52 @@ export default async function TemplatesPage({
     slug: template.slug,
     stepTitles: template.snapshot.steps.map((step) => step.title),
   }));
+  const categories = new Set(templates.map((template) => template.industry));
+  const categoryValue = searchParamValue(query.category);
+  const complexityValue = searchParamValue(query.complexity);
+  const sortValue = searchParamValue(query.sort);
+  const initialFilters: TemplateLibraryFilters = {
+    category: categoryValue && categories.has(categoryValue) ? categoryValue : "all",
+    complexity:
+      complexityValue === "advanced" || complexityValue === "standard" ? complexityValue : "all",
+    page: parseListPage(query.page),
+    query: (searchParamValue(query.q) ?? "").trim().slice(0, 80),
+    sortOrder: sortValue === "name" || sortValue === "questions" ? sortValue : "default",
+  };
 
   return (
     <main className="panel-workspace templates-panel">
-      <div className="panel-page">
-        <section
-          aria-labelledby="template-library-title"
-          className="panel-card template-library-surface"
-        >
-          <header className="template-library-heading">
-            <nav aria-label="Ścieżka nawigacji">
-              <Link href={`/panel/${organizationId}/procesy`}>Procesy</Link>
-              <PanelIcon name="chevron-right" />
-              <span aria-current="page">Szablony branżowe</span>
-            </nav>
-            <div className="template-library-heading__row">
-              <div>
-                <h1 id="template-library-title">Szablony branżowe</h1>
-                <p>Wybierz gotowy punkt startowy dla nowego procesu.</p>
-              </div>
-              <div className="template-library-heading__actions">
-                <LinkButton
-                  className="template-library-heading__secondary"
-                  href={`/panel/${organizationId}/procesy`}
-                  size="small"
-                >
-                  <PanelIcon name="arrow-left" />
-                  Moje procesy
-                </LinkButton>
-                <LinkButton
-                  className="template-library-heading__primary"
-                  href="#template-library-grid"
-                  size="small"
-                  variant="primary"
-                >
-                  <PanelIcon name="plus" />
-                  Nowy proces
-                </LinkButton>
-              </div>
-            </div>
-          </header>
-          <TemplateLibrary organizationId={organizationId} templates={templates} />
-        </section>
-      </div>
+      <PanelPageHeader
+        actions={
+          <LinkButton
+            className="template-back-action"
+            href={`/panel/${organizationId}/procesy`}
+            size="small"
+          >
+            <PanelIcon name="arrow-left" />
+            Moje procesy
+          </LinkButton>
+        }
+        breadcrumbs={[
+          { href: `/panel/${organizationId}/procesy`, label: "Procesy" },
+          { label: "Szablony" },
+        ]}
+        description="Wybierz gotowy punkt startowy dla nowego procesu."
+        title="Szablony branżowe"
+      />
+
+      <section aria-label="Biblioteka szablonów" className="template-library-surface">
+        <TemplateLibrary
+          initialFilters={initialFilters}
+          key={`${initialFilters.query}:${initialFilters.category}:${initialFilters.complexity}:${initialFilters.sortOrder}:${initialFilters.page}`}
+          organizationId={organizationId}
+          templates={templates}
+        />
+      </section>
     </main>
   );
+}
+
+function searchParamValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
 }

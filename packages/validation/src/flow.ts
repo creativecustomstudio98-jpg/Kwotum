@@ -24,18 +24,72 @@ const consentContentSchema = z
   })
   .strict();
 
-export const leadCaptureSchema = z
+const leadCaptureBaseSchema = z.object({
+  filesEnabled: z.boolean(),
+  marketingEmailConsent: consentContentSchema.optional(),
+  privacyNotice: consentContentSchema
+    .extend({
+      policyUrl: httpsUrlSchema.optional(),
+    })
+    .strict(),
+});
+
+export const leadCaptureFieldStateSchema = z.enum(["hidden", "optional", "required"]);
+
+const leadCaptureFieldsSchema = z
   .object({
-    filesEnabled: z.boolean(),
-    leadCaptureSchemaVersion: z.literal(1),
-    marketingEmailConsent: consentContentSchema.optional(),
-    privacyNotice: consentContentSchema
-      .extend({
-        policyUrl: httpsUrlSchema.optional(),
-      })
-      .strict(),
+    email: leadCaptureFieldStateSchema,
+    name: leadCaptureFieldStateSchema,
+    phone: leadCaptureFieldStateSchema,
+    preferredContactChannel: leadCaptureFieldStateSchema,
+    preferredContactWindow: leadCaptureFieldStateSchema,
   })
-  .strict();
+  .strict()
+  .superRefine((fields, context) => {
+    if (fields.email === "hidden" && fields.phone === "hidden") {
+      context.addIssue({
+        code: "custom",
+        message: "Formularz kontaktowy wymaga pola e-mail albo telefonu.",
+      });
+    }
+    if (fields.email !== "required") {
+      context.addIssue({
+        code: "custom",
+        message: "Kontakt v3 wymaga adresu e-mail; telefon może być drugim kanałem.",
+      });
+    }
+    if (
+      fields.preferredContactChannel !== "hidden" &&
+      (fields.email === "hidden" || fields.phone === "hidden")
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "Preferowany kanał wymaga widocznego e-maila i telefonu.",
+        path: ["preferredContactChannel"],
+      });
+    }
+  });
+
+export const leadCaptureSchema = z.discriminatedUnion("leadCaptureSchemaVersion", [
+  leadCaptureBaseSchema
+    .extend({
+      leadCaptureSchemaVersion: z.literal(1),
+    })
+    .strict(),
+  leadCaptureBaseSchema
+    .extend({
+      contactPolicy: z.enum(["email_required", "phone_required"]),
+      leadCaptureSchemaVersion: z.literal(2),
+    })
+    .strict(),
+  leadCaptureBaseSchema
+    .extend({
+      completionOrder: z.enum(["result_then_contact", "contact_then_result"]),
+      fields: leadCaptureFieldsSchema,
+      leadCaptureSchemaVersion: z.literal(3),
+    })
+    .strict(),
+]);
 
 export const flowDraftMetadataSchema = z
   .object({
@@ -53,6 +107,153 @@ export const flowOptionSchema = z
     key: keySchema,
     label: z.string().trim().min(1).max(160),
     nextStepKey: keySchema.nullable().optional(),
+  })
+  .strict();
+
+export const flowExperienceModeSchema = z.enum([
+  "quick_form",
+  "guided_brief",
+  "visual_configurator",
+]);
+
+const reservedContextKeys = new Set([
+  "consent",
+  "organization_id",
+  "price",
+  "routing",
+  "score",
+  "tenant_id",
+]);
+
+export const flowContextFieldSchema = z
+  .object({
+    allowedValues: z.array(z.string().trim().min(1).max(120)).min(1).max(30).optional(),
+    key: keySchema,
+    label: z.string().trim().min(1).max(80),
+    mode: z.enum(["confirm", "informational", "system"]),
+    required: z.boolean(),
+    systemValue: z.string().trim().min(1).max(120).optional(),
+    type: z.enum(["enum", "text"]),
+  })
+  .strict()
+  .superRefine((field, context) => {
+    if (
+      reservedContextKeys.has(field.key) ||
+      /^(consent|organization|price|routing|score|tenant)(_|$)/.test(field.key)
+    ) {
+      context.addIssue({ code: "custom", message: "Ten klucz kontekstu jest zastrzeżony." });
+    }
+    if (field.type === "enum") {
+      if (
+        !field.allowedValues ||
+        new Set(field.allowedValues).size !== field.allowedValues.length
+      ) {
+        context.addIssue({
+          code: "custom",
+          message: "Pole enum wymaga unikalnej listy dozwolonych wartości.",
+          path: ["allowedValues"],
+        });
+      }
+      if (field.systemValue && !field.allowedValues?.includes(field.systemValue)) {
+        context.addIssue({
+          code: "custom",
+          message: "Wartość systemowa musi należeć do listy dozwolonych wartości.",
+          path: ["systemValue"],
+        });
+      }
+    } else if (field.allowedValues !== undefined) {
+      context.addIssue({
+        code: "custom",
+        message: "Lista wartości jest dozwolona tylko dla pola enum.",
+        path: ["allowedValues"],
+      });
+    }
+    if (field.mode === "system" && field.systemValue === undefined) {
+      context.addIssue({
+        code: "custom",
+        message: "Pole systemowe wymaga wartości zapisanej w procesie.",
+        path: ["systemValue"],
+      });
+    }
+    if (field.mode !== "system" && field.systemValue !== undefined) {
+      context.addIssue({
+        code: "custom",
+        message: "Wartość systemowa jest dozwolona wyłącznie w trybie systemowym.",
+        path: ["systemValue"],
+      });
+    }
+  });
+
+export const flowContextSchema = z
+  .object({
+    fields: z.array(flowContextFieldSchema).max(8),
+    schemaVersion: z.literal(1),
+  })
+  .strict()
+  .superRefine((schema, context) => {
+    const keys = schema.fields.map((field) => field.key);
+    if (new Set(keys).size !== keys.length) {
+      context.addIssue({ code: "custom", message: "Klucze kontekstu muszą być unikalne." });
+    }
+  });
+
+export const flowPresentationIconKeys = [
+  "apartment",
+  "building",
+  "calendar",
+  "camera",
+  "check",
+  "clock",
+  "document",
+  "door",
+  "fence",
+  "globe",
+  "home",
+  "kitchen",
+  "layers",
+  "location",
+  "palette",
+  "phone",
+  "renovation",
+  "ruler",
+  "settings",
+  "shopping_bag",
+  "snowflake",
+  "sparkles",
+  "store",
+  "wardrobe",
+] as const;
+
+export const flowPresentationIconSchema = z.enum(flowPresentationIconKeys);
+
+export const flowOptionPresentationSchema = z
+  .object({
+    asset: z
+      .object({
+        alt: z.string().trim().min(1).max(160),
+        id: z.uuid(),
+      })
+      .strict()
+      .optional(),
+    description: z.string().trim().min(1).max(180).optional(),
+    icon: flowPresentationIconSchema.optional(),
+  })
+  .strict()
+  .refine(
+    (presentation) =>
+      presentation.asset !== undefined ||
+      presentation.description !== undefined ||
+      presentation.icon !== undefined,
+    { message: "Prezentacja opcji nie może być pusta." },
+  );
+
+export const flowOptionV3Schema = flowOptionSchema
+  .extend({ presentation: flowOptionPresentationSchema.optional() })
+  .strict();
+
+export const flowStepPresentationSchema = z
+  .object({
+    variant: z.enum(["default", "text_cards", "icon_cards", "image_cards"]),
   })
   .strict();
 
@@ -339,12 +540,34 @@ export const estimationSchema = z
 
 const flowResultSchema = z
   .object({
+    action: z.enum(["capture_lead", "no_lead"]).optional(),
     disclaimer: z.string().trim().min(1).max(800),
+    fallbackContactLabel: z.string().trim().min(1).max(120).optional(),
+    fallbackContactUrl: httpsUrlSchema.optional(),
     headline: z.string().trim().min(1).max(240),
     mode: z.enum(["consultation", "no_price"]),
     nextStepLabel: z.string().trim().min(1).max(120),
+    resultSchemaVersion: z.literal(2).optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((result, context) => {
+    const upgraded = result.resultSchemaVersion === 2;
+    if (upgraded !== (result.action !== undefined)) {
+      context.addIssue({ code: "custom", message: "Outcome v2 wymaga jawnej akcji." });
+    }
+    if ((result.fallbackContactLabel === undefined) !== (result.fallbackContactUrl === undefined)) {
+      context.addIssue({
+        code: "custom",
+        message: "Kontakt awaryjny wymaga etykiety i adresu HTTPS.",
+      });
+    }
+    if (result.action === "capture_lead" && result.fallbackContactUrl !== undefined) {
+      context.addIssue({
+        code: "custom",
+        message: "Kontakt awaryjny jest dozwolony tylko dla wyniku bez formularza leada.",
+      });
+    }
+  });
 
 const flowDocumentBaseShape = {
   entryStepKey: keySchema,
@@ -364,7 +587,7 @@ export const flowDocumentV1Schema = z
   })
   .strict();
 
-export const flowDocumentSchema = z
+export const flowDocumentV2Schema = z
   .object({
     ...flowDocumentBaseShape,
     schemaVersion: z.literal(2),
@@ -373,22 +596,76 @@ export const flowDocumentSchema = z
   })
   .strict();
 
+export const flowStepV3Schema = flowStepSchema
+  .omit({ options: true })
+  .extend({
+    options: z.array(flowOptionV3Schema).max(20).default([]),
+    presentation: flowStepPresentationSchema,
+  })
+  .strict();
+
+export const flowDocumentSchema = z
+  .object({
+    ...flowDocumentBaseShape,
+    contextSchema: flowContextSchema.optional(),
+    experienceMode: flowExperienceModeSchema,
+    schemaVersion: z.literal(3),
+    sections: z.array(flowSectionSchema).min(1).max(20),
+    steps: z.array(flowStepV3Schema).min(1).max(40),
+  })
+  .strict()
+  .superRefine((document, context) => {
+    const action = document.result.action ?? "capture_lead";
+    if (
+      document.result.resultSchemaVersion === 2 &&
+      action === "capture_lead" &&
+      document.leadCapture === undefined
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "Outcome zbierający lead wymaga konfiguracji kontaktu.",
+        path: ["leadCapture"],
+      });
+    }
+    if (
+      action === "no_lead" &&
+      document.leadCapture?.leadCaptureSchemaVersion === 3 &&
+      document.leadCapture.completionOrder === "contact_then_result"
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "Wynik bez leada nie może wymagać kontaktu przed wynikiem.",
+        path: ["result", "action"],
+      });
+    }
+  });
+
 export const storedFlowDocumentSchema = z.discriminatedUnion("schemaVersion", [
   flowDocumentV1Schema,
+  flowDocumentV2Schema,
   flowDocumentSchema,
 ]);
 
 export type FlowDocumentV1 = z.infer<typeof flowDocumentV1Schema>;
+export type FlowDocumentV2 = z.infer<typeof flowDocumentV2Schema>;
 export type FlowDocument = z.infer<typeof flowDocumentSchema>;
 export type StoredFlowDocument = z.infer<typeof storedFlowDocumentSchema>;
 export type Estimation = z.infer<typeof estimationSchema>;
 export type EstimationCondition = z.infer<typeof estimationConditionSchema>;
+export type FlowContextField = z.infer<typeof flowContextFieldSchema>;
+export type FlowContextSchema = z.infer<typeof flowContextSchema>;
 export type LeadCapture = z.infer<typeof leadCaptureSchema>;
 export type FlowDraftMetadata = z.infer<typeof flowDraftMetadataSchema>;
 export type FlowOption = z.infer<typeof flowOptionSchema>;
+export type FlowOptionPresentation = z.infer<typeof flowOptionPresentationSchema>;
+export type FlowPresentationIcon = z.infer<typeof flowPresentationIconSchema>;
+export type FlowOptionV3 = z.infer<typeof flowOptionV3Schema>;
 export type FlowRule = z.infer<typeof flowRuleSchema>;
-export type FlowStep = z.infer<typeof flowStepSchema>;
+export type FlowStepV2 = z.infer<typeof flowStepSchema>;
+export type FlowStep = z.infer<typeof flowStepV3Schema>;
+export type FlowStepPresentation = z.infer<typeof flowStepPresentationSchema>;
 export type FlowStepV1 = z.infer<typeof flowStepV1Schema>;
+export type FlowStepV3 = FlowStep;
 export type FlowStepValidation = z.infer<typeof flowStepValidationSchema>;
 export type FlowSection = z.infer<typeof flowSectionSchema>;
 
@@ -401,10 +678,14 @@ export type FlowValidationIssueCode =
   | "DUPLICATE_ESTIMATION_RULE_ID"
   | "DUPLICATE_RULE_ID"
   | "DUPLICATE_STEP_KEY"
+  | "DOCUMENT_TOO_LARGE"
   | "EMPTY_SECTION"
   | "ENTRY_STEP_NOT_FOUND"
   | "FLOW_CYCLE"
   | "INVALID_OPTIONS"
+  | "INVALID_PRESENTATION"
+  | "QUICK_FORM_NOT_LINEAR"
+  | "QUICK_FORM_TOO_LONG"
   | "INVALID_QUANTITY_STEP"
   | "INVALID_SECTION"
   | "INVALID_STEP_VALIDATION"
@@ -438,28 +719,43 @@ const legacySectionBlueprints = [
 ] as const;
 
 export function upgradeFlowDocument(document: StoredFlowDocument): FlowDocument {
-  if (document.schemaVersion === 2) {
+  if (document.schemaVersion === 3) {
     return flowDocumentSchema.parse(document);
   }
 
-  const sectionSize = Math.max(
-    1,
-    Math.ceil(document.steps.length / legacySectionBlueprints.length),
-  );
-  const sectionCount = Math.ceil(document.steps.length / sectionSize);
-  const sections = legacySectionBlueprints.slice(0, sectionCount);
-  const steps = document.steps.map((step, index) => ({
-    ...step,
-    sectionKey:
-      sections[Math.min(sections.length - 1, Math.floor(index / sectionSize))]?.key ??
-      legacySectionBlueprints[0].key,
-  }));
+  const v2Document: FlowDocumentV2 =
+    document.schemaVersion === 2
+      ? flowDocumentV2Schema.parse(document)
+      : (() => {
+          const sectionSize = Math.max(
+            1,
+            Math.ceil(document.steps.length / legacySectionBlueprints.length),
+          );
+          const sectionCount = Math.ceil(document.steps.length / sectionSize);
+          const sections = legacySectionBlueprints.slice(0, sectionCount);
+          const steps = document.steps.map((step, index) => ({
+            ...step,
+            sectionKey:
+              sections[Math.min(sections.length - 1, Math.floor(index / sectionSize))]?.key ??
+              legacySectionBlueprints[0].key,
+          }));
+
+          return flowDocumentV2Schema.parse({
+            ...document,
+            schemaVersion: 2,
+            sections,
+            steps,
+          });
+        })();
 
   return flowDocumentSchema.parse({
-    ...document,
-    schemaVersion: 2,
-    sections,
-    steps,
+    ...v2Document,
+    experienceMode: "guided_brief",
+    schemaVersion: 3,
+    steps: v2Document.steps.map((step) => ({
+      ...step,
+      presentation: { variant: "default" },
+    })),
   });
 }
 
@@ -532,8 +828,33 @@ function stepValidationIsCompatible(step: FlowStep): boolean {
   return step.type === "date";
 }
 
+function stepPresentationIsCompatible(step: FlowStepV3): boolean {
+  const isChoice = step.type === "multiple_choice" || step.type === "single_choice";
+  if (!isChoice) return step.presentation.variant === "default";
+
+  if (step.presentation.variant === "default") {
+    return step.options.every((option) => option.presentation === undefined);
+  }
+  if (step.presentation.variant === "text_cards") {
+    return step.options.every((option) => option.presentation?.description !== undefined);
+  }
+  if (step.presentation.variant === "icon_cards") {
+    return step.options.every((option) => option.presentation?.icon !== undefined);
+  }
+  return step.options.every((option) => option.presentation?.asset !== undefined);
+}
+
 export function validateFlowDocument(document: FlowDocument): FlowValidationResult {
   const issues: FlowValidationIssue[] = [];
+  if (new TextEncoder().encode(JSON.stringify(document)).byteLength > 262_144) {
+    issues.push(
+      issue(
+        "DOCUMENT_TOO_LARGE",
+        "document",
+        "Dokument procesu przekracza bezpieczny limit 256 KiB.",
+      ),
+    );
+  }
   const sectionKeys = document.sections.map((section) => section.key);
   const sectionIndexByKey = new Map(sectionKeys.map((key, index) => [key, index]));
   const sectionUsage = new Map(sectionKeys.map((key) => [key, 0]));
@@ -541,6 +862,57 @@ export function validateFlowDocument(document: FlowDocument): FlowValidationResu
   const existingStepKeys = new Set(stepKeys);
   const stepByKey = new Map(document.steps.map((step) => [step.key, step]));
   const adjacency = new Map(document.steps.map((step) => [step.key, new Set<string>()]));
+
+  if (document.experienceMode === "quick_form") {
+    if (document.steps.length > 8) {
+      issues.push(
+        issue(
+          "QUICK_FORM_TOO_LONG",
+          "experienceMode",
+          "Krótki formularz może zawierać maksymalnie 8 pytań.",
+        ),
+      );
+    }
+    if (document.entryStepKey !== document.steps[0]?.key) {
+      issues.push(
+        issue(
+          "QUICK_FORM_NOT_LINEAR",
+          "entryStepKey",
+          "Krótki formularz musi rozpoczynać się od pierwszego pytania.",
+        ),
+      );
+    }
+    if (document.rules.length > 0) {
+      issues.push(
+        issue(
+          "QUICK_FORM_NOT_LINEAR",
+          "rules",
+          "Krótki formularz nie obsługuje rozgałęzień opartych na regułach.",
+        ),
+      );
+    }
+    document.steps.forEach((step, stepIndex) => {
+      const expectedNextStepKey = document.steps[stepIndex + 1]?.key ?? null;
+      if (step.nextStepKey !== expectedNextStepKey) {
+        issues.push(
+          issue(
+            "QUICK_FORM_NOT_LINEAR",
+            `steps.${stepIndex}.nextStepKey`,
+            `Pytanie „${step.title}” musi prowadzić bezpośrednio do kolejnego pytania w kolejności formularza.`,
+          ),
+        );
+      }
+      if (step.options.some((option) => option.nextStepKey !== undefined)) {
+        issues.push(
+          issue(
+            "QUICK_FORM_NOT_LINEAR",
+            `steps.${stepIndex}.options`,
+            `Opcje pytania „${step.title}” nie mogą zmieniać trasy krótkiego formularza.`,
+          ),
+        );
+      }
+    });
+  }
 
   for (const duplicate of findDuplicates(sectionKeys)) {
     issues.push(
@@ -583,6 +955,20 @@ export function validateFlowDocument(document: FlowDocument): FlowValidationResu
           "INVALID_STEP_VALIDATION",
           `steps.${stepIndex}.validation`,
           `Walidacja kroku „${step.title}” nie pasuje do jego typu.`,
+        ),
+      );
+    }
+
+    if (
+      (document.experienceMode !== "visual_configurator" &&
+        step.presentation.variant !== "default") ||
+      !stepPresentationIsCompatible(step)
+    ) {
+      issues.push(
+        issue(
+          "INVALID_PRESENTATION",
+          `steps.${stepIndex}.presentation`,
+          `Prezentacja kroku „${step.title}” nie pasuje do trybu, typu pytania lub opcji.`,
         ),
       );
     }

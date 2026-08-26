@@ -66,6 +66,28 @@ describe("validateFlowEditor", () => {
     );
   });
 
+  it("blocks an incomplete text-card presentation and points to its description", () => {
+    const source = document();
+    const choiceStep = source.steps.find((step) => step.type === "single_choice")!;
+    choiceStep.presentation = { variant: "text_cards" };
+    choiceStep.options = choiceStep.options.map((option) => ({
+      ...option,
+      presentation: { description: "" },
+    }));
+
+    const result = validateFlowEditor(source, "Proces kwalifikacji");
+
+    expect(result.canSave).toBe(false);
+    expect(result.issues).toContainEqual(
+      expect.objectContaining({
+        field: "presentation",
+        message: "Uzupełnij opis karty (od 1 do 180 znaków).",
+        optionIndex: 0,
+        stepKey: choiceStep.key,
+      }),
+    );
+  });
+
   it("allows saving but blocks publishing a schema-valid cyclic graph", () => {
     const source = document();
     source.steps[0]!.nextStepKey = source.steps[0]!.key;
@@ -79,6 +101,24 @@ describe("validateFlowEditor", () => {
         expect.objectContaining({
           field: "graph",
           message: expect.stringContaining("pętlę"),
+        }),
+      ]),
+    );
+  });
+
+  it("blocks saving when quick form would silently flatten a branching process", () => {
+    const source = document();
+    source.experienceMode = "quick_form";
+    const result = validateFlowEditor(source, "Krótki formularz");
+
+    expect(result.schemaValid).toBe(true);
+    expect(result.canSave).toBe(false);
+    expect(result.canPublish).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "experience",
+          message: expect.stringContaining("Krótki formularz"),
         }),
       ]),
     );

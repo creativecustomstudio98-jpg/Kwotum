@@ -1,12 +1,14 @@
-# Lorum — protokół pracy z referencjami obrazowymi
+# Kwotum — protokół pracy z referencjami obrazowymi
 
 **Status:** CANONICAL
 **Owner:** Principal Product Designer + Visual QA
-**Last reviewed:** 2026-07-26
+**Last reviewed:** 2026-08-26
 
 ## 1. Zasada
 
-Obrazy załączone do bieżącej wiadomości Codexa oraz kopie w `references/` są specyfikacją wizualną. Nie wolno traktować ich jako moodboardu ani redukować do podobnej palety.
+Obraz zaakceptowany dla konkretnego regionu staje się specyfikacją wizualną
+dopiero po zapisaniu go w `REFERENCE_MANIFEST.md` z rolą, rozmiarem i SHA-256.
+Treść demonstracyjna obrazu nie jest wymaganiem produktu.
 
 ## 2. Obowiązkowy preflight
 
@@ -25,10 +27,9 @@ Przed kodowaniem Codex musi:
 
 ```text
 docs/ui/REFERENCE_MANIFEST.md
-docs/ui/REFERENCE_DECOMPOSITION.md
-docs/ui/VISUAL_MEASUREMENTS.md
-docs/ui/REFERENCE_GAPS.md
-docs/ui/references/derived/
+docs/ui/REFERENCE_MANIFEST.md
+docs/ui/<scope>/README.md
+artifacts/visual-qa/<scope>/<stage>/<screen>/diff.md
 ```
 
 ## 4. Co odwzorowywać
@@ -61,4 +62,6 @@ docs/ui/references/derived/
 
 ## 6. Visual QA
 
-Dla każdego ekranu/sekcji zapisz: reference, before, after-v1, overlay-v1, after-v2, overlay-v2 i diff report. Bez overlay nie ma PASS.
+Dla każdego ekranu lub sekcji zapisz: referencję albo jej kanoniczną ścieżkę,
+`before`, finalny `after`, overlay albo difference, reprezentatywny mobile i
+`diff.md`. Bez porównania nie ma wizualnego PASS.

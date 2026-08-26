@@ -28,7 +28,11 @@ export default async function OnboardingPage({
   return (
     <main className="panel-workspace onboarding-panel">
       <PanelPageHeader
-        eyebrow="Konfiguracja konta"
+        breadcrumbs={[
+          { href: `/panel/${organizationId}`, label: "Przegląd" },
+          { label: "Uruchomienie" },
+        ]}
+        description="Kroki potrzebne do opublikowania i zainstalowania pierwszego procesu."
         title={state.activeFlow ? "Dokończ uruchomienie" : "Uruchom pierwszy proces"}
       />
       <div className="panel-page onboarding-layout">
@@ -119,7 +123,6 @@ export default async function OnboardingPage({
                     </span>
                     <TemplateCreateForm
                       organizationId={organizationId}
-                      templateName={template.name}
                       templateSlug={template.slug}
                     />
                   </li>

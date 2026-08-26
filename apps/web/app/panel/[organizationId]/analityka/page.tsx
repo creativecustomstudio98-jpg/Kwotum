@@ -155,6 +155,11 @@ export default async function AnalyticsPage({ params, searchParams }: PageProps)
             ))}
           </nav>
         }
+        breadcrumbs={[
+          { href: `/panel/${organizationId}`, label: "Przegląd" },
+          { label: "Analityka" },
+        ]}
+        description="Wyniki procesów z zachowaniem progów prywatności."
         title="Analityka"
       />
 

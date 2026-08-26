@@ -34,6 +34,7 @@ function newQuestion(key: string, sectionKey: string) {
       { key: "opcja_1", label: "Opcja 1" },
       { key: "opcja_2", label: "Opcja 2" },
     ],
+    presentation: { variant: "default" as const },
     required: true,
     sectionKey,
     title: "Nowe pytanie",

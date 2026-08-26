@@ -5,6 +5,7 @@ import { requireTenantContext } from "../../../../../lib/auth/tenant-context";
 import { getWordPressIntegration } from "../../../../../lib/wordpress/service";
 import { PanelIcon } from "../../../panel-icon";
 import { PanelPageHeader } from "../../../panel-page-header";
+import { IntegrationsNavigation } from "../../integrations-navigation";
 import { revokeWordPressConnectionAction } from "./actions";
 import { WordPressTokenForm } from "./token-form";
 
@@ -29,13 +30,18 @@ export default async function WordPressIntegrationPage({
   return (
     <main className="panel-workspace wordpress-panel">
       <PanelPageHeader
-        eyebrow={organizationName}
-        title="Integracje"
         actions={
           <LinkButton href={`/panel/${organizationId}/procesy`} size="small" variant="secondary">
-            Przejdź do instalacji procesu
+            Przejdź do procesów
           </LinkButton>
         }
+        breadcrumbs={[
+          { href: `/panel/${organizationId}`, label: "Przegląd" },
+          { label: "Integracje" },
+        ]}
+        description={`Połączenia zewnętrzne organizacji ${organizationName}.`}
+        navigation={<IntegrationsNavigation />}
+        title="Integracje"
       />
       <div className="panel-page integrations-workspace">
         <div className="integrations-primary-grid">

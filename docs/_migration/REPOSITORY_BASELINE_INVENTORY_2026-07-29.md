@@ -1,5 +1,10 @@
 # Inventory baseline'u repozytorium — Etap 12ZD
 
+> **Aktualizacja po ADR-049:** wymienione niżej obrazy i katalogi panelu
+> opisują stan historyczny z dnia inwentaryzacji. Zostały wycofane z aktywnego
+> repozytorium 2026-08-26; aktualny kontrakt znajduje się w
+> `../ui/panel-minimal-v1/README.md`.
+
 > Historyczny snapshot pierwszego passu. Aktualny stan i decyzję o Semgrep CE
 > zamiast niedostępnego CodeQL opisują
 > `REPOSITORY_BASELINE_AUDIT_2026-08-08.md`, ADR-038 i `docs/TASKS.md`.

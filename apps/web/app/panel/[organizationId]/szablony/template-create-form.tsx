@@ -15,27 +15,26 @@ const initialState: FlowActionState = {
 
 export function TemplateCreateForm({
   organizationId,
-  templateName,
   templateSlug,
 }: Readonly<{
   organizationId: string;
-  templateName: string;
   templateSlug: string;
 }>) {
   const [state, action, pending] = useActionState(createFlowFromTemplateAction, initialState);
   return (
     <form action={action}>
       <input name="organizationId" type="hidden" value={organizationId} />
-      <input name="templateName" type="hidden" value={templateName} />
       <input name="templateSlug" type="hidden" value={templateSlug} />
       <Button
         className="template-use-button"
         disabled={pending}
+        loading={pending}
+        loadingLabel="Tworzę proces…"
         size="small"
         type="submit"
         variant="primary"
       >
-        <span>{pending ? "Tworzę…" : "Użyj szablonu"}</span>
+        <span>Użyj szablonu</span>
         <PanelIcon name="arrow-right" />
       </Button>
       {state.error ? (

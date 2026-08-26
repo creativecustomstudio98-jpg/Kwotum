@@ -47,6 +47,40 @@ export const marketingColorTokens = {
   success: "#15964A",
 } as const;
 
+export const panelColorTokens = {
+  background: "#FFFFFF",
+  surface: "#FFFFFF",
+  surfaceMuted: "#FAFAF9",
+  textPrimary: "#171A1F",
+  textSecondary: "#60666C",
+  border: "#E4E7E5",
+  borderStrong: "#8C948F",
+  brand: "#003B25",
+  brandHover: "#002F1E",
+  brandSoft: "#EDF6F1",
+  focus: "#087047",
+} as const;
+
+export const panelSidebarTokens = {
+  widthExpanded: "256px",
+  widthCollapsed: "72px",
+  background: "#FAFAF9",
+  text: "#171A1F",
+  textMuted: "#60666C",
+  textSubtle: "#6A706C",
+  label: "#6A706C",
+  line: "#E4E7E5",
+  hover: "#F1F3F1",
+  activeBackground: "#FFFFFF",
+  activeBorder: "#DDE2DE",
+  activeText: "#171A1F",
+  activeMarker: "#087047",
+  focus: "#087047",
+  status: "#087047",
+  accountBackground: "#FFFFFF",
+  accountBorder: "#E4E7E5",
+} as const;
+
 export const spacingTokens = {
   0: "0",
   1: "0.25rem",

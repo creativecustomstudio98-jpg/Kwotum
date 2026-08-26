@@ -1,16 +1,20 @@
 "use client";
 
 import { Button, Dialog } from "@wyceno/ui";
+import { flowPresentationIconKeys, type FlowPresentationIcon } from "@wyceno/validation";
 import type {
   FlowDocument,
   FlowRule,
   FlowSection,
   FlowStep,
   FlowStepValidation,
+  WidgetManifestContract,
 } from "@wyceno/validation";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  type ChangeEvent,
   type DragEvent,
   type FormEvent,
   type KeyboardEvent,
@@ -58,6 +62,7 @@ import {
   type FlowEditorIssue,
 } from "../../../../../lib/flows/editor-validation";
 import { LatestTaskQueue } from "../../../../../lib/flows/latest-task-queue";
+import type { FlowMediaAsset } from "../../../../../lib/flows/media";
 import { PanelIcon } from "../../../panel-icon";
 import {
   type FlowActionState,
@@ -69,8 +74,15 @@ import {
   FlowBuilderAreaTabs,
   type FlowBuilderArea,
 } from "./estimation-editor";
+import { ContextConfigurationEditor } from "./context-configuration-editor";
+import { FlowPreview } from "./instalacja/flow-preview";
 
 type BuilderMode = "inspector" | "preview" | "questions";
+const builderPaneIds: Record<BuilderMode, string> = {
+  inspector: "builder-inspector-panel",
+  preview: "builder-preview-panel",
+  questions: "builder-questions-panel",
+};
 type BuilderSaveStatus =
   "conflict" | "dirty" | "error" | "invalid" | "publishing" | "saved" | "saving";
 
@@ -102,9 +114,68 @@ type PendingEstimationImpact =
       targetLabel: string;
     }>;
 
+function buildDraftPreviewManifest(
+  document: FlowDocument,
+  publicId: string,
+): WidgetManifestContract {
+  return {
+    challenge: null,
+    entryStepKey: document.entryStepKey,
+    experienceMode: document.experienceMode,
+    intro: document.intro,
+    leadCapture: document.leadCapture
+      ? {
+          contactPolicy:
+            document.leadCapture.leadCaptureSchemaVersion === 2
+              ? document.leadCapture.contactPolicy
+              : "email_required",
+          filesEnabled: document.leadCapture.filesEnabled,
+          ...(document.leadCapture.leadCaptureSchemaVersion === 3
+            ? {
+                completionOrder: document.leadCapture.completionOrder,
+                fields: document.leadCapture.fields,
+                leadCaptureSchemaVersion: 3 as const,
+              }
+            : { leadCaptureSchemaVersion: 2 as const }),
+          marketingEmailConsent: document.leadCapture.marketingEmailConsent ?? null,
+          privacyNotice: {
+            ...document.leadCapture.privacyNotice,
+            policyUrl: document.leadCapture.privacyNotice.policyUrl ?? null,
+          },
+        }
+      : null,
+    manifestVersion: 3,
+    publicId,
+    publishedAt: "2026-08-25T00:00:00.000Z",
+    result: document.result,
+    rules: document.rules,
+    snapshotHash: "0".repeat(64),
+    steps: document.steps.map((step) => ({
+      allowUnknown: step.allowUnknown,
+      description: step.description ?? null,
+      key: step.key,
+      nextStepKey: step.nextStepKey,
+      options: step.options.map((option) => ({
+        key: option.key,
+        label: option.label,
+        nextStepKey: option.nextStepKey ?? step.nextStepKey,
+        overridesNextStep: option.nextStepKey !== undefined,
+        presentation: option.presentation ?? null,
+      })),
+      presentation: step.presentation,
+      required: step.required,
+      title: step.title,
+      type: step.type,
+      validation: step.validation ?? null,
+    })),
+    title: document.title,
+  };
+}
+
 export function FlowBuilder({
   canPublish,
   initialDocument,
+  initialMediaAssets,
   initialName,
   initialRevision,
   organizationId,
@@ -112,6 +183,7 @@ export function FlowBuilder({
 }: Readonly<{
   canPublish: boolean;
   initialDocument: FlowDocument;
+  initialMediaAssets: readonly FlowMediaAsset[];
   initialName: string;
   initialRevision: number;
   organizationId: string;
@@ -127,6 +199,9 @@ export function FlowBuilder({
     [initialSnapshot],
   );
   const [history, setHistory] = useState(() => createFlowEditorHistory(initialSnapshot));
+  const [mediaAssets, setMediaAssets] = useState<readonly FlowMediaAsset[]>(initialMediaAssets);
+  const [mediaUploadError, setMediaUploadError] = useState<string | null>(null);
+  const [mediaUploading, setMediaUploading] = useState(false);
   const [activeStepKey, setActiveStepKey] = useState(initialDocument.entryStepKey);
   const [builderArea, setBuilderArea] = useState<FlowBuilderArea>("form");
   const [mode, setMode] = useState<BuilderMode>("questions");
@@ -240,6 +315,18 @@ export function FlowBuilder({
     ? document.steps.filter((step) => step.sectionKey === pendingSectionDeletion).length
     : 0;
   const editorValidation = useMemo(() => validateFlowEditor(document, name), [document, name]);
+  const experienceIssues = editorValidation.issues.filter((issue) => issue.field === "experience");
+  const previewBlockingIssues = editorValidation.issues.filter(
+    (issue) => issue.field !== "graph" && issue.field !== "name",
+  );
+  const previewManifest = useMemo(
+    () => buildDraftPreviewManifest(document, flowId),
+    [document, flowId],
+  );
+  const previewAssetUrls = useMemo(
+    () => Object.fromEntries(mediaAssets.map((asset) => [asset.id, asset.previewUrl])),
+    [mediaAssets],
+  );
   const canSave = editorValidation.canSave;
   const canPublishCurrent = editorValidation.canPublish;
   const activeStepIssues = editorValidation.issues.filter(
@@ -329,8 +416,85 @@ export function FlowBuilder({
     );
   };
 
+  const linearizeQuickForm = () => {
+    setDocument((current) => ({
+      ...current,
+      entryStepKey: current.steps[0]?.key ?? current.entryStepKey,
+      rules: [],
+      steps: current.steps.map((step, index) => ({
+        ...step,
+        nextStepKey: current.steps[index + 1]?.key ?? null,
+        options: step.options.map((option) => {
+          const linearOption = { ...option };
+          delete linearOption.nextStepKey;
+          return linearOption;
+        }),
+      })),
+    }));
+  };
+
+  const selectExperienceMode = (experienceMode: FlowDocument["experienceMode"]) => {
+    setDocument((current) => ({ ...current, experienceMode }));
+  };
+
+  const handleExperienceModeKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!["ArrowDown", "ArrowLeft", "ArrowRight", "ArrowUp", "End", "Home"].includes(event.key)) {
+      return;
+    }
+    const options = Array.from(
+      event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]') ??
+        [],
+    );
+    const currentIndex = options.indexOf(event.currentTarget);
+    if (currentIndex < 0 || options.length === 0) return;
+    let nextIndex = currentIndex;
+    if (["ArrowDown", "ArrowRight"].includes(event.key)) {
+      nextIndex = (currentIndex + 1) % options.length;
+    }
+    if (["ArrowLeft", "ArrowUp"].includes(event.key)) {
+      nextIndex = (currentIndex - 1 + options.length) % options.length;
+    }
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = options.length - 1;
+    const next = options[nextIndex];
+    if (!next) return;
+    const experienceMode = next.dataset.experienceMode;
+    if (experienceMode !== "guided_brief" && experienceMode !== "quick_form") return;
+    event.preventDefault();
+    selectExperienceMode(experienceMode);
+    next.focus();
+  };
+
+  const selectBuilderPane = (nextMode: BuilderMode) => {
+    if (nextMode === "inspector") setInspectorOpen(true);
+    setMode(nextMode);
+  };
+
+  const handleBuilderPaneKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!["ArrowLeft", "ArrowRight", "End", "Home"].includes(event.key)) return;
+    const tabs = Array.from(
+      event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? [],
+    );
+    const currentIndex = tabs.indexOf(event.currentTarget);
+    if (currentIndex < 0 || tabs.length === 0) return;
+    let nextIndex = currentIndex;
+    if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
+    if (event.key === "ArrowLeft") {
+      nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    }
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = tabs.length - 1;
+    const next = tabs[nextIndex];
+    if (!next) return;
+    const nextMode = next.dataset.builderMode as BuilderMode | undefined;
+    if (!nextMode || !builderPaneIds[nextMode]) return;
+    event.preventDefault();
+    selectBuilderPane(nextMode);
+    next.focus();
+  };
+
   return (
-    <div className="flow-builder" data-layout-region="builder">
+    <div className="flow-builder flow-builder--m7" data-layout-region="builder">
       <header className="flow-builder__toolbar" data-layout-region="builder-toolbar">
         <div className="flow-builder__identity" data-no-overlap="builder-toolbar-actions">
           <Link
@@ -519,11 +683,15 @@ export function FlowBuilder({
 
       <FlowBuilderAreaTabs
         area={builderArea}
-        className="flow-builder__area-tabs--mobile"
+        className="flow-builder__area-tabs--primary"
         onChange={selectBuilderArea}
       />
 
-      <div aria-label="Widok edytora" className="flow-builder__mobile-tabs" role="tablist">
+      <div
+        aria-label="Widok edytora"
+        className="flow-builder__mobile-tabs panel-segmented-track"
+        role="tablist"
+      >
         {[
           [
             "questions",
@@ -533,14 +701,15 @@ export function FlowBuilder({
           ["inspector", "Ustawienia"],
         ].map(([value, label]) => (
           <button
+            aria-controls={builderPaneIds[value as BuilderMode]}
             aria-selected={mode === value}
+            data-builder-mode={value}
+            id={`builder-pane-tab-${value}`}
             key={value}
-            onClick={() => {
-              const nextMode = value as BuilderMode;
-              if (nextMode === "inspector") setInspectorOpen(true);
-              setMode(nextMode);
-            }}
+            onClick={() => selectBuilderPane(value as BuilderMode)}
+            onKeyDown={handleBuilderPaneKeyDown}
             role="tab"
+            tabIndex={mode === value ? 0 : -1}
             type="button"
           >
             {label}
@@ -556,16 +725,76 @@ export function FlowBuilder({
       </p>
 
       <div
+        aria-labelledby={`builder-area-tab-${builderArea}`}
         className={`flow-builder__grid ${inspectorOpen ? "" : "is-inspector-closed"}`}
+        id="builder-workspace-panel"
         inert={publishPending ? true : undefined}
+        role="tabpanel"
       >
         <aside
           aria-label="Sekcje i pytania"
           className={`flow-builder__questions ${mode === "questions" ? "is-mobile-active" : ""}`}
           data-layout-region="builder-questions"
           hidden={builderArea !== "form"}
+          id={builderArea === "form" ? "builder-questions-panel" : undefined}
         >
-          <FlowBuilderAreaTabs area={builderArea} onChange={selectBuilderArea} />
+          <section aria-labelledby="experience-mode-title" className="builder-experience-mode">
+            <div>
+              <h2 id="experience-mode-title">Sposób wypełniania</h2>
+              <p>Wybierz układ odpowiedni do długości i logiki procesu.</p>
+            </div>
+            <div
+              className="builder-experience-mode__choices panel-segmented-track panel-segmented-track--descriptive"
+              aria-labelledby="experience-mode-title"
+              role="radiogroup"
+            >
+              <button
+                aria-checked={document.experienceMode === "guided_brief"}
+                data-experience-mode="guided_brief"
+                onClick={() => selectExperienceMode("guided_brief")}
+                onKeyDown={handleExperienceModeKeyDown}
+                role="radio"
+                tabIndex={document.experienceMode === "guided_brief" ? 0 : -1}
+                type="button"
+              >
+                <strong>Prowadzony brief</strong>
+                <span>Jedno pytanie na ekranie, także dla procesów z rozgałęzieniami.</span>
+              </button>
+              <button
+                aria-checked={document.experienceMode === "quick_form"}
+                data-experience-mode="quick_form"
+                onClick={() => selectExperienceMode("quick_form")}
+                onKeyDown={handleExperienceModeKeyDown}
+                role="radio"
+                tabIndex={document.experienceMode === "quick_form" ? 0 : -1}
+                type="button"
+              >
+                <strong>Krótki formularz</strong>
+                <span>Wszystkie pytania na jednej stronie; maks. 8 i bez rozgałęzień.</span>
+              </button>
+            </div>
+            {experienceIssues.length > 0 ? (
+              <div className="builder-experience-mode__conflict" role="alert">
+                <strong>Ten proces nie jest jeszcze zgodny z krótkim formularzem.</strong>
+                <ul>
+                  {experienceIssues.map((issue) => (
+                    <li key={issue.id}>{issue.message}</li>
+                  ))}
+                </ul>
+                <button onClick={linearizeQuickForm} type="button">
+                  Usuń rozgałęzienia i ustaw kolejność liniową
+                </button>
+                <small>Ta akcja usuwa reguły przejść, ale nie usuwa pytań. Możesz ją cofnąć.</small>
+              </div>
+            ) : null}
+            <p className="builder-experience-mode__future">
+              Wygląd odpowiedzi ustawiasz osobno dla każdego pytania w panelu ustawień.
+            </p>
+          </section>
+          <ContextConfigurationEditor
+            onChange={(contextSchema) => setDocument((current) => ({ ...current, contextSchema }))}
+            schema={document.contextSchema}
+          />
           <div className="flow-builder__panel-heading">
             <div>
               <h2>Sekcje i pytania</h2>
@@ -872,6 +1101,7 @@ export function FlowBuilder({
           className={`flow-builder__preview ${mode === "preview" ? "is-mobile-active" : ""}`}
           data-layout-region="builder-preview"
           hidden={builderArea !== "form"}
+          id={builderArea === "form" ? "builder-preview-panel" : undefined}
         >
           <div className="flow-builder__panel-heading">
             <div>
@@ -891,84 +1121,15 @@ export function FlowBuilder({
               </button>
             ) : null}
           </div>
-          <div className="form-preview">
-            <div className="form-preview__step">
-              Krok {activeIndex + 1} z {document.steps.length}
+          {previewBlockingIssues.length > 0 ? (
+            <div className="flow-builder__preview-blocked" role="status">
+              <PanelIcon name="warning" />
+              <h3>Podgląd czeka na kompletną konfigurację</h3>
+              <p>Uzupełnij oznaczone pola pytania albo popraw konflikt wybranego trybu.</p>
             </div>
-            <div className="form-preview__progress" aria-hidden="true">
-              {document.steps.map((step, index) => (
-                <i className={index <= activeIndex ? "is-complete" : undefined} key={step.key} />
-              ))}
-            </div>
-            <form
-              className="form-preview__card"
-              data-within-viewport="builder-preview"
-              onSubmit={(event) => event.preventDefault()}
-            >
-              <div>
-                <label className="form-preview__question-title">
-                  <span className="wy-sr-only">Treść pytania</span>
-                  <AutoSizeQuestionTitle
-                    aria-describedby={
-                      activeStepIssues.some((issue) => issue.field === "title")
-                        ? "active-question-title-error"
-                        : undefined
-                    }
-                    aria-invalid={
-                      activeStepIssues.some((issue) => issue.field === "title") || undefined
-                    }
-                    data-editor-field="title"
-                    maxLength={240}
-                    onValueChange={(value) =>
-                      updateActiveStep(
-                        { ...activeStep, title: value },
-                        `step-title:${activeStep.key}`,
-                      )
-                    }
-                    value={activeStep.title}
-                  />
-                </label>
-                {activeStepIssues
-                  .filter((issue) => issue.field === "title")
-                  .slice(0, 1)
-                  .map((issue) => (
-                    <small
-                      className="builder-field-error"
-                      id="active-question-title-error"
-                      key={issue.id}
-                    >
-                      <PanelIcon name="warning" />
-                      {issue.message}
-                    </small>
-                  ))}
-                {activeStep.description ? (
-                  <p>{activeStep.description}</p>
-                ) : isChoiceType(activeStep.type) ? (
-                  <p>Wybierz jedną z dostępnych opcji.</p>
-                ) : null}
-              </div>
-              <PreviewControl step={activeStep} />
-              <div className="form-preview__actions">
-                <button
-                  className="panel-secondary-button"
-                  disabled={activeIndex === 0}
-                  onClick={() => selectQuestion(activeIndex - 1)}
-                  type="button"
-                >
-                  Wstecz
-                </button>
-                <button
-                  className="panel-primary-button"
-                  disabled={activeIndex === document.steps.length - 1}
-                  onClick={() => selectQuestion(activeIndex + 1)}
-                  type="button"
-                >
-                  Dalej
-                </button>
-              </div>
-            </form>
-            <p className="form-preview__brand">Powered by Kwotum</p>
-          </div>
+          ) : (
+            <FlowPreview assetUrls={previewAssetUrls} manifest={previewManifest} />
+          )}
         </section>
 
         {builderArea === "form" && inspectorOpen ? (
@@ -976,6 +1137,7 @@ export function FlowBuilder({
             aria-label="Ustawienia pytania"
             className={`flow-builder__inspector ${mode === "inspector" ? "is-mobile-active" : ""}`}
             data-layout-region="builder-inspector"
+            id="builder-inspector-panel"
           >
             <div className="flow-builder__panel-heading">
               <div>
@@ -1017,6 +1179,41 @@ export function FlowBuilder({
                 </section>
               ) : null}
               <label>
+                <span>Treść pytania</span>
+                <AutoSizeQuestionTitle
+                  aria-describedby={
+                    activeStepIssues.some((issue) => issue.field === "title")
+                      ? "active-question-title-error"
+                      : undefined
+                  }
+                  aria-invalid={
+                    activeStepIssues.some((issue) => issue.field === "title") || undefined
+                  }
+                  data-editor-field="title"
+                  maxLength={240}
+                  onValueChange={(value) =>
+                    updateActiveStep(
+                      { ...activeStep, title: value },
+                      `step-title:${activeStep.key}`,
+                    )
+                  }
+                  value={activeStep.title}
+                />
+              </label>
+              {activeStepIssues
+                .filter((issue) => issue.field === "title")
+                .slice(0, 1)
+                .map((issue) => (
+                  <small
+                    className="builder-field-error"
+                    id="active-question-title-error"
+                    key={issue.id}
+                  >
+                    <PanelIcon name="warning" />
+                    {issue.message}
+                  </small>
+                ))}
+              <label>
                 <span>Typ pytania</span>
                 <select
                   onChange={(event) => {
@@ -1049,6 +1246,50 @@ export function FlowBuilder({
               {isChoiceType(activeStep.type) ? (
                 <fieldset className="question-options">
                   <legend>Opcje odpowiedzi</legend>
+                  <label className="question-presentation">
+                    <span>Sposób pokazania odpowiedzi</span>
+                    <select
+                      onChange={(event) =>
+                        setChoicePresentationVariant(
+                          event.currentTarget.value as
+                            "default" | "icon_cards" | "image_cards" | "text_cards",
+                        )
+                      }
+                      value={
+                        activeStep.presentation.variant === "text_cards" ||
+                        activeStep.presentation.variant === "icon_cards" ||
+                        activeStep.presentation.variant === "image_cards"
+                          ? activeStep.presentation.variant
+                          : "default"
+                      }
+                    >
+                      <option value="default">Lista odpowiedzi</option>
+                      <option value="text_cards">Karty z opisem</option>
+                      <option value="icon_cards">Karty z ikoną</option>
+                      <option value="image_cards">Karty ze zdjęciem firmy</option>
+                    </select>
+                    <small>
+                      Zdjęcie służy decyzji wizualnej; nazwa odpowiedzi pozostaje obowiązkowa.
+                    </small>
+                  </label>
+                  {activeStep.presentation.variant === "image_cards" ? (
+                    <div className="question-media-library">
+                      <div>
+                        <strong>Biblioteka tego konta</strong>
+                        <span>JPEG, PNG lub WebP, maks. 5 MiB; zapis jako bezpieczny WebP.</span>
+                      </div>
+                      <label className="panel-secondary-button">
+                        {mediaUploading ? "Przetwarzanie…" : "Dodaj własne zdjęcie"}
+                        <input
+                          accept="image/jpeg,image/png,image/webp"
+                          disabled={mediaUploading}
+                          onChange={uploadFlowMedia}
+                          type="file"
+                        />
+                      </label>
+                      {mediaUploadError ? <p role="alert">{mediaUploadError}</p> : null}
+                    </div>
+                  ) : null}
                   {activeStep.options.map((option, index) => {
                     const dropClass =
                       optionDropIndicator?.optionKey === option.key
@@ -1119,6 +1360,153 @@ export function FlowBuilder({
                         >
                           ×
                         </button>
+                        {activeStep.presentation.variant === "text_cards" ? (
+                          <label className="question-options__description">
+                            <span>Opis karty „{accessibleLabel}”</span>
+                            <textarea
+                              aria-invalid={
+                                activeStepIssues.some(
+                                  (issue) =>
+                                    issue.field === "presentation" &&
+                                    (issue.optionIndex === null || issue.optionIndex === index),
+                                ) || undefined
+                              }
+                              data-editor-field={`presentation-${index}`}
+                              maxLength={180}
+                              onChange={(event) =>
+                                updateOption(
+                                  index,
+                                  {
+                                    ...option,
+                                    presentation: {
+                                      description: event.currentTarget.value,
+                                    },
+                                  },
+                                  `option-description:${activeStep.key}:${option.key}`,
+                                )
+                              }
+                              rows={2}
+                              value={option.presentation?.description ?? ""}
+                            />
+                            <small>{option.presentation?.description?.length ?? 0}/180</small>
+                          </label>
+                        ) : null}
+                        {activeStep.presentation.variant === "icon_cards" ? (
+                          <label className="question-options__description">
+                            <span>Ikona karty „{accessibleLabel}”</span>
+                            <select
+                              aria-invalid={
+                                activeStepIssues.some(
+                                  (issue) =>
+                                    issue.field === "presentation" &&
+                                    (issue.optionIndex === null || issue.optionIndex === index),
+                                ) || undefined
+                              }
+                              data-editor-field={`presentation-${index}`}
+                              onChange={(event) =>
+                                updateOption(
+                                  index,
+                                  {
+                                    ...option,
+                                    presentation: {
+                                      icon: event.currentTarget.value as FlowPresentationIcon,
+                                    },
+                                  },
+                                  `option-icon:${activeStep.key}:${option.key}`,
+                                )
+                              }
+                              value={option.presentation?.icon ?? ""}
+                            >
+                              <option value="">Wybierz ikonę</option>
+                              {flowPresentationIconKeys.map((icon) => (
+                                <option key={icon} value={icon}>
+                                  {presentationIconLabels[icon]}
+                                </option>
+                              ))}
+                            </select>
+                            <small>Zamknięty katalog — bez własnego SVG i kodu.</small>
+                          </label>
+                        ) : null}
+                        {activeStep.presentation.variant === "image_cards" ? (
+                          <div className="question-options__media">
+                            <label>
+                              <span>Zdjęcie karty „{accessibleLabel}”</span>
+                              <select
+                                aria-invalid={
+                                  activeStepIssues.some(
+                                    (issue) =>
+                                      issue.field === "presentation" &&
+                                      (issue.optionIndex === null || issue.optionIndex === index),
+                                  ) || undefined
+                                }
+                                data-editor-field={`presentation-${index}`}
+                                onChange={(event) =>
+                                  updateOption(
+                                    index,
+                                    {
+                                      ...option,
+                                      presentation: event.currentTarget.value
+                                        ? {
+                                            asset: {
+                                              alt: option.presentation?.asset?.alt ?? "",
+                                              id: event.currentTarget.value,
+                                            },
+                                          }
+                                        : undefined,
+                                    },
+                                    `option-asset:${activeStep.key}:${option.key}`,
+                                  )
+                                }
+                                value={option.presentation?.asset?.id ?? ""}
+                              >
+                                <option value="">Wybierz zdjęcie</option>
+                                {mediaAssets.map((asset) => (
+                                  <option key={asset.id} value={asset.id}>
+                                    {asset.name} · {asset.width}×{asset.height}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                            {mediaAssets.find(
+                              (asset) => asset.id === option.presentation?.asset?.id,
+                            ) ? (
+                              <Image
+                                alt=""
+                                height={180}
+                                src={
+                                  mediaAssets.find(
+                                    (asset) => asset.id === option.presentation?.asset?.id,
+                                  )?.previewUrl ?? ""
+                                }
+                                unoptimized
+                                width={240}
+                              />
+                            ) : null}
+                            <label>
+                              <span>Opis obrazu dla czytnika ekranu</span>
+                              <input
+                                maxLength={160}
+                                onChange={(event) => {
+                                  const assetId = option.presentation?.asset?.id;
+                                  if (!assetId) return;
+                                  updateOption(
+                                    index,
+                                    {
+                                      ...option,
+                                      presentation: {
+                                        asset: { alt: event.currentTarget.value, id: assetId },
+                                      },
+                                    },
+                                    `option-asset-alt:${activeStep.key}:${option.key}`,
+                                  );
+                                }}
+                                placeholder="Np. jasny front dębowy o pionowym usłojeniu"
+                                value={option.presentation?.asset?.alt ?? ""}
+                              />
+                              <small>{option.presentation?.asset?.alt.length ?? 0}/160</small>
+                            </label>
+                          </div>
+                        ) : null}
                         <details className="question-options__mobile-actions">
                           <summary aria-label={`Akcje opcji „${accessibleLabel}”`}>⋮</summary>
                           <div>
@@ -1167,7 +1555,7 @@ export function FlowBuilder({
                     ＋ Dodaj opcję
                   </button>
                   {activeStepIssues
-                    .filter((issue) => issue.field === "option")
+                    .filter((issue) => issue.field === "option" || issue.field === "presentation")
                     .map((issue) => (
                       <small className="builder-field-error" key={issue.id}>
                         <PanelIcon name="warning" />
@@ -1353,7 +1741,6 @@ export function FlowBuilder({
             area={builderArea}
             document={document}
             mobilePane={mode}
-            onAreaChange={selectBuilderArea}
             onDocumentChange={setDocument}
           />
         ) : null}
@@ -1559,11 +1946,6 @@ export function FlowBuilder({
   function selectBuilderArea(nextArea: FlowBuilderArea) {
     setBuilderArea(nextArea);
     setInspectorOpen(true);
-  }
-
-  function selectQuestion(index: number) {
-    const step = document.steps[index];
-    if (step) setActiveStepKey(step.key);
   }
 
   function addSection() {
@@ -2000,8 +2382,8 @@ export function FlowBuilder({
     setMode(previewField ? "preview" : "inspector");
     window.requestAnimationFrame(() => {
       const selector =
-        issue.field === "option"
-          ? `[data-editor-field="option-${issue.optionIndex ?? 0}"]`
+        issue.field === "option" || issue.field === "presentation"
+          ? `[data-editor-field="${issue.field}-${issue.optionIndex ?? 0}"]`
           : issue.field === "title" || issue.field === "validation"
             ? `[data-editor-field="${issue.field}"]`
             : ".question-inspector__errors";
@@ -2019,6 +2401,72 @@ export function FlowBuilder({
       },
       group,
     );
+  }
+
+  async function uploadFlowMedia(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file || mediaUploading) return;
+    setMediaUploadError(null);
+    setMediaUploading(true);
+    try {
+      const body = new FormData();
+      body.set("file", file);
+      const response = await fetch(`/api/v1/organizations/${organizationId}/flow-assets`, {
+        body,
+        method: "POST",
+      });
+      const payload: unknown = await response.json();
+      const asset = parseUploadedFlowMediaAsset(payload);
+      if (!response.ok || !asset) {
+        throw new Error(flowMediaUploadMessage(payload));
+      }
+      setMediaAssets((current) => [asset, ...current.filter((item) => item.id !== asset.id)]);
+    } catch (error) {
+      setMediaUploadError(error instanceof Error ? error.message : "Nie udało się dodać zdjęcia.");
+    } finally {
+      setMediaUploading(false);
+    }
+  }
+
+  function setChoicePresentationVariant(
+    variant: "default" | "icon_cards" | "image_cards" | "text_cards",
+  ) {
+    updateActiveStep({
+      ...activeStep,
+      options: activeStep.options.map((option) => {
+        if (variant === "text_cards") {
+          return {
+            ...option,
+            presentation: {
+              description: option.presentation?.description ?? "",
+            },
+          };
+        }
+        if (variant === "icon_cards") {
+          return {
+            ...option,
+            presentation: {
+              ...(option.presentation?.icon ? { icon: option.presentation.icon } : {}),
+            },
+          };
+        }
+        if (variant === "image_cards") {
+          return {
+            ...option,
+            presentation: {
+              ...(option.presentation?.asset ? { asset: option.presentation.asset } : {}),
+            },
+          };
+        }
+        return {
+          key: option.key,
+          label: option.label,
+          ...(option.nextStepKey === undefined ? {} : { nextStepKey: option.nextStepKey }),
+        };
+      }),
+      presentation: { variant },
+    });
   }
 
   function addOption() {
@@ -2123,7 +2571,11 @@ export function FlowBuilder({
     const optionKeys = new Set(original.options.map((option) => option.key));
     const options = isChoiceType(nextType)
       ? isChoiceType(original.type)
-        ? original.options
+        ? original.options.map((option) => ({
+            key: option.key,
+            label: option.label,
+            ...(option.nextStepKey === undefined ? {} : { nextStepKey: option.nextStepKey }),
+          }))
         : [
             { key: "opcja_1", label: "Opcja 1" },
             { key: "opcja_2", label: "Opcja 2" },
@@ -2150,6 +2602,7 @@ export function FlowBuilder({
               key: step.key,
               nextStepKey: step.nextStepKey,
               options,
+              presentation: { variant: "default" as const },
               required: step.required,
               sectionKey: step.sectionKey,
               title: step.title,
@@ -2512,6 +2965,126 @@ const questionTypes: ReadonlyArray<readonly [FlowStep["type"], string]> = [
   ["location", "Lokalizacja"],
 ];
 
+function AutoSizeQuestionTitle({
+  "aria-describedby": ariaDescribedBy,
+  "aria-invalid": ariaInvalid,
+  "data-editor-field": dataEditorField,
+  maxLength,
+  onValueChange,
+  value,
+}: Readonly<{
+  "aria-describedby": string | undefined;
+  "aria-invalid": boolean | undefined;
+  "data-editor-field": string;
+  maxLength: number;
+  onValueChange: (value: string) => void;
+  value: string;
+}>) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    let previousWidth = -1;
+    const fitToContent = () => {
+      const width = textarea.getBoundingClientRect().width;
+      if (Math.abs(width - previousWidth) < 0.5 && textarea.style.height) return;
+      previousWidth = width;
+      textarea.style.height = "auto";
+      const style = window.getComputedStyle(textarea);
+      const borderHeight =
+        style.boxSizing === "border-box"
+          ? Number.parseFloat(style.borderTopWidth) + Number.parseFloat(style.borderBottomWidth)
+          : 0;
+      textarea.style.height = `${textarea.scrollHeight + borderHeight}px`;
+    };
+
+    fitToContent();
+    if (typeof ResizeObserver === "undefined") return;
+
+    const resizeObserver = new ResizeObserver(fitToContent);
+    resizeObserver.observe(textarea);
+    return () => resizeObserver.disconnect();
+  }, [value]);
+
+  return (
+    <textarea
+      aria-describedby={ariaDescribedBy}
+      aria-invalid={ariaInvalid}
+      data-editor-field={dataEditorField}
+      maxLength={maxLength}
+      onChange={(event) => onValueChange(event.currentTarget.value.replace(/[\r\n]+/g, " "))}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && !event.nativeEvent.isComposing) event.preventDefault();
+      }}
+      ref={textareaRef}
+      rows={1}
+      value={value}
+    />
+  );
+}
+
+const presentationIconLabels: Readonly<Record<FlowPresentationIcon, string>> = {
+  apartment: "Mieszkanie",
+  building: "Budynek",
+  calendar: "Kalendarz",
+  camera: "Zdjęcie",
+  check: "Potwierdzenie",
+  clock: "Czas",
+  document: "Dokument",
+  door: "Drzwi",
+  fence: "Ogrodzenie",
+  globe: "Internet",
+  home: "Dom",
+  kitchen: "Kuchnia",
+  layers: "Warstwy",
+  location: "Lokalizacja",
+  palette: "Kolor i styl",
+  phone: "Telefon",
+  renovation: "Remont",
+  ruler: "Wymiar",
+  settings: "Ustawienia",
+  shopping_bag: "Zakup",
+  snowflake: "Chłodzenie",
+  sparkles: "Wykończenie",
+  store: "Lokal handlowy",
+  wardrobe: "Szafa",
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function parseUploadedFlowMediaAsset(value: unknown): FlowMediaAsset | null {
+  if (!isRecord(value) || !isRecord(value.asset)) return null;
+  const asset = value.asset;
+  if (
+    typeof asset.id !== "string" ||
+    typeof asset.name !== "string" ||
+    typeof asset.previewUrl !== "string" ||
+    typeof asset.sizeBytes !== "number" ||
+    typeof asset.width !== "number" ||
+    typeof asset.height !== "number"
+  ) {
+    return null;
+  }
+  return {
+    height: asset.height,
+    id: asset.id,
+    name: asset.name,
+    previewUrl: asset.previewUrl,
+    sizeBytes: asset.sizeBytes,
+    width: asset.width,
+  };
+}
+
+function flowMediaUploadMessage(value: unknown): string {
+  return isRecord(value) && typeof value.message === "string"
+    ? value.message
+    : "Nie udało się dodać zdjęcia.";
+}
+
 function buildQuestionSections(document: FlowDocument) {
   return document.sections.map((section) => ({
     key: section.key,
@@ -2531,6 +3104,7 @@ function createDefaultQuestion(key: string, sectionKey: string): FlowStep {
       { key: "opcja_1", label: "Opcja 1" },
       { key: "opcja_2", label: "Opcja 2" },
     ],
+    presentation: { variant: "default" },
     required: true,
     sectionKey,
     title: "Nowe pytanie",
@@ -2578,139 +3152,4 @@ function QuestionTypeIcon({ type }: Readonly<{ type: FlowStep["type"] }>) {
             ? "⌖"
             : "≡";
   return <span className="question-list__type">{symbol}</span>;
-}
-
-function AutoSizeQuestionTitle({
-  "aria-describedby": ariaDescribedBy,
-  "aria-invalid": ariaInvalid,
-  "data-editor-field": dataEditorField,
-  maxLength,
-  onValueChange,
-  value,
-}: Readonly<{
-  "aria-describedby": string | undefined;
-  "aria-invalid": boolean | undefined;
-  "data-editor-field": string;
-  maxLength: number;
-  onValueChange: (value: string) => void;
-  value: string;
-}>) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    let previousWidth = -1;
-    const fitToContent = () => {
-      const width = textarea.getBoundingClientRect().width;
-      if (Math.abs(width - previousWidth) < 0.5 && textarea.style.height) return;
-      previousWidth = width;
-      textarea.style.height = "auto";
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    };
-
-    fitToContent();
-    if (typeof ResizeObserver === "undefined") return;
-
-    const resizeObserver = new ResizeObserver(fitToContent);
-    resizeObserver.observe(textarea);
-    return () => resizeObserver.disconnect();
-  }, [value]);
-
-  return (
-    <textarea
-      aria-describedby={ariaDescribedBy}
-      aria-invalid={ariaInvalid}
-      data-editor-field={dataEditorField}
-      maxLength={maxLength}
-      onChange={(event) => onValueChange(event.currentTarget.value.replace(/[\r\n]+/g, " "))}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" && !event.nativeEvent.isComposing) event.preventDefault();
-      }}
-      ref={textareaRef}
-      rows={1}
-      value={value}
-    />
-  );
-}
-
-function PreviewControl({ step }: Readonly<{ step: FlowStep }>) {
-  if (step.type === "single_choice" || step.type === "multiple_choice") {
-    return (
-      <fieldset className="form-preview__options">
-        <legend className="wy-sr-only">{step.title}</legend>
-        {step.options.map((option) => (
-          <label key={option.key}>
-            <input
-              name={step.key}
-              type={step.type === "single_choice" ? "radio" : "checkbox"}
-              value={option.key}
-            />
-            <span>{option.label}</span>
-          </label>
-        ))}
-      </fieldset>
-    );
-  }
-  if (step.type === "yes_no") {
-    return (
-      <fieldset className="form-preview__options">
-        <legend className="wy-sr-only">{step.title}</legend>
-        {["Tak", "Nie"].map((label) => (
-          <label key={label}>
-            <input name={step.key} type="radio" value={label.toLocaleLowerCase("pl-PL")} />
-            <span>{label}</span>
-          </label>
-        ))}
-      </fieldset>
-    );
-  }
-  if (step.type === "long_text") {
-    const validation = step.validation?.kind === "text_length" ? step.validation : null;
-    return (
-      <textarea
-        aria-label={step.title}
-        maxLength={validation?.maxLength ?? 2000}
-        minLength={validation?.minLength}
-        placeholder="Wpisz odpowiedź…"
-        rows={5}
-      />
-    );
-  }
-  const dateValidation = step.validation?.kind === "date_range" ? step.validation : null;
-  const numberValidation = step.validation?.kind === "number_range" ? step.validation : null;
-  const textValidation = step.validation?.kind === "text_length" ? step.validation : null;
-  return (
-    <input
-      aria-label={step.title}
-      max={
-        step.type === "date"
-          ? dateValidation?.max
-          : step.type === "number" || step.type === "budget"
-            ? numberValidation?.max
-            : undefined
-      }
-      maxLength={
-        textValidation?.maxLength ??
-        (step.type === "location" || step.type === "short_text" ? 500 : undefined)
-      }
-      min={
-        step.type === "date"
-          ? dateValidation?.min
-          : step.type === "number" || step.type === "budget"
-            ? numberValidation?.min
-            : undefined
-      }
-      minLength={textValidation?.minLength}
-      placeholder={step.type === "location" ? "Miejscowość lub kod pocztowy" : "Wpisz odpowiedź…"}
-      type={
-        step.type === "date"
-          ? "date"
-          : step.type === "number" || step.type === "budget"
-            ? "number"
-            : "text"
-      }
-    />
-  );
 }

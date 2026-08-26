@@ -68,8 +68,9 @@ Manipulacja ceną: serwer odtwarza kalkulację na opublikowanej wersji. IDOR: za
 Pozostałe ryzyko: Web Component działa w originie strony gospodarza, więc
 Shadow DOM nie chroni storage przed jej JavaScriptem. Integrator musi ograniczać
 third-party scripts i CSP, a token pozostaje celowo wąski i krótkotrwały.
-Rozproszone rate limits per IP/origin oraz adaptacyjny Turnstile są wymagane
-przed publiczną produkcją.
+Rozproszone rate limits per IP/origin zostały wdrożone w FTZ-03A. Adaptacyjny
+Turnstile został wdrożony lokalnie w FTZ-03B; produkcja nadal wymaga osobnych
+kluczy, hostów Cloudflare, testu na rzeczywistym embedzie i akceptacji prawnej.
 
 ## Kontrole wdrożone w Etapie 6
 
@@ -121,6 +122,83 @@ Klasyfikacja, ograniczenie skutków, zachowanie dowodów, rotacja, ocena obowią
 - zapis i publikacja nadal odtwarzają tenant context i capability po stronie
   serwera, a dane wejściowe bez poprawnego UUID, rewizji, nazwy i dokumentu są
   odrzucane przed wywołaniem usługi;
+
+## Kontrole wdrożone w podetapie 13B / FTZ-03A
+
+- dokładna tenantowa allowlista originów zastąpiła wildcard CORS; hosted link
+  ufa wyłącznie originowi `APP_URL`, a odpowiedzi dodają `Vary: Origin`;
+- obcy origin jest odrzucany przed manifestem, utworzeniem sesji i każdą
+  mutacją; preflight nie zastępuje ponownej kontroli właściwego żądania;
+- bezstanowe instancje aplikacji korzystają ze wspólnych atomowych kubełków
+  PostgreSQL dla IP/originu/procesu/sesji/organizacji i rodzaju operacji;
+- surowy IP jest HMAC-owany server-side osobnym sekretem i nie jest utrwalany;
+  poza local brak zaufanego `x-vercel-forwarded-for` powoduje fail-closed;
+- publiczne RPC domenowe nie są wykonywalne przez `anon` ani
+  `authenticated`, więc bezpośrednie REST Supabase nie omija bramy;
+- Owner/Admin zarządza maksymalnie 10 dokładnymi originami na proces, zapis
+  podlega tenant scope, RLS i audit log; Sales oraz obcy tenant są odrzucani;
+- 429 zawiera `Retry-After`; negatywne testy obejmują bypass bezpośredniego
+  RPC, obcy origin, role, brak zaufanego IP i niezależne budżety klientów.
+
+## Kontrole wdrożone w podetapie 13B / FTZ-03B
+
+- każdy finalny submit poza local wymaga tokenu Turnstile do 2048 znaków;
+  brak tokenu jest odrzucany przed kontaktem z providerem i bazą;
+- dynamiczny widget używa oficjalnego skryptu, explicit render,
+  `execution: execute` i `appearance: interaction-only`; challenge powstaje po
+  uploadzie, aby ograniczyć ryzyko wygaśnięcia tokenu;
+- serwerowe Siteverify jest przed RPC tworzącym lead i wymaga zgodnej akcji,
+  dokładnego hosta, świeżego wyniku i `success`; token nie trafia do logów,
+  bazy, analytics ani eventów hosta;
+- trusted client IP jest wysyłany providerowi jako `remoteip`, lecz surowa
+  wartość nadal nie jest utrwalana; request do providera ma timeout i jedno
+  bounded retry z tym samym `idempotency_key`;
+- replay `timeout-or-duplicate`, błędny host/akcja, timeout i niedostępność
+  providera są fail-closed; retry UI pobiera nowy token;
+- local bez obu kluczy ma jawny tryb disabled, ale częściowa konfiguracja oraz
+  brak kluczy w preview/staging/production blokują publiczny formularz;
+- CSP aplikacji dopuszcza `challenges.cloudflare.com` wyłącznie dla skryptu i
+  ramki; host pilota wymaga tej samej jawnej konfiguracji bez wildcardów.
+
+Pozostałe ryzyko FTZ-03: klucze i hostname'y nie są jeszcze skonfigurowane w
+Cloudflare/Vercel, nie wykonano smoke na rzeczywistej domenie Fortez, a
+Cloudflare wymaga zatwierdzenia jako dostawca. To nadal blokuje produkcyjny GO,
+mimo że FTZ-03B jest zamknięte lokalnie.
+
+## Kontrole wdrożone w PX3
+
+- quick form nie przyjmuje nowego payloadu ani ceny; używa istniejących,
+  sekwencyjnych mutacji odpowiedzi i serwerowej kalkulacji;
+- TypeScript, PostgreSQL i parser manifestu niezależnie odrzucają ponad 8
+  pytań, reguły, override'y opcji i trasę inną niż kolejność dokumentu;
+- builder blokuje zapis niezgodnego trybu i nie spłaszcza grafu bez jawnej,
+  odwracalnej decyzji użytkownika;
+- podgląd używa memory-only adaptera bez sesji, storage, analityki i leada;
+- finalny kontakt zachowuje origin allowlist, limiter, Turnstile, privacy proof,
+  upload i atomową unikalność leada na sesję; klient blokuje submit równoległy.
+
+## Kontrole wdrożone w PX4
+
+- tylko aktywny Owner/Admin rezerwuje i odczytuje rejestr assetów swojej
+  organizacji; forced RLS oraz tenant context blokują Sales i drugi tenant;
+- wejście ma limit 5 MiB, allowlistę JPEG/PNG/WebP, sprawdzenie magic bytes i
+  fail-closed malware scan poza loopback;
+- dekoder ma limit pikseli, usuwa metadata, nie powiększa obrazu, ogranicza
+  wymiary i normalizuje wynik do niezmiennego WebP;
+- prywatna ścieżka zawiera organizację i losowy UUID, ale nie trafia do draftu,
+  snapshotu, manifestu ani publicznej odpowiedzi;
+- status `ready` powstaje dopiero po zapisie Storage i potwierdzeniu konkretnego
+  rekordu; niepotwierdzony obiekt jest usuwany;
+- triggery PostgreSQL odrzucają brakujący, niegotowy i obcy UUID zarówno w
+  draftcie, jak i immutable wersji;
+- publiczny resolver service-role zwraca obiekt tylko dla assetu przywołanego
+  w wersji wskazanego, aktualnie opublikowanego flow; wszystkie odmowy są 404;
+- widget nie renderuje HTML/SVG ani URL-a użytkownika, ma jawne wymiary,
+  lazy-loading, neutralny fallback i zachowuje natywną kontrolkę wyboru.
+
+Pozostałe ryzyko PX4: przed produkcją trzeba skonfigurować i zweryfikować
+prywatny skaner malware, zatwierdzić prawa do realnych fotografii oraz przyjąć
+politykę usuwania i retencji assetów używanych przez historyczne wersje.
 
 ## Kontrole webhooka Etapu 12ZF
 
@@ -253,3 +331,26 @@ runtime’u CMS. Credential ma zatem minimalny zakres read-public-flows,
 diagnostics i self-revocation, bez dostępu do leadów czy konfiguracji. Rotacja
 salts wymaga reconnectu. Etap 12 musi ponownie ocenić rate limiting endpointów,
 log redaction, dependency/secret scan i DAST.
+
+# Kontrole kontekstu hosta PX5
+
+Dozwolony `Origin` nie czyni payloadu hosta zaufanym. Serwer porównuje każdy
+klucz z immutable flow version, blokuje prefiksy biznesowe i PII-like wartości,
+nie dopuszcza systemowych pól z hosta oraz uniemożliwia odpowiedź przed
+potwierdzeniem. Snapshot nie jest źródłem ceny, scoringu, routingu lub zgody i
+nie jest emitowany do analytics ani logów aplikacyjnych. Negatywne przypadki są
+wykonywane przez `supabase/tests/flow_context.sql`.
+
+# Kontrole zakończenia i brandingu PX6
+
+Kolejność kontaktu, wymagania pól i outcome pochodzą z immutable flow version i
+są ponownie sprawdzane w PostgreSQL. Klient nie może zamienić `no_lead` na
+submit ani wyprowadzić pełnego wyniku z prywatnego score. Publiczna odpowiedź
+nie zawiera kategorii kwalifikacji, trace ani reguł wewnętrznych.
+
+Branding nie przyjmuje custom CSS, HTML, fontów, skryptów, data URI ani
+zewnętrznych URL. Kolor ma dokładny format `#RRGGBB`, kontrast tekstu wynika z
+jednej funkcji serwerowej, a błędna projekcja kończy się bezpiecznym fallbackiem.
+Logo musi być gotowym WebP należącym do organizacji i jest wydawane przez
+same-origin resolver. Negatywne testy IDOR, kontrastu, outcome i submitu znajdują
+się w `supabase/tests/completion_branding.sql`.

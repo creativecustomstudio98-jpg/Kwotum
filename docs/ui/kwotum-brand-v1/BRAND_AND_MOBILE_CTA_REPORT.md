@@ -2,7 +2,7 @@
 
 **Status:** PASS lokalny
 **Data:** 2026-08-03
-**Zakres:** widoczna marka, finalne CTA/kontakt i akcje przykładowego leada na `/`
+**Zakres:** widoczna marka oraz finalne CTA/kontakt na `/`
 
 ## Referencje
 
@@ -11,7 +11,6 @@
 | `reference/01-kwotum-logo-direction.png`    | 1600 × 900 | `0ae9103735a3b0bf0d48653cdc38ba311776c7d175efe45b48a26ba9a1083a97` | nazwa, konstrukcja Q, paleta i mała skala           |
 | `reference/02-mobile-final-cta-padding.png` | 780 × 1688 | `97ac5c1ba02547248da3006173c8a146f906e483f4e88ba1fd473981d3c87fb7` | rytm i bezpieczne marginesy finalnego CTA na mobile |
 | `reference/03-final-cta-facts-spacing.png`  | 1460 × 158 | `2fa98bbf8b746e189373210250a779a4c48f721e37180f633a29ca0a1fb6e683` | zwarty rail trzech warunków bez sztucznych kolumn   |
-| `reference/04-lead-actions-width.png`       |  564 × 262 | `b048c0a8cdb6e15c0f59f8048c0397e53fab3576c7cc5078dc04228d9896e72d` | równa szerokość obu akcji przykładowego leada       |
 
 ADR-033 nadaje tym obrazom pierwszeństwo wyłącznie dla marki oraz mobilnej
 geometrii finalnego CTA. Nie zmienia zakresu produktu ani kontraktów
@@ -65,10 +64,9 @@ Drugi przegląd ujawnił dwa lokalne wyjątki CSS. Rail warunków używał kolum
 zastąpiony zwartym, zawijanym flexem z kontrolowanym odstępem 16–32 px; poniżej
 768 px przechodzi w pojedynczą kolumnę.
 
-Kontener akcji przykładowego leada miał 15,25 rem, ale pierwsza akcja otrzymała
-osobną szerokość 12 rem. Wyjątek usunięto. Na desktopie oba przyciski mają
-15,25 rem, a na mobile oba zajmują pełną szerokość kolumny. Różnica mierzona
-przez test nie może przekroczyć 1 px.
+Historyczna referencja akcji przykładowego leada została wycofana razem ze
+starymi obrazami panelu na mocy ADR-049. Nie steruje już żadnym ekranem ani
+proofem produktowym.
 
 ## Artefakty QA
 

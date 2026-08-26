@@ -5,11 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
+import { signOut } from "../logowanie/actions";
 import { PanelIcon } from "./panel-icon";
 import { PanelNavigationIcon } from "./panel-navigation-icon";
 import {
   isMobilePanelDetailPath,
   isPanelNavigationItemActive,
+  isPanelNavigationItemCurrent,
   splitMobileNavigationItems,
   type PanelNavigationItem,
 } from "./panel-navigation-model";
@@ -18,21 +20,36 @@ const SIDEBAR_PREFERENCE_KEY = "lorum:panel-sidebar-collapsed";
 const SIDEBAR_PREFERENCE_EVENT = "lorum:panel-sidebar-preference";
 let volatileSidebarPreference = false;
 
+const SIDEBAR_SECTIONS = [
+  { icons: ["dashboard", "leads", "processes"], label: "Praca" },
+  { icons: ["templates", "analytics", "integration"], label: "Narzędzia" },
+  { icons: ["settings"], label: "System" },
+] as const;
+
 export function PanelNavigation({
   items,
   notificationsHref,
   organizationName,
+  privacyHref,
   userName,
 }: {
   items: ReadonlyArray<PanelNavigationItem>;
   notificationsHref: string;
   organizationName: string;
+  privacyHref?: string;
   userName: string;
 }) {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [sidebarTooltip, setSidebarTooltip] = useState<{
+    label: string;
+    top: number;
+  } | null>(null);
   const moreButtonRef = useRef<HTMLButtonElement>(null);
   const moreDialogRef = useRef<HTMLElement>(null);
+  const accountButtonRef = useRef<HTMLButtonElement>(null);
+  const accountMenuRef = useRef<HTMLElement>(null);
   const collapsed = useSyncExternalStore(
     subscribeToSidebarPreference,
     getSidebarPreference,
@@ -42,13 +59,12 @@ export function PanelNavigation({
   const { primary: mobilePrimaryItems, secondary: mobileSecondaryItems } =
     splitMobileNavigationItems(items);
   const mobileNavigationHidden = isMobilePanelDetailPath(pathname, organizationRoot);
-  const settingsItem = mobileSecondaryItems.find((item) => item.icon === "settings");
   const moreActive =
     pathname === notificationsHref ||
-    pathname === `${organizationRoot}/prywatnosc` ||
+    pathname === privacyHref ||
     pathname === `${organizationRoot}/start` ||
     mobileSecondaryItems.some((item) =>
-      isPanelNavigationItemActive(pathname, item.href, organizationRoot),
+      isPanelNavigationItemActive(pathname, item.href, organizationRoot, item.activeHrefPrefixes),
     );
 
   useEffect(() => {
@@ -105,9 +121,39 @@ export function PanelNavigation({
     return () => mobileQuery.removeEventListener("change", closeOutsideMobile);
   }, []);
 
+  useEffect(() => {
+    if (!accountMenuOpen) return;
+
+    const closeAccountMenu = (event: KeyboardEvent | PointerEvent) => {
+      if (event instanceof KeyboardEvent) {
+        if (event.key !== "Escape") return;
+        event.preventDefault();
+        setAccountMenuOpen(false);
+        requestAnimationFrame(() => accountButtonRef.current?.focus());
+        return;
+      }
+
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (accountMenuRef.current?.contains(target) || accountButtonRef.current?.contains(target)) {
+        return;
+      }
+      setAccountMenuOpen(false);
+    };
+
+    document.addEventListener("keydown", closeAccountMenu);
+    document.addEventListener("pointerdown", closeAccountMenu);
+    return () => {
+      document.removeEventListener("keydown", closeAccountMenu);
+      document.removeEventListener("pointerdown", closeAccountMenu);
+    };
+  }, [accountMenuOpen]);
+
   function toggleSidebar() {
     const nextPreference = !collapsed;
     volatileSidebarPreference = nextPreference;
+    setAccountMenuOpen(false);
+    setSidebarTooltip(null);
 
     try {
       window.localStorage.setItem(SIDEBAR_PREFERENCE_KEY, String(nextPreference));
@@ -118,6 +164,24 @@ export function PanelNavigation({
     window.dispatchEvent(new Event(SIDEBAR_PREFERENCE_EVENT));
   }
 
+  function showSidebarTooltip(target: EventTarget | null) {
+    if (!collapsed || !(target instanceof Element)) return;
+    const tooltipTarget = target.closest<HTMLElement>("[data-sidebar-tooltip]");
+    const label = tooltipTarget?.dataset.sidebarTooltip;
+    if (!tooltipTarget || !label) return;
+
+    const bounds = tooltipTarget.getBoundingClientRect();
+    setSidebarTooltip({ label, top: bounds.top + bounds.height / 2 });
+  }
+
+  function hideSidebarTooltip(target: EventTarget | null, relatedTarget: EventTarget | null) {
+    if (!(target instanceof Element)) return;
+    const tooltipTarget = target.closest<HTMLElement>("[data-sidebar-tooltip]");
+    if (!tooltipTarget) return;
+    if (relatedTarget instanceof Element && tooltipTarget.contains(relatedTarget)) return;
+    setSidebarTooltip(null);
+  }
+
   return (
     <>
       <aside
@@ -125,16 +189,22 @@ export function PanelNavigation({
         className="panel-rail"
         data-collapsed={collapsed}
         id="panel-sidebar"
+        onBlurCapture={(event) => hideSidebarTooltip(event.target, event.relatedTarget)}
+        onFocusCapture={(event) => showSidebarTooltip(event.target)}
+        onMouseOut={(event) => hideSidebarTooltip(event.target, event.relatedTarget)}
+        onMouseOver={(event) => showSidebarTooltip(event.target)}
       >
         <div className="panel-rail__header">
-          <Link aria-label="Kwotum — wybór organizacji" className="panel-rail__brand" href="/panel">
+          <Link
+            aria-label="Kwotum — wybór organizacji"
+            className="panel-rail__brand"
+            href="/panel"
+            prefetch={false}
+          >
             <span className="panel-rail__brand-mark">
-              <Image alt="" height={38} priority src="/Logoicon.svg" width={38} />
+              <Image alt="" height={34} priority src="/kwotum-logo-v3.png" width={34} />
             </span>
-            <span className="panel-rail__brand-copy">
-              <strong className="panel-rail__brand-name">Kwotum</strong>
-              <small>Panel operacyjny</small>
-            </span>
+            <strong className="panel-rail__brand-name">Kwotum</strong>
           </Link>
           <button
             aria-controls="panel-primary-navigation"
@@ -145,55 +215,162 @@ export function PanelNavigation({
             title={collapsed ? "Rozwiń menu" : "Zwiń menu"}
             type="button"
           >
-            <PanelIcon name="chevron-left" />
+            <span aria-hidden="true" className="panel-rail__toggle-brand">
+              <Image alt="" height={34} priority src="/kwotum-logo-v3.png" width={34} />
+            </span>
+            <span aria-hidden="true" className="panel-rail__toggle-chevron">
+              <PanelIcon name="chevron-left" />
+            </span>
           </button>
         </div>
-        <nav aria-label="Narzędzia organizacji" id="panel-primary-navigation">
-          {items.map((item) => {
-            const active = isPanelNavigationItemActive(pathname, item.href, organizationRoot);
-            return (
-              <Link
-                aria-current={active ? "page" : undefined}
-                className={active ? "is-active" : undefined}
-                href={item.href}
-                key={item.href}
-              >
-                <span aria-hidden="true" className="panel-rail__nav-icon">
-                  <PanelNavigationIcon name={item.icon} />
-                </span>
-                <span className="panel-rail__label">{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-        <div aria-label="Skróty i konto" className="panel-rail__utilities" role="group">
-          <Link aria-label="Powiadomienia" href={notificationsHref}>
-            <span aria-hidden="true" className="panel-rail__nav-icon">
-              <PanelNavigationIcon name="notification" />
-            </span>
-            <span className="panel-rail__label">Powiadomienia</span>
-          </Link>
-          <Link aria-label="Pomoc" href="/jak-dziala">
-            <span aria-hidden="true" className="panel-rail__nav-icon">
-              <PanelNavigationIcon name="help" />
-            </span>
-            <span className="panel-rail__label">Pomoc</span>
-          </Link>
-          <Link
-            aria-label={`Zmień organizację. Zalogowano jako ${userName} w ${organizationName}`}
-            className="panel-rail__organization"
-            href="/panel"
-          >
-            <span aria-hidden="true" className="panel-rail__avatar">
-              {initials(userName)}
-            </span>
-            <span className="panel-rail__account-copy">
-              <strong>{userName}</strong>
-              <small>{organizationName}</small>
-            </span>
-          </Link>
+        <Link
+          aria-label={`Zmień organizację. Obecna organizacja: ${organizationName}`}
+          className="panel-rail__organization-switcher"
+          data-sidebar-tooltip={`Organizacja: ${organizationName}`}
+          href="/panel"
+          prefetch={false}
+          title={collapsed ? `Organizacja: ${organizationName}` : undefined}
+        >
+          <span className="panel-rail__section-label">Organizacja</span>
+          <span className="panel-rail__organization-row">
+            <strong>{organizationName}</strong>
+            <PanelIcon name="chevron-down" />
+          </span>
+        </Link>
+
+        <div className="panel-rail__main">
+          <nav aria-label="Narzędzia organizacji" id="panel-primary-navigation">
+            {SIDEBAR_SECTIONS.map((section) => {
+              const sectionItems = items.filter((item) =>
+                section.icons.some((icon) => icon === item.icon),
+              );
+              if (sectionItems.length === 0) return null;
+
+              return (
+                <section className="panel-rail__section" key={section.label}>
+                  <h2 className="panel-rail__section-label">{section.label}</h2>
+                  <div className="panel-rail__section-items">
+                    {sectionItems.map((item) => {
+                      const active = isPanelNavigationItemActive(
+                        pathname,
+                        item.href,
+                        organizationRoot,
+                        item.activeHrefPrefixes,
+                      );
+                      const current = isPanelNavigationItemCurrent(pathname, item.href);
+                      return (
+                        <Link
+                          aria-current={current ? "page" : undefined}
+                          className={active ? "is-active" : undefined}
+                          data-sidebar-tooltip={item.label}
+                          href={item.href}
+                          key={item.href}
+                          prefetch={false}
+                          title={collapsed ? item.label : undefined}
+                        >
+                          <span aria-hidden="true" className="panel-rail__nav-icon">
+                            <PanelNavigationIcon name={item.icon} />
+                          </span>
+                          <span className="panel-rail__label">{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
+          </nav>
         </div>
+
+        <footer aria-label="Skróty i konto" className="panel-rail__footer">
+          <div className="panel-rail__utilities">
+            <Link
+              aria-current={pathname === notificationsHref ? "page" : undefined}
+              className={pathname === notificationsHref ? "is-active" : undefined}
+              data-sidebar-tooltip="Powiadomienia"
+              href={notificationsHref}
+              prefetch={false}
+              title={collapsed ? "Powiadomienia" : undefined}
+            >
+              <span aria-hidden="true" className="panel-rail__nav-icon">
+                <PanelNavigationIcon name="notification" />
+              </span>
+              <span className="panel-rail__label">Powiadomienia</span>
+            </Link>
+            <Link
+              data-sidebar-tooltip="Pomoc"
+              href="/jak-dziala"
+              prefetch={false}
+              title={collapsed ? "Pomoc" : undefined}
+            >
+              <span aria-hidden="true" className="panel-rail__nav-icon">
+                <PanelNavigationIcon name="help" />
+              </span>
+              <span className="panel-rail__label">Pomoc</span>
+            </Link>
+          </div>
+
+          <div className="panel-rail__account">
+            <Link
+              aria-label={`Zmień organizację. Zalogowano jako ${userName} w ${organizationName}`}
+              className="panel-rail__account-profile"
+              data-sidebar-tooltip={`${userName} · ${organizationName}`}
+              href="/panel"
+              prefetch={false}
+              title={collapsed ? `${userName} · ${organizationName}` : undefined}
+            >
+              <span aria-hidden="true" className="panel-rail__avatar">
+                {initials(userName)}
+              </span>
+              <span className="panel-rail__account-copy">
+                <strong>{userName}</strong>
+                <small>{organizationName}</small>
+              </span>
+            </Link>
+            <button
+              ref={accountButtonRef}
+              aria-controls="panel-account-menu"
+              aria-expanded={accountMenuOpen}
+              aria-label="Otwórz menu konta"
+              className="panel-rail__account-trigger"
+              onClick={() => setAccountMenuOpen((current) => !current)}
+              type="button"
+            >
+              <span aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+            </button>
+          </div>
+        </footer>
       </aside>
+
+      {sidebarTooltip && collapsed ? (
+        <div
+          className="panel-rail__floating-tooltip"
+          role="tooltip"
+          style={{ top: sidebarTooltip.top }}
+        >
+          {sidebarTooltip.label}
+        </div>
+      ) : null}
+
+      {accountMenuOpen && !collapsed ? (
+        <section
+          ref={accountMenuRef}
+          aria-label="Menu konta"
+          className="panel-rail__account-menu"
+          id="panel-account-menu"
+        >
+          <Link href="/panel" onClick={() => setAccountMenuOpen(false)} prefetch={false}>
+            Zmień organizację
+          </Link>
+          <form action={signOut}>
+            <button type="submit">Wyloguj się</button>
+          </form>
+        </section>
+      ) : null}
 
       <nav
         aria-label="Główna nawigacja panelu"
@@ -201,13 +378,20 @@ export function PanelNavigation({
         data-mobile-hidden={mobileNavigationHidden}
       >
         {mobilePrimaryItems.map((item) => {
-          const active = isPanelNavigationItemActive(pathname, item.href, organizationRoot);
+          const active = isPanelNavigationItemActive(
+            pathname,
+            item.href,
+            organizationRoot,
+            item.activeHrefPrefixes,
+          );
+          const current = isPanelNavigationItemCurrent(pathname, item.href);
           return (
             <Link
-              aria-current={active ? "page" : undefined}
+              aria-current={current ? "page" : undefined}
               className={`panel-mobile-navigation__item${active ? " is-active" : ""}`}
               href={item.href}
               key={item.href}
+              prefetch={false}
             >
               <span className="panel-mobile-navigation__icon">
                 <PanelNavigationIcon name={item.icon} strokeWidth={1.65} />
@@ -278,6 +462,7 @@ export function PanelNavigation({
               className="panel-mobile-more__account"
               href="/panel"
               onClick={() => setMoreOpen(false)}
+              prefetch={false}
             >
               <span aria-hidden="true" className="panel-mobile-more__avatar">
                 {initials(userName)}
@@ -291,14 +476,25 @@ export function PanelNavigation({
 
             <nav aria-label="Pozostałe narzędzia panelu" className="panel-mobile-more__links">
               {mobileSecondaryItems.map((item) => {
-                const active = isPanelNavigationItemActive(pathname, item.href, organizationRoot);
+                const privacyHasDedicatedEntry =
+                  Boolean(privacyHref) && pathname === privacyHref && item.icon === "settings";
+                const active =
+                  !privacyHasDedicatedEntry &&
+                  isPanelNavigationItemActive(
+                    pathname,
+                    item.href,
+                    organizationRoot,
+                    item.activeHrefPrefixes,
+                  );
+                const current = isPanelNavigationItemCurrent(pathname, item.href);
                 return (
                   <Link
-                    aria-current={active ? "page" : undefined}
+                    aria-current={current ? "page" : undefined}
                     className={active ? "is-active" : undefined}
                     href={item.href}
                     key={item.href}
                     onClick={() => setMoreOpen(false)}
+                    prefetch={false}
                   >
                     <span>
                       <PanelNavigationIcon name={item.icon} />
@@ -308,14 +504,13 @@ export function PanelNavigation({
                   </Link>
                 );
               })}
-              {settingsItem ? (
+              {privacyHref ? (
                 <Link
-                  aria-current={pathname === `${organizationRoot}/prywatnosc` ? "page" : undefined}
-                  className={
-                    pathname === `${organizationRoot}/prywatnosc` ? "is-active" : undefined
-                  }
-                  href={`${organizationRoot}/prywatnosc`}
+                  aria-current={pathname === privacyHref ? "page" : undefined}
+                  className={pathname === privacyHref ? "is-active" : undefined}
+                  href={privacyHref}
                   onClick={() => setMoreOpen(false)}
+                  prefetch={false}
                 >
                   <span>
                     <PanelNavigationIcon name="privacy" />
@@ -329,6 +524,7 @@ export function PanelNavigation({
                 className={pathname === notificationsHref ? "is-active" : undefined}
                 href={notificationsHref}
                 onClick={() => setMoreOpen(false)}
+                prefetch={false}
               >
                 <span>
                   <PanelNavigationIcon name="notification" />
@@ -336,7 +532,7 @@ export function PanelNavigation({
                 <strong>Powiadomienia</strong>
                 <PanelIcon name="chevron-right" />
               </Link>
-              <Link href="/jak-dziala" onClick={() => setMoreOpen(false)}>
+              <Link href="/jak-dziala" onClick={() => setMoreOpen(false)} prefetch={false}>
                 <span>
                   <PanelNavigationIcon name="help" />
                 </span>

@@ -2,14 +2,22 @@
 
 import { Button, LinkButton } from "@wyceno/ui";
 import type { WidgetManifestContract } from "@wyceno/validation";
-import { useMemo, useState } from "react";
+import { type KeyboardEvent, useMemo, useState } from "react";
 
+import { AllowedOriginsForm } from "./allowed-origins-form";
 import { FlowPreview } from "./flow-preview";
 import { InvitationForm } from "./invitation-form";
 
 type InstallationMode = "fullscreen" | "hosted" | "inline" | "popup";
+const installationModes = [
+  ["inline", "Inline", "Proces w treści strony"],
+  ["popup", "Popup", "Otwierany z przycisku"],
+  ["fullscreen", "Fullscreen", "Pełny ekran procesu"],
+  ["hosted", "Hosted link", "Gotowy adres Kwotum"],
+] as const satisfies ReadonlyArray<readonly [InstallationMode, string, string]>;
 
 export function InstallationPanel({
+  allowedOrigins,
   appOrigin,
   currentVersion,
   flowId,
@@ -22,6 +30,7 @@ export function InstallationPanel({
   publishedAt,
   wordpressConnection,
 }: Readonly<{
+  allowedOrigins: ReadonlyArray<string>;
   appOrigin: string;
   currentVersion: number;
   flowId: string;
@@ -71,8 +80,42 @@ export function InstallationPanel({
     }
   }
 
+  const selectInstallationMode = (nextMode: InstallationMode) => {
+    setMode(nextMode);
+    setCopied(null);
+  };
+
+  const handleInstallationModeKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!["ArrowDown", "ArrowLeft", "ArrowRight", "ArrowUp", "End", "Home"].includes(event.key)) {
+      return;
+    }
+
+    const currentMode = event.currentTarget.dataset.installationMode as
+      InstallationMode | undefined;
+    const currentIndex = installationModes.findIndex(([value]) => value === currentMode);
+    if (currentIndex < 0) return;
+
+    let nextIndex = currentIndex;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+      nextIndex = (currentIndex + 1) % installationModes.length;
+    }
+    if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + installationModes.length) % installationModes.length;
+    }
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = installationModes.length - 1;
+
+    const nextMode = installationModes[nextIndex]?.[0];
+    if (!nextMode) return;
+    event.preventDefault();
+    selectInstallationMode(nextMode);
+    event.currentTarget.parentElement
+      ?.querySelector<HTMLButtonElement>(`[data-installation-mode="${nextMode}"]`)
+      ?.focus();
+  };
+
   return (
-    <div className="installation-workspace">
+    <div className="installation-workspace installation-workspace--m7">
       <div className="sharing-workspace">
         {manifest ? (
           <FlowPreview manifest={manifest} />
@@ -175,22 +218,20 @@ export function InstallationPanel({
                 <p>Wybierz sposób uruchamiania procesu na stronie.</p>
               </div>
             </div>
-            <div className="installation-mode-grid" role="group" aria-label="Sposób osadzenia">
-              {(
-                [
-                  ["inline", "Inline", "Proces w treści strony"],
-                  ["popup", "Popup", "Otwierany z przycisku"],
-                  ["fullscreen", "Fullscreen", "Pełny ekran procesu"],
-                  ["hosted", "Hosted link", "Gotowy adres Kwotum"],
-                ] satisfies ReadonlyArray<readonly [InstallationMode, string, string]>
-              ).map(([value, label, description]) => (
+            <div
+              aria-label="Sposób osadzenia"
+              className="installation-mode-grid panel-segmented-track panel-segmented-track--descriptive"
+              role="radiogroup"
+            >
+              {installationModes.map(([value, label, description]) => (
                 <button
-                  aria-pressed={mode === value}
+                  aria-checked={mode === value}
+                  data-installation-mode={value}
                   key={value}
-                  onClick={() => {
-                    setMode(value);
-                    setCopied(null);
-                  }}
+                  onClick={() => selectInstallationMode(value)}
+                  onKeyDown={handleInstallationModeKeyDown}
+                  role="radio"
+                  tabIndex={mode === value ? 0 : -1}
                   type="button"
                 >
                   <strong>{label}</strong>
@@ -199,6 +240,12 @@ export function InstallationPanel({
               ))}
             </div>
           </section>
+
+          <AllowedOriginsForm
+            flowId={flowId}
+            organizationId={organizationId}
+            origins={allowedOrigins}
+          />
 
           <section
             className="panel-card installation-code"

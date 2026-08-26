@@ -1,0 +1,18 @@
+M6 lead workspace — canonical visual direction
+
+Primary reference:
+docs/ui/panel-minimal-v1/reference/panel-dashboard-primary-1199x842.png
+SHA-256: 824df7d47e16d9114ae66990a0d02e91f4954ce1ba7b5d1c4d180fea84aed6e1
+
+Secondary reference:
+docs/ui/panel-minimal-v1/reference/panel-dashboard-direction-404x316.png
+SHA-256: 2cd7db369c2233f08f77b497a2b2e54e5458bf840548c5ba6e791b48518e3b64
+
+Evaluated implementation viewport: 1536 x 1024 px.
+Responsive evidence: 320, 375, 390, 430, 720, 768, 1024, 1280, 1440 and 1536 px.
+
+There is no active one-to-one reference for a lead-detail screen. The primary
+image controls the flat geometry, hairline separators, restrained colour and
+document-plus-rail proportions. The secondary image informs typography and
+the compact top-left tab pattern only; it is not a pixel target. The local
+before.png is a frozen implementation baseline, not a design reference.

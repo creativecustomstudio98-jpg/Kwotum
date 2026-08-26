@@ -2,6 +2,9 @@
 
 import { Button, EmptyState } from "@wyceno/ui";
 
+import { PanelTenantPageHeader } from "../../panel-tenant-page-header";
+import { SettingsNavigation } from "../settings-navigation";
+
 export default function OrganizationSettingsError({
   reset,
 }: Readonly<{
@@ -9,6 +12,12 @@ export default function OrganizationSettingsError({
 }>) {
   return (
     <main className="panel-workspace settings-panel">
+      <PanelTenantPageHeader
+        currentLabel="Ustawienia"
+        description="Dane organizacji, branding i dostawa nowych leadów."
+        navigation={<SettingsNavigation />}
+        title="Ustawienia"
+      />
       <div className="panel-page">
         <EmptyState
           action={<Button onClick={reset}>Ponów</Button>}

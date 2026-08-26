@@ -32,9 +32,11 @@ export type WebhookEnvelopeV1 = Readonly<{
   data: Readonly<{
     lead: Readonly<{
       contact: Readonly<{
-        email: string;
+        email: string | null;
         name: string | null;
         phone: string | null;
+        preferred_channel?: "email" | "phone" | null;
+        preferred_window?: "morning" | "afternoon" | "evening" | null;
       }>;
       estimate: Readonly<{
         currency: string;
@@ -53,5 +55,5 @@ export type WebhookEnvelopeV1 = Readonly<{
   occurred_at: string;
   organization_id: string;
   type: "lead.created";
-  version: "2026-08-09";
+  version: "2026-08-09" | "2026-08-25";
 }>;

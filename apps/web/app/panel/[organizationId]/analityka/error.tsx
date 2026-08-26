@@ -2,12 +2,16 @@
 
 import { Button, EmptyState } from "@wyceno/ui";
 
-import { PanelPageHeader } from "../../panel-page-header";
+import { PanelTenantPageHeader } from "../../panel-tenant-page-header";
 
 export default function AnalyticsError({ reset }: { reset: () => void }) {
   return (
     <main className="panel-workspace analytics-panel">
-      <PanelPageHeader title="Analityka" />
+      <PanelTenantPageHeader
+        currentLabel="Analityka"
+        description="Wyniki procesów z zachowaniem progów prywatności."
+        title="Analityka"
+      />
       <div className="panel-page">
         <section className="panel-card analytics-privacy-state">
           <EmptyState

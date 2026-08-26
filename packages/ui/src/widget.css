@@ -43,6 +43,7 @@ button {
 }
 
 .wyceno-card {
+  --wyceno-accent: var(--wyceno-tenant-accent, #0b6048);
   width: min(100%, 1080px);
   min-height: 720px;
   margin: 0 auto;
@@ -76,6 +77,94 @@ button {
   gap: 20px;
 }
 
+.wyceno-context {
+  width: min(calc(100% - 40px), 640px);
+  margin: 26px auto 0;
+  padding: 18px 0 22px;
+  border-top: 1px solid var(--wyceno-border-strong);
+  border-bottom: 1px solid var(--wyceno-border);
+}
+
+.wyceno-context__heading {
+  margin-bottom: 16px;
+  display: grid;
+  gap: 3px;
+}
+
+.wyceno-context__heading small,
+.wyceno-context__form label > span,
+.wyceno-context__readonly span,
+.wyceno-context__summary dt {
+  color: var(--wyceno-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wyceno-context__heading h2 {
+  font-size: 17px;
+  letter-spacing: -0.025em;
+}
+
+.wyceno-context__form,
+.wyceno-context__summary {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.wyceno-context__form label {
+  display: grid;
+  gap: 6px;
+}
+
+.wyceno-context__form input,
+.wyceno-context__form select {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 11px;
+  border: 1px solid var(--wyceno-border-strong);
+  border-radius: 4px;
+  color: inherit;
+  background: var(--wyceno-surface);
+}
+
+.wyceno-context__form input:focus {
+  border-color: var(--wyceno-accent);
+  outline: 3px solid color-mix(in srgb, var(--wyceno-accent) 18%, transparent);
+  outline-offset: 1px;
+}
+
+.wyceno-context__readonly,
+.wyceno-context__summary > div {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(110px, 0.42fr) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 12px;
+}
+
+.wyceno-context__readonly strong,
+.wyceno-context__summary dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.wyceno-context__error {
+  margin: 0;
+  color: var(--wyceno-error);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wyceno-context__form .wyceno-primary {
+  width: fit-content;
+  margin-top: 4px;
+}
+
 .wyceno-brand {
   min-width: 0;
   display: flex;
@@ -91,10 +180,19 @@ button {
   display: grid;
   place-items: center;
   background: var(--wyceno-accent);
-  color: var(--wyceno-surface);
+  color: var(--wyceno-tenant-accent-text, var(--wyceno-surface));
   font-size: 10px;
   font-weight: 800;
   letter-spacing: -0.02em;
+}
+
+.wyceno-brand-logo {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  display: block;
+  object-fit: contain;
+  background: #ffffff;
 }
 
 .wyceno-brand > div {
@@ -261,6 +359,373 @@ button {
   order: 1;
 }
 
+.wyceno-form--quick {
+  min-height: 0;
+  gap: 0;
+}
+
+.wyceno-quick-field {
+  padding: 22px 0;
+  border-top: 1px solid var(--wyceno-border);
+}
+
+.wyceno-quick-field:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.wyceno-quick-field legend {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  font-size: 1rem;
+  font-weight: 740;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.wyceno-quick-field legend small {
+  color: var(--wyceno-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.wyceno-quick-number {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  background: var(--wyceno-soft);
+  color: var(--wyceno-accent);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.wyceno-form--quick .wyceno-choices {
+  margin-top: 12px;
+}
+
+.wyceno-form--quick input[type="text"],
+.wyceno-form--quick input[type="number"],
+.wyceno-form--quick input[type="date"],
+.wyceno-form--quick textarea {
+  margin-top: 12px;
+}
+
+.wyceno-unknown {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--wyceno-muted);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.wyceno-quick-field[aria-invalid="true"] {
+  margin-inline: -14px;
+  padding-inline: 14px;
+  border-radius: 7px;
+  background: #fff7f7;
+}
+
+.wyceno-form--quick .wyceno-actions--quick {
+  margin-top: 8px;
+  padding-top: 22px;
+  border-top: 1px solid var(--wyceno-border);
+}
+
+/* Quick form is intentionally quiet: content, spacing and state do the work. */
+.wyceno-card--quick {
+  --wyceno-border: #e3e6e4;
+  --wyceno-border-strong: #aab2ae;
+  --wyceno-muted: #606963;
+  --wyceno-soft: #f6f7f6;
+
+  width: min(100%, 760px);
+  min-height: 0;
+  border-color: #e1e4e2;
+  border-radius: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.wyceno-card--quick .wyceno-header {
+  min-height: 56px;
+  margin-inline: 40px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e6e8e6;
+  background: #ffffff;
+  color: #17211d;
+}
+
+.wyceno-card--quick .wyceno-brand-mark {
+  display: none;
+}
+
+.wyceno-card--quick .wyceno-brand {
+  gap: 0;
+}
+
+.wyceno-card--quick .wyceno-brand strong {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wyceno-card--quick .wyceno-brand small,
+.wyceno-card--quick .wyceno-sync {
+  color: #626a65;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.wyceno-stage--quick {
+  width: min(calc(100% - 80px), 680px);
+  min-height: 0;
+  padding: 48px 0 56px;
+  display: block;
+}
+
+.wyceno-stage--quick .wyceno-introduction {
+  margin: 0;
+}
+
+.wyceno-stage--quick .wyceno-introduction h1 {
+  max-width: 28ch;
+  margin: 0 0 10px;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.wyceno-stage--quick .wyceno-intro {
+  max-width: 52ch;
+  color: #606963;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.wyceno-document-meta {
+  margin-top: 32px;
+  padding: 10px 0;
+  border: 1px solid #dfe3e0;
+  border-width: 1px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #626a65;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.wyceno-stage--quick .wyceno-analytics {
+  margin: 18px 0 0;
+  padding: 14px 0 0;
+  border: 1px solid #e5e7e5;
+  border-width: 1px 0 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.wyceno-stage--quick .wyceno-analytics p {
+  max-width: 62ch;
+  color: #68706b;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.wyceno-stage--quick .wyceno-analytics-actions {
+  margin-top: 10px;
+}
+
+.wyceno-stage--quick .wyceno-analytics.is-resolved {
+  padding-block: 12px;
+  border-width: 1px 0;
+}
+
+.wyceno-stage--quick .wyceno-form--quick {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.wyceno-stage--quick .wyceno-quick-field {
+  padding-block: 28px;
+  border-top: 1px solid #e5e7e5;
+}
+
+.wyceno-stage--quick .wyceno-quick-field:first-child {
+  padding-top: 30px;
+  border-top: 0;
+}
+
+.wyceno-stage--quick .wyceno-quick-field legend {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.wyceno-stage--quick .wyceno-quick-number {
+  width: auto;
+  height: auto;
+  display: block;
+  border: 0;
+  background: transparent;
+  color: #7a827d;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+}
+
+.wyceno-stage--quick .wyceno-choices {
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-top: 1px solid #dfe3e0;
+}
+
+.wyceno-stage--quick .wyceno-choice {
+  min-height: 46px;
+  padding: 10px 8px;
+  border: 0;
+  border-bottom: 1px solid #dfe3e0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 0.78rem;
+}
+
+.wyceno-stage--quick .wyceno-choice:hover {
+  border-color: #bdc4c0;
+  background: #fafbfa;
+}
+
+.wyceno-stage--quick .wyceno-choice:has(input:checked) {
+  border-color: #cad7d1;
+  background: #f2f7f4;
+  box-shadow: inset 2px 0 0 var(--wyceno-accent);
+}
+
+.wyceno-stage--quick input[type="text"],
+.wyceno-stage--quick input[type="number"],
+.wyceno-stage--quick input[type="date"],
+.wyceno-stage--quick textarea {
+  min-height: 48px;
+  padding: 11px 12px;
+  border-radius: 3px;
+  background: #ffffff;
+}
+
+.wyceno-stage--quick .wyceno-actions--quick .wyceno-primary {
+  min-height: 44px;
+  padding-inline: 18px;
+  border-radius: 3px;
+  font-size: 0.78rem;
+}
+
+.wyceno-stage--quick .wyceno-actions--quick {
+  justify-content: flex-end;
+}
+
+/* Visual choices use the same document grammar without pretending to be a mockup. */
+.wyceno-card--visual {
+  width: min(100%, 860px);
+  min-height: 0;
+  border-color: #e1e4e2;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.wyceno-card--visual .wyceno-header {
+  min-height: 56px;
+  margin-inline: 40px;
+  padding: 10px 0;
+  border-bottom-color: #e6e8e6;
+}
+
+.wyceno-card--visual .wyceno-brand-mark {
+  display: none;
+}
+
+.wyceno-card--visual .wyceno-brand {
+  gap: 0;
+}
+
+.wyceno-card--visual .wyceno-brand strong {
+  font-size: 12px;
+}
+
+.wyceno-card--visual .wyceno-brand small,
+.wyceno-card--visual .wyceno-sync {
+  color: #626a65;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.wyceno-card--visual .wyceno-progress-region,
+.wyceno-stage--visual {
+  width: min(calc(100% - 80px), 680px);
+}
+
+.wyceno-card--visual .wyceno-progress-region {
+  padding-top: 26px;
+}
+
+.wyceno-stage--visual {
+  min-height: 0;
+  padding: 30px 0 48px;
+}
+
+.wyceno-stage--visual .wyceno-introduction {
+  margin-bottom: 30px;
+}
+
+.wyceno-stage--visual .wyceno-introduction h1 {
+  max-width: 28ch;
+  margin: 0 0 8px;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.wyceno-stage--visual .wyceno-form {
+  min-height: 0;
+}
+
+.wyceno-stage--visual legend {
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+}
+
+.wyceno-stage--visual .wyceno-analytics {
+  margin-top: 28px;
+  padding: 14px 0 0;
+  border-width: 1px 0 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.wyceno-stage--visual .wyceno-analytics p {
+  font-size: 10px;
+}
+
+.wyceno-stage--visual .wyceno-actions {
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
 fieldset {
   margin: 0;
   padding: 0;
@@ -316,6 +781,113 @@ legend {
   box-shadow: inset 0 0 0 1px var(--wyceno-accent);
 }
 
+.wyceno-choices--text-cards .wyceno-choice {
+  min-height: 76px;
+  align-items: flex-start;
+  padding: 14px;
+}
+
+.wyceno-choices--icon-cards .wyceno-choice {
+  min-height: 94px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: auto 28px minmax(0, 1fr);
+  align-items: start;
+}
+
+.wyceno-presentation-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--wyceno-accent);
+}
+
+.wyceno-choices--icon-cards .wyceno-choice:has(input:checked) .wyceno-presentation-icon {
+  color: #084c3a;
+}
+
+.wyceno-choices--image-cards {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wyceno-choices--image-cards .wyceno-choice {
+  position: relative;
+  min-height: 0;
+  padding: 0 0 14px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px 0;
+  overflow: hidden;
+}
+
+.wyceno-choices--image-cards .wyceno-choice > input {
+  margin: 2px 0 0 14px;
+}
+
+.wyceno-choice-media {
+  position: relative;
+  grid-column: 1 / -1;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-bottom: 1px solid var(--wyceno-border);
+  background: #eef1ee;
+}
+
+.wyceno-choice-media img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.wyceno-choice-media.is-loaded img {
+  opacity: 1;
+}
+
+.wyceno-choice-media-fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  place-items: center;
+  padding: 16px;
+  color: #55605a;
+  font-size: 11px;
+  text-align: center;
+}
+
+.wyceno-choice-media.is-failed img {
+  display: none;
+}
+
+.wyceno-choice-media.is-failed .wyceno-choice-media-fallback {
+  display: grid;
+}
+
+.wyceno-choices--image-cards .wyceno-choice-copy {
+  align-self: start;
+  padding-right: 14px;
+}
+
+.wyceno-choice-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.wyceno-choice-copy strong {
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.wyceno-choice-copy small {
+  color: var(--wyceno-muted);
+  font-size: 11px;
+  font-weight: 450;
+  line-height: 1.45;
+}
+
 input[type="radio"],
 input[type="checkbox"] {
   width: 18px;
@@ -355,7 +927,7 @@ button {
 .wyceno-launcher {
   border: 1px solid var(--wyceno-accent);
   background: var(--wyceno-accent);
-  color: #ffffff;
+  color: var(--wyceno-tenant-accent-text, #ffffff);
 }
 
 .wyceno-primary:hover,
@@ -537,6 +1109,22 @@ button {
   grid-column: 1 / -1;
 }
 
+.wyceno-challenge {
+  width: min(100%, 320px);
+  margin: 18px auto 0;
+  color: var(--wyceno-muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.wyceno-challenge p {
+  margin: 0 0 8px;
+}
+
+.wyceno-challenge-target {
+  min-height: 1px;
+}
+
 .wyceno-contact-field {
   display: grid;
   gap: 5px;
@@ -544,7 +1132,8 @@ button {
   font-weight: 700;
 }
 
-.wyceno-contact-field input {
+.wyceno-contact-field input,
+.wyceno-contact-field select {
   width: 100%;
   min-height: 44px;
   padding: 9px 11px;
@@ -623,11 +1212,119 @@ button {
 }
 
 @media (max-width: 700px) {
+  .wyceno-context {
+    width: calc(100% - 32px);
+    margin-top: 18px;
+  }
+
+  .wyceno-context__readonly,
+  .wyceno-context__summary > div {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .wyceno-context__form .wyceno-primary {
+    width: 100%;
+  }
+
+  .wyceno-choices--image-cards {
+    grid-template-columns: 1fr;
+  }
+
   .wyceno-card {
     min-height: 100dvh;
     border: 0;
     border-radius: 0;
     box-shadow: none;
+  }
+
+  .wyceno-card.wyceno-card--quick {
+    min-height: 0;
+    background: #ffffff;
+  }
+
+  .wyceno-card.wyceno-card--visual {
+    min-height: 100dvh;
+    background: #ffffff;
+  }
+
+  .wyceno-card--quick .wyceno-header {
+    min-height: 54px;
+    margin-inline: 16px;
+    padding: 9px 0;
+    gap: 10px;
+  }
+
+  .wyceno-card--quick .wyceno-brand strong {
+    display: block;
+    max-width: 155px;
+  }
+
+  .wyceno-card--quick .wyceno-brand small {
+    display: block;
+    color: #626a65;
+    font-size: 9px;
+    font-weight: 500;
+  }
+
+  .wyceno-stage.wyceno-stage--quick {
+    width: 100%;
+    min-height: 0;
+    padding: 32px 16px calc(24px + env(safe-area-inset-bottom));
+    display: block;
+  }
+
+  .wyceno-stage--quick .wyceno-introduction {
+    margin: 0;
+  }
+
+  .wyceno-stage--quick .wyceno-introduction h1 {
+    max-width: 24ch;
+    margin-block: 0 9px;
+    font-size: 1.75rem;
+  }
+
+  .wyceno-stage--quick .wyceno-intro {
+    max-width: 34ch;
+  }
+
+  .wyceno-document-meta {
+    margin-top: 24px;
+  }
+
+  .wyceno-stage--quick .wyceno-analytics {
+    margin-bottom: 0;
+  }
+
+  .wyceno-stage--quick .wyceno-form--quick {
+    min-height: 0;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .wyceno-stage--quick .wyceno-quick-field {
+    padding-block: 24px;
+  }
+
+  .wyceno-card--visual .wyceno-header {
+    min-height: 54px;
+    margin-inline: 16px;
+    padding: 9px 0;
+  }
+
+  .wyceno-card--visual .wyceno-progress-region {
+    width: calc(100% - 32px);
+    padding-top: 18px;
+  }
+
+  .wyceno-stage.wyceno-stage--visual {
+    width: 100%;
+    min-height: 0;
+    padding: 28px 16px calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .wyceno-stage--visual .wyceno-introduction h1 {
+    font-size: 1.75rem;
   }
 
   .wyceno-header {
@@ -660,6 +1357,18 @@ button {
     font-size: clamp(1.7rem, 8vw, 2rem);
   }
 
+  .wyceno-quick-field legend {
+    font-size: 1rem;
+  }
+
+  .wyceno-form--quick .wyceno-choices {
+    grid-template-columns: 1fr;
+  }
+
+  .wyceno-actions--quick .wyceno-primary {
+    width: 100%;
+  }
+
   .wyceno-form {
     min-height: calc(100dvh - 230px);
   }
@@ -689,6 +1398,24 @@ button {
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--wyceno-border);
     background: var(--wyceno-surface);
+  }
+
+  .wyceno-form.wyceno-form--quick {
+    min-height: 0;
+  }
+
+  .wyceno-form--quick .wyceno-actions--quick {
+    position: static;
+    margin: 6px 0 0;
+    padding: 20px 0 0;
+    background: transparent;
+  }
+
+  .wyceno-stage--visual .wyceno-actions {
+    position: static;
+    margin: 20px 0 0;
+    padding: 16px 0 0;
+    background: transparent;
   }
 
   .wyceno-actions button {

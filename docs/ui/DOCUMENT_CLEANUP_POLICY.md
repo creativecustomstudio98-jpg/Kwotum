@@ -1,8 +1,8 @@
-# Lorum — polityka czyszczenia dokumentacji
+# Kwotum — polityka czyszczenia dokumentacji
 
 **Status:** CANONICAL
 **Owner:** Documentation Architect
-**Last reviewed:** 2026-07-26
+**Last reviewed:** 2026-08-26
 
 ## Zasada
 
@@ -27,11 +27,13 @@ Najpierw inwentaryzacja, następnie MERGE/REPLACE/ARCHIVE, dopiero na końcu DEL
 - `docs/VISUAL_QA.md`
 - `docs/ui/REFERENCE_IMAGE_PROTOCOL.md`
 - `docs/ui/SECTION_FIDELITY_MATRIX.md`
-- `docs/ui/PRODUCT_SCREEN_FIDELITY_MATRIX.md`
 - `docs/ui/VISUAL_ACCEPTANCE_SCORECARD.md`
 - `docs/ui/REFERENCE_MANIFEST.md`
+- `docs/ui/panel-minimal-v1/README.md`
 
-Dokumenty `lorum-product-ui-reference-v1` i `lorum-landing-reference-v2` mogą pozostać jako materiał źródłowy, ale po konsolidacji nie mogą konkurować z V6 jako równoległe źródła decyzji. Ich status i rola mają być jednoznacznie opisane w `docs/INDEX.md`.
+Pakiet `lorum-product-ui-reference-v1` został usunięty po konsolidacji do
+`panel-minimal-v1`. `lorum-landing-reference-v2` pozostaje materiałem
+pomocniczym tylko dla landingu i nie może konkurować z V7 ani sterować panelem.
 
 ## Obowiązkowe artefakty migracji
 

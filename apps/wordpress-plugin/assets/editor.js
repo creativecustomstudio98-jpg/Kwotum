@@ -9,6 +9,7 @@
   const SelectControl = components.SelectControl;
   const RangeControl = components.RangeControl;
   const Notice = components.Notice;
+  const TextareaControl = components.TextareaControl;
 
   blocks.registerBlockType("wyceno/flow", {
     edit: function (props) {
@@ -73,6 +74,14 @@
                 setAttributes({ height: value });
               },
               value: attributes.height,
+            }),
+            el(TextareaControl, {
+              help: 'Wyłącznie krótkie dane produktowe, np. {"model":"M2"}. Bez danych kontaktowych, cen i zgód.',
+              label: "Kontekst strony (JSON)",
+              onChange: function (value) {
+                setAttributes({ contextValues: value });
+              },
+              value: attributes.contextValues,
             }),
           ),
         ),

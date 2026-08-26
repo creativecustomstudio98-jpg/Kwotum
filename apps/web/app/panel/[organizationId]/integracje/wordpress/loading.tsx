@@ -1,16 +1,18 @@
 import { Skeleton } from "@wyceno/ui";
 
+import { PanelTenantPageHeader } from "../../../panel-tenant-page-header";
+import { IntegrationsNavigation } from "../../integrations-navigation";
+
 export default function WordPressIntegrationLoading() {
   return (
-    <main aria-busy="true" className="panel-workspace settings-panel">
-      <header className="panel-topbar">
-        <div className="panel-topbar__context">
-          <div>
-            <p className="panel-topbar__eyebrow">Integracje</p>
-            <h1>WordPress</h1>
-          </div>
-        </div>
-      </header>
+    <main aria-busy="true" className="panel-workspace wordpress-panel">
+      <PanelTenantPageHeader
+        currentLabel="Integracje"
+        description="Połączenia zewnętrzne organizacji."
+        navigation={<IntegrationsNavigation />}
+        title="Integracje"
+        utilityAction={{ hrefSuffix: "/procesy", label: "Przejdź do procesów" }}
+      />
       <div className="panel-page">
         <Skeleton label="Sprawdzanie połączeń WordPress" lines={7} />
       </div>

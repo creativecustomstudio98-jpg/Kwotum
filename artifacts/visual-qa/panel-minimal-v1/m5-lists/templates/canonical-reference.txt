@@ -1,0 +1,8 @@
+Primary reference: ../../../../../docs/ui/panel-minimal-v1/reference/panel-dashboard-primary-1199x842.png
+SHA-256: 824df7d47e16d9114ae66990a0d02e91f4954ce1ba7b5d1c4d180fea84aed6e1
+Measured region: the lower full-width list/table rhythm, compact controls, thin separators and flat surfaces.
+Directional reference: ../../../../../docs/ui/panel-minimal-v1/reference/panel-dashboard-direction-404x316.png
+SHA-256: 2cd7db369c2233f08f77b497a2b2e54e5458bf840548c5ba6e791b48518e3b64
+Directional role only: professional typography, sparse colour and compact controls; imagery is not copied.
+Target viewports: 1536x1024 desktop and 390x844 mobile; responsive boundary matrix per docs/VISUAL_QA.md.
+Protected state: authenticated tenant; search/category/complexity/sort, template creation, selection and full preview remain real and keyboard-operable.

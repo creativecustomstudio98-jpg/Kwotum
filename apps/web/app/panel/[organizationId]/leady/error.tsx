@@ -3,6 +3,8 @@
 import { Button, EmptyState } from "@wyceno/ui";
 import { useEffect } from "react";
 
+import { PanelTenantPageHeader } from "../../panel-tenant-page-header";
+
 export default function LeadsError({
   error,
   reset,
@@ -15,8 +17,13 @@ export default function LeadsError({
   }, [error]);
 
   return (
-    <main className="panel-workspace">
-      <div className="panel-page">
+    <main className="panel-workspace lead-panel">
+      <PanelTenantPageHeader
+        currentLabel="Leady"
+        description="Lista zapytań i ich bieżący status obsługi."
+        title="Leady"
+      />
+      <section aria-live="assertive" className="record-list-surface lead-list-surface" role="alert">
         <EmptyState
           action={
             <Button onClick={reset} type="button">
@@ -26,7 +33,7 @@ export default function LeadsError({
           description="Nie udało się bezpiecznie pobrać danych. Spróbuj ponownie."
           title="Panel leadów jest chwilowo niedostępny"
         />
-      </div>
+      </section>
     </main>
   );
 }

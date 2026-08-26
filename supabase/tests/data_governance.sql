@@ -117,8 +117,10 @@ begin
     'aaaaaaaa-0000-4000-8000-000000000001',
     target
   );
-  if exported ->> 'exportVersion' is distinct from '1'
+  if exported ->> 'exportVersion' is distinct from '2'
     or exported #>> '{lead,contact,email}' is distinct from 'klient@example.test'
+    or not (exported #> '{lead,contact}' ? 'preferredChannel')
+    or not (exported #> '{lead,contact}' ? 'preferredWindow')
     or jsonb_array_length(exported -> 'answers') = 0
     or jsonb_array_length(exported -> 'consents') <> 2
   then

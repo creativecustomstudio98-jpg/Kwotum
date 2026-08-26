@@ -117,10 +117,14 @@ export function LeadNoteForm({
 }) {
   const [state, action, pending] = useActionState(addLeadNoteAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
+  const handledNoteIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!state.success) return;
+    if (!state.success || !state.createdNote || handledNoteIdRef.current === state.createdNote.id) {
+      return;
+    }
+    handledNoteIdRef.current = state.createdNote.id;
     formRef.current?.reset();
-    if (state.createdNote) onCreated?.(state.createdNote);
+    onCreated?.(state.createdNote);
   }, [onCreated, state]);
   return (
     <form

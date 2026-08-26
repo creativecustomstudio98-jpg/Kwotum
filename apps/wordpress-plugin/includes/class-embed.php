@@ -17,12 +17,13 @@ final class Embed
     public static function shortcode(array $attributes = []): string
     {
         $attributes = shortcode_atts(
-            ['height' => '720', 'id' => '', 'mode' => 'inline'],
+            ['context' => '', 'height' => '720', 'id' => '', 'mode' => 'inline'],
             $attributes,
             'wyceno'
         );
         return self::render([
             'flowId' => sanitize_text_field((string) $attributes['id']),
+            'contextValues' => (string) $attributes['context'],
             'height' => (int) $attributes['height'],
             'mode' => sanitize_key((string) $attributes['mode']),
         ]);
@@ -59,6 +60,7 @@ final class Embed
         $flow_id = strtolower(sanitize_text_field((string) ($attributes['flowId'] ?? '')));
         $mode = sanitize_key((string) ($attributes['mode'] ?? 'inline'));
         $height = min(1600, max(320, (int) ($attributes['height'] ?? 720)));
+        $context_json = self::safe_context_json((string) ($attributes['contextValues'] ?? ''));
         if (! in_array($mode, ['inline', 'popup', 'fullscreen'], true)) {
             $mode = 'inline';
         }
@@ -93,11 +95,50 @@ final class Embed
                 . esc_html__('Integracja Kwotum wymaga konfiguracji.', 'wyceno-connector')
                 . '</p>';
         }
+        $context_attribute = $context_json === null
+            ? ''
+            : ' context-values="' . esc_attr($context_json) . '"';
         return sprintf(
-            '<div class="wyceno-connector-embed" style="min-height:%dpx"><wyceno-widget public-id="%s" mode="%s"></wyceno-widget></div>',
+            '<div class="wyceno-connector-embed" style="min-height:%dpx"><wyceno-widget public-id="%s" mode="%s"%s></wyceno-widget></div>',
             $height,
             esc_attr($flow_id),
-            esc_attr($mode)
+            esc_attr($mode),
+            $context_attribute
         );
+    }
+
+    private static function safe_context_json(string $candidate): ?string
+    {
+        if (trim($candidate) === '') {
+            return null;
+        }
+        $decoded = json_decode($candidate, true);
+        if (! is_array($decoded) || array_is_list($decoded) || count($decoded) > 8) {
+            return null;
+        }
+        $safe = [];
+        foreach ($decoded as $key => $value) {
+            if (
+                ! is_string($key)
+                || ! preg_match('/^[a-z][a-z0-9_]{0,63}$/', $key)
+                || preg_match('/^(consent|organization|price|routing|score|tenant)(_|$)/', $key)
+                || ! is_string($value)
+            ) {
+                return null;
+            }
+            $value = trim($value);
+            if (
+                $value === ''
+                || mb_strlen($value) > 120
+                || preg_match('/[[:cntrl:]]/', $value)
+                || filter_var($value, FILTER_VALIDATE_EMAIL)
+                || preg_match('/(^|\s)(https?:\/\/|www\.)/i', $value)
+                || preg_match('/^\+?[0-9 ()-]{7,}$/', $value)
+            ) {
+                return null;
+            }
+            $safe[$key] = $value;
+        }
+        return wp_json_encode($safe, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: null;
     }
 }

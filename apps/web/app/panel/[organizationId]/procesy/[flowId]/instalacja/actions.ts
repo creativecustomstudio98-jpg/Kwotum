@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { requireTenantContext } from "../../../../../../lib/auth/tenant-context";
-import { createFlowInvitation } from "../../../../../../lib/installation/service";
+import {
+  createFlowInvitation,
+  setFlowAllowedOrigins,
+} from "../../../../../../lib/installation/service";
 
 export type FlowInvitationActionState = Readonly<{
   error: string | null;
@@ -12,11 +15,10 @@ export type FlowInvitationActionState = Readonly<{
   success: string | null;
 }>;
 
-export const initialFlowInvitationActionState: FlowInvitationActionState = {
-  error: null,
-  invitationId: null,
-  success: null,
-};
+export type AllowedOriginsActionState = Readonly<{
+  error: string | null;
+  success: string | null;
+}>;
 
 const optionalNameSchema = z
   .string()
@@ -79,6 +81,47 @@ export async function createFlowInvitationAction(
     return {
       error: "Nie udało się wysłać formularza. Sprawdź publikację i spróbuj ponownie.",
       invitationId: null,
+      success: null,
+    };
+  }
+}
+
+export async function updateAllowedOriginsAction(
+  _previous: AllowedOriginsActionState,
+  formData: FormData,
+): Promise<AllowedOriginsActionState> {
+  const organizationId = z.uuid().safeParse(formData.get("organizationId"));
+  const flowId = z.uuid().safeParse(formData.get("flowId"));
+  const originsText = z
+    .string()
+    .trim()
+    .max(3000)
+    .safeParse(formData.get("origins") ?? "");
+  if (!organizationId.success || !flowId.success || !originsText.success) {
+    return { error: "Sprawdź listę domen.", success: null };
+  }
+  const origins = originsText.data
+    ? originsText.data
+        .split(/\r?\n/u)
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+    : [];
+  if (origins.length > 10) {
+    return { error: "Możesz dodać maksymalnie 10 domen.", success: null };
+  }
+  try {
+    const context = await requireTenantContext(organizationId.data);
+    await setFlowAllowedOrigins(context, flowId.data, origins);
+    revalidatePath(`/panel/${organizationId.data}/procesy/${flowId.data}/instalacja`);
+    return {
+      error: null,
+      success: origins.length
+        ? "Dozwolone domeny zostały zapisane."
+        : "Osadzanie na zewnętrznych domenach zostało wyłączone.",
+    };
+  } catch {
+    return {
+      error: "Nie udało się zapisać. Podaj pełne adresy HTTPS bez ścieżki, np. https://firma.pl.",
       success: null,
     };
   }

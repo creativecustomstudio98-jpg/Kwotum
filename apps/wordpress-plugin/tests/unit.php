@@ -41,6 +41,18 @@ wyceno_assert(str_contains($html, 'public-id="' . $flow_id . '"'), 'Shortcode lo
 wyceno_assert(str_contains($html, 'mode="popup"'), 'Popup mode was not rendered.');
 wyceno_assert(str_contains($html, 'min-height:1600px'), 'Height was not clamped.');
 wyceno_assert(! str_contains($html, $credential), 'Credential leaked into frontend HTML.');
+
+$context_html = Embed::shortcode([
+    'context' => '{"model":"M2","wariant":"jasny"}',
+    'id' => $flow_id,
+]);
+wyceno_assert(str_contains($context_html, 'context-values='), 'Safe context was not rendered.');
+wyceno_assert(str_contains($context_html, '&quot;model&quot;'), 'Context JSON was not escaped.');
+$pii_context_html = Embed::shortcode([
+    'context' => '{"model":"klient@example.test"}',
+    'id' => $flow_id,
+]);
+wyceno_assert(! str_contains($pii_context_html, 'context-values='), 'PII context reached HTML.');
 wyceno_assert(
     ($wyceno_test_enqueued_scripts['wyceno-connector-widget']['source'] ?? '')
         === 'https://api.wyceno.test/widget/v1/loader.js',

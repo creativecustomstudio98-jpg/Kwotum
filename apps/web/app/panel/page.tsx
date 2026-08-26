@@ -44,7 +44,7 @@ export default async function PanelPage() {
     organizationIds.length > 0
       ? await supabase
           .from("organizations")
-          .select("id, name, slug")
+          .select("id, name")
           .in("id", organizationIds)
           .is("deleted_at", null)
       : { data: [], error: null };
@@ -128,7 +128,7 @@ export default async function PanelPage() {
     <main className="organization-picker">
       <header className="organization-picker__header">
         <Link aria-label="Kwotum — strona główna" href="/">
-          <Image alt="" height={46} priority src="/Logoicon.svg" width={46} />
+          <Image alt="" height={46} priority src="/kwotum-logo-v3.png" width={46} />
           <strong>Kwotum</strong>
         </Link>
         <form action={signOut} className="organization-picker__logout">
@@ -138,13 +138,10 @@ export default async function PanelPage() {
         </form>
       </header>
       <div className="organization-picker__content">
-        <div className="panel-section-heading">
-          <div>
-            <p className="panel-topbar__eyebrow">Obszar roboczy</p>
-            <h1>Wybierz organizację</h1>
-            <p>Każda organizacja ma oddzielne dane, role i konfigurację.</p>
-          </div>
-        </div>
+        <header className="organization-picker__intro">
+          <h1>Wybierz organizację</h1>
+          <p>Wybierz organizację, w której chcesz pracować</p>
+        </header>
         {organizations.length === 0 ? (
           <div className="panel-card">
             <EmptyState
@@ -160,55 +157,35 @@ export default async function PanelPage() {
                 overview?.activeFlowCount === null
                   ? "Dostęp do leadów"
                   : formatActiveProcessCount(overview?.activeFlowCount ?? 0);
+              const membership = memberships.find(
+                (item) => item.organization_id === organization.id,
+              );
 
               return (
-                <li className="panel-card" key={organization.id}>
+                <li className="organization-list__card" key={organization.id}>
                   <div className="organization-list__identity">
                     <span aria-hidden="true">{initials(organization.name)}</span>
-                    <div className="organization-list__body">
-                      <div className="organization-list__copy">
-                        <strong>{organization.name}</strong>
-                        <small>/{organization.slug}</small>
-                      </div>
-                      <ul
-                        aria-label={`Podsumowanie organizacji ${organization.name}`}
-                        className="organization-list__meta"
-                      >
-                        <li>{activeFlowLabel}</li>
-                        <li>{formatAttentionLeadCount(overview?.attentionLeadCount ?? 0)}</li>
-                        <li>{formatLastActivity(overview?.lastActivityAt ?? null)}</li>
-                      </ul>
+                    <div className="organization-list__copy">
+                      <strong>{organization.name}</strong>
+                      <small>{formatRole(membership?.role)}</small>
                     </div>
                   </div>
+                  <ul
+                    aria-label={`Podsumowanie organizacji ${organization.name}`}
+                    className="organization-list__meta"
+                  >
+                    <li>{activeFlowLabel}</li>
+                    <li>{formatAttentionLeadCount(overview?.attentionLeadCount ?? 0)}</li>
+                    <li>{formatLastActivity(overview?.lastActivityAt ?? null)}</li>
+                  </ul>
                   <div className="organization-actions">
                     <LinkButton
                       className="organization-actions__primary"
                       href={`/panel/${organization.id}`}
-                      variant="primary"
+                      variant="secondary"
                     >
-                      Otwórz panel
+                      Wybierz
                     </LinkButton>
-                    {memberships.find(
-                      (membership) =>
-                        membership.organization_id === organization.id &&
-                        (membership.role === "owner" || membership.role === "admin"),
-                    ) ? (
-                      <LinkButton
-                        className="organization-actions__secondary"
-                        href={`/panel/${organization.id}/procesy`}
-                        variant="secondary"
-                      >
-                        Procesy
-                      </LinkButton>
-                    ) : (
-                      <LinkButton
-                        className="organization-actions__secondary"
-                        href={`/panel/${organization.id}/leady`}
-                        variant="secondary"
-                      >
-                        Leady
-                      </LinkButton>
-                    )}
                   </div>
                 </li>
               );
@@ -228,4 +205,10 @@ function initials(value: string): string {
       .map((part) => part[0]?.toLocaleUpperCase("pl-PL") ?? "")
       .join("") || "OR"
   );
+}
+
+function formatRole(role: "admin" | "owner" | "sales" | undefined): string {
+  if (role === "owner") return "Właściciel organizacji";
+  if (role === "admin") return "Administrator organizacji";
+  return "Dostęp do obsługi leadów";
 }

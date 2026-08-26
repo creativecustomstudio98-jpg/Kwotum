@@ -82,7 +82,7 @@ drill; nie jest domyślną reakcją na błąd konfiguracji.
 `minimumReleaseAge`, `trustPolicy: no-downgrade`, blokada egzotycznych zależności
 tranzytywnych, strict peers i jawna allowlista lifecycle scripts. Dopuszczone
 są tylko `sharp` i `unrs-resolver`. Wyjątki od wieku wydania są ograniczone do
-zweryfikowanych poprawek bezpieczeństwa `nanoid@3.3.17` i `postcss@8.5.26`.
+zweryfikowanych poprawek bezpieczeństwa `nanoid@3.3.18` i `postcss@8.5.26`.
 Wyjątki od polityki pochodzenia są ograniczone do istniejących wersji
 `eslint-import-resolver-typescript@3.10.1` i `semver@6.3.1`; nie obejmują
 przyszłych wersji tych paczek.
@@ -650,7 +650,8 @@ pozostają bez zmian. Decyzja nie daje zgody na deployment.
 **Status:** accepted dla kanonizacji dokumentacji 2026-07-27; implementacja
 pozostaje etapowa
 
-**Decyzja:** pakiet `nowydesign.zip` o SHA-256
+**Decyzja:** historyczny pakiet wejściowy `nowydesign.zip`, usunięty po
+poprawnej ekstrakcji, miał SHA-256
 `f1e86da64f28788065d687e7c2b65e9199af162ca4ff1bec9e05266b838fc141`
 zostaje przyjęty jako V6 Image-Locked — mierzalny kontrakt kompozycji,
 typografii, gęstości, kontrolek i transformacji responsive. Jego aktywne źródła
@@ -900,6 +901,11 @@ zerwaniu sesji, osadzeń, lokalnych preferencji i integracji.
 decyzji. Nie wolno przedstawiać dostępności domeny ani ochrony znaku jako
 potwierdzonej bez profesjonalnego badania.
 
+Korekta właścicielska z 2026-08-11 zastępuje geometrię wcześniejszego symbolu
+dostarczonym gradientowym znakiem Q z trzema liniami i potwierdzeniem. Tło oraz
+światło znaku są przezroczyste. Zakres obejmuje wszystkie powierzchnie marki
+Kwotum, ale nie tenantowe logo firmy wyświetlane w jej formularzu.
+
 ## ADR-034: tenantowy webhook `lead.created` z osobnym outboxem i pochodnym sekretem
 
 **Status:** accepted dla Etapu 12ZF na podstawie domyślnej decyzji programu
@@ -1117,3 +1123,498 @@ Obecny plan prywatnego repozytorium nie udostępnia branch protection, więc
 GitHub nie wymusza statusów przed merge. Do czasu GitHub Pro zielone Quality
 Gate, Gitleaks, Semgrep i WordPress na jednym SHA są ręczną, obowiązkową bramką
 właściciela; nie wolno merge'ować czerwonego lub niepełnego przebiegu.
+
+## ADR-039: wersjonowana polityka kontaktu i tenantowy adres alertów o leadach
+
+**Status:** accepted dla przygotowania pilotażu Fortez na podstawie decyzji
+właściciela produktu z 2026-08-10
+
+**Decyzja:** immutable snapshot opublikowanej wersji procesu otrzymuje
+`leadCaptureSchemaVersion: 2` oraz jawną `contactPolicy`. W pierwszej wersji
+obsługujemy dwie polityki: `email_required` i `phone_required`. Istniejące
+snapshoty v1 zachowują dotychczasową semantykę `email_required`; nie są
+przepisywane ani unieważniane. Publiczny manifest ujawnia wyłącznie wybraną
+politykę, aby widget mógł pokazać właściwe pola i oznaczenia wymagania. Serwer
+ponownie waliduje ją z immutable snapshotu i nie ufa samemu payloadowi klienta.
+Każdy lead musi mieć co najmniej e-mail albo telefon. Zgoda marketingowa e-mail
+bez adresu e-mail jest odrzucana. Potwierdzenie dla klienta powstaje tylko, gdy
+lead podał e-mail.
+
+Adres powiadomień firmy jest osobną tenantową konfiguracją, niezależną od konta
+użytkownika i adresu właściciela organizacji. Owner albo Admin ustawia jeden
+znormalizowany adres `lead_alert_email` przez kontrolowany zapis po stronie
+serwera. Sales nie odczytuje ani nie zmienia konfiguracji. Outbox utrwala
+snapshot odbiorcy w chwili utworzenia leada. Dla organizacji bez konfiguracji
+pozostaje kompatybilny fallback do najstarszego aktywnego Ownera; jego użycie
+jest stanem przejściowym, a nie docelową konfiguracją pilota. Publicznego adresu
+Fortez ani innych rzeczywistych danych klienta nie zapisujemy w repozytorium —
+wartość zostanie ustawiona dopiero w tenantowej konfiguracji środowiska.
+
+**Dlaczego:** w branżach wymagających szybkiego oddzwonienia, w tym w pilotażu
+Fortez, telefon jest podstawowym kanałem, a e-mail klienta nie zawsze jest
+dostępny. Jednocześnie firma może nie obsługiwać panelu, zaś firmowy adres
+kontaktowy może przekazywać wiadomości do istniejącej skrzynki. Wiązanie alertu
+z kontem Ownera wymuszałoby sztuczne konto albo wysyłkę do niewłaściwej osoby.
+Jawna polityka w wersji procesu i niezależny adres odbiorczy rozwiązują oba
+problemy bez osłabiania tenant isolation.
+
+**Konsekwencje:** `leads.contact_email` staje się nullable, a aplikacja, eksport,
+webhook i panel muszą bezpiecznie obsłużyć lead telefoniczny. Migracja jest
+forward-only i dodaje ograniczenie wymagające co najmniej jednego kanału
+kontaktu. Rollback aplikacji nie cofa schematu: snapshoty v2 pozostają poprawne,
+więc starszej wersji aplikacji nie wolno wdrożyć bez feature gate blokującego
+procesy `phone_required`. Wyłączenie nowej konfiguracji pozostawia historyczne
+snapshoty odbiorców w outboxie, a organizacje bez wpisu nadal korzystają z
+fallbacku Ownera. Przed dopuszczeniem prawdziwych leadów wymagane są negatywne
+testy RLS, UAT leada bez e-maila i kontrola rzeczywistej dostawy na skonfigurowany
+adres firmy.
+
+## ADR-040: serwerowa brama publicznego formularza z tenantową allowlistą originów
+
+**Status:** accepted dla podetapu FTZ-03A przygotowania pilotażu Fortez na
+podstawie polecenia kontynuacji właściciela produktu z 2026-08-10
+
+**Decyzja:** wszystkie przeglądarkowe endpointy formularza przechodzą przez
+jedną serwerową bramę przed wykonaniem operacji domenowej. Brama rozpoznaje
+opublikowany proces po `public_id` albo sesję wyłącznie po hashu tokenu,
+sprawdza dokładny znormalizowany origin oraz atomowo zużywa limity zapisane w
+PostgreSQL. Dozwolone originy są konfiguracją konkretnego procesu i
+organizacji, zarządzaną wyłącznie przez Ownera albo Admina. Zastąpienie listy
+blokuje wiersz procesu, aby dwa równoczesne zapisy nie złożyły konfiguracji.
+Hosted link z originu `APP_URL` pozostaje dozwolony. Żądanie przeglądarkowe z innym originem
+jest odrzucane przed odczytem manifestu i przed każdą mutacją. Odpowiedź CORS
+odzwierciedla wyłącznie zatwierdzony origin, dodaje `Vary: Origin` i nigdy nie
+używa wildcardu.
+
+Limiter jest rozproszony, ponieważ jego liczniki i stałe okna znajdują się w
+PostgreSQL, a nie w pamięci bezstanowej instancji aplikacji. Stosuje osobne
+budżety zależne od rodzaju operacji dla zahashowanego adresu klienta, originu,
+procesu, sesji i organizacji. Baza przechowuje wyłącznie HMAC-SHA-256 adresu IP
+oraz nieodwracalne hashe kluczy kubełków; surowy IP nie jest zapisywany ani
+logowany. Na Vercel źródłem adresu jest nadpisywany przez platformę
+`x-vercel-forwarded-for`. Poza środowiskiem lokalnym brak zaufanego nagłówka
+powoduje odrzucenie żądania. Odpowiedź 429 zawiera `Retry-After`.
+
+Publiczne RPC wykonujące operacje formularza tracą grant `anon`. Route
+Handlery po pozytywnym przejściu bramy używają serwerowego klienta wyłącznie do
+wąskich, `security definer` RPC. Dzięki temu bezpośrednie wywołanie Supabase nie
+omija origin allowlisty ani limitera. Service role nie trafia do klienta i nie
+jest używana w zwykłym ruchu panelu. Preflight bez tokenu może potwierdzić
+jedynie, czy origin występuje przy dowolnym aktywnym procesie; właściwe żądanie
+zawsze ponownie sprawdza origin dla konkretnego procesu lub sesji.
+
+**Dlaczego:** CORS jest kontrolą przeglądarki, a nie uwierzytelnieniem. Samo
+zastąpienie `*` allowlistą w Next.js pozostawiłoby anonimowe RPC Supabase jako
+pełne obejście. Limiter w pamięci pojedynczej funkcji również nie zapewnia
+globalnego budżetu po skalowaniu lub restarcie. Tenantowa konfiguracja pozwala
+uruchomić ten sam SaaS na domenach różnych klientów bez globalnego rozszerzania
+zaufania.
+
+**Konsekwencje:** przed osadzeniem procesu operator musi zapisać dokładny origin
+witryny, na przykład `https://example.pl`; ścieżki i wildcardy nie są
+akceptowane. Brak konfiguracji blokuje osadzenie cross-origin, ale nie hosted
+link. Brak nagłówka `Origin` nie jest traktowany jako uwierzytelnienie i dlatego
+nadal podlega limitom. Migracja jest expand-and-restrict: nowa tabela originów i
+prywatne kubełki są zgodne ze starszą aplikacją, lecz po odebraniu grantu `anon`
+rollback wymaga najpierw ponownego wdrożenia wersji korzystającej z bramy albo
+czasowego przywrócenia grantów według runbooka. Kubełki wygasają i mogą zostać
+usunięte bez wpływu na dane biznesowe. Adaptacyjny Turnstile jest osobnym
+podetapem FTZ-03B; ADR-041 zamyka jego implementację lokalną, ale konfiguracja i
+smoke środowiska nadal blokują produkcyjny GO.
+
+## ADR-041: adaptacyjny Turnstile na finalnym zapisie leada
+
+**Status:** accepted dla podetapu FTZ-03B przygotowania pilotażu Fortez na
+podstawie polecenia kontynuacji właściciela produktu z 2026-08-10
+
+**Decyzja:** każde produkcyjne wysłanie leada wymaga świeżego tokenu Cloudflare
+Turnstile. Widget używa jawnego renderowania z `appearance: interaction-only`
+oraz `execution: execute`: element weryfikacyjny pozostaje niewidoczny, gdy
+Cloudflare nie wymaga interakcji, ale nie tworzymy własnego, nieaudytowalnego
+scoringu ryzyka. Token jest dołączany wyłącznie do finalnego żądania submit i
+nie jest zapisywany w bazie, analytics ani logach. Tryb podglądu procesu nie
+tworzy leada i dlatego korzysta z lokalnego adaptera bez providera.
+
+Route Handler po pozytywnym origin/rate guardzie, walidacji tokenu sesji i
+payloadu, lecz przed RPC tworzącym lead, wywołuje serwerowe Siteverify. Wymaga
+`success`, zgodnej akcji `kwotum_lead_submit`, dozwolonego hosta oraz świeżego
+wyniku. Zaufany adres klienta jest przekazywany jako opcjonalny `remoteip`, ale
+nie jest utrwalany. `mutationId` jest `idempotency_key` walidacji, dzięki czemu
+jedno automatyczne ponowienie Siteverify po błędzie sieci używa tej samej
+operacji. Timeout, błąd providera, brak konfiguracji poza local, niezgodny host
+lub akcja oraz token zużyty, nieważny lub wygasły kończą się fail-closed przed
+zapisem leada. Ponowienie przez użytkownika zawsze pobiera nowy token, ponieważ
+token Turnstile jest jednorazowy.
+
+Publiczny site key i stała akcja są dokładane przez warstwę HTTP do manifestu
+runtime; immutable snapshot procesu i baza nie przechowują klucza providera.
+Sekret pozostaje wyłącznie po stronie serwera. Local może działać bez Turnstile
+tylko wtedy, gdy oba klucze są nieobecne; preview, staging i production
+wymagają kompletnej pary i blokują publiczną ścieżkę przy błędnej konfiguracji.
+Testy integracyjne używają wyłącznie oficjalnych kluczy testowych Cloudflare.
+
+Host aplikacji i wszystkie hosty osadzenia muszą być jawnie wpisane w ustawienia
+widgetu Cloudflare. CSP aplikacji i hosta klienta dopuszcza wyłącznie oficjalny
+origin challenge w `script-src` i `frame-src`; skrypt nie jest proxy'owany ani
+cache'owany przez Kwotum. Nie włączamy pre-clearance, nie uzależniamy działania
+od cookies Cloudflare i nie traktujemy Turnstile jako zamiennika walidacji,
+origin allowlisty, limitera ani kontroli uprawnień.
+
+**Dlaczego:** sprawdzanie wyłącznie po stronie klienta jest możliwe do ominięcia,
+a własny próg „podejrzanego” ruchu byłby trudny do wyjaśnienia, strojenia i
+testowania przed pierwszym pilotem. Managed challenge pozwala providerowi
+adaptować poziom tarcia, a obowiązkowe Siteverify utrzymuje jedną jednoznaczną
+bramę bezpieczeństwa przed utworzeniem danych biznesowych.
+
+**Konsekwencje:** awaria Turnstile może czasowo zablokować nowe leady Kwotum;
+pilot zachowuje więc dotychczasowy formularz lub kanał kontaktu jako jawny
+fallback operacyjny. Rollback aplikacji nie może po cichu wyłączyć weryfikacji:
+należy najpierw odłączyć embed albo przywrócić poprzedni kanał, a dopiero potem
+wycofać aplikację. Rotacja kluczy wymaga skoordynowanej zmiany Cloudflare i
+sekretów środowiska. Turnstile staje się kolejnym subprocessorem wymagającym
+zatwierdzenia prawnego i pozostaje pozycją produkcyjnego GO mimo ukończenia
+implementacji lokalnej.
+
+## ADR-042: finalny sidebar Kwotum 256/72 i lokalny Instrument Sans
+
+**Status:** accepted dla etapu P1 rebrandingu panelu na podstawie
+zaakceptowanej referencji i specyfikacji właściciela z 2026-08-13
+
+**Decyzja:** wspólny desktopowy sidebar `/panel/[organizationId]` pozostaje
+jednym komponentem z capability-gated konfiguracją, ale przyjmuje płaski język
+Kwotum: 256 px w stanie rozwiniętym, 72 px w stanie zwiniętym, tło `#0D2B24`,
+trzy nazwane grupy oraz jasną aktywną zakładkę dochodzącą do prawej krawędzi i
+zakończoną dwoma ścięciami. Nie używa gradientu, poświaty, blur, tekstury,
+cienia, skalowania ani powierzchni glass. App shell ma jedno źródło szerokości
+`--kw-sidebar-width`; trasy i ekrany nie otrzymują lokalnych `margin-left`.
+
+Tokeny `--kw-sidebar-*` są ograniczonym, semantycznym kontraktem tego
+komponentu zdefiniowanym centralnie w `packages/ui`, a nie drugim ogólnym
+systemem kolorów. Istniejące role `--wy-*` nadal sterują pozostałymi
+powierzchniami. Aktywna pozycja zachowuje fokus na nieprzyciętym linku, a
+kształt tworzy pseudo-element. Collapse zachowuje techniczny klucz
+`lorum:panel-sidebar-collapsed` wymagany przez ADR-033. Poniżej 56 rem nadal
+działa dotychczasowa mobilna dolna nawigacja i dialog „Więcej”.
+
+Sidebar używa lokalnego Instrument Sans Variable przez `next/font/local` bez
+CDN. Plik pochodzi z repozytorium `Instrument/instrument-sans`, commit
+`7fa22308a3d0c94ee2b3cd537a1196b65db34a3e`, jest objęty SIL OFL 1.1 i ma
+SHA-256 `aa72922aafcc0dc18f36ec1d805b0212057dabe8b9d5b8b57f67035aea1b826d`.
+Font jest aktywowany wyłącznie w sidebarze; pozostały interfejs pozostaje poza
+zakresem P1.
+
+**Dlaczego:** wcześniejszy wariant 240/78 używał radialnych świateł,
+dekoracyjnych gradientów, półprzezroczystych powierzchni i cieni, przez co był
+sprzeczny z zaakceptowanym, operacyjnym kierunkiem Kwotum. Nowa referencja
+rozstrzyga zarówno charakter marki, jak i dokładną geometrię obu stanów, bez
+rozszerzania funkcji produktu.
+
+**Konsekwencje:** testy shellu i buildera muszą przyjąć 256/72 px oraz ponownie
+zmierzyć dostępny workspace. Nazwa `Dashboard` zmienia się na `Przegląd`
+wyłącznie w nawigacji; istniejąca trasa organizacji pozostaje bez zmian.
+Serwerowe źródła organizacji, profilu, capabilities, auth i tenant scope nie są
+modyfikowane. Rollback usuwa font i tokeny P1, przywraca 240/78 oraz poprzedni
+CSS, nie dotykając danych ani preferencji użytkownika.
+
+**Korekta ADR-049:** powyższa procedura rollbacku opisywała stan sprzed
+Minimal V1. Od 2026-08-26 geometria 256/72 pozostaje stałym kontraktem; rollback
+M1–M10 cofa wyłącznie prezentację bieżącego etapu i nie przywraca 240/78 ani
+wycofanego pakietu CSS.
+
+## ADR-043: jeden silnik intake i trzy wersjonowane tryby doświadczenia
+
+**Status:** accepted dla programu PX1–PX7 na podstawie decyzji właściciela
+produktu z 2026-08-25; implementacja kontraktu danych wymaga osobnego ADR w PX2
+
+**Decyzja:** Kwotum rozwija jeden bezpieczny silnik procesu z trzema trybami
+prezentacji: `quick_form`, `guided_brief` oraz `visual_configurator`.
+`quick_form` obsługuje klienta znającego usługę lub produkt i może pokazać
+zgodny, nierozgałęziony zestaw pól na jednej stronie. `guided_brief` zachowuje
+prowadzony wywiad. `visual_configurator` rozszerza go o kontrolowane warianty
+prezentacji, kiedy obraz, ikona albo próbka rzeczywiście pomaga podjąć decyzję.
+
+Tryby nie tworzą osobnych tabel leada, publicznych endpointów ani słabszej
+ścieżki submitu. Korzystają ze wspólnych immutable snapshots, sesji, zgód,
+serwerowej kalkulacji, idempotencji, origin allowlist, rate limitu, Turnstile,
+powiadomień, analityki i tenant isolation. Prezentacja kroku i opcji będzie
+wersjonowana oraz allowlistowana. Niedozwolone pozostają dowolne HTML, CSS,
+JavaScript, SVG, URL zasobu i niezdefiniowane metadata użytkownika.
+
+Istniejący krótki formularz, telefon lub WhatsApp firmy nie są automatycznie
+zastępowane. Strona może kierować użytkownika znającego model do krótkiej
+ścieżki, a osobę potrzebującą doboru do procesu prowadzonego. Bezpieczny context
+hosta będzie osobnym, typowanym kontraktem; nie może nadpisywać ceny, score,
+zgód, routingu ani tenant ID.
+
+**Dlaczego:** obecny model jest technicznie kompletny, ale niemal każde pytanie
+renderuje jako tę samą tekstową listę. To ogranicza użyteczność w decyzjach
+wizualnych, a jednocześnie wymusza zbyt długą ścieżkę dla osoby, która dokładnie
+wie, czego chce. Trzy kompozycje jednego silnika pozwalają dopasować tarcie bez
+duplikowania logiki bezpieczeństwa i operacji leada.
+
+**Konsekwencje:** FlowDocument wymaga kolejnej wersji, migratora pamięciowego,
+niezależnej walidacji PostgreSQL i rozszerzenia publicznej projekcji manifestu.
+Zmiany są realizowane sekwencyjnie w PX2–PX7 według
+`docs/product-experience-v1/`. Historyczne snapshoty pozostają niezmienne i
+publikowalne. Pięć obecnych szablonów ma status hipotezy do czasu badań; UI nie
+może nazywać ich zweryfikowanymi. Pilot zachowuje dotychczasowe kanały jako
+fallback, a rozszerzenie na kolejnych tenantów wymaga osobnej decyzji po danych.
+
+## ADR-044: FlowDocument v3 z zamkniętym kontraktem prezentacji
+
+**Status:** accepted dla PX2 na podstawie polecenia kontynuacji lokalnej
+właściciela produktu z 2026-08-25
+
+**Decyzja:** `FlowDocument v3` pozostaje tym samym agregatem JSONB i dodaje
+wyłącznie trzy elementy potrzebne zaplanowanym konsumentom PX3/PX4:
+`experienceMode` na poziomie dokumentu, wymagany wariant `presentation` kroku
+oraz opcjonalne `presentation` odpowiedzi. Tryb doświadczenia jest jednym z
+`quick_form`, `guided_brief` i `visual_configurator`. Wariant kroku jest jednym
+z `default`, `text_cards`, `icon_cards` i `image_cards`. Opcja może zawierać
+krótki opis, klucz z zamkniętej allowlisty ikon albo referencję kontrolowanego
+assetu jako nieprzewidywalny UUID z obowiązkowym tekstem alternatywnym.
+
+Kontrakt nie przyjmuje URL zasobu, SVG, HTML, CSS, JavaScript, `data:` URI ani
+dowolnych metadanych. `icon_cards` wymaga ikony każdej opcji, a `image_cards`
+wymaga assetu i tekstu alternatywnego każdej opcji. Prezentacje kart są
+dozwolone wyłącznie dla pytań jedno- i wielokrotnego wyboru. Referencja UUID
+jest tylko bezpiecznym identyfikatorem kontraktu; tenantowe przechowywanie,
+rozwiązywanie i publikacyjna kontrola własności assetu powstaną atomowo w PX4.
+Do tego czasu v3 pozwala zapisać referencję, ale renderer jej nie pobiera ani
+nie wyświetla.
+
+Czytnik przyjmuje v1, v2 i v3. Deterministyczny migrator podnosi v1 przez
+sekcje v2, a następnie dodaje `guided_brief`, `default` oraz brak prezentacji
+opcji. Migracja działa wyłącznie w pamięci; istniejące drafty zostają zapisane
+jako v3 dopiero po zwykłej edycji, a immutable snapshoty nie są przepisywane.
+Publiczny manifest v3 jest jawną projekcją allowlistowanych pól i nie ujawnia
+sekcji, tenant ID, pricingu, scoringu ani prywatnych metadanych. Runtime PX2
+parsuje nowe pola, ale świadomie renderuje dotychczasowy wariant tekstowy.
+
+**Dlaczego:** osobne pola semantyczne pozwalają później zmienić kompozycję bez
+rozgałęziania domeny leada i bez interpretowania swobodnej konfiguracji
+wyglądu. Zamknięte enumy i projekcja manifestu ograniczają XSS, SSRF, wyciek
+danych i przypadkowe stworzenie drugiego systemu design tokens. Rozdzielenie
+identyfikatora assetu od jego przyszłego magazynu nie pozoruje uploadu w etapie
+modelu i nie osłabia tenant isolation.
+
+**Konsekwencje:** builder zaczyna zapisywać v3, lecz PX2 nie dodaje kontrolek
+trybu ani prezentacji. PX3 implementuje `quick_form`; PX4 wdraża mapę ikon,
+tenantowy rejestr assetów, kontrolę referencji oraz visual QA. Rollback aplikacji
+może zatrzymać tworzenie nowych v3, ale musi zachować parser i manifest v3,
+dopóki istnieje choć jeden draft, snapshot albo aktywna sesja tej wersji.
+
+## ADR-045: quick form jako liniowa kompozycja istniejącej sesji
+
+**Status:** accepted dla lokalnego PX3 na podstawie polecenia właściciela
+produktu „kolejny etap” z 2026-08-25; bez zgody na deploy
+
+**Decyzja:** `quick_form` jest kompozycją `FlowDocument v3`, a nie osobnym
+typem procesu, endpointem ani modelem leada. Może zawierać od 1 do 8 pytań,
+musi zaczynać się od pierwszego elementu tablicy i prowadzić dokładnie po jej
+kolejności. Nie dopuszcza reguł przejść ani override'ów opcji. Walidatory
+TypeScript, PostgreSQL i publicznego manifestu egzekwują to niezależnie.
+
+Builder udostępnia Ownerowi/Adminowi wybór pomiędzy prowadzonym briefem a
+krótkim formularzem. Niezgodny graf blokuje zapis i publikację z konkretnym
+wyjaśnieniem. Linearyzacja jest wyłącznie jawną akcją użytkownika, usuwa reguły
+i override'y, nie usuwa pytań i może zostać cofnięta. Podgląd nie ma osobnej
+makiety: używa produkcyjnego Web Componentu z pamięciowym adapterem preview.
+
+Runtime pokazuje wszystkie pola na jednej zwartej powierzchni, zachowuje dane
+po błędzie i fokusuje pierwsze niepoprawne pole. Po poprawnej walidacji tworzy
+uporządkowaną kolejkę tych samych idempotentnych mutacji odpowiedzi co
+`guided_brief`. Wynik, kontakt, privacy proof, Turnstile, rate limit, origin
+allowlist, upload i atomowy submit leada pozostają bez zmian. Równoległy drugi
+submit jest blokowany również w kontrolerze.
+
+**Dlaczego:** małe firmy potrzebują zwykłego formularza bez sztucznego
+przechodzenia przez ekrany, ale osobna ścieżka danych zdublowałaby
+bezpieczeństwo i groziłaby innym wynikiem. Twardy liniowy kontrakt pozwala
+zmienić tarcie i wygląd bez zmiany znaczenia odpowiedzi ani serwera.
+
+**Konsekwencje:** proces rozgałęziony pozostaje `guided_brief`, dopóki
+użytkownik jawnie nie uprości routingu. Quick form dłuższy niż 8 pytań jest
+blokowany bez automatycznego kasowania treści. `visual_configurator`, media,
+prefill i nowe outcome pozostają poza PX3. Rollback może ukryć selektor i
+renderować `guided_brief`, ale musi zachować parser v3 oraz walidację zapisanych
+snapshotów quick form.
+
+## ADR-046: prywatne, niezmienne assety kart obrazowych
+
+**Status:** accepted dla lokalnego PX4 na podstawie polecenia właściciela
+produktu „dalej” z 2026-08-25; bez zgody na deploy
+
+**Decyzja:** obraz karty jest prywatnym, tenantowym rekordem
+`flow_media_assets` i obiektem w istniejącym bucketcie `tenant-private`.
+Owner/Admin przesyła wyłącznie JPEG, PNG albo WebP do 5 MiB. Serwer sprawdza
+sygnaturę, skanuje wejście według obowiązującej polityki malware, dekoduje je z
+limitem pikseli, usuwa metadane i zapisuje nowy, niezmienny WebP maksymalnie
+1600 × 1200 px. Ścieżka obiektu wynika wyłącznie z organization UUID i asset
+UUID; nazwa klienta nigdy jej nie tworzy.
+
+FlowDocument nadal przechowuje tylko UUID i tekst alternatywny. Trigger bazy
+odrzuca zapis draftu i wersji, jeśli asset nie jest gotowy albo należy do innej
+organizacji. Publiczny widget nie otrzymuje ścieżki Storage ani podpisanego URL.
+Buduje same-origin URL z publicznego ID procesu i UUID assetu. Wąska trasa
+zwraca obraz tylko wtedy, gdy gotowy asset tej organizacji występuje w co
+najmniej jednej immutable wersji wskazanego publicznego procesu. Pozwala to
+działać wznowionym sesjom starszej wersji bez publicznego bucketu.
+
+Preview buildera używa krótkotrwałych, podpisanych URL przekazanych wyłącznie
+jako pamięciowa mapa do tego samego renderera. Mapa nie trafia do snapshotu ani
+publicznego manifestu. Obraz ma stały aspekt, lazy loading, jawne wymiary i
+tekstowy fallback; jego brak nie zmienia odpowiedzi, routingu ani kalkulacji.
+
+**Dlaczego:** dowolny URL tworzyłby SSRF, tracking i XSS-adjacent surface, a
+publiczny bucket rozszerzałby dostęp do wszystkich materiałów firmy. Sam UUID
+bez tenantowej kontroli pozwalałby natomiast na IDOR między organizacjami.
+Normalizacja do WebP ogranicza rozmiar, usuwa EXIF i zapewnia przewidywalny
+format bez zaufania do danych wejściowych.
+
+**Konsekwencje:** dochodzi jedna tabela, wąski resolver oraz zależność `sharp`
+używana wyłącznie po stronie Node. Stare opublikowane wersje utrzymują dostęp
+do wykorzystanych, publicznie zatwierdzonych obrazów; trwałe usuwanie takiego
+assetu wymaga osobnej polityki wygaszania wersji i nie jest częścią PX4.
+Rollback UI może ukryć upload i `image_cards`, ale nie może usunąć tabeli,
+resolvera ani obiektów, dopóki istnieje odwołujący się snapshot.
+
+## ADR-047: zamknięty kontekst hosta jako osobny snapshot sesji i leada
+
+**Status:** accepted dla lokalnego PX5 na podstawie polecenia właściciela
+produktu „dalej” z 2026-08-25; bez zgody na deploy
+
+**Decyzja:** `FlowDocument v3` może zawierać opcjonalny, niezależnie
+wersjonowany `contextSchema` w wersji 1 z maksymalnie ośmioma polami. Każde pole
+ma kontrolowany klucz, etykietę, typ `text` albo `enum` oraz tryb:
+`informational`, `confirm` albo `system`. Wartość informacyjna jest widoczna i
+nieedytowalna, wartość `confirm` jest widoczna, edytowalna i wymaga jawnego
+potwierdzenia przed pierwszą odpowiedzią, a wartość `system` pochodzi wyłącznie
+ze statycznej wartości immutable snapshotu i nigdy z JavaScriptu hosta.
+
+Host przekazuje kontekst tylko w małym body JSON podczas tworzenia sesji. URL,
+query string, custom event, analytics i log nie są nośnikiem kontekstu. Route
+Handler najpierw stosuje istniejący exact-origin guard i limiter, a PostgreSQL
+ponownie waliduje dokładny zestaw kluczy, typy, wymagania, enumy, limity oraz
+zakazane wzorce PII. Nieznany lub systemowy klucz w payloadzie odrzuca całe
+żądanie. Klucze `organization_id`, `tenant_id`, `price`, `score`, `consent`,
+`routing` i ich warianty są zastrzeżone już na poziomie konfiguracji.
+
+Sesja zapisuje kanoniczny `context_snapshot`, pochodzenie wyliczone po stronie
+serwera (`hosted` albo `embedded`) oraz opcjonalny timestamp
+potwierdzenia. Potwierdzenie jest idempotentną mutacją dozwoloną tylko raz,
+przed pierwszą odpowiedzią i przed wygaśnięciem sesji. Nie zmienia rewizji
+odpowiedzi, routingu, ceny, score ani zgód. Submit kopiuje dokładnie ten snapshot
+do leada; panel pokazuje go osobno od odpowiedzi klienta. Analityka zachowuje
+dotychczasowy zamknięty enum źródła i nie otrzymuje kluczy ani wartości
+kontekstu.
+
+Hosted link i dotychczasowy shortcode WordPress bez kontekstu pozostają
+kompatybilne. WordPress może przekazać jawny obiekt w atrybucie osadzenia, lecz
+jest on nadal niezaufanym wejściem i podlega temu samemu originowi oraz
+walidacji serwera. PX5 nie dodaje dowolnego worka metadata, kontekstu z URL ani
+wartości hosta wpływającej na estymację.
+
+**Dlaczego:** `Origin` potwierdza stronę wysyłającą żądanie, ale nie
+autentyczność jej JavaScriptu ani biznesową prawdziwość modelu produktu.
+Oddzielenie kontekstu od odpowiedzi zapobiega cichej zmianie routingu i wyceny,
+a jawne potwierdzenie pozwala usunąć powtórne pytanie bez udawania, że wartość
+hosta została zweryfikowana. Zamknięty snapshot daje firmie audytowalne źródło
+bez rozlewania PII do telemetryki.
+
+**Konsekwencje:** dochodzą kolumny sesji i leada oraz wąskie RPC tworzenia i
+potwierdzania kontekstu. Publiczny manifest nadal nie ujawnia pól systemowych.
+Rollback UI może przestać przyjmować nowy kontekst i tworzyć puste sesje, ale
+musi zachować odczyt istniejących snapshotów oraz rozszerzone odpowiedzi RPC.
+Po przyjęciu ruchu kolumn nie usuwamy; korekta kontraktu wymaga nowej wersji
+`contextSchema` i migracji naprawczej.
+
+## ADR-048: wersjonowane zakończenie, typowane preferencje i ograniczony branding
+
+**Status:** accepted dla lokalnego PX6 na podstawie polecenia właściciela
+produktu „dalej” z 2026-08-25; bez zgody na deploy
+
+**Decyzja:** `leadCaptureSchemaVersion: 3` zapisuje zamknięty zestaw pięciu pól
+(`name`, `email`, `phone`, `preferredContactChannel`,
+`preferredContactWindow`) ze stanem `hidden`, `optional` albo `required` oraz
+kolejność `result_then_contact` lub `contact_then_result`. E-mail pozostaje
+wymaganym kanałem dostawy w v3; telefon może być drugim kanałem. Preferowany
+kanał i pora są enumami, a kanał jest poprawny tylko wtedy, gdy odpowiadająca
+mu wartość kontaktowa faktycznie istnieje. Snapshoty v1/v2 nie otrzymują pola
+kolejności i zachowują wynik przed kontaktem.
+
+`resultSchemaVersion: 2` dodaje wyłącznie zatwierdzony, deklaratywny outcome:
+`capture_lead` albo `no_lead`, oraz opcjonalny awaryjny link HTTPS dla wariantu
+bez leada. Wariant `no_lead` nigdy nie może być schowany za bramką kontaktową.
+Serwer wybiera i zwraca publiczny outcome z immutable snapshotu oraz obliczoną
+cenę bez score, kategorii i śladu reguł. Submit jest ponownie weryfikowany
+w bazie i odrzucany dla outcome bez leada. Tekst CTA nie modeluje SLA; nie ma
+pola, z którego można zbudować niepotwierdzoną obietnicę czasu odpowiedzi.
+
+Branding jest ustawieniem organizacji, niezależnym od nazwy procesu. Owner
+może ustawić nazwę publiczną, kolor `#RRGGBB` i opcjonalny gotowy tenantowy
+asset WebP. Kolor tekstu jest deterministycznie wyliczany po stronie serwera i
+sprawdzany constraintem; brak lub błędna wartość kończy się bezpiecznym
+fallbackiem. Publiczny manifest dostaje wyłącznie nazwę, dwa zweryfikowane
+kolory i same-origin URL wąskiego resolvera logo. Nie przyjmujemy custom CSS,
+HTML, font URL, skryptu ani dowolnego URL obrazu.
+
+**Dlaczego:** kolejność kontaktu istotnie zmienia tarcie i musi być częścią
+wersji procesu, nie chwilowym ustawieniem widgetu. Preferencje jako swobodny
+tekst byłyby nieporównywalne i trudne do bezpiecznej propagacji. Branding
+organizacji powinien budować zaufanie, ale nie może otwierać powierzchni XSS,
+trackingu, SSRF ani pozwalać na nieczytelne CTA.
+
+**Konsekwencje:** preferencje są widoczne w panelu, e-mailu HTML/text,
+webhooku `2026-08-25` i eksporcie danych v2. Worker wzbogaca istniejące claimy
+po tenantowych identyfikatorach przed wysyłką, więc nie zmieniamy atomowej
+semantyki kolejki. Branding jest bieżącą identyfikacją organizacji, podczas gdy
+logika i kolejność pozostają immutable w flow version. Rollback może ukryć
+kontrolki i wrócić do fallbacku, ale nie usuwa kolumn, resolvera ani parserów
+historycznych kontraktów.
+
+## ADR-049: minimalistyczny panel V1 i jedno źródło nowych referencji
+
+**Status:** accepted na podstawie dwóch referencji właściciela produktu z
+2026-08-26 oraz jawnego polecenia usunięcia poprzednich referencji panelu
+
+**Decyzja:** wszystkie wcześniejsze obrazy referencyjne panelu, pakiet Lorum
+Product UI V1 i zależne raporty wizualne przestają sterować kolejnymi zmianami.
+Jedynym kanonicznym kontraktem kierunku panelu jest
+`docs/ui/panel-minimal-v1/README.md` oraz dwa zablokowane w nim obrazy: główna
+referencja 1199 × 842 px i pomocnicza referencja perspektywiczna 404 × 316 px.
+Pierwsza blokuje hierarchię, rytm, powierzchnie, topbar, menu kontekstowe i
+dashboard; druga potwierdza wyłącznie charakter typografii, zakładek i
+oszczędnego koloru.
+
+Panel przechodzi na jasny, neutralny canvas i sidebar, cienkie granice, małe
+promienie, brak dekoracyjnych cieni oraz punktowe użycie zieleni Kwotum.
+Instrument Sans Variable, już przechowywany lokalnie na licencji OFL 1.1,
+staje się docelowym fontem całego `.wy-panel-theme` od etapu M1. Dozwolone są
+wyłącznie wagi 400/500/600/700. Inter pozostaje fallbackiem technicznym.
+
+ADR-042 pozostaje wiążący dla geometrii sidebara 256/72 px, kompatybilnego
+klucza `lorum:panel-sidebar-collapsed`, routingu, capabilities, danych profilu
+i organizacji oraz transformacji mobile. Niniejsza decyzja zastępuje ADR-042
+wyłącznie w zakresie ciemnej powierzchni sidebara i ograniczenia Instrument
+Sans do samej nawigacji.
+
+Redesign jest realizowany sekwencyjnie w M0–M10. Nie zmienia sam z siebie Auth,
+RLS, tenant scope, API, bazy, pricingu, scoringu, FlowDocument, immutable
+publikacji, server actions ani widoczności funkcji według roli. Tekst i dane
+widoczne na obrazach nie tworzą wymagań produktu. Brak modelu danych oznacza
+brak kontrolki.
+
+**Dlaczego:** poprzednie materiały prowadziły do kilku konkurencyjnych języków
+wizualnych, bardzo gęstego dashboardu, mikrotekstu i rozbudowanej kaskady CSS.
+Nowe obrazy oraz polecenie właściciela jednoznacznie wybierają spokojny,
+profesjonalny i niemal monochromatyczny system operacyjny. Zachowanie geometrii
+256/72 ogranicza ryzyko regresji buildera i pozwala zmieniać wygląd małymi,
+odwracalnymi etapami.
+
+**Konsekwencje:** przed implementacją każdego modułu trzeba zapisać jego
+`before`, finalny `after`, overlay lub difference, mobile i raport zgodnie z
+`docs/VISUAL_QA.md`. Każdy etap kończy pełny gate bezpieczeństwa, typów,
+testów, builda, E2E, axe i responsive. Rollback M1–M10 przywraca wyłącznie
+tokeny, CSS i kompozycję danego modułu; nie wymaga migracji danych ani zmiany
+identyfikatorów technicznych.

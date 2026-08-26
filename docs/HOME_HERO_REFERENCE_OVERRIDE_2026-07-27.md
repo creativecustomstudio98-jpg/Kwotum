@@ -14,8 +14,8 @@ tenant scope, RLS, pricingu, scoringu, widgetu ani tras poza `/`.
 
 1. nowszy ekran Wyceno dołączony do rozmowy;
 2. `nowydesign.zip`;
-3. znajdujący się w archiwum
-   `lorum-codex-ui-rebuild-v6-image-locked/references/accepted-master-board.png`.
+3. historyczna plansza V6, usunięta z aktywnych materiałów po przejściu
+   landingu na V7 i panelu na ADR-049.
 
 Zgodnie z `START_HERE.md` archiwum ekran dołączony w bieżącej wiadomości ma
 pierwszeństwo nad starszymi kopiami repozytoryjnymi. Marka pozostaje Lorum na

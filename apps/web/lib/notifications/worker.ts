@@ -1,5 +1,5 @@
 import { parseServerEnv } from "@wyceno/config/env";
-import type { Database, NotificationErrorCode, NotificationKind } from "@wyceno/database";
+import type { Database, Json, NotificationErrorCode, NotificationKind } from "@wyceno/database";
 import {
   renderNotificationEmail,
   ResendEmailDeliveryAdapter,
@@ -11,7 +11,11 @@ import { formatMinorAmount } from "@wyceno/validation";
 import { createServiceClient } from "../supabase/service";
 
 type ClaimedNotification =
-  Database["public"]["Functions"]["claim_notification_batch"]["Returns"][number];
+  Database["public"]["Functions"]["claim_notification_batch"]["Returns"][number] &
+    Readonly<{
+      preferred_contact_channel?: "email" | "phone" | null;
+      preferred_contact_window?: "morning" | "afternoon" | "evening" | null;
+    }>;
 
 export interface NotificationRepository {
   claim(
@@ -56,6 +60,34 @@ function expectedTemplate(kind: NotificationKind): string {
   return kind === "lead_company_alert" ? "lead-company-v1" : "lead-customer-v1";
 }
 
+function answerText(answer: Json): string | null {
+  if (typeof answer === "string") return answer;
+  if (typeof answer === "number") return new Intl.NumberFormat("pl-PL").format(answer);
+  if (typeof answer === "boolean") return answer ? "Tak" : "Nie";
+  if (Array.isArray(answer) && answer.every((item) => typeof item === "string")) {
+    return answer.join(", ");
+  }
+  return null;
+}
+
+function notificationAnswers(
+  answers: Json,
+): ReadonlyArray<Readonly<{ question: string; value: string }>> {
+  if (!Array.isArray(answers)) return [];
+  return answers.slice(0, 40).flatMap((item) => {
+    if (
+      !item ||
+      Array.isArray(item) ||
+      typeof item !== "object" ||
+      typeof item.question !== "string"
+    ) {
+      return [];
+    }
+    const value = answerText(item.answer ?? null);
+    return value === null ? [] : [{ question: item.question, value }];
+  });
+}
+
 export async function processNotificationBatch(
   input: Readonly<{
     adapter: EmailDeliveryAdapter;
@@ -88,10 +120,14 @@ export async function processNotificationBatch(
     let message;
     try {
       message = renderNotificationEmail({
+        answers: notificationAnswers(claim.answers),
         appUrl: input.appUrl,
         companyName: claim.company_name,
         contactEmail: claim.contact_email,
         contactName: claim.contact_name,
+        contactPhone: claim.contact_phone,
+        preferredContactChannel: claim.preferred_contact_channel ?? null,
+        preferredContactWindow: claim.preferred_contact_window ?? null,
         flowTitle: claim.flow_title,
         kind: claim.kind,
         leadId: claim.lead_id,
@@ -141,7 +177,20 @@ function databaseRepository(): NotificationRepository {
         worker_id: input.workerId,
       });
       if (error) throw new Error("Notification claim failed.");
-      return data;
+      const leadIds = data.map((claim) => claim.lead_id);
+      const preferences = leadIds.length
+        ? await client
+            .from("leads")
+            .select("id, preferred_contact_channel, preferred_contact_window")
+            .in("id", leadIds)
+        : { data: [], error: null };
+      if (preferences.error) throw new Error("Notification contact projection failed.");
+      const byLead = new Map(preferences.data.map((lead) => [lead.id, lead]));
+      return data.map((claim) => ({
+        ...claim,
+        preferred_contact_channel: byLead.get(claim.lead_id)?.preferred_contact_channel ?? null,
+        preferred_contact_window: byLead.get(claim.lead_id)?.preferred_contact_window ?? null,
+      }));
     },
     async fail(claim, input) {
       const { error } = await client.rpc("fail_notification_delivery", {

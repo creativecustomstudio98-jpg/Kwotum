@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@wyceno/ui";
+import { Button, FieldMessage, FormField, Input } from "@wyceno/ui";
 import { useActionState } from "react";
 
 import { createWordPressTokenAction, type WordPressTokenActionState } from "./actions";
@@ -30,9 +30,8 @@ export function WordPressTokenForm({ organizationId }: { organizationId: string 
       </div>
       <form action={action} className="wordpress-token-form">
         <input name="organizationId" type="hidden" value={organizationId} />
-        <label>
-          <span>Origin strony WordPress</span>
-          <input
+        <FormField id="wordpress-site-origin" label="Origin strony WordPress">
+          <Input
             autoComplete="url"
             id="wordpress-site-origin"
             name="siteOrigin"
@@ -40,15 +39,15 @@ export function WordPressTokenForm({ organizationId }: { organizationId: string 
             required
             type="url"
           />
-        </label>
-        <Button disabled={pending} type="submit">
-          {pending ? "Generuję…" : "Wygeneruj token instalacyjny"}
+        </FormField>
+        <Button loading={pending} loadingLabel="Generuję…" type="submit">
+          Wygeneruj token instalacyjny
         </Button>
       </form>
       {state.error ? (
-        <p className="lead-action-error" role="alert">
+        <FieldMessage className="wordpress-token-message" tone="error">
           {state.error}
-        </p>
+        </FieldMessage>
       ) : null}
       {state.token ? (
         <div className="wordpress-token-result" role="status">

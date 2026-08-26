@@ -10,6 +10,7 @@ import { z } from "zod";
 import { createClient } from "../supabase/server";
 
 export type FlowInstallation = Readonly<{
+  allowedOrigins: ReadonlyArray<string>;
   currentVersion: number | null;
   flowId: string;
   flowName: string;
@@ -44,39 +45,51 @@ export async function getFlowInstallation(
 ): Promise<FlowInstallation> {
   assertCapability(context, "flow:read");
   const supabase = await createClient();
-  const [organizationResult, flowResult, publishedResult, eventResult, wordpressResult] =
-    await Promise.all([
-      supabase.from("organizations").select("name").eq("id", context.organizationId).maybeSingle(),
-      supabase
-        .from("flows")
-        .select("id, organization_id, name")
-        .eq("id", flowId)
-        .eq("organization_id", context.organizationId)
-        .maybeSingle(),
-      supabase
-        .from("published_flows")
-        .select("public_id, published_at, flow_version_id")
-        .eq("flow_id", flowId)
-        .eq("organization_id", context.organizationId)
-        .maybeSingle(),
-      supabase
-        .from("session_events")
-        .select("occurred_at")
-        .eq("flow_id", flowId)
-        .eq("organization_id", context.organizationId)
-        .eq("name", "widget_opened")
-        .order("occurred_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      supabase
-        .from("wordpress_connections")
-        .select("site_origin, last_seen_at")
-        .eq("organization_id", context.organizationId)
-        .is("revoked_at", null)
-        .order("last_seen_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-    ]);
+  const [
+    organizationResult,
+    flowResult,
+    publishedResult,
+    eventResult,
+    wordpressResult,
+    originsResult,
+  ] = await Promise.all([
+    supabase.from("organizations").select("name").eq("id", context.organizationId).maybeSingle(),
+    supabase
+      .from("flows")
+      .select("id, organization_id, name")
+      .eq("id", flowId)
+      .eq("organization_id", context.organizationId)
+      .maybeSingle(),
+    supabase
+      .from("published_flows")
+      .select("public_id, published_at, flow_version_id")
+      .eq("flow_id", flowId)
+      .eq("organization_id", context.organizationId)
+      .maybeSingle(),
+    supabase
+      .from("session_events")
+      .select("occurred_at")
+      .eq("flow_id", flowId)
+      .eq("organization_id", context.organizationId)
+      .eq("name", "widget_opened")
+      .order("occurred_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("wordpress_connections")
+      .select("site_origin, last_seen_at")
+      .eq("organization_id", context.organizationId)
+      .is("revoked_at", null)
+      .order("last_seen_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("public_flow_origins")
+      .select("origin")
+      .eq("organization_id", context.organizationId)
+      .eq("flow_id", flowId)
+      .order("origin", { ascending: true }),
+  ]);
 
   if (flowResult.error || !flowResult.data) {
     throw new AuthorizationError("NOT_FOUND", "Resource not found.");
@@ -88,14 +101,18 @@ export async function getFlowInstallation(
     !organizationResult.data ||
     publishedResult.error ||
     eventResult.error ||
-    wordpressResult.error
+    wordpressResult.error ||
+    originsResult.error
   ) {
     throw new Error("Nie udało się pobrać danych instalacji.");
   }
 
   const [manifestResult, invitationsResult, currentVersionResult] = await Promise.all([
     publishedResult.data?.public_id
-      ? supabase.rpc("get_widget_manifest", { target_public_id: publishedResult.data.public_id })
+      ? supabase.rpc("get_flow_installation_manifest", {
+          target_flow_id: flowId,
+          target_organization_id: context.organizationId,
+        })
       : Promise.resolve({ data: null, error: null }),
     supabase
       .from("flow_invitations")
@@ -147,6 +164,7 @@ export async function getFlowInstallation(
   );
 
   return {
+    allowedOrigins: originsResult.data.map((item) => item.origin),
     currentVersion: currentVersionResult.data?.version_number ?? null,
     flowId: flowResult.data.id,
     flowName: flowResult.data.name,
@@ -174,6 +192,60 @@ export async function getFlowInstallation(
         }
       : null,
   };
+}
+
+export async function setFlowAllowedOrigins(
+  context: TenantContext,
+  flowId: string,
+  origins: ReadonlyArray<string>,
+): Promise<void> {
+  assertCapability(context, "flow:share");
+  if (origins.length > 10) throw new Error("Za dużo dozwolonych domen.");
+  const normalizedOrigins: string[] = [];
+  for (const origin of origins) {
+    const normalized = normalizeInstallationOrigin(origin);
+    if (!normalized) throw new Error("Nieprawidłowy origin.");
+    normalizedOrigins.push(normalized);
+  }
+  const uniqueOrigins = [...new Set(normalizedOrigins)];
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_public_flow_origins", {
+    target_flow_id: flowId,
+    target_organization_id: context.organizationId,
+    target_origins: uniqueOrigins,
+  });
+  if (error) {
+    if (error.code === "42501" || error.code === "P0002") {
+      throw new AuthorizationError("NOT_FOUND", "Resource not found.");
+    }
+    throw new Error("Nie udało się zapisać dozwolonych domen.");
+  }
+}
+
+function normalizeInstallationOrigin(value: string): string | null {
+  const candidate = value.trim();
+  if (!candidate || candidate.length > 255) return null;
+  let parsed: URL;
+  try {
+    parsed = new URL(candidate);
+  } catch {
+    return null;
+  }
+  const loopback =
+    parsed.hostname === "localhost" ||
+    parsed.hostname === "127.0.0.1" ||
+    parsed.hostname === "[::1]";
+  if (
+    (parsed.protocol !== "https:" && !(parsed.protocol === "http:" && loopback)) ||
+    parsed.username ||
+    parsed.password ||
+    parsed.search ||
+    parsed.hash ||
+    (parsed.pathname !== "/" && parsed.pathname !== "")
+  ) {
+    return null;
+  }
+  return parsed.origin;
 }
 
 const invitationResultSchema = z.object({

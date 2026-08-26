@@ -4,6 +4,10 @@
 **Zakres:** dokumentacja i referencje UI  
 **Zasada:** bez usuwania ani przenoszenia w rozległym, istniejącym worktree
 
+> Aktualizacja 2026-08-26: pakiet referencji panelu V1 został usunięty po
+> konsolidacji do `../ui/panel-minimal-v1/README.md`. Poniższe wpisy pozostają
+> wyłącznie zapisem historycznej inwentaryzacji.
+
 ## KEEP — aktywne i unikalne
 
 | Grupa            | Pliki                                                                                                                                                         |

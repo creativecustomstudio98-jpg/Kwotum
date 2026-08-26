@@ -163,9 +163,89 @@ as $$
   }'::jsonb;
 $$;
 
+create function test_support.valid_flow_document_v3()
+returns jsonb
+language sql
+immutable
+set search_path = ''
+as $$
+  with base as (
+    select test_support.valid_flow_document_v2() as document
+  )
+  select (document - 'schemaVersion' - 'steps') || jsonb_build_object(
+    'schemaVersion',
+    3,
+    'experienceMode',
+    'visual_configurator',
+    'steps',
+    (
+      select jsonb_agg(
+        case
+          when step_index = 1 then
+            step || jsonb_build_object(
+              'presentation', jsonb_build_object('variant', 'icon_cards'),
+              'options', (
+                select jsonb_agg(
+                  option || jsonb_build_object(
+                    'presentation',
+                    jsonb_build_object(
+                      'description', 'Czytelny wariant usługi.',
+                      'icon', case when option_index = 1 then 'check' else 'sparkles' end
+                    )
+                  )
+                  order by option_index
+                )
+                from jsonb_array_elements(step -> 'options')
+                  with ordinality as options(option, option_index)
+              )
+            )
+          else step || jsonb_build_object(
+            'presentation', jsonb_build_object('variant', 'default')
+          )
+        end
+        order by step_index
+      )
+      from jsonb_array_elements(document -> 'steps')
+        with ordinality as steps(step, step_index)
+    )
+  )
+  from base;
+$$;
+
+create function test_support.valid_quick_form_document_v3()
+returns jsonb
+language sql
+immutable
+set search_path = ''
+as $$
+  with base as (
+    select test_support.valid_flow_document_v2() as document
+  )
+  select (document - 'schemaVersion' - 'steps') || jsonb_build_object(
+    'schemaVersion',
+    3,
+    'experienceMode',
+    'quick_form',
+    'steps',
+    (
+      select jsonb_agg(
+        step || jsonb_build_object(
+          'presentation', jsonb_build_object('variant', 'default')
+        )
+        order by step_index
+      )
+      from jsonb_array_elements(document -> 'steps')
+        with ordinality as steps(step, step_index)
+    )
+  )
+  from base;
+$$;
+
 grant usage on schema test_support to authenticated;
 grant execute on function test_support.valid_flow_document() to authenticated;
 grant execute on function test_support.valid_flow_document_v2() to authenticated;
+grant execute on function test_support.valid_flow_document_v3() to authenticated;
+grant execute on function test_support.valid_quick_form_document_v3() to authenticated;
 
 set role authenticated;
 select set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000001', false);
@@ -232,6 +312,88 @@ begin
   ) <> 1 then
     raise exception 'published flow alias was not created';
   end if;
+end;
+$$;
+
+insert into public.flows (
+  id,
+  organization_id,
+  name,
+  slug,
+  draft,
+  created_by,
+  updated_by
+)
+values (
+  'f1000000-0000-4000-8000-000000000010',
+  'aaaaaaaa-0000-4000-8000-000000000001',
+  'Krótki formularz v3',
+  'krotki-formularz-v3',
+  test_support.valid_quick_form_document_v3(),
+  '10000000-0000-4000-8000-000000000001',
+  '10000000-0000-4000-8000-000000000001'
+);
+
+do $$
+declare
+  publication jsonb;
+  validation jsonb;
+begin
+  validation := public.validate_flow('f1000000-0000-4000-8000-000000000010');
+  if not (validation ->> 'valid')::boolean
+    or jsonb_array_length(validation -> 'issues') <> 0
+  then
+    raise exception 'valid quick form did not pass database validation: %', validation;
+  end if;
+
+  publication := public.publish_flow('f1000000-0000-4000-8000-000000000010', 1);
+  if (publication ->> 'versionNumber')::integer <> 1 then
+    raise exception 'valid quick form was not published: %', publication;
+  end if;
+end;
+$$;
+
+insert into public.flows (
+  id,
+  organization_id,
+  name,
+  slug,
+  draft,
+  created_by,
+  updated_by
+)
+values (
+  'f1000000-0000-4000-8000-000000000011',
+  'aaaaaaaa-0000-4000-8000-000000000001',
+  'Krótki formularz z rozgałęzieniem',
+  'krotki-formularz-z-rozgalezieniem',
+  jsonb_set(
+    test_support.valid_quick_form_document_v3(),
+    '{steps,0,options,0,nextStepKey}',
+    to_jsonb('location'::text)
+  ),
+  '10000000-0000-4000-8000-000000000001',
+  '10000000-0000-4000-8000-000000000001'
+);
+
+do $$
+declare
+  validation jsonb;
+begin
+  validation := public.validate_flow('f1000000-0000-4000-8000-000000000011');
+  if (validation ->> 'valid')::boolean
+    or not ((validation -> 'issues') @> '[{"code":"QUICK_FORM_NOT_LINEAR"}]'::jsonb)
+  then
+    raise exception 'branching quick form was not rejected: %', validation;
+  end if;
+
+  begin
+    perform public.publish_flow('f1000000-0000-4000-8000-000000000011', 1);
+    raise exception 'branching quick form was published';
+  exception
+    when check_violation then
+      null;
+  end;
 end;
 $$;
 
@@ -322,6 +484,97 @@ begin
   ) <> 'published' then
     raise exception 'republished snapshot remained archived';
   end if;
+end;
+$$;
+
+insert into public.flows (
+  id,
+  organization_id,
+  name,
+  slug,
+  draft,
+  created_by,
+  updated_by
+)
+values (
+  'f1000000-0000-4000-8000-000000000008',
+  'aaaaaaaa-0000-4000-8000-000000000001',
+  'Proces v3',
+  'proces-v3',
+  test_support.valid_flow_document_v3(),
+  '10000000-0000-4000-8000-000000000001',
+  '10000000-0000-4000-8000-000000000001'
+);
+
+do $$
+declare
+  publication jsonb;
+  validation jsonb;
+begin
+  validation := public.validate_flow('f1000000-0000-4000-8000-000000000008');
+  if not (validation ->> 'valid')::boolean
+    or jsonb_array_length(validation -> 'issues') <> 0
+  then
+    raise exception 'valid v3 flow did not pass validation: %', validation;
+  end if;
+
+  publication := public.publish_flow(
+    'f1000000-0000-4000-8000-000000000008',
+    1
+  );
+  if (publication ->> 'versionNumber')::integer <> 1
+    or (
+      select snapshot ->> 'schemaVersion'
+      from public.flow_versions
+      where id = (publication ->> 'flowVersionId')::uuid
+    ) <> '3'
+  then
+    raise exception 'v3 publication did not preserve its immutable snapshot';
+  end if;
+end;
+$$;
+
+insert into public.flows (
+  id,
+  organization_id,
+  name,
+  slug,
+  draft,
+  created_by,
+  updated_by
+)
+values (
+  'f1000000-0000-4000-8000-000000000009',
+  'aaaaaaaa-0000-4000-8000-000000000001',
+  'Proces v3 z niedozwoloną ikoną',
+  'proces-v3-bledna-ikona',
+  jsonb_set(
+    test_support.valid_flow_document_v3(),
+    '{steps,0,options,0,presentation,icon}',
+    to_jsonb('uploaded_svg'::text)
+  ),
+  '10000000-0000-4000-8000-000000000001',
+  '10000000-0000-4000-8000-000000000001'
+);
+
+do $$
+declare
+  validation jsonb;
+begin
+  validation := public.validate_flow('f1000000-0000-4000-8000-000000000009');
+  if (validation ->> 'valid')::boolean
+    or not ((validation -> 'issues') @> '[{"code":"INVALID_PRESENTATION"}]'::jsonb)
+  then
+    raise exception 'invalid v3 icon was not rejected: %', validation;
+  end if;
+
+  begin
+    perform public.publish_flow('f1000000-0000-4000-8000-000000000009', 1);
+    raise exception 'invalid v3 presentation was published';
+  exception
+    when check_violation then
+      null;
+  end;
 end;
 $$;
 
@@ -612,6 +865,16 @@ begin
       'f1000000-0000-4000-8000-000000000001'
     );
     raise exception 'tenant B validated tenant A flow';
+  exception
+    when no_data_found then
+      null;
+  end;
+
+  begin
+    perform public.validate_flow(
+      'f1000000-0000-4000-8000-000000000008'
+    );
+    raise exception 'tenant B validated tenant A v3 flow';
   exception
     when no_data_found then
       null;

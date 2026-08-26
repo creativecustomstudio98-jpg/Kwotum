@@ -1,0 +1,211 @@
+{
+  "configVersion": 1,
+  "fallbackChannels": [
+    { "key": "phone", "mustRemainActive": true },
+    { "key": "whatsapp", "mustRemainActive": true },
+    { "key": "legacy_form", "mustRemainActive": true }
+  ],
+  "intendedCta": "Pomóż mi dobrać",
+  "pilotKey": "fortez_guided_selection",
+  "pilotStatus": "hypothesis",
+  "snapshot": {
+    "contextSchema": {
+      "fields": [
+        {
+          "allowedValues": ["guided_selection"],
+          "key": "cta_source",
+          "label": "Źródło uruchomienia",
+          "mode": "system",
+          "required": true,
+          "systemValue": "guided_selection",
+          "type": "enum"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "entryStepKey": "zastosowanie",
+    "experienceMode": "visual_configurator",
+    "intro": "Opisz zastosowanie i ograniczenia. Wynik porządkuje brief do rozmowy — nie wybiera automatycznie modelu.",
+    "leadCapture": {
+      "contactPolicy": "phone_required",
+      "filesEnabled": false,
+      "leadCaptureSchemaVersion": 2,
+      "privacyNotice": {
+        "label": "Potwierdzam zapoznanie się z informacją o przetwarzaniu danych.",
+        "textHash": "2222222222222222222222222222222222222222222222222222222222222222",
+        "version": "pilot-draft-not-approved"
+      }
+    },
+    "result": {
+      "action": "capture_lead",
+      "disclaimer": "Proces nie rekomenduje automatycznie modelu. Dobór, cena, dostępność i termin wymagają potwierdzenia przez firmę.",
+      "headline": "Brief potrzeb jest gotowy do konsultacji",
+      "mode": "no_price",
+      "nextStepLabel": "Przekaż numer telefonu do rozmowy o doborze",
+      "resultSchemaVersion": 2
+    },
+    "rules": [],
+    "schemaVersion": 3,
+    "sections": [
+      { "key": "ladunek", "title": "Zastosowanie i ładunek" },
+      { "key": "ograniczenia", "title": "Wymagania i ograniczenia" },
+      { "key": "zakup", "title": "Plan zakupu" }
+    ],
+    "steps": [
+      {
+        "allowUnknown": false,
+        "key": "zastosowanie",
+        "nextStepKey": "opis_ladunku",
+        "options": [
+          {
+            "key": "dom_ogrod",
+            "label": "Dom, ogród lub remont",
+            "presentation": { "icon": "home" }
+          },
+          {
+            "key": "regularna_praca",
+            "label": "Materiały i regularna praca",
+            "presentation": { "icon": "settings" }
+          },
+          {
+            "key": "maszyny",
+            "label": "Maszyny, quad lub sprzęt",
+            "presentation": { "icon": "layers" }
+          },
+          { "key": "motocykl", "label": "Motocykl", "presentation": { "icon": "shopping_bag" } },
+          { "key": "lodz", "label": "Łódź lub skuter wodny", "presentation": { "icon": "globe" } },
+          {
+            "key": "inne",
+            "label": "Inne lub jeszcze nie wiem",
+            "presentation": { "icon": "sparkles" }
+          }
+        ],
+        "presentation": { "variant": "icon_cards" },
+        "required": true,
+        "sectionKey": "ladunek",
+        "title": "Co chcesz najczęściej przewozić?",
+        "type": "single_choice"
+      },
+      {
+        "allowUnknown": false,
+        "description": "Bez nazw technicznych — wystarczy zwykły opis przedmiotów i typowego użycia.",
+        "key": "opis_ladunku",
+        "nextStepKey": "masa_ladunku",
+        "options": [],
+        "presentation": { "variant": "default" },
+        "required": true,
+        "sectionKey": "ladunek",
+        "title": "Co dokładnie będzie typowym ładunkiem?",
+        "type": "long_text",
+        "validation": { "kind": "text_length", "maxLength": 800, "minLength": 10 }
+      },
+      {
+        "allowUnknown": true,
+        "key": "masa_ladunku",
+        "nextStepKey": "czestotliwosc",
+        "options": [
+          {
+            "key": "do_300",
+            "label": "Do około 300 kg",
+            "presentation": { "description": "Lżejsze prace domowe i rekreacyjne." }
+          },
+          {
+            "key": "od_300_do_700",
+            "label": "Około 300–700 kg",
+            "presentation": { "description": "Częstszy transport materiałów lub sprzętu." }
+          },
+          {
+            "key": "powyzej_700",
+            "label": "Powyżej 700 kg",
+            "presentation": { "description": "Wymaga dokładnego sprawdzenia zestawu i ograniczeń." }
+          },
+          {
+            "key": "nie_wiem",
+            "label": "Nie wiem",
+            "presentation": { "description": "Firma pomoże ustalić potrzebny zakres." }
+          }
+        ],
+        "presentation": { "variant": "text_cards" },
+        "required": false,
+        "sectionKey": "ladunek",
+        "title": "Jaka jest orientacyjna masa ładunku?",
+        "type": "single_choice"
+      },
+      {
+        "allowUnknown": false,
+        "key": "czestotliwosc",
+        "nextStepKey": "wazne_cechy",
+        "options": [
+          { "key": "sporadycznie", "label": "Kilka razy w roku" },
+          { "key": "regularnie", "label": "Kilka razy w miesiącu" },
+          { "key": "intensywnie", "label": "Co tydzień lub częściej" }
+        ],
+        "presentation": { "variant": "default" },
+        "required": true,
+        "sectionKey": "ladunek",
+        "title": "Jak często przyczepa będzie używana?",
+        "type": "single_choice"
+      },
+      {
+        "allowUnknown": true,
+        "key": "wazne_cechy",
+        "nextStepKey": "ograniczenia_auta",
+        "options": [
+          { "key": "uchylna", "label": "Uchylna skrzynia" },
+          { "key": "resory", "label": "Łagodniejsze tłumienie" },
+          { "key": "dwie_osie", "label": "Dwie osie" },
+          { "key": "burty", "label": "Demontowalne burty" },
+          { "key": "akcesoria", "label": "Plandeka, stelaż lub nadstawki" },
+          { "key": "dobor", "label": "Nie wiem — potrzebuję konsultacji" }
+        ],
+        "presentation": { "variant": "default" },
+        "required": false,
+        "sectionKey": "ograniczenia",
+        "title": "Które cechy są ważne?",
+        "type": "multiple_choice"
+      },
+      {
+        "allowUnknown": true,
+        "description": "Np. dopuszczalna masa, rodzaj prawa jazdy, hak lub wymiary miejsca postoju.",
+        "key": "ograniczenia_auta",
+        "nextStepKey": "termin_zakupu",
+        "options": [],
+        "presentation": { "variant": "default" },
+        "required": false,
+        "sectionKey": "ograniczenia",
+        "title": "Czy auto lub sposób użytkowania mają ważne ograniczenia?",
+        "type": "long_text",
+        "validation": { "kind": "text_length", "maxLength": 800, "minLength": 0 }
+      },
+      {
+        "allowUnknown": true,
+        "key": "termin_zakupu",
+        "nextStepKey": "lokalizacja",
+        "options": [
+          { "key": "jak_najszybciej", "label": "Jak najszybciej" },
+          { "key": "do_miesiaca", "label": "W ciągu miesiąca" },
+          { "key": "do_kwartalu", "label": "W ciągu trzech miesięcy" },
+          { "key": "sprawdzam", "label": "Na razie porównuję możliwości" }
+        ],
+        "presentation": { "variant": "default" },
+        "required": false,
+        "sectionKey": "zakup",
+        "title": "Kiedy planowany jest zakup?",
+        "type": "single_choice"
+      },
+      {
+        "allowUnknown": false,
+        "key": "lokalizacja",
+        "nextStepKey": null,
+        "options": [],
+        "presentation": { "variant": "default" },
+        "required": true,
+        "sectionKey": "zakup",
+        "title": "Z jakiej miejscowości kontaktujesz się z firmą?",
+        "type": "location",
+        "validation": { "kind": "text_length", "maxLength": 120, "minLength": 2 }
+      }
+    ],
+    "title": "Pomoc w doborze przyczepy"
+  }
+}

@@ -7,6 +7,8 @@ import type {
   WidgetAnswer,
   WidgetApi,
   WidgetCalculatedResult,
+  WidgetContextInput,
+  WidgetContextValue,
   WidgetManifest,
   WidgetSessionSnapshot,
   WidgetSubmission,
@@ -35,7 +37,11 @@ export class PreviewWidgetApi implements WidgetApi {
     this.#manifest = structuredClone(manifest);
   }
 
-  async createSession(publicId: string): Promise<CreatedWidgetSession> {
+  async createSession(
+    publicId: string,
+    context: WidgetContextInput,
+  ): Promise<CreatedWidgetSession> {
+    void context;
     if (publicId !== this.#manifest.publicId) {
       throw new WidgetApiError("NOT_FOUND", "Proces podglądu nie istnieje.");
     }
@@ -48,12 +54,18 @@ export class PreviewWidgetApi implements WidgetApi {
     };
     this.#sessions.set(token, session);
     return {
+      context: [],
+      contextConfirmed: true,
       currentStepKey: this.#manifest.entryStepKey,
       expiresAt: session.expiresAt,
       manifest: structuredClone(this.#manifest),
       revision: session.revision,
       token,
     };
+  }
+
+  async confirmContext(): Promise<WidgetContextValue[]> {
+    return [];
   }
 
   async getManifest(publicId: string): Promise<WidgetManifest> {
@@ -69,7 +81,10 @@ export class PreviewWidgetApi implements WidgetApi {
       throw new WidgetApiError("INVALID", "Podgląd nie został ukończony.");
     }
     return {
+      action: this.#manifest.result.action ?? "capture_lead",
       disclaimer: this.#manifest.result.disclaimer,
+      fallbackContactLabel: this.#manifest.result.fallbackContactLabel ?? null,
+      fallbackContactUrl: this.#manifest.result.fallbackContactUrl ?? null,
       headline: this.#manifest.result.headline,
       nextStepLabel: this.#manifest.result.nextStepLabel,
       pricing: null,
@@ -80,6 +95,8 @@ export class PreviewWidgetApi implements WidgetApi {
     const session = this.#session(token);
     return {
       answers: structuredClone(session.answers),
+      context: [],
+      contextConfirmed: true,
       currentStepKey: session.currentStepKey,
       expiresAt: session.expiresAt,
       manifest: structuredClone(this.#manifest),

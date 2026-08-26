@@ -1,11 +1,15 @@
 import { Skeleton } from "@wyceno/ui";
 
-import { PanelPageHeader } from "../../panel-page-header";
+import { PanelTenantPageHeader } from "../../panel-tenant-page-header";
 
 export default function AnalyticsLoading() {
   return (
     <main aria-busy="true" className="panel-workspace analytics-panel">
-      <PanelPageHeader title="Analityka" />
+      <PanelTenantPageHeader
+        currentLabel="Analityka"
+        description="Wyniki procesów z zachowaniem progów prywatności."
+        title="Analityka"
+      />
       <div className="panel-page">
         <section aria-label="Obliczamy podsumowanie okresu">
           <div className="metric-grid">

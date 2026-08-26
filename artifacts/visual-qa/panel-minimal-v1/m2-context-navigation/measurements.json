@@ -1,0 +1,17 @@
+{
+  "accessibilityViolations": 0,
+  "forcedColorsAccessibilityViolations": 0,
+  "desktop": {
+    "headingLevelOneCount": 1,
+    "integrationsNavigationItems": 2,
+    "settingsNavigationItems": 3,
+    "topbarHeight": 54
+  },
+  "mobile": {
+    "documentOverflow": 0,
+    "flexWrap": "nowrap",
+    "linkHeights": [44, 44, 44],
+    "overflowX": "auto",
+    "scrollable": true
+  }
+}

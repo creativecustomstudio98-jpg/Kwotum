@@ -1,4 +1,9 @@
-import { assertCapability, type Json, type TenantContext } from "@wyceno/database";
+import {
+  assertCapability,
+  AuthorizationError,
+  type Json,
+  type TenantContext,
+} from "@wyceno/database";
 
 import { createClient } from "../supabase/server";
 
@@ -91,7 +96,13 @@ export async function exportLeadPersonalData(
     target_lead_id: leadId,
     target_organization_id: context.organizationId,
   });
+  if (error?.code === "P0002") {
+    throw new AuthorizationError("NOT_FOUND", "Resource not found.");
+  }
   if (error) throw new Error("Nie udało się wyeksportować danych leada.");
+  if (data === null) {
+    throw new AuthorizationError("NOT_FOUND", "Resource not found.");
+  }
   return data;
 }
 

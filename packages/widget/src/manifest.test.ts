@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isAnswerValid, parseWidgetManifest, resolveNextStep } from "./manifest.js";
-import { testManifest } from "./test-fixtures.js";
+import { quickTestManifest, testManifest } from "./test-fixtures.js";
 
 describe("widget manifest", () => {
   it("parses the allowlisted contract and rejects a bad hash", () => {
@@ -9,6 +9,44 @@ describe("widget manifest", () => {
     expect(() => parseWidgetManifest({ ...testManifest, snapshotHash: "not-a-hash" })).toThrow(
       "Manifest ma nieprawidłową strukturę",
     );
+  });
+
+  it("accepts only the runtime Turnstile contract", () => {
+    const configured = {
+      ...testManifest,
+      challenge: {
+        action: "kwotum_lead_submit" as const,
+        appearance: "interaction-only" as const,
+        provider: "turnstile" as const,
+        siteKey: "1x00000000000000000000AA",
+      },
+    };
+    expect(parseWidgetManifest(configured).challenge).toEqual(configured.challenge);
+    expect(() =>
+      parseWidgetManifest({
+        ...configured,
+        challenge: { ...configured.challenge, action: "untrusted_action" },
+      }),
+    ).toThrow("Nieprawidłowa konfiguracja zabezpieczenia formularza");
+  });
+
+  it("accepts derived branding contrast and rejects CSS-like accent injection", () => {
+    const branded = {
+      ...testManifest,
+      branding: {
+        accentColor: "#F4D35E",
+        accentTextColor: "#000000" as const,
+        companyName: "Studio Forma",
+        logoUrl: null,
+      },
+    };
+    expect(parseWidgetManifest(branded).branding).toEqual(branded.branding);
+    expect(() =>
+      parseWidgetManifest({
+        ...branded,
+        branding: { ...branded.branding, accentColor: "url(x)" },
+      }),
+    ).toThrow("Nieprawidłowa konfiguracja brandingu");
   });
 
   it("uses rule order before option and step fallbacks", () => {
@@ -73,6 +111,96 @@ describe("widget manifest", () => {
     expect(isAnswerValid(parsed.steps[1]!, "Za krótko")).toBe(false);
     expect(isAnswerValid(parsed.steps[1]!, "Wystarczająco długi opis")).toBe(true);
     expect(isAnswerValid(parsed.steps[2]!, "  A  ")).toBe(false);
+  });
+
+  it("parses manifest v3 without changing answer behavior", () => {
+    const manifestV3 = {
+      ...testManifest,
+      experienceMode: "visual_configurator" as const,
+      manifestVersion: 3 as const,
+      steps: testManifest.steps.map((step, stepIndex) => ({
+        ...step,
+        options: step.options.map((option, optionIndex) => ({
+          ...option,
+          presentation:
+            stepIndex === 0
+              ? {
+                  description: "Wariant opisany bez dowolnego kodu.",
+                  icon: optionIndex === 0 ? ("check" as const) : ("sparkles" as const),
+                }
+              : null,
+        })),
+        presentation: { variant: stepIndex === 0 ? ("icon_cards" as const) : ("default" as const) },
+      })),
+    };
+
+    const parsed = parseWidgetManifest(manifestV3);
+    expect(parsed).toEqual(manifestV3);
+    expect(isAnswerValid(parsed.steps[0]!, "standard")).toBe(true);
+  });
+
+  it("rejects a branching or oversized quick-form manifest", () => {
+    expect(parseWidgetManifest(quickTestManifest)).toEqual(quickTestManifest);
+    const branching = {
+      ...quickTestManifest,
+      steps: quickTestManifest.steps.map((step, stepIndex) => ({
+        ...step,
+        options: step.options.map((option, optionIndex) => ({
+          ...option,
+          overridesNextStep: stepIndex === 0 && optionIndex === 0 ? true : option.overridesNextStep,
+        })),
+      })),
+    };
+    expect(() => parseWidgetManifest(branching)).toThrow("jednej liniowej trasie");
+
+    const oversized = {
+      ...quickTestManifest,
+      entryStepKey: "field_0",
+      steps: Array.from({ length: 9 }, (_, index) => ({
+        ...quickTestManifest.steps[2]!,
+        key: `field_${index}`,
+        nextStepKey: index < 8 ? `field_${index + 1}` : null,
+      })),
+    };
+    expect(() => parseWidgetManifest(oversized)).toThrow("maksymalnie 8 pytań");
+  });
+
+  it("rejects unallowlisted icons, asset URLs and presentation metadata", () => {
+    const manifestV3 = {
+      ...testManifest,
+      experienceMode: "visual_configurator" as const,
+      manifestVersion: 3 as const,
+      steps: testManifest.steps.map((step) => ({
+        ...step,
+        options: step.options.map((option) => ({ ...option, presentation: null })),
+        presentation: { variant: "default" as const },
+      })),
+    };
+    const option = manifestV3.steps[0]!.options[0]!;
+
+    expect(() =>
+      parseWidgetManifest({
+        ...manifestV3,
+        steps: [
+          {
+            ...manifestV3.steps[0],
+            options: [
+              {
+                ...option,
+                presentation: {
+                  asset: { alt: "Wariant", id: "https://example.test/image.jpg" },
+                  html: "<img src=x onerror=alert(1)>",
+                  icon: "uploaded_svg",
+                  url: "data:image/svg+xml;base64,PHN2Zz4=",
+                },
+              },
+              ...manifestV3.steps[0]!.options.slice(1),
+            ],
+          },
+          ...manifestV3.steps.slice(1),
+        ],
+      }),
+    ).toThrow();
   });
 
   it("enforces numeric and date ranges", () => {

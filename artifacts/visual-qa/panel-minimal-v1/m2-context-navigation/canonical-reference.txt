@@ -1,0 +1,16 @@
+Etap: M2 — pasek kontekstu, page intro i nawigacja kontekstowa
+
+Referencja główna:
+docs/ui/panel-minimal-v1/reference/panel-dashboard-primary-1199x842.png
+SHA-256: 824df7d47e16d9114ae66990a0d02e91f4954ce1ba7b5d1c4d180fea84aed6e1
+Rola: proporcje, niski pasek kontekstu, lewa oś i płaska hierarchia.
+
+Referencja pomocnicza:
+docs/ui/panel-minimal-v1/reference/panel-dashboard-direction-404x316.png
+SHA-256: 2cd7db369c2233f08f77b497a2b2e54e5458bf840548c5ba6e791b48518e3b64
+Rola: kierunek typografii, poziomych zakładek i oszczędnego koloru.
+
+Oba obrazy sterują kierunkiem, nie treścią produktu. Referencja pomocnicza jest
+ucięta i pokazana pod kątem, dlatego nie jest podstawą pixel diffu 1:1.
+Porównania before/after powstały na tej samej platformie, w Chromium i przy
+tych samych viewportach.

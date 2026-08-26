@@ -73,8 +73,9 @@ const privacyText = "Akceptuję informację o przetwarzaniu danych w celu przygo
 const privacyHash = createHash("sha256").update(privacyText).digest("hex");
 const document = structuredClone(baseTemplate.snapshot);
 document.leadCapture = {
+  contactPolicy: "email_required",
   filesEnabled: false,
-  leadCaptureSchemaVersion: 1,
+  leadCaptureSchemaVersion: 2,
   privacyNotice: {
     label: privacyText,
     textHash: privacyHash,
@@ -254,6 +255,36 @@ for (const template of flowTemplates.slice(1)) {
     `);
   }
   if (template === editorTemplate) editorFlowId = templateFlowId;
+}
+
+const seededProcesses = 109;
+const supplementalProcessCount = Math.max(0, seededProcesses - flowTemplates.length);
+const longSpacedProcessName =
+  "Kompleksowy wieloetapowy proces kwalifikacji inwestycji z konsultacją, pomiarem, budżetem, harmonogramem, dokumentacją i koordynacją wykonawczą";
+const longUnbrokenProcessName = `Proces${"BezPrzerw".repeat(24)}`.slice(0, 160);
+if (supplementalProcessCount > 0) {
+  query(`
+    insert into public.flows (
+      id, organization_id, name, slug, draft, created_by, updated_by,
+      created_at, updated_at
+    )
+    select
+      gen_random_uuid(),
+      ${sqlLiteral(organizationId)}::uuid,
+      case
+        when generated.position = 1 then ${sqlLiteral(longSpacedProcessName)}
+        when generated.position = 2 then ${sqlLiteral(longUnbrokenProcessName)}
+        else 'Proces demonstracyjny ' || lpad(generated.position::text, 3, '0')
+      end,
+      'visual-qa-skala-' || lpad(generated.position::text, 3, '0'),
+      ${jsonLiteral(document)},
+      ${sqlLiteral(userId)}::uuid,
+      ${sqlLiteral(userId)}::uuid,
+      now() - interval '30 days' - generated.position * interval '1 minute',
+      now() - interval '30 days' - generated.position * interval '1 minute'
+    from generate_series(1, ${supplementalProcessCount}) as generated(position)
+    on conflict (organization_id, slug) do nothing;
+  `);
 }
 
 const wordpressCredentialHash = createHash("sha256")
@@ -517,17 +548,23 @@ for (const [day, additionalCount] of additionalLeadsByDay.entries()) {
   }
 }
 
-for (let index = 0; index < 39; index += 1) {
+for (let index = 0; index < 53; index += 1) {
   leads.push({
     city: ["Warszawa", "Poznań", "Gdańsk", "Wrocław", "Kraków", "Łódź"][index % 6],
     completionSeconds: 216,
     email: `visualqa+poprzedni-okres-${String(index + 1).padStart(2, "0")}@example.invalid`,
-    name: `Klient poprzedniego okresu ${String(index + 1).padStart(2, "0")}`,
+    name:
+      index === 52
+        ? "Bardzo długa nazwa klienta testująca bezpieczne zawijanie treści w liście operacyjnej"
+        : `Klient poprzedniego okresu ${String(index + 1).padStart(2, "0")}`,
     phone: `+48 604 ${String(100 + index).padStart(3, "0")} ${String(300 + index).padStart(3, "0")}`,
     priceMaximum: 3_930_000,
     priceMinimum: 2_930_000,
     score: [65, 72, 78, 81, 86, 90][index % 6],
-    service: primaryServices[index % primaryServices.length],
+    service:
+      index === 52
+        ? "Kompleksowa realizacja wieloetapowa z konsultacją, pomiarem i koordynacją wykonawczą"
+        : primaryServices[index % primaryServices.length],
     status: supplementalStatuses[index % supplementalStatuses.length],
     submittedDaysAgo: 31.5 + (index % 28),
     timeline: primaryTimelines[index % primaryTimelines.length],
@@ -555,6 +592,29 @@ for (const [index, lead] of leads.entries()) {
   const priceMinimum = lead.priceMinimum ?? 2_500_000 + (index % 6) * 250_000;
   const priceMaximum = lead.priceMaximum ?? 3_500_000 + (index % 6) * 300_000;
   const completionSeconds = lead.completionSeconds ?? 192;
+  const contextSnapshot =
+    index === 0
+      ? {
+          source: {
+            kind: "embedded",
+            origin: "https://partner.example.invalid",
+          },
+          values: [
+            {
+              key: "campaign",
+              label: "Źródło zapytania",
+              mode: "informational",
+              value: "Kampania partnerska · kuchnie premium",
+            },
+            {
+              key: "project_reference",
+              label: "Numer projektu klienta",
+              mode: "confirm",
+              value: `PROJEKT-${"BEZPIECZNY-DLUGI-IDENTYFIKATOR-".repeat(4)}`,
+            },
+          ],
+        }
+      : { source: { kind: "hosted", origin: null }, values: [] };
   const eventNames = [
     "widget_loaded",
     "widget_opened",
@@ -589,7 +649,10 @@ for (const [index, lead] of leads.entries()) {
         score_category_label = ${sqlLiteral(category.label)},
         price_min_minor = ${priceMinimum},
         price_max_minor = ${priceMaximum},
-        flow_title = ${sqlLiteral(lead.service ?? document.title)}
+        flow_title = ${sqlLiteral(lead.service ?? document.title)},
+        preferred_contact_channel = ${index === 0 ? sqlLiteral("email") : "null"},
+        preferred_contact_window = ${index === 0 ? sqlLiteral("afternoon") : "null"},
+        context_snapshot = ${jsonLiteral(contextSnapshot)}
       where organization_id = ${sqlLiteral(organizationId)}::uuid
         and contact_email = ${sqlLiteral(lead.email)};
 
@@ -605,7 +668,8 @@ for (const [index, lead] of leads.entries()) {
       update public.widget_sessions session
       set
         created_at = ${sqlLiteral(submittedIso)}::timestamptz,
-        last_seen_at = ${sqlLiteral(submittedIso)}::timestamptz
+        last_seen_at = ${sqlLiteral(submittedIso)}::timestamptz,
+        context_snapshot = ${jsonLiteral(contextSnapshot)}
       from public.leads lead_record
       where lead_record.organization_id = ${sqlLiteral(organizationId)}::uuid
         and lead_record.contact_email = ${sqlLiteral(lead.email)}
@@ -681,6 +745,15 @@ for (const [index, lead] of leads.entries()) {
     ["budzet", "Jaki przedział budżetu planujesz?", "25 000–35 000 zł"],
     ["termin", "Kiedy zabudowa ma być gotowa?", lead.timeline ?? "W ciągu 3 miesięcy"],
     ["lokalizacja", "Gdzie będzie realizowana inwestycja?", lead.city],
+    ...(index === 0
+      ? [
+          [
+            "dodatkowe_informacje",
+            "Jakie dodatkowe wymagania powinniśmy uwzględnić?",
+            "Zależy nam na spokojnej, ergonomicznej przestrzeni, łatwej pielęgnacji materiałów oraz spójnym projekcie obejmującym oświetlenie, przechowywanie i bezpieczne przejścia.",
+          ],
+        ]
+      : []),
   ];
   const answerRows = answers
     .map(
@@ -743,7 +816,7 @@ for (const [index, lead] of leads.entries()) {
     insert into public.widget_sessions (
       id, organization_id, flow_id, flow_version_id, public_flow_id,
       token_hash, status, revision, step_history, current_step_key,
-      expires_at, created_at, last_seen_at
+      context_snapshot, expires_at, created_at, last_seen_at
     ) values (
       ${sqlLiteral(sessionId)}::uuid,
       ${sqlLiteral(organizationId)}::uuid,
@@ -755,6 +828,7 @@ for (const [index, lead] of leads.entries()) {
       ${document.steps.length},
       array[${document.steps.map((step) => sqlLiteral(step.key)).join(",")}],
       null,
+      ${jsonLiteral(contextSnapshot)},
       now() + interval '7 days',
       ${sqlLiteral(submittedIso)}::timestamptz,
       ${sqlLiteral(submittedIso)}::timestamptz
@@ -763,7 +837,8 @@ for (const [index, lead] of leads.entries()) {
     insert into public.leads (
       id, public_id, organization_id, flow_id, flow_version_id, flow_name,
       flow_title, session_id, submit_mutation_id, status, contact_email,
-      contact_name, contact_phone, score, score_category_key,
+      contact_name, contact_phone, preferred_contact_channel,
+      preferred_contact_window, context_snapshot, score, score_category_key,
       score_category_label, price_min_minor, price_max_minor, price_currency,
       price_presentation, estimation_explanation, submitted_at, updated_at
     ) values (
@@ -780,6 +855,9 @@ for (const [index, lead] of leads.entries()) {
       ${sqlLiteral(lead.email)},
       ${sqlLiteral(lead.name)},
       ${sqlLiteral(lead.phone)},
+      ${index === 0 ? sqlLiteral("email") : "null"},
+      ${index === 0 ? sqlLiteral("afternoon") : "null"},
+      ${jsonLiteral(contextSnapshot)},
       ${lead.score},
       ${sqlLiteral(category.key)},
       ${sqlLiteral(category.label)},
@@ -830,6 +908,47 @@ for (const [index, lead] of leads.entries()) {
               new Date(submittedAt.getTime() + 30 * 60 * 1_000).toISOString(),
             )}::timestamptz
           );
+
+          with inserted_tasks as (
+            insert into public.lead_tasks (
+              organization_id, lead_id, request_id, kind, title, description,
+              due_at, assigned_to, created_by
+            ) values
+            (
+              ${sqlLiteral(organizationId)}::uuid,
+              ${sqlLiteral(leadId)}::uuid,
+              gen_random_uuid(),
+              'contact',
+              'Kontakt w sprawie terminu realizacji',
+              'Potwierdź dostępność klienta i przygotuj listę pytań przed rozmową.',
+              now() + interval '1 day',
+              ${sqlLiteral(userId)}::uuid,
+              ${sqlLiteral(userId)}::uuid
+            ),
+            (
+              ${sqlLiteral(organizationId)}::uuid,
+              ${sqlLiteral(leadId)}::uuid,
+              gen_random_uuid(),
+              'task',
+              'Zweryfikuj zakres zabudowy i przygotuj rekomendowane następne kroki',
+              'Sprawdź wymiary, materiały, budżet i ograniczenia montażowe przed przygotowaniem odpowiedzi dla klienta.',
+              now() + interval '2 days',
+              ${sqlLiteral(userId)}::uuid,
+              ${sqlLiteral(userId)}::uuid
+            )
+            returning id
+          )
+          insert into public.lead_activity_events (
+            organization_id, lead_id, task_id, kind, actor_user_id, occurred_at
+          )
+          select
+            ${sqlLiteral(organizationId)}::uuid,
+            ${sqlLiteral(leadId)}::uuid,
+            id,
+            'task_created',
+            ${sqlLiteral(userId)}::uuid,
+            now()
+          from inserted_tasks;
 
           insert into public.notifications (
             id, organization_id, lead_id, kind, recipient_email,
@@ -1142,6 +1261,7 @@ console.log(
     publicId,
     seededAttachment,
     seededLeads,
+    seededProcesses,
     webhookEndpointId,
   }),
 );

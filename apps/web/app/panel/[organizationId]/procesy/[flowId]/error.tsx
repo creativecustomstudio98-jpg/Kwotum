@@ -4,7 +4,7 @@ import { Button, EmptyState } from "@wyceno/ui";
 
 export default function FlowBuilderError({ reset }: { reset: () => void }) {
   return (
-    <main className="panel-workspace panel-workspace--builder">
+    <main className="panel-workspace panel-workspace--builder panel-workspace--builder-m7">
       <div className="panel-page">
         <EmptyState
           action={<Button onClick={reset}>Odśwież draft</Button>}

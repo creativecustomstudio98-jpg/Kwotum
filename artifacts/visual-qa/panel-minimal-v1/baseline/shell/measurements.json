@@ -1,0 +1,65 @@
+[
+  {
+    "documentOverflow": 0,
+    "label": "1536x1024",
+    "mode": "desktop",
+    "railHeight": 1024,
+    "railWidth": 256
+  },
+  {
+    "documentOverflow": 0,
+    "label": "1440x900",
+    "mode": "desktop",
+    "railHeight": 900,
+    "railWidth": 256
+  },
+  {
+    "documentOverflow": 0,
+    "label": "1280x800",
+    "mode": "desktop",
+    "railHeight": 800,
+    "railWidth": 256
+  },
+  {
+    "documentOverflow": 0,
+    "label": "1024x768",
+    "mode": "desktop",
+    "railHeight": 768,
+    "railWidth": 256
+  },
+  {
+    "documentOverflow": 0,
+    "label": "320x800",
+    "mobileNavigationHeight": 64.984375,
+    "mode": "mobile",
+    "railWidth": 0
+  },
+  {
+    "documentOverflow": 0,
+    "label": "375x812",
+    "mobileNavigationHeight": 64.984375,
+    "mode": "mobile",
+    "railWidth": 0
+  },
+  {
+    "documentOverflow": 0,
+    "label": "390x844",
+    "mobileNavigationHeight": 64.984375,
+    "mode": "mobile",
+    "railWidth": 0
+  },
+  {
+    "documentOverflow": 0,
+    "label": "430x932",
+    "mobileNavigationHeight": 64.984375,
+    "mode": "mobile",
+    "railWidth": 0
+  },
+  {
+    "documentOverflow": 0,
+    "label": "768x1024",
+    "mobileNavigationHeight": 64.984375,
+    "mode": "mobile",
+    "railWidth": 0
+  }
+]

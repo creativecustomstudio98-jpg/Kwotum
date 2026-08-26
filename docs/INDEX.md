@@ -1,7 +1,7 @@
 # Indeks dokumentacji Kwotum
 
 **Status:** kanoniczny  
-**Ostatni przegląd:** 2026-08-09
+**Ostatni przegląd:** 2026-08-26
 
 Ten plik wskazuje jedno aktywne źródło prawdy dla każdego obszaru. Materiały
 referencyjne i raporty historyczne nie zastępują wymagań produktu, decyzji ADR
@@ -32,42 +32,45 @@ zamiast tworzyć ich konkurencyjne kopie.
    samodzielnego rozszerzania zakresu.
 
 Nowszy obraz zaakceptowany w rozmowie może zastąpić starszą geometrię wyłącznie
-po zapisaniu różnicy w `ui/REFERENCE_MANIFEST.md` lub
-`ui/REFERENCE_GAPS.md`. Obraz nigdy nie obniża wymagań bezpieczeństwa i nie
-zatwierdza funkcji spoza `SCOPE.md`.
+po zapisaniu różnicy w `ui/REFERENCE_MANIFEST.md` i kontrakcie właściwego
+modułu. Obraz nigdy nie obniża wymagań bezpieczeństwa i nie zatwierdza funkcji
+spoza `SCOPE.md`.
 
 ## Mapa źródeł prawdy
 
-| Obszar                          | Dokument kanoniczny                                     | Dokumenty uzupełniające                                                                                  |
-| ------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Cel i pozycjonowanie            | `PRODUCT_VISION.md`                                     | `JOBS_TO_BE_DONE.md`, `PERSONAS.md`, `USER_JOURNEYS.md`                                                  |
-| Zakres MVP                      | `PRODUCT_REQUIREMENTS.md`, `SCOPE.md`, `NON_GOALS.md`   | `ROADMAP.md`                                                                                             |
-| Decyzje                         | `DECISIONS.md`                                          | `ASSUMPTIONS_AND_OPEN_QUESTIONS.md`, `RISKS.md`                                                          |
-| Architektura                    | `ARCHITECTURE.md`                                       | `DEPENDENCIES.md`, `DEVELOPMENT.md`                                                                      |
-| Dane i tenant scope             | `DATABASE.md`, `AUTHORIZATION.md`                       | `FLOW_DOMAIN.md`, `LEAD_PIPELINE.md`                                                                     |
-| Bezpieczeństwo                  | `SECURITY.md`, `THREAT_MODEL.md`                        | `SECURITY_AUDIT_2026-07-25.md`, `BACKUP_AND_RECOVERY.md`                                                 |
-| Prywatność                      | `PRIVACY.md`                                            | `DPA_AND_SUBPROCESSORS.md`, `RELEASE_CHECKLIST.md`                                                       |
-| Widget                          | `WIDGET_ARCHITECTURE.md`                                | `WIDGET_IMPLEMENTATION.md`, `WORDPRESS_PLUGIN.md`                                                        |
-| Podgląd i udostępnianie procesu | `FLOW_PREVIEW_AND_SHARING_IMPLEMENTATION_2026-08-03.md` | `WIDGET_ARCHITECTURE.md`, `NOTIFICATIONS.md`, ADR-035                                                    |
-| Operacyjna obsługa leada        | `LEAD_OPERATIONS_IMPLEMENTATION_2026-08-03.md`          | `LEAD_PIPELINE.md`, `AUTHORIZATION.md`, ADR-036                                                          |
-| E-maile konta i SMTP Auth       | `AUTH_EMAILS.md`                                        | `NOTIFICATIONS.md`, `SECURITY_AND_DATA.md`, ADR-018                                                      |
-| Webhook `lead.created`          | `WEBHOOKS.md`                                           | `API_CONTRACTS.md`, `SECURITY.md`, ADR-034                                                               |
-| Runtime liveness i readiness    | `RUNTIME_READINESS_IMPLEMENTATION_2026-08-03.md`        | `DEPLOYMENT.md`, `OBSERVABILITY.md`, ADR-037                                                             |
-| Estymacja                       | `ESTIMATION_ENGINE.md`                                  | `PRODUCT_REQUIREMENTS.md`, ADR-016                                                                       |
-| Analityka                       | `ANALYTICS_PLAN.md`                                     | `ANALYTICS_IMPLEMENTATION.md`, ADR-019                                                                   |
-| Marketing i SEO                 | `CONTENT_ARCHITECTURE.md`, `SEO_STRATEGY.md`            | `MARKETING_IMPLEMENTATION.md`, `CRO_PLAN.md`                                                             |
-| Treść i stany UX                | `CONTENT_DESIGN.md`, `EMPTY_LOADING_ERROR_STATES.md`    | `ACCEPTANCE_CRITERIA.md`                                                                                 |
-| System wizualny                 | `DESIGN_SYSTEM.md`                                      | `DESIGN_PRINCIPLES.md`, ADR-024–ADR-028                                                                  |
-| Zakres ekranów                  | `UI_SCREEN_SPEC.md`                                     | `ui/MASTER_SCREEN_SCOPE.md`, `panel-reference-audit.md`, `BUILDER_COMPLETENESS_AUDIT_2026-07-29.md`      |
-| Responsive                      | `RESPONSIVE_LAYOUT.md`                                  | `ui/RESPONSIVE_LAYOUT_INTEGRITY.md`                                                                      |
-| Visual QA                       | `VISUAL_QA.md`                                          | `panel-visual-qa.md`, `QA_PLAN.md`, `ACCESSIBILITY.md`                                                   |
-| Obrazy referencyjne             | `ui/REFERENCE_MANIFEST.md`                              | `ui/UI_REFERENCE_INDEX.md`, `ui/REFERENCE_IMAGE_PROTOCOL.md`                                             |
-| Marka Kwotum                    | `DECISIONS.md` (ADR-033)                                | `ui/kwotum-brand-v1/`, `_migration/LORUM_BRAND_IDENTIFIER_MATRIX.md`                                     |
-| Rebranding podstron             | `ui/marketing-subpages-v1/MASTER_REBRAND_PLAN.md`       | `ui/marketing-subpages-v1/ROUTE_AND_SECTION_AUDIT.md`, `ui/marketing-subpages-v1/DESIGN_ARCHITECTURE.md` |
-| Plan prac                       | `TASKS.md`                                              | `ROADMAP.md`, `RELEASE_CHECKLIST.md`                                                                     |
-| Gotowość produkcyjna            | `PRODUCTION_READINESS.md`                               | `PRODUCTION_READINESS_PLAN.md`, `RELEASE_CHECKLIST.md`, `DEPLOYMENT.md`                                  |
-| Bezpieczeństwo startu           | `SECURITY_AND_DATA.md`                                  | `SECURITY.md`, `DATABASE.md`, `AUTHORIZATION.md`, `BACKUP_AND_RECOVERY.md`                               |
-| Pierwszych 5 klientów           | `LAUNCH_FIRST_5_CLIENTS.md`                             | `ROADMAP.md`, `ANALYTICS_PLAN.md`, `CRO_PLAN.md`                                                         |
+| Obszar                          | Dokument kanoniczny                                     | Dokumenty uzupełniające                                                                                                                 |
+| ------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Cel i pozycjonowanie            | `PRODUCT_VISION.md`                                     | `JOBS_TO_BE_DONE.md`, `PERSONAS.md`, `USER_JOURNEYS.md`                                                                                 |
+| Zakres MVP                      | `PRODUCT_REQUIREMENTS.md`, `SCOPE.md`, `NON_GOALS.md`   | `ROADMAP.md`                                                                                                                            |
+| Decyzje                         | `DECISIONS.md`                                          | `ASSUMPTIONS_AND_OPEN_QUESTIONS.md`, `RISKS.md`                                                                                         |
+| Architektura                    | `ARCHITECTURE.md`                                       | `DEPENDENCIES.md`, `DEVELOPMENT.md`                                                                                                     |
+| Dane i tenant scope             | `DATABASE.md`, `AUTHORIZATION.md`                       | `FLOW_DOMAIN.md`, `LEAD_PIPELINE.md`                                                                                                    |
+| Bezpieczeństwo                  | `SECURITY.md`, `THREAT_MODEL.md`                        | `SECURITY_AUDIT_2026-07-25.md`, `BACKUP_AND_RECOVERY.md`                                                                                |
+| Prywatność                      | `PRIVACY.md`                                            | `DPA_AND_SUBPROCESSORS.md`, `RELEASE_CHECKLIST.md`                                                                                      |
+| Widget                          | `WIDGET_ARCHITECTURE.md`                                | `WIDGET_IMPLEMENTATION.md`, `WORDPRESS_PLUGIN.md`                                                                                       |
+| Podgląd i udostępnianie procesu | `FLOW_PREVIEW_AND_SHARING_IMPLEMENTATION_2026-08-03.md` | `WIDGET_ARCHITECTURE.md`, `NOTIFICATIONS.md`, ADR-035                                                                                   |
+| Operacyjna obsługa leada        | `LEAD_OPERATIONS_IMPLEMENTATION_2026-08-03.md`          | `LEAD_PIPELINE.md`, `AUTHORIZATION.md`, ADR-036                                                                                         |
+| E-maile konta i SMTP Auth       | `AUTH_EMAILS.md`                                        | `NOTIFICATIONS.md`, `SECURITY_AND_DATA.md`, ADR-018                                                                                     |
+| Webhook `lead.created`          | `WEBHOOKS.md`                                           | `API_CONTRACTS.md`, `SECURITY.md`, ADR-034                                                                                              |
+| Runtime liveness i readiness    | `RUNTIME_READINESS_IMPLEMENTATION_2026-08-03.md`        | `DEPLOYMENT.md`, `OBSERVABILITY.md`, ADR-037                                                                                            |
+| Estymacja                       | `ESTIMATION_ENGINE.md`                                  | `PRODUCT_REQUIREMENTS.md`, ADR-016                                                                                                      |
+| Adaptive Intake PX1–PX7         | `product-experience-v1/MASTER_PLAN.md`                  | `product-experience-v1/ACCEPTANCE_MATRIX.md`, raporty PX2–PX6, `pilots/PX7_PILOT_READINESS_AND_DECISION_2026-08-25.md`, ADR-043–ADR-048 |
+| Analityka                       | `ANALYTICS_PLAN.md`                                     | `ANALYTICS_IMPLEMENTATION.md`, ADR-019                                                                                                  |
+| Marketing i SEO                 | `CONTENT_ARCHITECTURE.md`, `SEO_STRATEGY.md`            | `MARKETING_IMPLEMENTATION.md`, `CRO_PLAN.md`                                                                                            |
+| Treść i stany UX                | `CONTENT_DESIGN.md`, `EMPTY_LOADING_ERROR_STATES.md`    | `ACCEPTANCE_CRITERIA.md`                                                                                                                |
+| System wizualny                 | `DESIGN_SYSTEM.md`                                      | `DESIGN_PRINCIPLES.md`, ADR-024–ADR-028 dla marketingu; panel podlega ADR-049                                                           |
+| Zakres ekranów                  | `UI_SCREEN_SPEC.md`                                     | `ui/panel-minimal-v1/README.md`                                                                                                         |
+| Responsive                      | `RESPONSIVE_LAYOUT.md`                                  | `ui/RESPONSIVE_LAYOUT_INTEGRITY.md`                                                                                                     |
+| Visual QA                       | `VISUAL_QA.md`                                          | `QA_PLAN.md`, `ACCESSIBILITY.md`                                                                                                        |
+| Obrazy referencyjne             | `ui/REFERENCE_MANIFEST.md`                              | `ui/REFERENCE_IMAGE_PROTOCOL.md`                                                                                                        |
+| Marka Kwotum                    | `DECISIONS.md` (ADR-033)                                | `ui/kwotum-brand-v2/`, `ui/kwotum-brand-v1/`, `_migration/LORUM_BRAND_IDENTIFIER_MATRIX.md`                                             |
+| Minimalistyczny panel           | `ui/panel-minimal-v1/README.md`                         | `ui/panel-minimal-v1/M0_CLEANUP_AND_AUDIT.md`, `ui/REFERENCE_MANIFEST.md`, ADR-049                                                      |
+| Rebranding podstron             | `ui/marketing-subpages-v1/MASTER_REBRAND_PLAN.md`       | `ui/marketing-subpages-v1/ROUTE_AND_SECTION_AUDIT.md`, `ui/marketing-subpages-v1/DESIGN_ARCHITECTURE.md`                                |
+| Plan prac                       | `TASKS.md`                                              | `ROADMAP.md`, `RELEASE_CHECKLIST.md`                                                                                                    |
+| Gotowość produkcyjna            | `PRODUCTION_READINESS.md`                               | `PRODUCTION_READINESS_PLAN.md`, `RELEASE_CHECKLIST.md`, `DEPLOYMENT.md`                                                                 |
+| Bezpieczeństwo startu           | `SECURITY_AND_DATA.md`                                  | `SECURITY.md`, `DATABASE.md`, `AUTHORIZATION.md`, `BACKUP_AND_RECOVERY.md`                                                              |
+| Pierwszych 5 klientów           | `LAUNCH_FIRST_5_CLIENTS.md`                             | `ROADMAP.md`, `ANALYTICS_PLAN.md`, `CRO_PLAN.md`                                                                                        |
+| Pilotaż Fortez i PX7            | `pilots/PX7_PILOT_READINESS_AND_DECISION_2026-08-25.md` | `pilots/PX7_UAT_AND_EVIDENCE_MATRIX_2026-08-25.md`, `pilots/FORTEZ_PILOT_DISCOVERY_2026-08-10.md`, `RELEASE_CHECKLIST.md`               |
 
 ## Kontrakt wykonawczy V7 i pakiety źródłowe V6
 
@@ -84,10 +87,11 @@ zatwierdza funkcji spoza `SCOPE.md`.
   implementacji kolejnych etapów bez osobnego gate'u.
 - `ui/lorum-landing-reference-v2/` — starsza mierzalna referencja landingu,
   prototyp i renderingi. Materiał pomocniczy dla regionów niepokazanych w V7.
-- `ui/lorum-product-ui-reference-v1/` — referencje panelu, mobile i buildera.
-  Materiał źródłowy; najnowsze obrazy wymienione w manifeście mają pierwszeństwo.
-- `../references/` — główne plansze V6 zachowane dla historii i regionów
-  niepokazanych w V7; nie utrzymujemy ich dodatkowej kopii w `ui/references/`.
+- `ui/panel-minimal-v1/` — jedyny aktywny kontrakt wizualny panelu, dwie
+  zablokowane referencje oraz plan etapów M0–M10. Zastępuje wcześniejsze
+  plansze panelu bez zmiany logiki produktu i zabezpieczeń.
+- `../references/` — pomocnicze materiały marketingowe dla regionów
+  niepokazanych w V7. Nie sterują panelem.
 - `../CODEX_MASTER_PROMPT.md` — jedyny aktywny master prompt. V7 ogranicza
   najbliższą przebudowę do wiernej rekonstrukcji desktopu `/`, wymaga audytu
   przed usuwaniem martwego kodu i odkłada właściwy redesign mobile do osobnego
@@ -95,10 +99,10 @@ zatwierdza funkcji spoza `SCOPE.md`.
 - `../snippets/layout-integrity.spec.ts` — referencyjny test integralności
   layoutu; przed użyciem trzeba dostosować selektory do bieżącego etapu.
 
-Aktualną rekonstrukcję panelu dokumentują `panel-reference-audit.md`,
-`panel-ui-gap-analysis.md` i `panel-visual-qa.md`. Pierwszy blokuje pomiary,
-drugi zachowuje porównanie stanu „przed”, a trzeci jest raportem odbioru po
-implementacji.
+Aktualny kierunek panelu dokumentuje wyłącznie
+`ui/panel-minimal-v1/README.md`. ADR-049 wycofuje poprzednie referencje,
+raporty porównawcze i kontrakt rebrandingu panelu. Historia zmian pozostaje w
+Git, ale nie jest aktywnym źródłem decyzji.
 
 Historyczną korektę hero strony głównej dokumentuje
 `LANDING_RENDERED_PHONE_HERO_2026-07-29.md`. Pakiet
@@ -134,3 +138,25 @@ Widoczna marka to **Kwotum**. Identyfikatory kompatybilności `@wyceno/*`,
 WordPress oraz historyczne prefiksy preferencji `lorum:*` pozostają celowo bez
 zmian zgodnie z ADR-033. Pełna matryca znajduje
 się w `_migration/LORUM_BRAND_IDENTIFIER_MATRIX.md`.
+
+# PX5: kontekst i prefill
+
+- `product-experience-v1/PX5_CONTEXT_PREFILL_CONTRACT.md` — model zaufania,
+  wersjonowany kontrakt, integracja, threat model i rollback.
+- `product-experience-v1/PX5_IMPLEMENTATION_REPORT.md` — gate lokalnego etapu.
+
+# PX6: zakończenie, kontakt i branding
+
+- `product-experience-v1/PX6_COMPLETION_AND_BRANDING_CONTRACT.md` — kontrakt
+  wersji, propagacji, bezpieczeństwa i rollbacku.
+- `product-experience-v1/PX6_IMPLEMENTATION_REPORT.md` — gate lokalnego etapu
+  oraz wynik visual QA bez historycznych zdjęć.
+
+# PX7: kontrolowany pilot
+
+- `pilots/PX7_PILOT_READINESS_AND_DECISION_2026-08-25.md` — konfiguracja,
+  blokady, fallback, rollback i formalne NO-GO dla prawdziwego ruchu.
+- `pilots/PX7_UAT_AND_EVIDENCE_MATRIX_2026-08-25.md` — wykonywalna macierz
+  preflight, UAT, operacji, prawa i dostępności.
+- `pilots/configs/` — trzy syntetyczne konfiguracje `hypothesis`, bez starych
+  zdjęć i bez prawa do publikacji przed akceptacją firmy.

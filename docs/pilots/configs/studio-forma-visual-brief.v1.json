@@ -1,0 +1,219 @@
+{
+  "configVersion": 1,
+  "fallbackChannels": [
+    { "key": "phone", "mustRemainActive": true },
+    { "key": "legacy_form", "mustRemainActive": true }
+  ],
+  "intendedCta": "Opisz planowaną zabudowę",
+  "pilotKey": "studio_forma_visual_brief",
+  "pilotStatus": "hypothesis",
+  "snapshot": {
+    "contextSchema": {
+      "fields": [
+        {
+          "allowedValues": ["visual_brief"],
+          "key": "cta_source",
+          "label": "Źródło uruchomienia",
+          "mode": "system",
+          "required": true,
+          "systemValue": "visual_brief",
+          "type": "enum"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "entryStepKey": "rodzaj_zabudowy",
+    "experienceMode": "visual_configurator",
+    "intro": "Zbierzemy typ zabudowy, etap przygotowania, wymiary i priorytety potrzebne do pierwszej rozmowy.",
+    "leadCapture": {
+      "completionOrder": "result_then_contact",
+      "fields": {
+        "email": "required",
+        "name": "optional",
+        "phone": "optional",
+        "preferredContactChannel": "optional",
+        "preferredContactWindow": "optional"
+      },
+      "filesEnabled": true,
+      "leadCaptureSchemaVersion": 3,
+      "privacyNotice": {
+        "label": "Potwierdzam zapoznanie się z informacją o przetwarzaniu danych.",
+        "textHash": "3333333333333333333333333333333333333333333333333333333333333333",
+        "version": "pilot-draft-not-approved"
+      }
+    },
+    "result": {
+      "action": "capture_lead",
+      "disclaimer": "Podsumowanie ma charakter orientacyjny. Zakres, materiały, termin i cena wymagają pomiaru oraz potwierdzenia przez wykonawcę.",
+      "headline": "Zakres jest gotowy do pierwszej konsultacji",
+      "mode": "no_price",
+      "nextStepLabel": "Przekaż dane kontaktowe i opcjonalny materiał",
+      "resultSchemaVersion": 2
+    },
+    "rules": [],
+    "schemaVersion": 3,
+    "sections": [
+      { "key": "zakres", "title": "Rodzaj i etap inwestycji" },
+      { "key": "przestrzen", "title": "Przestrzeń i potrzeby" },
+      { "key": "realizacja", "title": "Budżet i realizacja" }
+    ],
+    "steps": [
+      {
+        "allowUnknown": false,
+        "key": "rodzaj_zabudowy",
+        "nextStepKey": "etap_przygotowania",
+        "options": [
+          { "key": "kuchnia", "label": "Kuchnia", "presentation": { "icon": "kitchen" } },
+          {
+            "key": "szafa",
+            "label": "Szafa lub garderoba",
+            "presentation": { "icon": "wardrobe" }
+          },
+          { "key": "lazienka", "label": "Zabudowa łazienkowa", "presentation": { "icon": "door" } },
+          { "key": "inne", "label": "Inna zabudowa", "presentation": { "icon": "layers" } }
+        ],
+        "presentation": { "variant": "icon_cards" },
+        "required": true,
+        "sectionKey": "zakres",
+        "title": "Jakiej zabudowy potrzebujesz?",
+        "type": "single_choice"
+      },
+      {
+        "allowUnknown": false,
+        "key": "etap_przygotowania",
+        "nextStepKey": "wymiary",
+        "options": [
+          {
+            "key": "pomysl",
+            "label": "Mam ogólny pomysł",
+            "presentation": {
+              "description": "Potrzebuję pomocy w układzie, materiałach i zakresie."
+            }
+          },
+          {
+            "key": "inspiracje",
+            "label": "Mam inspiracje i wstępne wymiary",
+            "presentation": { "description": "Kierunek jest znany, ale wymaga dopracowania." }
+          },
+          {
+            "key": "projekt",
+            "label": "Mam gotowy projekt",
+            "presentation": { "description": "Chcę zweryfikować wykonanie i zakres." }
+          },
+          {
+            "key": "wymiana",
+            "label": "Wymieniam istniejącą zabudowę",
+            "presentation": { "description": "Trzeba uwzględnić demontaż i stan pomieszczenia." }
+          }
+        ],
+        "presentation": { "variant": "text_cards" },
+        "required": true,
+        "sectionKey": "zakres",
+        "title": "Na jakim etapie jest inwestycja?",
+        "type": "single_choice"
+      },
+      {
+        "allowUnknown": true,
+        "description": "Podaj przybliżoną długość zabudowy w centymetrach. Możesz wybrać „nie wiem”.",
+        "key": "wymiary",
+        "nextStepKey": "priorytety",
+        "options": [],
+        "presentation": { "variant": "default" },
+        "required": false,
+        "sectionKey": "przestrzen",
+        "title": "Jaka jest orientacyjna długość zabudowy?",
+        "type": "number",
+        "validation": { "kind": "number_range", "max": 5000, "min": 30 }
+      },
+      {
+        "allowUnknown": false,
+        "key": "priorytety",
+        "nextStepKey": "standard",
+        "options": [
+          { "key": "przechowywanie", "label": "Więcej miejsca do przechowywania" },
+          { "key": "ergonomia", "label": "Wygodny układ i ergonomia" },
+          { "key": "trwalosc", "label": "Trwałość i łatwa pielęgnacja" },
+          { "key": "wyglad", "label": "Konkretny efekt wizualny" },
+          { "key": "budzet", "label": "Kontrola budżetu" }
+        ],
+        "presentation": { "variant": "default" },
+        "required": true,
+        "sectionKey": "przestrzen",
+        "title": "Co jest najważniejsze w tej realizacji?",
+        "type": "multiple_choice"
+      },
+      {
+        "allowUnknown": false,
+        "key": "standard",
+        "nextStepKey": "budzet",
+        "options": [
+          {
+            "key": "praktyczny",
+            "label": "Praktyczny",
+            "presentation": {
+              "description": "Sprawdzone materiały i rozwiązania z naciskiem na funkcję."
+            }
+          },
+          {
+            "key": "podwyzszony",
+            "label": "Podwyższony",
+            "presentation": { "description": "Więcej możliwości wykończenia i wyposażenia." }
+          },
+          {
+            "key": "premium",
+            "label": "Indywidualny premium",
+            "presentation": {
+              "description": "Nietypowe detale, materiały i rozwiązania wykonywane na zamówienie."
+            }
+          },
+          {
+            "key": "do_ustalenia",
+            "label": "Do ustalenia",
+            "presentation": { "description": "Najpierw chcę poznać sensowne warianty." }
+          }
+        ],
+        "presentation": { "variant": "text_cards" },
+        "required": true,
+        "sectionKey": "przestrzen",
+        "title": "Jaki poziom wykończenia bierzesz pod uwagę?",
+        "type": "single_choice"
+      },
+      {
+        "allowUnknown": true,
+        "key": "budzet",
+        "nextStepKey": "termin",
+        "options": [],
+        "presentation": { "variant": "default" },
+        "required": false,
+        "sectionKey": "realizacja",
+        "title": "Jaki orientacyjny budżet planujesz?",
+        "type": "budget",
+        "validation": { "kind": "number_range", "max": 1000000, "min": 0 }
+      },
+      {
+        "allowUnknown": true,
+        "key": "termin",
+        "nextStepKey": "lokalizacja",
+        "options": [],
+        "presentation": { "variant": "default" },
+        "required": false,
+        "sectionKey": "realizacja",
+        "title": "Kiedy zabudowa powinna być gotowa?",
+        "type": "date"
+      },
+      {
+        "allowUnknown": false,
+        "key": "lokalizacja",
+        "nextStepKey": null,
+        "options": [],
+        "presentation": { "variant": "default" },
+        "required": true,
+        "sectionKey": "realizacja",
+        "title": "Gdzie będzie realizowana inwestycja?",
+        "type": "location",
+        "validation": { "kind": "text_length", "maxLength": 120, "minLength": 2 }
+      }
+    ],
+    "title": "Brief zabudowy na wymiar"
+  }
+}

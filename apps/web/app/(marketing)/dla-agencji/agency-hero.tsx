@@ -134,7 +134,7 @@ function AgencyPanelProof() {
       <div className={styles.panelShell} data-agency-panel-preview>
         <aside className={styles.sidebar}>
           <div className={styles.sidebarBrand}>
-            <Image alt="" height={38} src="/Logoicon.svg" width={38} />
+            <Image alt="" height={38} src="/kwotum-logo-v3.png" width={38} />
             <span>
               <strong>Kwotum</strong>
               <small>Panel operacyjny</small>

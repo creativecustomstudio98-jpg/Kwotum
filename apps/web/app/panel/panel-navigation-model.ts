@@ -1,6 +1,7 @@
 import type { PanelIconName } from "./panel-icon";
 
 export type PanelNavigationItem = {
+  activeHrefPrefixes?: ReadonlyArray<string>;
   href: string;
   icon: PanelIconName;
   label: string;
@@ -12,8 +13,17 @@ export function isPanelNavigationItemActive(
   pathname: string,
   href: string,
   organizationRoot: string,
+  activeHrefPrefixes: ReadonlyArray<string> = [],
 ): boolean {
-  return pathname === href || (href !== organizationRoot && pathname.startsWith(`${href}/`));
+  return (
+    pathname === href ||
+    (href !== organizationRoot && pathname.startsWith(`${href}/`)) ||
+    activeHrefPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
+  );
+}
+
+export function isPanelNavigationItemCurrent(pathname: string, href: string): boolean {
+  return pathname === href;
 }
 
 export function isMobilePanelDetailPath(pathname: string, organizationRoot: string): boolean {

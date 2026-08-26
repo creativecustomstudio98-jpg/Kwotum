@@ -139,14 +139,15 @@ export function buildFlowBreakdown(
 export function buildEstimateBreakdown(leads: ReadonlyArray<DashboardLead>): DashboardBreakdown[] {
   const buckets = [
     { key: "below-10", label: "poniżej 10 000 zł", maximum: 1_000_000 },
-    { key: "10-20", label: "10 000 – 20 000 zł", maximum: 2_000_000 },
-    { key: "20-40", label: "20 000 – 40 000 zł", maximum: 4_000_000 },
-    { key: "40-80", label: "40 000 – 80 000 zł", maximum: 8_000_000 },
-    { key: "above-80", label: "powyżej 80 000 zł", maximum: Number.POSITIVE_INFINITY },
+    { key: "10-20", label: "10 000 – 19 999 zł", maximum: 2_000_000 },
+    { key: "20-40", label: "20 000 – 39 999 zł", maximum: 4_000_000 },
+    { key: "40-80", label: "40 000 – 79 999 zł", maximum: 8_000_000 },
+    { key: "above-80", label: "80 000 zł i więcej", maximum: Number.POSITIVE_INFINITY },
   ] as const;
   const pricedLeads = leads.filter(
     (lead) => lead.priceCurrency === "PLN" && lead.priceMinMinor !== null,
   );
+  if (pricedLeads.length === 0) return [];
   let previousMaximum = 0;
 
   return buckets.map((bucket) => {

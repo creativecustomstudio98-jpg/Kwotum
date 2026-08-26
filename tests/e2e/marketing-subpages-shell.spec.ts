@@ -40,7 +40,7 @@ test.describe("marketing subpages R1 shell", () => {
 
         await expect(header).toBeVisible();
         await expect(header.getByRole("link", { name: "Kwotum — strona główna" })).toBeVisible();
-        await expect(header.locator(".marketing-brand__mark svg")).toHaveCount(1);
+        await expect(header.locator(".marketing-brand__mark img")).toHaveCount(1);
         await expect(breadcrumbs).toBeVisible();
         await expect(footer).toBeVisible();
 
@@ -138,7 +138,7 @@ test.describe("marketing subpages R1 shell", () => {
       for (const route of allSubpageRoutes) {
         await page.goto(route);
         await expect(page.locator(".marketing-header--subpage")).toBeVisible();
-        await expect(page.locator(".marketing-brand__mark svg").first()).toBeVisible();
+        await expect(page.locator(".marketing-brand__mark img").first()).toBeVisible();
         await expect(page.getByRole("navigation", { name: "Okruszki" })).toBeVisible();
         expect(
           await page.evaluate(

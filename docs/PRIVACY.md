@@ -52,11 +52,21 @@ prawna pozostaje w immutable snapshotcie procesu, a publiczny manifest
 otrzymuje tylko etykietę, wersję, hash i opcjonalny link. Jest to mechanizm
 dowodowy produktu, nie rozstrzygnięcie podstawy prawnej organizacji.
 
+ADR-039 pozwala procesowi wymagać telefonu zamiast e-maila. Każdy lead nadal
+ma co najmniej jeden kanał kontaktu, a polityka wynika z immutable wersji
+procesu. Zgoda marketingowa e-mail bez adresu e-mail jest odrzucana, a dla
+leada phone-first nie powstaje transakcyjne potwierdzenie e-mail. Telefon,
+podobnie jak e-mail, jest PII objętym tenantowym RLS, eksportem, retencją i
+usunięciem.
+
 Etap 8 utrwala adres odbiorcy przy rekordzie outboxu, aby późniejsza zmiana
 członkostwa nie przepisała historii dostawy. Jest to dodatkowa kopia PII,
 objęta tenantowym RLS, retencją, eksportem/usunięciem i DSAR. Próby dostawy nie
 zawierają treści wiadomości. Logi oraz odpowiedź workera mają wyłącznie
 techniczne statusy i liczniki.
+
+Tenantowy adres alertów jest osobną daną konfiguracyjną widoczną wyłącznie
+Ownerowi/Adminowi. Audit log rejestruje fakt zmiany, ale nie kopiuje adresu.
 
 Adapter Resend pozostaje wyłączony produkcyjnie do zatwierdzenia dostawcy.
 Według dokumentacji dostawcy dane konta, metadane e-mail i logi API są
@@ -72,6 +82,15 @@ obejmuje wyłącznie populację consented i ukrywa próbę/grupę poniżej 5.
 Surowe eventy mają maksymalnie 90 dni retencji. Minimalne rekordy decyzji mają
 osobną retencję do zatwierdzenia w Etapie 12. Brak zewnętrznego providera
 analityki oznacza brak nowego transferu danych w Etapie 9.
+
+FTZ-03B uruchamia Cloudflare Turnstile wyłącznie po finalnym kliknięciu wysłania
+leada. Provider otrzymuje techniczny token, hostname i zaufany adres klienta
+jako `remoteip`, a skrypt przetwarza również opisane przez Cloudflare sygnały
+ochronne, między innymi IP, TLS fingerprint, User-Agent, site key i origin.
+Kwotum nie zapisuje tokenu ani surowego IP w bazie, analytics i logach.
+Cloudflare musi zostać wpisany do zatwierdzonego łańcucha
+procesorów/podprocesorów, informacji prywatności i oceny transferu przed
+ruchem rzeczywistym; wdrożenie kodu nie stanowi takiej akceptacji.
 
 ## Przed produkcją
 

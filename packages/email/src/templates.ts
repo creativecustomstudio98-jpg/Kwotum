@@ -1,10 +1,14 @@
 export type NotificationKind = "lead_company_alert" | "lead_customer_confirmation";
 
 export type NotificationTemplateInput = Readonly<{
+  answers: ReadonlyArray<Readonly<{ question: string; value: string }>>;
   appUrl: string;
   companyName: string;
-  contactEmail: string;
+  contactEmail: string | null;
   contactName: string | null;
+  contactPhone: string | null;
+  preferredContactChannel?: "email" | "phone" | null;
+  preferredContactWindow?: "morning" | "afternoon" | "evening" | null;
   flowTitle: string;
   kind: NotificationKind;
   leadId: string;
@@ -54,7 +58,11 @@ function safeLine(value: string): string {
   return value.replace(/[\r\n\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]+/g, " ").trim();
 }
 
-function document(subject: string, content: string): string {
+function document(subject: string, content: string, appUrl: string): string {
+  const logoUrl = new URL(appUrl);
+  logoUrl.pathname = "/kwotum-logo-v3.png";
+  logoUrl.search = "";
+  logoUrl.hash = "";
   return `<!doctype html>
 <html lang="pl">
 <head>
@@ -64,6 +72,12 @@ function document(subject: string, content: string): string {
 </head>
 <body style="${bodyStyle}">
   <main style="${mainStyle}">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 28px">
+      <tr>
+        <td style="padding-right:10px;vertical-align:middle"><img src="${escapeHtml(logoUrl.toString())}" width="36" height="36" alt="" style="display:block;width:36px;height:36px"></td>
+        <td style="color:#143d2f;font-size:20px;font-weight:bold;vertical-align:middle">Kwotum</td>
+      </tr>
+    </table>
     ${content}
     <p style="margin-top:32px;color:#52675f;font-size:14px">Wiadomość transakcyjna wygenerowana przez Kwotum.</p>
   </main>
@@ -81,13 +95,15 @@ function customerTemplate(input: NotificationTemplateInput): RenderedEmail {
     ? `Orientacyjny wynik zapisany przy zapytaniu: ${safeLine(input.price)}.`
     : "Firma otrzymała zakres zapytania i dane kontaktowe.";
   const subject = safeHeader(`Potwierdzenie zapytania — ${company}`);
+  const preference = contactPreference(input);
   return {
     html: document(
       subject,
       `<h1 style="margin:0 0 16px;font-size:28px">${escapeHtml(greeting)}</h1>
     <p>Twoje zapytanie dotyczące procesu „${escapeHtml(flow)}” zostało przekazane do firmy ${escapeHtml(company)}.</p>
     <p>${escapeHtml(priceText)}</p>
-    <p>Wynik ma charakter orientacyjny i nie stanowi oferty. Firma może skontaktować się, aby potwierdzić zakres i warunki.</p>`,
+    <p>Wynik ma charakter orientacyjny i nie stanowi oferty. Firma może skontaktować się, aby potwierdzić zakres i warunki.</p>${preference.html}`,
+      input.appUrl,
     ),
     subject,
     templateVersion: "lead-customer-v1",
@@ -97,7 +113,7 @@ Twoje zapytanie dotyczące procesu „${flow}” zostało przekazane do firmy ${
 
 ${priceText}
 
-Wynik ma charakter orientacyjny i nie stanowi oferty. Firma może skontaktować się, aby potwierdzić zakres i warunki.
+Wynik ma charakter orientacyjny i nie stanowi oferty. Firma może skontaktować się, aby potwierdzić zakres i warunki.${preference.text}
 
 Wiadomość transakcyjna wygenerowana przez Kwotum.`,
   };
@@ -106,8 +122,10 @@ Wiadomość transakcyjna wygenerowana przez Kwotum.`,
 function companyTemplate(input: NotificationTemplateInput): RenderedEmail {
   const company = safeLine(input.companyName);
   const flow = safeLine(input.flowTitle);
-  const contactEmail = safeLine(input.contactEmail);
+  const contactEmail = input.contactEmail ? safeLine(input.contactEmail) : "Nie podano";
   const contactName = input.contactName ? safeLine(input.contactName) : "Nie podano";
+  const contactPhone = input.contactPhone ? safeLine(input.contactPhone) : "Nie podano";
+  const preference = contactPreference(input);
   const appUrl = new URL(input.appUrl);
   appUrl.pathname = `/panel/${encodeURIComponent(input.organizationId)}/leady/${encodeURIComponent(input.leadId)}`;
   appUrl.search = "";
@@ -116,6 +134,23 @@ function companyTemplate(input: NotificationTemplateInput): RenderedEmail {
   const subject = safeHeader(`Nowy lead — ${flow}`);
   const scoreLine = input.score === null ? "Nie obliczono" : `${input.score}/100`;
   const priceLine = input.price ? safeLine(input.price) : "Nie obliczono";
+  const answers = input.answers.slice(0, 40).map((answer) => ({
+    question: safeLine(answer.question).slice(0, 240),
+    value: safeLine(answer.value).slice(0, 2000),
+  }));
+  const answersHtml =
+    answers.length === 0
+      ? "<p>Brak zapisanych odpowiedzi.</p>"
+      : `<dl>${answers
+          .map(
+            (answer) =>
+              `<dt style="font-weight:bold">${escapeHtml(answer.question)}</dt><dd style="margin:0 0 12px">${escapeHtml(answer.value)}</dd>`,
+          )
+          .join("")}</dl>`;
+  const answersText =
+    answers.length === 0
+      ? "Brak zapisanych odpowiedzi."
+      : answers.map((answer) => `${answer.question}: ${answer.value}`).join("\n");
   return {
     html: document(
       subject,
@@ -123,11 +158,16 @@ function companyTemplate(input: NotificationTemplateInput): RenderedEmail {
     <p>Klient ukończył proces „${escapeHtml(flow)}”.</p>
     <dl>
       <dt style="font-weight:bold">Imię</dt><dd style="margin:0 0 12px">${escapeHtml(contactName)}</dd>
+      <dt style="font-weight:bold">Telefon</dt><dd style="margin:0 0 12px">${escapeHtml(contactPhone)}</dd>
       <dt style="font-weight:bold">E-mail</dt><dd style="margin:0 0 12px">${escapeHtml(contactEmail)}</dd>
+      ${preference.rows}
       <dt style="font-weight:bold">Orientacyjny wynik</dt><dd style="margin:0 0 12px">${escapeHtml(priceLine)}</dd>
       <dt style="font-weight:bold">Score</dt><dd style="margin:0 0 12px">${escapeHtml(scoreLine)}</dd>
     </dl>
+    <h2 style="margin:24px 0 12px;font-size:20px">Odpowiedzi klienta</h2>
+    ${answersHtml}
     <p><a href="${escapeHtml(detailsUrl)}" style="color:#0d5c43;font-weight:bold">Otwórz szczegóły leada w panelu</a></p>`,
+      input.appUrl,
     ),
     subject,
     templateVersion: "lead-company-v1",
@@ -136,14 +176,51 @@ function companyTemplate(input: NotificationTemplateInput): RenderedEmail {
 Klient ukończył proces „${flow}”.
 
 Imię: ${contactName}
+Telefon: ${contactPhone}
 E-mail: ${contactEmail}
+${preference.lines}
 Orientacyjny wynik: ${priceLine}
 Score: ${scoreLine}
+
+Odpowiedzi klienta:
+${answersText}
 
 Otwórz szczegóły leada w panelu:
 ${detailsUrl}
 
 Wiadomość transakcyjna wygenerowana przez Kwotum.`,
+  };
+}
+
+function contactPreference(
+  input: NotificationTemplateInput,
+): Readonly<{ html: string; lines: string; rows: string; text: string }> {
+  const channel =
+    input.preferredContactChannel === "email"
+      ? "E-mail"
+      : input.preferredContactChannel === "phone"
+        ? "Telefon"
+        : null;
+  const window = input.preferredContactWindow
+    ? {
+        morning: "Rano (8:00–12:00)",
+        afternoon: "Po południu (12:00–17:00)",
+        evening: "Wieczorem (17:00–20:00)",
+      }[input.preferredContactWindow]
+    : null;
+  const lines = [
+    channel ? `Preferowany kanał: ${channel}` : null,
+    window ? `Preferowana pora: ${window}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+  const rows = `${channel ? `<dt style="font-weight:bold">Preferowany kanał</dt><dd style="margin:0 0 12px">${channel}</dd>` : ""}${window ? `<dt style="font-weight:bold">Preferowana pora</dt><dd style="margin:0 0 12px">${window}</dd>` : ""}`;
+  const sentence = [channel, window].filter(Boolean).join(", ");
+  return {
+    html: sentence ? `<p>Zapisana preferencja kontaktu: ${escapeHtml(sentence)}.</p>` : "",
+    lines,
+    rows,
+    text: sentence ? `\n\nZapisana preferencja kontaktu: ${sentence}.` : "",
   };
 }
 
@@ -176,6 +253,7 @@ export function renderFlowInvitationEmail(input: FlowInvitationTemplateInput): R
     ${optionalHtml}
     <p><a href="${escapeHtml(processUrl)}" style="display:inline-block;padding:12px 18px;background:#06753a;color:#ffffff;text-decoration:none;font-weight:bold">Otwórz formularz</a></p>
     <p style="color:#52675f;font-size:14px">Link prowadzi do bezpiecznego formularza Kwotum. Nie odpowiadaj na tę automatyczną wiadomość.</p>`,
+      input.appUrl,
     ),
     subject,
     templateVersion: "flow-invitation-v1",

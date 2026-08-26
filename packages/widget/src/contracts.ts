@@ -33,6 +33,43 @@ export type WidgetOption = Readonly<{
   label: string;
   nextStepKey: string | null;
   overridesNextStep: boolean;
+  presentation?: WidgetOptionPresentation | null;
+}>;
+
+export type WidgetPresentationIcon =
+  | "apartment"
+  | "building"
+  | "calendar"
+  | "camera"
+  | "check"
+  | "clock"
+  | "document"
+  | "door"
+  | "fence"
+  | "globe"
+  | "home"
+  | "kitchen"
+  | "layers"
+  | "location"
+  | "palette"
+  | "phone"
+  | "renovation"
+  | "ruler"
+  | "settings"
+  | "shopping_bag"
+  | "snowflake"
+  | "sparkles"
+  | "store"
+  | "wardrobe";
+
+export type WidgetOptionPresentation = Readonly<{
+  asset?: Readonly<{ alt: string; id: string }>;
+  description?: string;
+  icon?: WidgetPresentationIcon;
+}>;
+
+export type WidgetStepPresentation = Readonly<{
+  variant: "default" | "text_cards" | "icon_cards" | "image_cards";
 }>;
 
 export type WidgetStep = Readonly<{
@@ -41,6 +78,7 @@ export type WidgetStep = Readonly<{
   key: string;
   nextStepKey: string | null;
   options: WidgetOption[];
+  presentation?: WidgetStepPresentation;
   required: boolean;
   title: string;
   type: WidgetStepType;
@@ -64,25 +102,51 @@ export type WidgetConsentContent = Readonly<{
 }>;
 
 export type WidgetManifest = Readonly<{
+  branding?: Readonly<{
+    accentColor: string;
+    accentTextColor: "#000000" | "#FFFFFF";
+    companyName: string;
+    logoUrl: string | null;
+  }>;
+  challenge: Readonly<{
+    action: "kwotum_lead_submit";
+    appearance: "interaction-only";
+    provider: "turnstile";
+    siteKey: string;
+  }> | null;
   entryStepKey: string;
+  experienceMode?: "quick_form" | "guided_brief" | "visual_configurator";
   intro: string;
   leadCapture: Readonly<{
+    contactPolicy: "email_required" | "phone_required";
+    completionOrder?: "result_then_contact" | "contact_then_result";
+    fields?: Readonly<{
+      email: "hidden" | "optional" | "required";
+      name: "hidden" | "optional" | "required";
+      phone: "hidden" | "optional" | "required";
+      preferredContactChannel: "hidden" | "optional" | "required";
+      preferredContactWindow: "hidden" | "optional" | "required";
+    }>;
     filesEnabled: boolean;
-    leadCaptureSchemaVersion: 1;
+    leadCaptureSchemaVersion: 1 | 2 | 3;
     marketingEmailConsent: WidgetConsentContent | null;
     privacyNotice: WidgetConsentContent &
       Readonly<{
         policyUrl: string | null;
       }>;
   }> | null;
-  manifestVersion: 1 | 2;
+  manifestVersion: 1 | 2 | 3;
   publicId: string;
   publishedAt: string;
   result: Readonly<{
+    action?: "capture_lead" | "no_lead";
     disclaimer: string;
+    fallbackContactLabel?: string;
+    fallbackContactUrl?: string;
     headline: string;
     mode: "consultation" | "no_price";
     nextStepLabel: string;
+    resultSchemaVersion?: 2;
   }>;
   rules: WidgetRule[];
   snapshotHash: string;
@@ -90,8 +154,21 @@ export type WidgetManifest = Readonly<{
   title: string;
 }>;
 
+export type WidgetContextValue = Readonly<{
+  allowedValues: readonly string[] | null;
+  key: string;
+  label: string;
+  mode: "confirm" | "informational";
+  type: "enum" | "text";
+  value: string;
+}>;
+
+export type WidgetContextInput = Readonly<Record<string, string>>;
+
 export type WidgetSessionSnapshot = Readonly<{
   answers: Record<string, WidgetAnswer>;
+  context: WidgetContextValue[];
+  contextConfirmed: boolean;
   currentStepKey: string | null;
   expiresAt: string;
   manifest: WidgetManifest;
@@ -99,6 +176,8 @@ export type WidgetSessionSnapshot = Readonly<{
 }>;
 
 export type CreatedWidgetSession = Readonly<{
+  context: WidgetContextValue[];
+  contextConfirmed: boolean;
   currentStepKey: string;
   expiresAt: string;
   manifest: WidgetManifest;
@@ -121,7 +200,10 @@ export type SavedWidgetAnswer = Readonly<{
 }>;
 
 export type WidgetCalculatedResult = Readonly<{
+  action: "capture_lead" | "no_lead";
   disclaimer: string;
+  fallbackContactLabel: string | null;
+  fallbackContactUrl: string | null;
   headline: string;
   nextStepLabel: string;
   pricing: Readonly<{
@@ -142,10 +224,13 @@ export type UploadedWidgetFile = Readonly<{
 }>;
 
 export type SubmitLeadInput = Readonly<{
+  challengeToken: string;
   contact: Readonly<{
-    email: string;
+    email?: string;
     name?: string;
     phone?: string;
+    preferredContactChannel?: "email" | "phone";
+    preferredContactWindow?: "morning" | "afternoon" | "evening";
   }>;
   fileIds: string[];
   marketingEmailConsent: Readonly<{
@@ -194,7 +279,12 @@ export type WidgetAnalyticsEvent = Readonly<{
 }>;
 
 export interface WidgetApi {
-  createSession(publicId: string): Promise<CreatedWidgetSession>;
+  confirmContext(input: {
+    mutationId: string;
+    token: string;
+    values: WidgetContextInput;
+  }): Promise<WidgetContextValue[]>;
+  createSession(publicId: string, context: WidgetContextInput): Promise<CreatedWidgetSession>;
   getManifest(publicId: string): Promise<WidgetManifest>;
   getResult(token: string): Promise<WidgetCalculatedResult>;
   resumeSession(token: string): Promise<WidgetSessionSnapshot>;
@@ -211,7 +301,14 @@ export interface WidgetApi {
 }
 
 export type WidgetApiErrorCode =
-  "CONFLICT" | "EXPIRED" | "INVALID" | "NETWORK" | "NOT_FOUND" | "RATE_LIMITED" | "UNAVAILABLE";
+  | "CHALLENGE"
+  | "CONFLICT"
+  | "EXPIRED"
+  | "INVALID"
+  | "NETWORK"
+  | "NOT_FOUND"
+  | "RATE_LIMITED"
+  | "UNAVAILABLE";
 
 export class WidgetApiError extends Error {
   readonly code: WidgetApiErrorCode;

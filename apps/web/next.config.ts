@@ -8,16 +8,17 @@ parseDeploymentEnv({
     (process.env.VERCEL_ENV === "production" ? "production" : "local"),
 });
 
-const supabaseOrigin = (() => {
+const supabaseUrl = (() => {
   const configuredUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!configuredUrl) return null;
   try {
     const url = new URL(configuredUrl);
-    return url.protocol === "http:" || url.protocol === "https:" ? url.origin : null;
+    return url.protocol === "http:" || url.protocol === "https:" ? url : null;
   } catch {
     return null;
   }
 })();
+const supabaseOrigin = supabaseUrl?.origin ?? null;
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -25,14 +26,27 @@ const contentSecurityPolicy = [
   `connect-src 'self'${supabaseOrigin ? ` ${supabaseOrigin}` : ""}`,
   "font-src 'self' data:",
   "form-action 'self'",
+  "frame-src https://challenges.cloudflare.com",
   "frame-ancestors 'none'",
   `img-src 'self' data: blob:${supabaseOrigin ? ` ${supabaseOrigin}` : ""}`,
   "object-src 'none'",
-  "script-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: supabaseUrl
+      ? [
+          {
+            hostname: supabaseUrl.hostname,
+            pathname: "/storage/v1/object/sign/**",
+            port: supabaseUrl.port,
+            protocol: supabaseUrl.protocol === "https:" ? "https" : "http",
+          },
+        ]
+      : [],
+  },
   async headers() {
     return [
       {

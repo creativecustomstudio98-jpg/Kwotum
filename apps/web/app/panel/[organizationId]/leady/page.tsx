@@ -1,20 +1,31 @@
 import { hasCapability, type LeadStatus } from "@wyceno/database";
-import { EmptyState } from "@wyceno/ui";
+import { EmptyState, Input, LinkButton, StatusBadge } from "@wyceno/ui";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 
 import { requireTenantContext } from "../../../../lib/auth/tenant-context";
-import { listLeads } from "../../../../lib/leads/service";
+import {
+  getLeadListCounts,
+  listLeadPage,
+  normalizeLeadListSearch,
+  type LeadListCounts,
+} from "../../../../lib/leads/service";
 import { createClient } from "../../../../lib/supabase/server";
+import { PanelPagination } from "../../panel-pagination";
+import { parseListPage } from "../../pagination-model";
 import { PanelIcon } from "../../panel-icon";
+import { PanelPageHeader } from "../../panel-page-header";
 
 export const metadata: Metadata = { title: "Leady" };
 export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ organizationId: string }>;
-  searchParams: Promise<{ page?: string; q?: string; status?: string }>;
+  searchParams: Promise<{
+    page?: string | string[];
+    q?: string | string[];
+    status?: string | string[];
+  }>;
 };
 
 type LeadFilter = "completed" | "in_progress" | "new" | "rejected";
@@ -30,11 +41,19 @@ const leadFilters: ReadonlyArray<Readonly<{ key?: LeadFilter; label: string }>> 
 export default async function LeadsPage({ params, searchParams }: PageProps) {
   const { organizationId } = await params;
   const query = await searchParams;
-  const status = parseLeadFilter(query.status);
+  const status = parseLeadFilter(searchParamValue(query.status));
+  const search = normalizeLeadListSearch(searchParamValue(query.q) ?? "");
+  const requestedPage = parseListPage(query.page);
   const context = await requireTenantContext(organizationId);
   const supabase = await createClient();
-  const [allLeads, publishedFlowResult] = await Promise.all([
-    listLeads(context),
+  const [leadPage, counts, publishedFlowResult] = await Promise.all([
+    listLeadPage(context, {
+      page: requestedPage,
+      pageSize: 8,
+      search,
+      statuses: leadFilterStatuses(status),
+    }),
+    getLeadListCounts(context),
     hasCapability(context, "flow:read")
       ? supabase
           .from("published_flows")
@@ -46,41 +65,25 @@ export default async function LeadsPage({ params, searchParams }: PageProps) {
       : Promise.resolve({ data: null }),
   ]);
   const publishedFlow = publishedFlowResult.data;
-  const search = (query.q ?? "").trim().slice(0, 80);
-  const normalizedSearch = search.toLocaleLowerCase("pl-PL");
-  const matchingLeads = allLeads.filter(
-    (lead) =>
-      matchesLeadFilter(lead.status, status) &&
-      (!normalizedSearch ||
-        lead.contactName?.toLocaleLowerCase("pl-PL").includes(normalizedSearch) ||
-        lead.contactEmail.toLocaleLowerCase("pl-PL").includes(normalizedSearch) ||
-        lead.flowTitle.toLocaleLowerCase("pl-PL").includes(normalizedSearch)),
-  );
-  const pageSize = 8;
-  const pageCount = Math.max(1, Math.ceil(matchingLeads.length / pageSize));
-  const requestedPage = Number(query.page);
-  const currentPage =
-    Number.isInteger(requestedPage) && requestedPage > 0 ? Math.min(requestedPage, pageCount) : 1;
-  const leads = matchingLeads.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <main className="panel-workspace lead-panel">
-      <section aria-labelledby="leads-title" className="lead-list-surface">
-        <header className="lead-list-header">
-          <h1 id="leads-title">Leady</h1>
-          <div className="lead-list-header__actions">
-            <form action={`/panel/${organizationId}/leady`} className="panel-search" method="get">
+      <PanelPageHeader
+        actions={
+          <div className="record-header-actions">
+            <form action={`/panel/${organizationId}/leady`} className="record-search" method="get">
               {status ? <input name="status" type="hidden" value={status} /> : null}
               <PanelIcon name="search" />
               <label className="wy-sr-only" htmlFor="lead-search">
                 Szukaj leadów
               </label>
-              <input
+              <Input
+                className="record-search__input"
                 defaultValue={search}
                 id="lead-search"
                 maxLength={80}
                 name="q"
-                placeholder="Szukaj leadów..."
+                placeholder="Szukaj leadów…"
                 type="search"
               />
               <button className="wy-sr-only" type="submit">
@@ -88,20 +91,30 @@ export default async function LeadsPage({ params, searchParams }: PageProps) {
               </button>
             </form>
             {publishedFlow ? (
-              <Link
-                className="lead-new-link"
+              <LinkButton
+                className="record-primary-action"
                 href={`/f/${publishedFlow.public_id}`}
                 rel="noreferrer"
+                size="small"
                 target="_blank"
+                variant="primary"
               >
-                <span aria-hidden="true">+</span>
+                <PanelIcon name="plus" />
                 Nowy lead
-              </Link>
+              </LinkButton>
             ) : null}
           </div>
-        </header>
+        }
+        breadcrumbs={[{ href: `/panel/${organizationId}`, label: "Przegląd" }, { label: "Leady" }]}
+        description="Lista zapytań i ich bieżący status obsługi."
+        title="Leady"
+      />
 
-        <nav aria-label="Filtr statusu" className="lead-filters">
+      <section aria-label="Lista leadów" className="record-list-surface lead-list-surface">
+        <nav
+          aria-label="Filtr statusu"
+          className="panel-segmented-track record-tabs lead-filters lead-filters--segmented"
+        >
           {leadFilters.map((item) => (
             <Link
               aria-current={status === item.key ? "page" : undefined}
@@ -109,17 +122,25 @@ export default async function LeadsPage({ params, searchParams }: PageProps) {
               key={item.key ?? "all"}
             >
               {item.label}
-              <span>
-                {item.key
-                  ? allLeads.filter((lead) => matchesLeadFilter(lead.status, item.key)).length
-                  : allLeads.length}
-              </span>
+              <span>{leadFilterCount(counts, item.key)}</span>
             </Link>
           ))}
         </nav>
 
-        {leads.length === 0 ? (
-          <div className="lead-list-empty">
+        <div className="record-list-meta">
+          <p aria-live="polite">
+            <strong>{leadPage.total}</strong> {resultLabel(leadPage.total)}
+            {search ? ` dla „${search}”` : ""}
+          </p>
+          {leadPage.total > 0 ? (
+            <p>
+              Strona {leadPage.page} z {leadPage.pageCount}
+            </p>
+          ) : null}
+        </div>
+
+        {leadPage.items.length === 0 ? (
+          <div className="record-list-empty lead-list-empty">
             <EmptyState
               description={
                 search
@@ -138,112 +159,130 @@ export default async function LeadsPage({ params, searchParams }: PageProps) {
             />
           </div>
         ) : (
-          <div className="lead-table-wrap">
-            <table className="lead-table">
-              <thead>
-                <tr>
-                  <th scope="col">Klient</th>
-                  <th scope="col">Usługa</th>
-                  <th scope="col">Wynik</th>
-                  <th scope="col">Budżet</th>
-                  <th scope="col">Termin</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Data</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leads.map((lead) => {
-                  const href = `/panel/${organizationId}/leady/${lead.id}`;
-                  return (
-                    <tr key={lead.id}>
-                      <th data-label="Klient" scope="row">
-                        <span className="lead-contact-cell">
-                          {lead.contactName === "Anna Kowalska" ? (
-                            <Image
-                              alt=""
-                              className="lead-list-avatar"
-                              height={28}
-                              src="/images/redesign/anna-kowalska-avatar-v1.webp"
-                              unoptimized
-                              width={28}
-                            />
-                          ) : (
-                            <span className="panel-avatar" aria-hidden="true">
-                              {initials(lead.contactName ?? lead.contactEmail)}
+          <>
+            <div className="record-table-wrap lead-table-wrap">
+              <table className="record-table lead-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Klient</th>
+                    <th scope="col">Usługa</th>
+                    <th scope="col">Wynik</th>
+                    <th scope="col">Budżet</th>
+                    <th scope="col">Termin</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Data</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {leadPage.items.map((lead) => {
+                    const href = `/panel/${organizationId}/leady/${lead.id}`;
+                    const contactLabel =
+                      lead.contactName ?? lead.contactEmail ?? lead.contactPhone ?? "Klient";
+                    return (
+                      <tr key={lead.id}>
+                        <th scope="row">
+                          <span className="lead-contact-cell">
+                            <span aria-hidden="true" className="record-avatar">
+                              {initials(contactLabel)}
                             </span>
+                            <Link href={href}>{contactLabel}</Link>
+                          </span>
+                        </th>
+                        <td>{lead.flowTitle}</td>
+                        <td>
+                          <strong className="lead-score">
+                            {lead.score === null ? "—" : lead.score}
+                            {lead.score === null ? null : <small>/100</small>}
+                          </strong>
+                        </td>
+                        <td>
+                          {formatLeadBudget(
+                            lead.priceMinMinor,
+                            lead.priceMaxMinor,
+                            lead.priceCurrency,
                           )}
-                          <Link href={href}>{lead.contactName ?? lead.contactEmail}</Link>
+                        </td>
+                        <td>{formatTimeline(lead.timelineLabel)}</td>
+                        <td>
+                          <StatusBadge className="record-status" tone={leadStatusTone(lead.status)}>
+                            {listStatusLabel(lead.status)}
+                          </StatusBadge>
+                        </td>
+                        <td>
+                          <time dateTime={lead.submittedAt}>
+                            {formatLeadDate(lead.submittedAt)}
+                          </time>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <ul aria-label="Leady" className="record-mobile-list lead-mobile-list">
+              {leadPage.items.map((lead) => {
+                const href = `/panel/${organizationId}/leady/${lead.id}`;
+                const contactLabel =
+                  lead.contactName ?? lead.contactEmail ?? lead.contactPhone ?? "Klient";
+                return (
+                  <li key={lead.id}>
+                    <article className="lead-mobile-row">
+                      <header>
+                        <span className="lead-contact-cell">
+                          <span aria-hidden="true" className="record-avatar">
+                            {initials(contactLabel)}
+                          </span>
+                          <span>
+                            <Link href={href}>{contactLabel}</Link>
+                            <small>{lead.flowTitle}</small>
+                          </span>
                         </span>
-                      </th>
-                      <td data-label="Usługa">{lead.flowTitle}</td>
-                      <td data-label="Wynik">
-                        <strong className="lead-score">
-                          {lead.score === null ? "—" : lead.score}
-                          {lead.score === null ? null : <small>/100</small>}
-                        </strong>
-                      </td>
-                      <td data-label="Budżet">
-                        {formatLeadBudget(
-                          lead.priceMinMinor,
-                          lead.priceMaxMinor,
-                          lead.priceCurrency,
-                        )}
-                      </td>
-                      <td data-label="Termin">{formatTimeline(lead.timelineLabel)}</td>
-                      <td data-label="Status">
-                        <span className={`panel-status panel-status--${lead.status}`}>
+                        <StatusBadge className="record-status" tone={leadStatusTone(lead.status)}>
                           {listStatusLabel(lead.status)}
-                        </span>
-                      </td>
-                      <td data-label="Data">{formatLeadDate(lead.submittedAt)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        </StatusBadge>
+                      </header>
+                      <dl>
+                        <div>
+                          <dt>Wynik</dt>
+                          <dd>{lead.score === null ? "—" : `${lead.score}/100`}</dd>
+                        </div>
+                        <div>
+                          <dt>Budżet</dt>
+                          <dd>
+                            {formatLeadBudget(
+                              lead.priceMinMinor,
+                              lead.priceMaxMinor,
+                              lead.priceCurrency,
+                            )}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Termin</dt>
+                          <dd>{formatTimeline(lead.timelineLabel)}</dd>
+                        </div>
+                      </dl>
+                      <footer>
+                        <time dateTime={lead.submittedAt}>{formatLeadDate(lead.submittedAt)}</time>
+                        <Link aria-label={`Otwórz lead: ${contactLabel}`} href={href}>
+                          Otwórz
+                          <PanelIcon name="arrow-right" />
+                        </Link>
+                      </footer>
+                    </article>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
         )}
-        {pageCount > 1 ? (
-          <nav aria-label="Paginacja leadów" className="panel-pagination">
-            <Link
-              aria-label="Poprzednia strona"
-              aria-disabled={currentPage === 1}
-              href={leadListHref(organizationId, {
-                page: Math.max(1, currentPage - 1),
-                q: search,
-                status,
-              })}
-            >
-              ‹
-            </Link>
-            {paginationItems(currentPage, pageCount).map((item, index) =>
-              item === "ellipsis" ? (
-                <span aria-hidden="true" className="panel-pagination__ellipsis" key={`e-${index}`}>
-                  …
-                </span>
-              ) : (
-                <Link
-                  aria-current={item === currentPage ? "page" : undefined}
-                  href={leadListHref(organizationId, { page: item, q: search, status })}
-                  key={item}
-                >
-                  {item}
-                </Link>
-              ),
-            )}
-            <Link
-              aria-label="Następna strona"
-              aria-disabled={currentPage === pageCount}
-              href={leadListHref(organizationId, {
-                page: Math.min(pageCount, currentPage + 1),
-                q: search,
-                status,
-              })}
-            >
-              ›
-            </Link>
-          </nav>
-        ) : null}
+
+        <PanelPagination
+          ariaLabel="Paginacja leadów"
+          currentPage={leadPage.page}
+          hrefForPage={(page) => leadListHref(organizationId, { page, q: search, status })}
+          pageCount={leadPage.pageCount}
+        />
       </section>
     </main>
   );
@@ -278,6 +317,10 @@ function leadListHref(
   return `/panel/${organizationId}/leady${query ? `?${query}` : ""}`;
 }
 
+function searchParamValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 function parseLeadFilter(value: string | undefined): LeadFilter | undefined {
   if (value === "new" || value === "in_progress") return value;
   if (value === "completed" || value === "qualified" || value === "won") return "completed";
@@ -285,11 +328,25 @@ function parseLeadFilter(value: string | undefined): LeadFilter | undefined {
   return undefined;
 }
 
-function matchesLeadFilter(status: LeadStatus, filter: LeadFilter | undefined): boolean {
-  if (!filter) return true;
-  if (filter === "completed") return status === "qualified" || status === "won";
-  if (filter === "rejected") return status === "lost" || status === "spam";
-  return status === filter;
+function leadFilterStatuses(filter: LeadFilter | undefined): readonly LeadStatus[] | undefined {
+  if (filter === "completed") return ["qualified", "won"];
+  if (filter === "rejected") return ["lost", "spam"];
+  return filter ? [filter] : undefined;
+}
+
+function leadFilterCount(counts: LeadListCounts, filter: LeadFilter | undefined): number {
+  if (filter === "new") return counts.new;
+  if (filter === "in_progress") return counts.inProgress;
+  if (filter === "completed") return counts.completed;
+  if (filter === "rejected") return counts.rejected;
+  return counts.all;
+}
+
+function leadStatusTone(status: LeadStatus): "error" | "info" | "success" | "warning" {
+  if (status === "new") return "info";
+  if (status === "in_progress") return "warning";
+  if (status === "qualified" || status === "won") return "success";
+  return "error";
 }
 
 function listStatusLabel(status: LeadStatus): string {
@@ -317,13 +374,12 @@ function formatLeadDate(value: string): string {
     .replace(",", "");
 }
 
-function paginationItems(currentPage: number, pageCount: number): Array<number | "ellipsis"> {
-  if (pageCount <= 5) return Array.from({ length: pageCount }, (_, index) => index + 1);
-  if (currentPage <= 3) return [1, 2, 3, "ellipsis", pageCount];
-  if (currentPage >= pageCount - 2) {
-    return [1, "ellipsis", pageCount - 2, pageCount - 1, pageCount];
-  }
-  return [1, "ellipsis", currentPage, "ellipsis", pageCount];
+function resultLabel(count: number): string {
+  if (count === 1) return "wynik";
+  const lastTwo = count % 100;
+  const last = count % 10;
+  if (last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14)) return "wyniki";
+  return "wyników";
 }
 
 function initials(value: string): string {

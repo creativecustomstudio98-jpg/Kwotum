@@ -38,8 +38,13 @@ for migration in "${repository_root}"/supabase/migrations/*.sql; do
 done
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/tenant_isolation.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/flow_domain.sql"
+psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/flow_media.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/widget_sessions.sql"
+psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/flow_context.sql"
+psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/public_request_guard.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/estimation.sql"
+psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/contact_delivery.sql"
+psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/completion_branding.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/lead_pipeline.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/lead_operations.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/runtime_readiness.sql"
@@ -49,3 +54,4 @@ psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/analytics.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/wordpress_connector.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/data_governance.sql"
+psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/dashboard_operational_leads.sql"

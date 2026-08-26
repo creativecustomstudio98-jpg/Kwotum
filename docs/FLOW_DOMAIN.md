@@ -8,7 +8,7 @@ i archiwizację wersji. Renderowanie procesu, sesje respondenta i publiczny
 manifest należą do Etapu 5. Opcjonalne rozszerzenie pricingu i scoringu zostało
 dodane w Etapie 6 i jest opisane w `docs/ESTIMATION_ENGINE.md`.
 
-## Dokumenty flow v1 i v2
+## Dokumenty flow v1, v2 i v3
 
 Draft jest agregatem JSONB walidowanym przez `@wyceno/validation`. Zawiera:
 
@@ -50,10 +50,34 @@ Granice są domknięte. Zakres wymaga co najmniej jednej granicy, zakres odwróc
 jest niedozwolony, a maksymalna długość nie może przekroczyć limitu bazowego
 typu. Nie ma dowolnych regexów, kodu ani wykonywalnych wyrażeń użytkownika.
 
-Parser odczytuje oba formaty. Draft v1 jest deterministycznie podnoszony do v2
+Parser odczytuje wszystkie trzy formaty. Draft v1 jest deterministycznie podnoszony do v2
 wyłącznie w pamięci edytora i trafia do bazy jako v2 dopiero przy jego zapisie.
 Historyczne `flow_versions.snapshot` pozostają niezmienione i mogą nadal być
 publikowane jako v1.
+
+`FlowDocument v3` dodaje tryb `quick_form`, `guided_brief` albo
+`visual_configurator`, zamknięty wariant prezentacji kroku oraz opcjonalną
+prezentację odpowiedzi. Warianty to `default`, `text_cards`, `icon_cards` i
+`image_cards`. Karty wizualne są dozwolone wyłącznie dla wyboru, wymagają
+kompletnych danych każdej opcji i mogą występować tylko w
+`visual_configurator`. Opis ma maksymalnie 180 znaków, ikona pochodzi z
+allowlisty, a asset jest referencją UUID z obowiązkowym tekstem alternatywnym.
+Dowolne URL, SVG, HTML, style, skrypty, data URI i metadata są niedozwolone.
+
+Migrator v1/v2 → v3 działa deterministycznie w pamięci i nadaje
+`guided_brief` oraz `default`. Snapshoty historyczne nie są przepisywane.
+PX4 uruchamia `text_cards`, `icon_cards` i `image_cards`. Zamknięty katalog
+ikon jest współdzielonym kontraktem TypeScript i nie przyjmuje markupu od
+tenanta. Obraz wskazuje gotowy rekord `flow_media_assets` tej samej organizacji.
+Trigger sprawdza referencje zarówno w draftach, jak i immutable wersjach;
+nieistniejący, oczekujący lub obcy UUID blokuje zapis.
+
+Tryb `quick_form` ma dodatkowy kontrakt wykonawczy: od 1 do 8 pytań, pierwszy
+krok jako wejście, brak reguł przejść, brak override'ów opcji i dokładnie
+liniowe `nextStepKey` zgodne z kolejnością tablicy. Builder nie spłaszcza grafu
+po cichu. Pokazuje konflikty przed zapisem i oferuje jawną, odwracalną akcję
+usunięcia rozgałęzień; nadmiarowych pytań nie usuwa automatycznie. TypeScript,
+PostgreSQL i parser publicznego manifestu sprawdzają ten kontrakt niezależnie.
 
 Klucze kroków, opcji i reguł są stabilnymi identyfikatorami technicznymi:
 małe litery ASCII, cyfry i podkreślenia. Zmiana etykiety nie zmienia klucza.
@@ -79,8 +103,10 @@ Publikację blokują między innymi:
 - dowolna osiągalna pętla;
 - brak osiągalnej ścieżki kończącej się wynikiem.
 - błędna konfiguracja estymacji, referencja kroku, próg lub zakres arytmetyczny.
+- quick form dłuższy niż 8 pytań albo zawierający jakiekolwiek rozgałęzienie.
 - brakująca, pusta, powtórzona lub nieuporządkowana sekcja v2;
 - ograniczenie odpowiedzi niezgodne z typem albo z odwróconymi granicami.
+- nieobsługiwany tryb, wariant, ikona, asset albo niekompletna prezentacja v3.
 
 Detekcja osiągalności i pętli ma ograniczony koszt dla maksymalnie 40 kroków.
 Nie wykonuje kodu użytkownika i nie interpretuje dowolnych wyrażeń.
@@ -115,7 +141,7 @@ samą wersję bez tworzenia duplikatu.
 
 ## Szablony
 
-Kod utrzymuje pięć syntetycznych szablonów tworzonych jako `FlowDocument v2`:
+Kod utrzymuje pięć syntetycznych szablonów podnoszonych do `FlowDocument v3`:
 
 | Slug                 | Branża             | Poziom |
 | -------------------- | ------------------ | ------ |
@@ -144,11 +170,12 @@ aktywnego członkostwa i roli; nie polegają wyłącznie na UI.
 ## Testy
 
 - `packages/validation/src/flow.test.ts`: pięć szablonów, deterministyczny
-  migrator v1 → v2, sekcje, ograniczenia, pętla, martwe kroki i nieistniejące
-  cele;
+  migrator v1/v2 → v3, sekcje, ograniczenia, prezentacje, pętla, martwe kroki
+  i nieistniejące cele;
 - `supabase/tests/flow_domain.sql`: tworzenie, walidacja, idempotentna
   publikacja, nowa wersja, konflikt rewizji, archiwizacja, immutable snapshot,
-  publikacja v1/v2, błędne sekcje/ograniczenia, Owner/Admin/Sales i drugi tenant;
-- `supabase/tests/widget_sessions.sql`: manifesty v1/v2 oraz ponowna walidacja
+  publikacja v1/v2/v3, błędne sekcje/ograniczenia/prezentacje,
+  Owner/Admin/Sales i drugi tenant;
+- `supabase/tests/widget_sessions.sql`: manifesty v1/v2/v3 oraz ponowna walidacja
   długości, liczby i daty na immutable snapshotcie;
 - `pnpm test:rls`: świeży PostgreSQL ze wszystkimi migracjami i testami.

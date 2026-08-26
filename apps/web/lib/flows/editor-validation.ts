@@ -1,7 +1,7 @@
 import { flowDocumentSchema, validateFlowDocument, type FlowDocument } from "@wyceno/validation";
 
 export type FlowEditorIssueField =
-  "document" | "graph" | "name" | "option" | "title" | "validation";
+  "document" | "experience" | "graph" | "name" | "option" | "presentation" | "title" | "validation";
 
 export type FlowEditorIssue = Readonly<{
   field: FlowEditorIssueField;
@@ -68,8 +68,15 @@ export function validateFlowEditor(document: FlowDocument, name: string): FlowEd
       const section = sectionIndexMatch
         ? parsed.data.sections[Number(sectionIndexMatch[1])]
         : undefined;
+      const experienceIssue =
+        issue.code === "QUICK_FORM_NOT_LINEAR" || issue.code === "QUICK_FORM_TOO_LONG";
       issues.push({
-        field: issue.code === "INVALID_STEP_VALIDATION" ? "validation" : "graph",
+        field:
+          issue.code === "INVALID_STEP_VALIDATION"
+            ? "validation"
+            : experienceIssue
+              ? "experience"
+              : "graph",
         id: `graph-${issue.code}-${issue.path}`,
         message: issue.message,
         optionIndex: null,
@@ -79,7 +86,8 @@ export function validateFlowEditor(document: FlowDocument, name: string): FlowEd
     }
   }
 
-  const canSave = trimmedName.length >= 2 && schemaValid;
+  const canSave =
+    trimmedName.length >= 2 && schemaValid && issues.every((issue) => issue.field !== "experience");
   const graphValid = schemaValid && issues.every((issue) => issue.field !== "graph");
   return {
     canPublish: canSave && graphValid,
@@ -91,6 +99,7 @@ export function validateFlowEditor(document: FlowDocument, name: string): FlowEd
 }
 
 function editorFieldFromPath(path: readonly string[]): FlowEditorIssueField {
+  if (path.includes("presentation")) return "presentation";
   if (path.includes("title")) return "title";
   if (path.includes("options")) return "option";
   if (path.includes("validation")) return "validation";
@@ -109,6 +118,11 @@ function schemaIssueMessage(
     return Number.isFinite(position)
       ? `Uzupełnij treść opcji ${position}.`
       : "Uzupełnij treści opcji odpowiedzi.";
+  }
+  if (field === "presentation") {
+    return path.includes("description")
+      ? "Uzupełnij opis karty (od 1 do 180 znaków)."
+      : "Uzupełnij poprawnie prezentację wszystkich opcji.";
   }
   if (field === "validation") {
     if (

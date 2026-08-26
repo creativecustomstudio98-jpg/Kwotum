@@ -1,0 +1,81 @@
+{
+  "accessibilityViolations": 0,
+  "desktop": {
+    "detail": {
+      "x": 280,
+      "y": 858,
+      "width": 1232,
+      "height": 271,
+      "top": 858,
+      "right": 1512,
+      "bottom": 1129,
+      "left": 280
+    },
+    "firstTitleFontSize": 14,
+    "overflow": 0,
+    "rowGaps": [0, 0, 0, 0],
+    "rowHeights": [112, 112, 112, 112, 112],
+    "rowWidths": [1232, 1232, 1232, 1232, 1232],
+    "surfaceWidth": 1280,
+    "toolbarHeight": 96,
+    "workspaceWidth": 1280
+  },
+  "forcedColorsFocusOutline": 3,
+  "mobile": {
+    "cardsInsideSurface": true,
+    "firstActionBottom": 697,
+    "overflow": 0
+  },
+  "responsiveMatrix": [
+    {
+      "height": 800,
+      "width": 320,
+      "overflow": 0
+    },
+    {
+      "height": 812,
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "height": 844,
+      "width": 390,
+      "overflow": 0
+    },
+    {
+      "height": 932,
+      "width": 430,
+      "overflow": 0
+    },
+    {
+      "height": 900,
+      "width": 720,
+      "overflow": 0
+    },
+    {
+      "height": 1024,
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "height": 768,
+      "width": 1024,
+      "overflow": 0
+    },
+    {
+      "height": 800,
+      "width": 1280,
+      "overflow": 0
+    },
+    {
+      "height": 900,
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "height": 1024,
+      "width": 1536,
+      "overflow": 0
+    }
+  ]
+}

@@ -5,6 +5,8 @@ import {
   type WidgetAnalyticsEventName,
   type WidgetApi,
   type WidgetCalculatedResult,
+  type WidgetContextInput,
+  type WidgetContextValue,
   type WidgetManifest,
   type WidgetStep,
   type WidgetSubmission,
@@ -16,6 +18,7 @@ import { type PendingAnswer, type PersistedWidgetSession, type WidgetStorage } f
 export type WidgetStatus =
   | "active"
   | "calculating_result"
+  | "contact"
   | "expired"
   | "idle"
   | "loading_manifest"
@@ -31,6 +34,9 @@ export type WidgetState = Readonly<{
   analyticsConsent: boolean | null;
   analyticsError: string | null;
   answers: Record<string, WidgetAnswer>;
+  context: WidgetContextValue[];
+  contextConfirmed: boolean;
+  contextError: string | null;
   currentStep: WidgetStep | null;
   errorMessage: string | null;
   history: string[];
@@ -40,7 +46,12 @@ export type WidgetState = Readonly<{
   status: WidgetStatus;
   syncStatus: WidgetSyncStatus;
   uploadedFiles: UploadedWidgetFile[];
+  validationStepKey: string | null;
 }>;
+
+export type QuickFormSubmissionResult =
+  | Readonly<{ accepted: true; firstInvalidStepKey: null }>
+  | Readonly<{ accepted: false; firstInvalidStepKey: string | null }>;
 
 export type LeadSubmissionDraft = Readonly<{
   email: string;
@@ -48,12 +59,18 @@ export type LeadSubmissionDraft = Readonly<{
   marketingEmailAccepted: boolean;
   name?: string;
   phone?: string;
+  preferredContactChannel?: "email" | "phone";
+  preferredContactWindow?: "morning" | "afternoon" | "evening";
   privacyAccepted: boolean;
 }>;
+
+export type ChallengeTokenProvider = () => Promise<string>;
 
 type ActiveSession = {
   analyticsConsent: boolean | null;
   answers: Record<string, WidgetAnswer>;
+  context: WidgetContextValue[];
+  contextConfirmed: boolean;
   currentStepKey: string | null;
   expiresAt: string;
   history: string[];
@@ -92,6 +109,7 @@ function analyticsSource(): WidgetAnalyticsEvent["source"] {
 
 export class WidgetSessionController {
   readonly #api: WidgetApi;
+  readonly #initialContext: WidgetContextInput;
   readonly #listeners = new Set<(state: WidgetState) => void>();
   readonly #storage: WidgetStorage;
   readonly #pendingAnalytics: WidgetAnalyticsEvent[] = [];
@@ -102,6 +120,9 @@ export class WidgetSessionController {
     analyticsConsent: null,
     analyticsError: null,
     answers: {},
+    context: [],
+    contextConfirmed: true,
+    contextError: null,
     currentStep: null,
     errorMessage: null,
     history: [],
@@ -111,10 +132,12 @@ export class WidgetSessionController {
     status: "idle",
     syncStatus: "synced",
     uploadedFiles: [],
+    validationStepKey: null,
   };
 
-  constructor(api: WidgetApi, storage: WidgetStorage) {
+  constructor(api: WidgetApi, storage: WidgetStorage, initialContext: WidgetContextInput = {}) {
     this.#api = api;
+    this.#initialContext = { ...initialContext };
     this.#storage = storage;
   }
 
@@ -138,6 +161,8 @@ export class WidgetSessionController {
         this.#session = {
           analyticsConsent: local.analyticsConsent ?? null,
           answers: { ...resumed.answers },
+          context: [...resumed.context],
+          contextConfirmed: resumed.contextConfirmed,
           currentStepKey: resumed.currentStepKey,
           expiresAt: resumed.expiresAt,
           history: local.history,
@@ -155,7 +180,7 @@ export class WidgetSessionController {
         this.#publishSession();
         await this.flush();
         this.trackAnalytics("widget_loaded");
-        if (this.#session.currentStepKey) {
+        if (this.#session.contextConfirmed && this.#session.currentStepKey) {
           this.trackAnalytics("step_viewed", this.#session.currentStepKey);
         }
         return;
@@ -175,10 +200,12 @@ export class WidgetSessionController {
     }
 
     try {
-      const created = await this.#api.createSession(publicId);
+      const created = await this.#api.createSession(publicId, this.#initialContext);
       this.#session = {
         analyticsConsent: null,
         answers: {},
+        context: [...created.context],
+        contextConfirmed: created.contextConfirmed,
         currentStepKey: created.currentStepKey,
         expiresAt: created.expiresAt,
         history: [],
@@ -190,7 +217,7 @@ export class WidgetSessionController {
       };
       this.#publishSession();
       this.trackAnalytics("widget_loaded");
-      this.trackAnalytics("step_viewed", created.currentStepKey);
+      if (created.contextConfirmed) this.trackAnalytics("step_viewed", created.currentStepKey);
     } catch (error) {
       this.#setState({
         errorMessage: isWidgetApiError(error, "NOT_FOUND")
@@ -211,12 +238,16 @@ export class WidgetSessionController {
       analyticsConsent: null,
       analyticsError: null,
       answers: {},
+      context: [],
+      contextConfirmed: true,
+      contextError: null,
       currentStep: null,
       history: [],
       manifest: null,
       result: null,
       submission: null,
       uploadedFiles: [],
+      validationStepKey: null,
     };
     await this.initialize(publicId);
   }
@@ -245,6 +276,26 @@ export class WidgetSessionController {
     }
   }
 
+  async confirmContext(values: WidgetContextInput): Promise<boolean> {
+    const session = this.#session;
+    if (!session || session.contextConfirmed) return Boolean(session?.contextConfirmed);
+    try {
+      session.context = await this.#api.confirmContext({
+        mutationId: crypto.randomUUID(),
+        token: session.token,
+        values,
+      });
+      session.contextConfirmed = true;
+      this.#state = { ...this.#state, contextError: null };
+      this.#publishSession();
+      if (session.currentStepKey) this.trackAnalytics("step_viewed", session.currentStepKey);
+      return true;
+    } catch {
+      this.#setState({ contextError: "Sprawdź wybrane dane i spróbuj ponownie." });
+      return false;
+    }
+  }
+
   trackAnalytics(name: WidgetAnalyticsEventName, stepKey: string | null = null): void {
     const session = this.#session;
     if (!session || session.analyticsConsent === false) return;
@@ -261,17 +312,48 @@ export class WidgetSessionController {
     if (session.analyticsConsent) void this.#flushAnalytics();
   }
 
-  async submitLead(draft: LeadSubmissionDraft): Promise<boolean> {
+  async submitLead(
+    draft: LeadSubmissionDraft,
+    challengeTokenProvider: ChallengeTokenProvider,
+  ): Promise<boolean> {
     const session = this.#session;
     const capture = session?.manifest.leadCapture;
-    if (!session || !capture || session.currentStepKey !== null || !this.#state.result)
+    if (
+      !session ||
+      !capture ||
+      session.currentStepKey !== null ||
+      session.pending.length > 0 ||
+      (this.#state.status !== "result" && this.#state.status !== "contact")
+    )
       return false;
     if (!draft.privacyAccepted) {
       this.#setState({ errorMessage: "Potwierdź zapoznanie się z informacją o prywatności." });
       return false;
     }
-    if (!draft.email.trim()) {
+    if (capture.contactPolicy === "email_required" && !draft.email.trim()) {
       this.#setState({ errorMessage: "Podaj adres e-mail." });
+      return false;
+    }
+    if (capture.contactPolicy === "phone_required" && !draft.phone?.trim()) {
+      this.#setState({ errorMessage: "Podaj numer telefonu." });
+      return false;
+    }
+    if (capture.fields?.name === "required" && !draft.name?.trim()) {
+      this.#setState({ errorMessage: "Podaj imię." });
+      return false;
+    }
+    if (capture.fields?.preferredContactChannel === "required" && !draft.preferredContactChannel) {
+      this.#setState({ errorMessage: "Wybierz preferowany kanał kontaktu." });
+      return false;
+    }
+    if (capture.fields?.preferredContactWindow === "required" && !draft.preferredContactWindow) {
+      this.#setState({ errorMessage: "Wybierz preferowaną porę kontaktu." });
+      return false;
+    }
+    if (draft.marketingEmailAccepted && !draft.email.trim()) {
+      this.#setState({
+        errorMessage: "Podaj adres e-mail albo wyłącz zgodę na wiadomości marketingowe.",
+      });
       return false;
     }
     const unmatchedUploaded = [...this.#state.uploadedFiles];
@@ -298,11 +380,19 @@ export class WidgetSessionController {
         this.trackAnalytics("file_uploaded");
         this.#setState({ uploadedFiles: [...uploaded] });
       }
+      const challengeToken = await challengeTokenProvider();
       const submission = await this.#api.submitLead({
+        challengeToken,
         contact: {
-          email: draft.email.trim(),
+          ...(draft.email.trim() ? { email: draft.email.trim() } : {}),
           ...(draft.name?.trim() ? { name: draft.name.trim() } : {}),
           ...(draft.phone?.trim() ? { phone: draft.phone.trim() } : {}),
+          ...(draft.preferredContactChannel
+            ? { preferredContactChannel: draft.preferredContactChannel }
+            : {}),
+          ...(draft.preferredContactWindow
+            ? { preferredContactWindow: draft.preferredContactWindow }
+            : {}),
         },
         fileIds: uploaded.map((file) => file.fileId),
         marketingEmailConsent:
@@ -321,8 +411,13 @@ export class WidgetSessionController {
         },
         token: session.token,
       });
+      const result =
+        capture.completionOrder === "contact_then_result"
+          ? await this.#api.getResult(session.token)
+          : this.#state.result;
       this.#setState({
         errorMessage: null,
+        result,
         status: "submitted",
         submission,
         uploadedFiles: uploaded,
@@ -342,7 +437,7 @@ export class WidgetSessionController {
           error instanceof Error
             ? error.message
             : "Nie udało się wysłać zapytania. Spróbuj ponownie.",
-        status: "result",
+        status: capture.completionOrder === "contact_then_result" ? "contact" : "result",
       });
       return false;
     }
@@ -352,6 +447,10 @@ export class WidgetSessionController {
     const session = this.#session;
     const currentStepKey = session?.currentStepKey;
     if (!session || !currentStepKey) return false;
+    if (!session.contextConfirmed) {
+      this.#setState({ contextError: "Najpierw potwierdź kontekst zapytania." });
+      return false;
+    }
     const step = session.manifest.steps.find((candidate) => candidate.key === currentStepKey);
     if (!step || !isAnswerValid(step, answer)) {
       this.#setState({ errorMessage: "Uzupełnij odpowiedź, aby przejść dalej." });
@@ -376,6 +475,59 @@ export class WidgetSessionController {
     this.#publishSession();
     void this.flush();
     return true;
+  }
+
+  submitQuickForm(
+    submittedAnswers: Readonly<Record<string, WidgetAnswer | null>>,
+  ): QuickFormSubmissionResult {
+    const session = this.#session;
+    if (
+      !session ||
+      !session.contextConfirmed ||
+      session.manifest.experienceMode !== "quick_form" ||
+      session.currentStepKey === null
+    ) {
+      return { accepted: false, firstInvalidStepKey: null };
+    }
+
+    const draftAnswers: Record<string, WidgetAnswer> = {};
+    let firstInvalidStepKey: string | null = null;
+    for (const step of session.manifest.steps) {
+      const answer = submittedAnswers[step.key] ?? null;
+      if (answer !== null) draftAnswers[step.key] = answer;
+      if (firstInvalidStepKey === null && !isAnswerValid(step, answer)) {
+        firstInvalidStepKey = step.key;
+      }
+    }
+    if (firstInvalidStepKey !== null) {
+      this.#setState({
+        answers: draftAnswers,
+        errorMessage: "Uzupełnij zaznaczone pole, aby wysłać formularz.",
+        validationStepKey: firstInvalidStepKey,
+      });
+      this.trackAnalytics("validation_error", firstInvalidStepKey);
+      return { accepted: false, firstInvalidStepKey };
+    }
+
+    session.answers = { ...draftAnswers };
+    session.history = [];
+    for (const step of session.manifest.steps) {
+      const answer = submittedAnswers[step.key] ?? null;
+      const nextStepKey = resolveNextStep(session.manifest, step.key, session.answers);
+      session.pending.push({
+        answer,
+        mutationId: crypto.randomUUID(),
+        nextStepKey,
+        stepKey: step.key,
+      });
+      session.history.push(step.key);
+      this.trackAnalytics("step_answered", step.key);
+    }
+    session.currentStepKey = null;
+    this.trackAnalytics("flow_started");
+    this.#publishSession();
+    void this.flush();
+    return { accepted: true, firstInvalidStepKey: null };
   }
 
   back(): void {
@@ -404,6 +556,8 @@ export class WidgetSessionController {
     this.#session = {
       analyticsConsent: local.analyticsConsent ?? null,
       answers: { ...local.answers },
+      context: [...(local.context ?? [])],
+      contextConfirmed: local.contextConfirmed ?? true,
       currentStepKey: local.currentStepKey,
       expiresAt: local.expiresAt,
       history: [...local.history],
@@ -476,6 +630,13 @@ export class WidgetSessionController {
     ) {
       return;
     }
+    if (
+      session.manifest.leadCapture?.completionOrder === "contact_then_result" &&
+      !this.#state.submission
+    ) {
+      this.#setState({ status: "contact", syncStatus: "synced" });
+      return;
+    }
     this.#setState({ status: "calculating_result" });
     try {
       const result = await this.#api.getResult(session.token);
@@ -512,6 +673,9 @@ export class WidgetSessionController {
       analyticsConsent: session.analyticsConsent,
       analyticsError: this.#state.analyticsError,
       answers: { ...session.answers },
+      context: [...session.context],
+      contextConfirmed: session.contextConfirmed,
+      contextError: this.#state.contextError,
       currentStep,
       errorMessage: null,
       history: [...session.history],
@@ -521,12 +685,15 @@ export class WidgetSessionController {
         ? "active"
         : this.#state.submission
           ? "submitted"
-          : this.#state.result
-            ? "result"
-            : "calculating_result",
+          : session.manifest.leadCapture?.completionOrder === "contact_then_result"
+            ? "contact"
+            : this.#state.result
+              ? "result"
+              : "calculating_result",
       submission: this.#state.submission,
       syncStatus,
       uploadedFiles: [...this.#state.uploadedFiles],
+      validationStepKey: null,
     };
     this.#persist();
     this.#emit();
@@ -538,6 +705,8 @@ export class WidgetSessionController {
     this.#storage.save({
       analyticsConsent: session.analyticsConsent,
       answers: { ...session.answers },
+      context: [...session.context],
+      contextConfirmed: session.contextConfirmed,
       currentStepKey: session.currentStepKey,
       expiresAt: session.expiresAt,
       history: [...session.history],

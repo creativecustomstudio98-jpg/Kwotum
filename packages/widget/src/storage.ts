@@ -1,4 +1,4 @@
-import type { WidgetAnswer, WidgetManifest } from "./contracts.js";
+import type { WidgetAnswer, WidgetContextValue, WidgetManifest } from "./contracts.js";
 import { parseWidgetManifest } from "./manifest.js";
 
 export type PendingAnswer = Readonly<{
@@ -11,6 +11,8 @@ export type PendingAnswer = Readonly<{
 export type PersistedWidgetSession = Readonly<{
   analyticsConsent?: boolean | null;
   answers: Record<string, WidgetAnswer>;
+  context?: WidgetContextValue[];
+  contextConfirmed?: boolean;
   currentStepKey: string | null;
   expiresAt: string;
   history: string[];
@@ -54,6 +56,9 @@ function isPersistedSession(value: unknown, publicId: string): value is Persiste
     typeof candidate.answers === "object" &&
     candidate.answers !== null &&
     !Array.isArray(candidate.answers) &&
+    (candidate.context === undefined ||
+      (Array.isArray(candidate.context) && candidate.context.every(isContextValue))) &&
+    (candidate.contextConfirmed === undefined || typeof candidate.contextConfirmed === "boolean") &&
     Array.isArray(candidate.history) &&
     candidate.history.every((stepKey) => typeof stepKey === "string") &&
     Array.isArray(candidate.pending) &&
@@ -61,6 +66,18 @@ function isPersistedSession(value: unknown, publicId: string): value is Persiste
     (candidate.analyticsConsent === undefined ||
       candidate.analyticsConsent === null ||
       typeof candidate.analyticsConsent === "boolean")
+  );
+}
+
+function isContextValue(value: unknown): value is WidgetContextValue {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const entry = value as Partial<WidgetContextValue>;
+  return (
+    typeof entry.key === "string" &&
+    typeof entry.label === "string" &&
+    (entry.mode === "confirm" || entry.mode === "informational") &&
+    (entry.type === "enum" || entry.type === "text") &&
+    typeof entry.value === "string"
   );
 }
 

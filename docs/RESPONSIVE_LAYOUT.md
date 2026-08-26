@@ -42,9 +42,9 @@ reduced motion i forced colors.
 | Tabela leadów    | gęsta tabela                                     | mniej kolumn i kontrolowane zawijanie          | lista kart z szybkimi akcjami                             |
 | Lead detail      | dokument + panel operacyjny                      | panel schodzi pod nagłówek lub dokument        | jedna kolejność i sticky primary action                   |
 | Builder          | rail + lista + preview + inspector               | trzy obszary bez przedwczesnego stacku         | drill-down: Kroki / Podgląd / Ustawienia                  |
-| Nawigacja panelu | sidebar Kwotum 240 px / zwinięty rail 78 px      | biała dolna nawigacja do 56 rem                | Start / Leady / Procesy / Analityka / Więcej, bez scrolla |
+| Nawigacja panelu | sidebar Kwotum 256 px / zwinięty rail 72 px      | biała dolna nawigacja do 56 rem                | Start / Leady / Procesy / Analityka / Więcej, bez scrolla |
 | Szablony panelu  | 5 kart, filtry, KPI i podgląd procesu            | 3/2 karty, podgląd pod opisem                  | 1 karta, filtry i KPI w jednej kolumnie                   |
-| Ustawienia       | nawigacja kategorii + formularz                  | węższa nawigacja                               | lista kategorii → osobny ekran                            |
+| Ustawienia       | menu tras + formularz                            | przewijane poziomo menu tras                   | jedna przewijana linia zakładek, osobne trasy             |
 | Widget           | wycentrowana powierzchnia procesu                | pełna szerokość w kontenerze                   | pojedyncze pytanie i dolne akcje                          |
 | Pricing          | tabela porównawcza tylko po zatwierdzeniu modelu | kontrolowane przewijanie semantyczne           | pionowe plany, bez ściskania tabeli                       |
 

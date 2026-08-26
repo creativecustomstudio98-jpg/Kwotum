@@ -1,16 +1,17 @@
 import { Skeleton } from "@wyceno/ui";
 
+import { PanelTenantPageHeader } from "../../panel-tenant-page-header";
+import { SettingsNavigation } from "../settings-navigation";
+
 export default function NotificationsLoading() {
   return (
     <main aria-busy="true" className="panel-workspace settings-panel">
-      <header className="panel-topbar">
-        <div className="panel-topbar__context">
-          <div>
-            <p className="panel-topbar__eyebrow">Ustawienia</p>
-            <h1>Powiadomienia</h1>
-          </div>
-        </div>
-      </header>
+      <PanelTenantPageHeader
+        currentLabel="Ustawienia"
+        description="Reguły i historia systemowych wiadomości organizacji."
+        navigation={<SettingsNavigation />}
+        title="Ustawienia"
+      />
       <div className="panel-page">
         <Skeleton label="Wczytywanie dostaw powiadomień" lines={7} />
       </div>
