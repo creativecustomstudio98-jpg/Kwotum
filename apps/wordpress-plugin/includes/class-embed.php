@@ -83,9 +83,10 @@ final class Embed
                 . '</p>';
         }
         try {
+            $api_origin = Api::api_origin();
             wp_enqueue_script(
                 'wyceno-connector-widget',
-                Api::api_origin() . '/widget/v1/loader.js',
+                $api_origin . '/widget/v1/loader.js',
                 [],
                 WYCENO_CONNECTOR_VERSION,
                 true
@@ -99,9 +100,10 @@ final class Embed
             ? ''
             : ' context-values="' . esc_attr($context_json) . '"';
         return sprintf(
-            '<div class="wyceno-connector-embed" style="min-height:%dpx"><wyceno-widget public-id="%s" mode="%s"%s></wyceno-widget></div>',
+            '<div class="wyceno-connector-embed" style="min-height:%dpx"><wyceno-widget public-id="%s" api-base="%s" mode="%s"%s></wyceno-widget></div>',
             $height,
             esc_attr($flow_id),
+            esc_attr($api_origin),
             esc_attr($mode),
             $context_attribute
         );

@@ -15,6 +15,9 @@ export type LeadActivityKind =
 export type ConsentRecordType = "marketing_email" | "privacy_notice";
 export type LeadFileStatus = "pending" | "rejected" | "verified";
 export type NotificationKind = "lead_company_alert" | "lead_customer_confirmation";
+export type NotificationTemplateVersion =
+  "lead-company-v1" | "lead-company-v2" | "lead-customer-v1" | "lead-customer-v2";
+export type FlowInvitationTemplateVersion = "flow-invitation-v1" | "flow-invitation-v2";
 export type NotificationStatus = "failed" | "pending" | "processing" | "retry" | "sent";
 export type NotificationAttemptOutcome = "failed" | "retry" | "sent";
 export type NotificationErrorCode =
@@ -326,6 +329,7 @@ export type Database = {
         {
           answer: Json;
           created_at: string;
+          display_answer: Json;
           id: string;
           lead_id: string;
           organization_id: string;
@@ -335,6 +339,7 @@ export type Database = {
         {
           answer: Json;
           created_at?: string;
+          display_answer?: Json;
           id?: string;
           lead_id: string;
           organization_id: string;
@@ -344,6 +349,7 @@ export type Database = {
         {
           answer?: Json;
           created_at?: string;
+          display_answer?: Json;
           id?: string;
           lead_id?: string;
           organization_id?: string;
@@ -739,7 +745,7 @@ export type Database = {
           request_id: string;
           sent_at: string | null;
           status: FlowInvitationStatus;
-          template_version: "flow-invitation-v1";
+          template_version: FlowInvitationTemplateVersion;
           updated_at: string;
         },
         {
@@ -763,7 +769,7 @@ export type Database = {
           request_id: string;
           sent_at?: string | null;
           status?: FlowInvitationStatus;
-          template_version?: "flow-invitation-v1";
+          template_version?: FlowInvitationTemplateVersion;
           updated_at?: string;
         },
         {
@@ -787,7 +793,7 @@ export type Database = {
           request_id?: string;
           sent_at?: string | null;
           status?: FlowInvitationStatus;
-          template_version?: "flow-invitation-v1";
+          template_version?: FlowInvitationTemplateVersion;
           updated_at?: string;
         }
       >;
@@ -846,7 +852,7 @@ export type Database = {
           recipient_email: string | null;
           sent_at: string | null;
           status: NotificationStatus;
-          template_version: string;
+          template_version: NotificationTemplateVersion;
           updated_at: string;
         },
         {
@@ -865,7 +871,7 @@ export type Database = {
           recipient_email?: string | null;
           sent_at?: string | null;
           status?: NotificationStatus;
-          template_version: string;
+          template_version: NotificationTemplateVersion;
           updated_at?: string;
         },
         {
@@ -884,7 +890,7 @@ export type Database = {
           recipient_email?: string | null;
           sent_at?: string | null;
           status?: NotificationStatus;
-          template_version?: string;
+          template_version?: NotificationTemplateVersion;
           updated_at?: string;
         }
       >;
@@ -1543,7 +1549,7 @@ export type Database = {
           recipient_email: string;
           score: number | null;
           submitted_at: string;
-          template_version: string;
+          template_version: NotificationTemplateVersion;
         }>;
       };
       claim_webhook_delivery_batch: {
@@ -1590,7 +1596,7 @@ export type Database = {
           public_flow_id: string;
           recipient_email: string;
           recipient_name: string | null;
-          template_version: string;
+          template_version: FlowInvitationTemplateVersion;
         }>;
       };
       complete_flow_invitation_delivery: {
@@ -1775,6 +1781,39 @@ export type Database = {
         };
         Returns: undefined;
       };
+      finish_notification_worker_run: {
+        Args: {
+          target_claimed: number | null;
+          target_failed: number | null;
+          target_retrying: number | null;
+          target_run_id: string;
+          target_sent: number | null;
+          target_source: "cron" | "manual";
+          target_succeeded: boolean;
+        };
+        Returns: boolean;
+      };
+      get_notification_delivery_health: {
+        Args: Record<string, never>;
+        Returns: Array<{
+          cron_age_seconds: number | null;
+          invitation_failed: number;
+          invitation_oldest_waiting_age_seconds: number | null;
+          invitation_processing: number;
+          invitation_stale_processing: number;
+          invitation_waiting: number;
+          last_cron_failed_at: string | null;
+          last_cron_outcome: "failed" | "running" | "succeeded" | null;
+          last_cron_started_at: string | null;
+          last_cron_succeeded_at: string | null;
+          notification_failed: number;
+          notification_oldest_waiting_age_seconds: number | null;
+          notification_processing: number;
+          notification_stale_processing: number;
+          notification_waiting: number;
+          observed_at: string;
+        }>;
+      };
       publish_flow: {
         Args: {
           expected_draft_revision: number;
@@ -1920,6 +1959,10 @@ export type Database = {
       };
       set_organization_lead_alert_email: {
         Args: { target_email: string; target_organization_id: string };
+        Returns: undefined;
+      };
+      start_notification_worker_run: {
+        Args: { target_run_id: string; target_source: "cron" | "manual" };
         Returns: undefined;
       };
       set_public_flow_origins: {

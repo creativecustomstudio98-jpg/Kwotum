@@ -1900,6 +1900,11 @@ to wyłącznie M4 — przykładowy lead; M4 nie został rozpoczęty.
 - [x] R2.2: przebudować mapę produktu wokół jednego rekordu leada.
 - [x] R2.3: przebudować granice produktu jako kontrakt odpowiedzialności.
 - [x] R2.4: przebudować finalne CTA i overview produktu.
+- [x] R2.R: wycofać odrzucone proofy typu AI-template z całego `/produkt`
+      i zastąpić je redakcyjną narracją opartą na rzeczywistych ekranach
+      desktop/mobile.
+- [x] R2.V7: dopasować cały `/produkt` do zaakceptowanego systemu home V7,
+      zachowując rzeczywiste ekrany zamiast syntetycznych proofów.
 - [x] R3.1: przebudować hero `/jak-dziala` z jawną mapą zaufania.
 - [x] R3.2: przebudować kroki 1–3 `/jak-dziala` jako jawny kontrakt procesu.
 - [x] R3.3: przebudować kroki 4–6 `/jak-dziala` jako jawny outcome flow.
@@ -1925,10 +1930,18 @@ to wyłącznie M4 — przykładowy lead; M4 nie został rozpoczęty.
 - [~] R5.4: przebudować izolację widgetu od CSS strony hosta jako mały,
   code-native proof zgodny z rzeczywistym Shadow DOM; implementacja i gate
   są zamknięte, etap oczekuje na odbiór właściciela.
+- [x] R5.V7: dopasować całą trasę `/dla-agencji` do zaakceptowanego systemu
+      home V7, zachowując rzeczywistą macierz ról, tenant scope i kontrakt
+      izolacji widgetu bez pseudo-paneli.
+- [x] R7.V7: przebudować całą trasę `/branze` w systemie home V7, usunąć
+      odrzucony pseudo-dashboard i zachować pięć prawdziwych tras branżowych.
 - [ ] R5.5–R11: przebudowywać jedną trasę i jedną sekcję naraz zgodnie z
       `docs/ui/marketing-subpages-v1/MASTER_REBRAND_PLAN.md`.
 - [ ] R12: wykonać globalną kontrolę SEO, linków, dostępności, responsive,
       prawdziwości copy, wydajności i bezpieczny cleanup legacy.
+- [x] R12.T: ujednolicić H1, H2, H3, opisy sekcji i tekst podstawowy na
+      wszystkich publicznych trasach przez centralne tokeny `packages/ui`,
+      zachowując osobną typografię wewnętrznych proofów produktu.
 
 **Status R0 2026-08-02:** audyt objął 19 tras i 38 renderów. Wszystkie zwracają
 HTTP 200, nie zgłaszają błędów konsoli/pageerror i nie mają poziomego overflow.
@@ -2004,6 +2017,34 @@ pełne testy, lint, typecheck i build 39 tras są zielone. Raport i artefakty:
 `artifacts/visual-qa/marketing-subpages-v1/r2-4/`. Trasa `/produkt` ma
 ukończone R2.1–R2.4. Następny dozwolony etap to wyłącznie R3.1 — hero i mapa
 zaufania `/jak-dziala`; R3.1 nie został rozpoczęty.
+
+**Korekta R2.R 2026-08-14:** właściciel produktu odrzucił wcześniejszy R2 oraz
+pierwszą próbę korekty jako nadal generatywny szablon. Cały `/produkt`
+został przebudowany na płaską, redakcyjną narrację z jednym rzeczywistym
+ekranem aplikacji na rozdział: panel, builder, widok wyniku i rekord leada.
+Desktop i mobile używają osobnych, mechanicznie przyciętych kadrów z danych
+demonstracyjnych; nie użyto wygenerowanych ilustracji ani atrap interfejsu.
+Usunięto numerowane mapy, pseudotabele, powtarzalne karty, gradienty i sztuczne
+overview. CTA prowadzą wyłącznie do istniejących tras, forced-colors używa
+`Canvas/CanvasText`, a wszystkie kolory strony pochodzą z tokenów
+`packages/ui`. Dedykowane E2E przechodzą 30/30 na 1440/1024/768/430/390/320
+px, axe i klawiatura są zielone, brak overflow, lint/typecheck przechodzą po
+8/8, web ma 184/184 unit, RLS i WordPress przechodzą, a build monorepo 16/16
+oraz finalny build web są zielone. ADR-047, raport i visual QA:
+`docs/ui/marketing-subpages-v1/PRODUCT_EDITORIAL_RECOVERY_2026-08-14.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r2-recovery/`. Korekta nie
+wdraża strony na produkcję i nie zmienia kolejności dalszych etapów.
+
+**Korekta R2.V7 2026-08-15:** porównanie R2.R z zaakceptowaną stroną główną
+wykazało, że płaska narracja nadal tworzyła osobny język wizualny. `/produkt`
+został więc przebudowany na ten sam system V7: chłodny canvas, hero copy +
+zintegrowana scena prawdziwego panelu, kontrolowany podział bold/regular,
+sygnałowy rail, wycentrowane rozdziały oraz ograniczone powierzchnie zamiast
+białych pasów i ciężkiej ciemnej sekcji. Zachowano osobne, rzeczywiste kadry
+desktop/mobile i podpisy danych demonstracyjnych. Dedykowane E2E przechodzą
+30/30 na 1440/1024/768/430/390/320 px, axe, forced-colors, klawiatura i brak
+overflow są zielone. ADR-047 i raport zostały zaktualizowane; korekta nie
+zmienia funkcji, API, tenant scope ani danych i nie wdraża strony.
 
 **Status R3.1 2026-08-02:** tekstowy hero `/jak-dziala` zastąpiła code-native
 mapa przeglądarka → serwer → panel. Centralna karta wskazuje serwer jako źródło
@@ -2087,6 +2128,20 @@ Raport i artefakty:
 `artifacts/visual-qa/marketing-subpages-v1/r3-c/`. Etap R3 jest zamknięty.
 Następny dozwolony etap to wyłącznie R4.1 — hero `/cennik`; nie został
 rozpoczęty.
+
+**Korekta R3.V7 2026-08-15:** po akceptacji `/produkt` właściciel wskazał
+`/jak-dziala` jako następną podstronę do dopasowania do strony głównej. Trasa
+została przebudowana na ten sam system V7: hero z rzeczywistym wynikiem klienta
+i rekordem leada, rail sześciu etapów, trzy rozdziały po dwa kroki z globalną
+numeracją 01–06 oraz jedna zintegrowana powierzchnia bezpieczeństwa. Usunięto
+powtarzalny układ kart, ciężki ciemny blok i mobilne `details`; cała historia
+pozostaje dostępna bez JavaScriptu. Desktop i mobile używają właściwych kadrów
+tych samych demonstracyjnych ekranów co zaakceptowany `/produkt`. Dedykowany
+gate przechodzi 42/42 na 1536/1440/1280/1024/768/430/390/320 px, axe,
+forced-colors, minimalny tekst 12 px i brak overflow są zielone. ADR-048,
+raport i visual QA: `docs/ui/marketing-subpages-v1/HOW_V7_RECOVERY_2026-08-15.md`
+oraz `artifacts/visual-qa/marketing-subpages-v1/r3-home-aligned/`. Korekta nie
+zmienia funkcji, API, tenant scope ani danych i nie wdraża strony.
 
 **Status R4.1 2026-08-03:** tekstowe hero `/cennik` zastąpiła code-native mapa
 kwalifikacji wdrożenia. Trzy rekordy oddzielają proces, sposób publikacji i
@@ -2227,6 +2282,55 @@ shell + home 86/86, rzeczywisty test agresywnego CSS widgetu 1/1, unit 177/177,
 RLS i WordPress PASS, a lint/typecheck/build po 8/8. R5.5 i R7 pozostają
 zamrożone do jawnej decyzji właściciela. Raport:
 `docs/ui/marketing-subpages-v1/R5_4_AGENCY_ISOLATION_REPORT.md`.
+
+**Korekta R5.V7 2026-08-15 — LOCAL COMPLETE, OWNER REVIEW OPEN:** cała trasa
+`/dla-agencji` została połączona w jedną narrację zgodną z home V7. Cztery
+wcześniejsze, niezależne pseudo-panele zastąpiły rzeczywiste kadry panelu,
+edytora procesu, szczegółu leada i wyniku widgetu oraz redakcyjne opisy
+odpowiedzialności. Zachowano prawdziwą macierz Owner/Admin/Sales, zasadę braku
+domyślnego dostępu agencji, trzy warstwy tenant scope i jawne ograniczenie
+Shadow DOM do izolacji CSS. Dedykowany gate przechodzi 15/15 na
+1536/1440/1280/1024/768/430/390/320 px; klawiatura, axe, forced-colors,
+minimum 12 px tekstu, brak overflow i kompletna wersja bez JavaScriptu są
+zielone. ADR-050, raport i visual QA:
+`docs/ui/marketing-subpages-v1/AGENCY_V7_RECOVERY_2026-08-15.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r5-home-aligned/`. Zmiana nie dotyka
+API, auth, tenant scope, RLS, danych ani runtime widgetu i nie wdraża strony.
+Pełne lint i typecheck przechodzą 8/8, unit 22/22 zadań (web 184/184), RLS,
+WordPress i oba skany bezpieczeństwa są PASS, a build przechodzi 16/16 i
+generuje 42 trasy.
+
+**Korekta R7.V7 2026-08-15 — LOCAL COMPLETE, OWNER REVIEW OPEN:** cała trasa
+`/branze` została dopasowana do zaakceptowanego systemu home V7. Hero pokazuje
+pięć realnych kontekstów na jednej panoramie, a indeks prowadzi do istniejących
+tras mebli, ogrodzeń, stron internetowych, klimatyzacji i remontów. Pierwszy
+wariant porównania został odrzucony przez właściciela jako ciężki mini-dashboard
+i usunięty. Finalny wariant używa jednej dużej fotografii, spokojnego ciemnego
+opisu oraz dyskretnej nawigacji zakładkowej; nie ma score, pseudotabeli ani
+syntetycznej makiety panelu. Cała treść pięciu branż pozostaje dostępna bez
+JavaScriptu w redakcyjnym indeksie. Dedykowany gate przechodzi 13/13 na
+1536/1440/1280/1024/768/430/390/320 px, klawiatura, axe, forced-colors,
+minimalny tekst 12 px i brak overflow są zielone. ADR-049, raport i visual QA:
+`docs/ui/marketing-subpages-v1/INDUSTRIES_V7_RECOVERY_2026-08-15.md` oraz
+`artifacts/visual-qa/marketing-subpages-v1/r7-home-aligned/`. Zmiana nie dotyka
+API, auth, tenant scope, RLS ani danych. Pełne lint i typecheck przechodzą 8/8,
+unit 22/22 zadań (web 184/184), RLS, WordPress i skany bezpieczeństwa są PASS,
+a build przechodzi 16/16 i generuje 42 trasy. Etap nie wdraża strony.
+
+**Korekta R12.T 2026-08-15 — LOCAL COMPLETE, OWNER REVIEW OPEN:** wspólna
+responsywna skala H1/H2/H3, opisów sekcji i tekstu podstawowego została
+przeniesiona do `packages/ui` i podpięta do 21 publicznych tras. Desktop używa
+60/48/20 px, tablet 48/40/20 px, a mobile 42/36/18 px dla H1/H2/H3; lead ma
+18/17/16 px. Typografia demonstracyjnych ekranów panelu, widgetu i rekordów
+leada pozostaje celowo odrębna. Dedykowany Playwright wykonuje 63 pomiary
+route × viewport i potwierdza dokładne wartości, brak nieoznaczonych nagłówków
+treści oraz brak poziomego overflow. Pełny pakiet marketingowy przechodzi
+200/200, a pięć wzorców wizualnych przechodzi również w przypiętym obrazie
+Linux Playwright. Format, lint i typecheck przechodzą 8/8, a build przechodzi
+16/16 i generuje 42 trasy. ADR-051 i raport:
+`docs/ui/marketing-subpages-v1/TYPOGRAPHY_SYSTEM_2026-08-15.md`. Etap nie
+zmienia copy, API, auth, tenant scope, danych ani runtime widgetu i nie wdraża
+strony.
 
 - [x] Wskazać immutable commit SHA i wyniki jako bazę Etapu 12ZE.
 
@@ -2485,6 +2589,16 @@ alertów, warsztatu, DPA, UAT oraz podpisanego GO.
 - [x] Uruchomić unit, typecheck oraz pełny `pnpm test:rls` na czystej bazie.
 - [ ] Zastosować migrację na staging/produkcji i wykonać syntetyczny UAT
       rzeczywistej dostawy przed pierwszym prawdziwym leadem.
+- [x] Udostępnić w builderze konfigurację `email_required` / `phone_required`,
+      wersjonowaną informację prywatności i jawne wyłączenie plików bez ręcznej
+      edycji bazy.
+- [x] Przeliczać po stronie serwera hash treści informacji prywatności i zgody
+      marketingowej przy zapisie oraz publikacji draftu.
+- [x] Uruchomić unit, typecheck oraz pełny `pnpm test:rls` na czystej bazie.
+- [x] Zastosować migrację produkcyjną i skonfigurować tenantowy adres alertów
+      Fortez poza repozytorium.
+- [ ] Wdrożyć kontrolkę buildera i wykonać syntetyczny UAT rzeczywistej dostawy
+      przed pierwszym prawdziwym leadem.
 
 **Gate lokalny 2026-08-10:** pełna historia migracji i RLS przechodzi, w tym
 phone-only submit, brak potwierdzenia klienta bez e-maila, adres snapshotowany w
@@ -2524,6 +2638,19 @@ syntetycznego użytkownika oraz organizacji przez service role.
 wariant dla favicony, marketingu, auth, panelu i wiadomości. Runtime zachowuje
 dotychczasowe wymiary komponentów, a sufiks `-v3` odcina cache wcześniejszego assetu;
 tenantowy branding formularza pozostaje bez zmian.
+artefakty 19/20 zapisano w `artifacts/visual-qa/12zk-contact-delivery-settings/`.
+Gate produkcyjny jest otwarty do wdrożenia, schedulera, monitoringu i
+syntetycznej dostawy.
+
+**Stan 2026-08-11 — BUILDER CONTACT POLICY LOCAL PASS:** podczas konfiguracji
+produkcyjnego draftu wykryto, że schema i widget wspierają phone-first, lecz
+Owner nie miał kontrolki buildera do ustawienia tej polityki. Dodano osobny
+obszar Kontakt z kompatybilnym domyślnym `email_required`, phone-first,
+wersjonowaną informacją prywatności i plikami domyślnie wyłączonymi. Serwer
+normalizuje hash treści przed zapisem. Web 163/163, lint, typecheck, build oraz
+izolowany E2E buildera 1/1 są zielone; fixture Auth/DB/Storage został usunięty
+bez pozostałości. Zmiana nadal wymaga review, CI i wdrożenia przed konfiguracją
+draftu Fortez.
 
 ## Etap 12ZH — bezpieczny podgląd i wysłanie procesu
 
@@ -2827,6 +2954,139 @@ worktree z zaakceptowanego commita poprzednika i kończy się raportem oraz STOP
 Żaden wariant prezentacji nie może osłabić RLS, immutable versions, serwerowej
 kalkulacji, origin allowlist, rate limitu, Turnstile ani privacy proof.
 
+## Podetap 12ZL — zaakceptowany znak Kwotum V3
+
+- [x] Zablokować dostarczony znak i SHA-256 wariantów runtime.
+- [x] Podmienić faviconę, Apple touch icon, publiczną nawigację, auth i panel.
+- [x] Podmienić znak w demonstracjach produktu i wiadomościach.
+- [x] Zachować tenantowy branding formularza klienta.
+- [x] Wykonać format, lint, typecheck, unit, build i responsywny E2E.
+
+**Gate:** runtime nie odwołuje się do poprzedniego `Logoicon.svg`; wszystkie
+warianty zachowują przezroczyste tło, a desktop i mobile nie mają overflow ani
+regresji dostępności.
+
+**Gate zamknięty lokalnie 2026-08-11:** format i `git diff --check` przechodzą;
+web ma zielone lint, typecheck i unit 161/161, email ma zielone lint, typecheck,
+unit 18/18 i build, pełny build monorepo przechodzi 16/16, a responsywny Chromium
+E2E przechodzi 34/34 dla marketingu oraz 8/8 dla wspólnego shellu na viewportach
+od 320 px do 1536 px. W runtime nie pozostały odwołania do poprzedniego
+`Logoicon.svg`.
+
+## Etap 12ZM — finalny sidebar Kwotum
+
+- [x] Zablokować zaakceptowaną referencję 863 × 1822 px i jej SHA-256.
+- [x] Przebudować istniejący desktopowy sidebar do dokładnych 256/72 px.
+- [x] Zastosować płaskie tło, Instrument Sans i centralne tokeny bez efektów
+      glass, gradientów, blur oraz cieni.
+- [x] Zachować routing, capabilities, tenant scope, mobilną nawigację i klucz
+      `lorum:panel-sidebar-collapsed`.
+- [x] Sprawdzić klawiaturę, tooltipy, reduced motion, axe, app shell i geometrię
+      buildera.
+- [x] Uzyskać co najmniej 18/20 w Visual QA i zachować artefakty odbiorowe.
+- [x] Skorygować aktywną powierzchnię po review produkcji: zachować prawy
+      odstęp 16 px w wariancie rozwiniętym; w zwiniętym zacząć równo z lewym
+      brzegiem bez zaokrąglenia i zakończyć prawy skos 10 px przed krawędzią.
+
+**Gate P1 2026-08-13:** sidebar ma 256/72 px i 100dvh, a app shell korzysta z
+jednego `--kw-sidebar-width`. Visual QA osiągnęło 19/20; desktop 1440/1280/1024
+oraz mobile 390 nie mają poziomego overflow. Izolowany scenariusz Playwright
+potwierdza axe, klawiaturę, focus return, persistence i reduced motion.
+P2 rebrandingu panelu nie należy do tego release'u.
+
+**Hotfix P1 2026-08-13:** zaakceptowany zrzut produkcji nadpisał wyłącznie
+zakończenie aktywnej pozycji. Pseudo-element nie jest już wydłużany do prawej
+krawędzi w expanded; osobny crop collapsed zachowuje pełną lewą krawędź i
+prawy skos wewnątrz raila. Test E2E mierzy oba kontrakty osobno.
+
+## Etap 12ZN — finalny wybór organizacji Kwotum
+
+- [x] Zablokować zaakceptowaną referencję 1536 × 1024 px i jej SHA-256.
+- [x] Odtworzyć header 80 px, lewą kolumnę 484 px, oś listy 934 px,
+      wyszukiwarkę 376 × 50 px oraz wiersz 111 px.
+- [x] Użyć aktualnego logo i zielonej palety Kwotum bez kopiowania
+      przykładowych firm, domen, ról i aktywności z obrazu.
+- [x] Zachować auth, RLS, tenant scope, role `owner/admin/sales`, redirect
+      onboardingu i działający logout.
+- [x] Dodać działające wyszukiwanie po nazwie/slugu oraz osobne stany braku
+      członkostwa i braku wyników.
+- [x] Przekształcić tabelaryczny desktop w dostępne karty mobile bez zmiany
+      kolejności DOM i bez poziomego overflow.
+- [x] Dodać unit, E2E geometrii, klawiaturę, axe, before/after, overlay i diff.
+
+**Gate 2026-08-13:** dokładny E2E 1536 × 1024 potwierdza header 80 px, panel
+484 px, wyszukiwarkę 376 × 50 px, listę 934 px, header listy 62 px i wiersz
+111 px. Mobile 390 × 844 ma 0 px overflow i zerową liczbę naruszeń axe.
+Visual QA osiągnęło 19/20. Pierwszy test wykrył zbyt niski kontrast trzech
+etykiet mobile; poprawiono go i powtórzono test bez wyłączeń. Raport:
+`docs/PANEL_ORGANIZATION_PICKER_FINAL_2026-08-13.md`.
+
+## Etap 12ZO — pojedyncza powierzchnia biblioteki szablonów
+
+- [x] Zablokować zaakceptowany zrzut produkcji 3338 × 1962 px jako korektę
+      wyłącznie zewnętrznej powierzchni trasy szablonów.
+- [x] Usunąć klasę karty z kontenera całej biblioteki bez naruszania nagłówka,
+      filtrów, KPI, kart szablonów i podglądu.
+- [x] Zastosować ten sam kontrakt do stanów loading i error.
+- [x] Dodać regresję E2E dla przezroczystego tła, zerowego obramowania i braku
+      cienia zewnętrznej powierzchni.
+- [x] Potwierdzić desktop 2048 × 1220, mobile 390 × 844, axe, overflow i pełne
+      bramki jakości.
+
+**Gate:** ekran ma jedną powierzchnię workspace; `.template-library-surface`
+nie może tworzyć własnego tła, obramowania ani cienia. Wewnętrzne karty
+pozostają rozdzielone zgodnie z biblioteką 12ZC-T. Zakres nie zmienia danych,
+akcji, tenant scope, sidebara ani geometrii pozostałych ekranów.
+
+## Etap 12ZP — spokojniejsza typografia panelu
+
+- [x] Zablokować zaakceptowany crop produkcyjnego stanu „Brak danych”
+      1136 × 456 px i jego SHA-256.
+- [x] Zastąpić arbitralne wagi 520/550/620/640/650 w sidebarze centralnymi
+      tokenami 400/500/600 bez zmiany jego geometrii, ikon ani aktywnego skosu.
+- [x] Nadać stanowi małej próby analityki rzeczywisty inset 32 px na desktopie
+      i 24 px na mobile oraz uporządkować hierarchię 16/14 px.
+- [x] Usunąć z tego stanu zbędne wewnętrzne linie, nadmierną minimalną wysokość
+      i przypadkowe zawężenie opisu, zachowując komunikat oraz próg prywatności.
+- [x] Dodać regresję computed-style i visual QA dla sidebara oraz stanu pustego
+      w desktopowym i mobilnym buildzie produkcyjnym.
+
+**Gate 2026-08-13:** izolowany Playwright przeszedł 2/2, potwierdzając sidebar
+256 px z wagami 400/500/600, stan desktop 32 px / 16 px / 14 px oraz stan mobile
+24 px bez poziomego overflow. Zakres nie zmienia danych, logiki analityki,
+tenant scope, treści komunikatów, mobilnej nawigacji ani geometrii sidebara.
+Artefakty: `artifacts/visual-qa/12zp-panel-typography/`.
+
+## Etap 12ZR — tenantowe centrum pomocy i geometria akcji leada
+
+- [x] Zinwentaryzować rzeczywiste trasy, operacje, role i non-goals panelu.
+- [x] Zastąpić link do marketingowego `/jak-dziala` wewnętrzną trasą
+      `/panel/[organizationId]/pomoc` na desktopie i mobile.
+- [x] Przygotować 19 instrukcji obejmujących start, leady, procesy, analitykę,
+      powiadomienia, WordPress, webhooki, administrację i diagnostykę.
+- [x] Filtrować poradnik tymi samymi capabilities co moduły panelu, bez
+      ujawniania Sprzedaży instrukcji do buildera, integracji i prywatności.
+- [x] Dodać działające wyszukiwanie z normalizacją polskich znaków, szybkie
+      ścieżki, spis treści oraz natywne sekcje `details/summary`.
+- [x] Zachować SSR pełnej dostępnej treści, tenant scope, noindex oraz stany
+      loading, error i pusty wynik bez fikcyjnego formularza wsparcia.
+- [x] Wycentrować ikonę i tekst wewnątrz obu drugorzędnych akcji szczegółów
+      leada bez zmiany działania dialogów i serwerowego zapisu zadań.
+- [x] Dodać unit ról/wyszukiwania oraz E2E wyszukiwarki, klawiatury, nawigacji,
+      geometrii ikon, desktop/mobile, overflow i axe WCAG A/AA.
+
+**Gate lokalny 2026-08-13:** 187 testów web przechodzi, lint i typecheck są
+zielone, a build monorepo kończy 16/16 z dynamiczną trasą pomocy. Izolowane
+scenariusze produkcyjnego standalone przechodzą 1/1 dla Pomocy i 1/1 dla
+szczegółów leada, wraz z cleanupem tenanta bez pozostałości. Audyt axe wykrył
+za jasne numery szybkich ścieżek i etykietę spisu treści; kontrast poprawiono i
+powtórzony test ma zero naruszeń. Desktop 1536 × 1024 i mobile 390 × 844 nie
+mają poziomego overflow. Środki ikon i tekstu obu akcji leada różnią się o nie
+więcej niż 1 px. Raport: `PANEL_HELP_CENTER_FINAL_2026-08-13.md`; artefakty:
+`artifacts/visual-qa/12zr-help-center/` i istniejący etap
+`artifacts/visual-qa/12o-lead-detail-responsive/`. Etap nie zmienia API, bazy,
+RLS, modelu ról ani nie stanowi samodzielnej zgody na deployment.
+
 ## Etap 13 — Produkcja
 
 ### Etap 13A — staging i infrastruktura
@@ -2839,9 +3099,11 @@ SMTP do Supabase oraz wdrożono sześć wersjonowanych, polskich szablonów Auth
 Syntetyczne potwierdzenie rejestracji zostało dostarczone z poprawnym nadawcą i
 bez domyślnej treści Supabase; dowód i rollback opisuje `AUTH_EMAILS.md`.
 Prawne zatwierdzenie dostawcy, testy w rzeczywistych klientach pocztowych oraz
-outbox aplikacji nadal pozostają otwarte. Pozycje poniżej pozostają otwarte,
-ponieważ nie skonfigurowano jeszcze prywatnego skanera malware, Turnstile,
-monitoringu i schedulerów, nie wykonano też restore/rollback drill.
+niezależny alert probe nadal pozostają otwarte. Aplikacyjny outbox, scheduler,
+heartbeat i syntetyczna dostawa firmy działają produkcyjnie. Pozycje poniżej
+pozostają otwarte, ponieważ nie wdrożono jeszcze prywatnego skanera malware,
+pełnego monitoringu ani pozostałych schedulerów; nie wykonano też restore ani
+rollback drill.
 
 **Korekta lokalna 2026-08-25:** akcja „Użyj innego adresu” na ekranie po
 rejestracji zeruje stan formularza przez ponowne załadowanie trasy; nie jest już
@@ -2854,6 +3116,27 @@ linkiem klientowym do tej samej trasy, który pozostawiał ekran potwierdzenia.
 - [ ] Zbudować immutable pipeline migracja → deploy → smoke → obserwacja.
 - [ ] Uruchomić schedulery powiadomień, retencji, analytics purge i webhooków.
 - [ ] Zweryfikować health, readiness, CSP, CORS, cookies, OAuth i noindex.
+
+#### Podetap FTZ-04 — scheduler i alarmy aplikacyjnego outboxu
+
+**Stan produkcyjny 2026-08-11:** ADR-042, pięciominutowy Vercel Cron,
+odseparowane uwierzytelnienie GET/POST, prywatny heartbeat, agregowany probe i
+testy są wdrożone. Sekrety Production są rozdzielone, dwa cykle heartbeat
+zostały potwierdzone, a syntetyczny alert firmy został dostarczony dokładnie
+raz. FTZ-04 pozostaje otwarte wyłącznie przez brak niezależnego monitora z
+ustalonym ownerem i przećwiczonym alarmem 503 → recovery. Konto działa jako Pro
+Trial; utrzymanie cyklu wymaga Pro/Enterprise albo zatwierdzonego schedulera
+zastępczego.
+
+- [x] Zapisać ADR-042 i rollback bez usuwania kolejek.
+- [x] Dodać GET dla Vercel Cron z osobnym sekretem i zachować ręczny POST.
+- [x] Zapisać heartbeat bez PII i narrow RPC wyłącznie dla service role.
+- [x] Dodać chroniony probe schedulera, wieku kolejki, stale lock i `failed`.
+- [x] Pokryć unit, route, granty i RLS przypadkami negatywnymi.
+- [x] Wdrożyć migrację i release na jednym immutable SHA.
+- [x] Ustawić odrębne sekrety Production i potwierdzić dwa cykle heartbeat.
+- [ ] Podłączyć niezależny alert, ownera/kanał i przećwiczyć 503 → recovery.
+- [x] Skonfigurować ograniczony klucz Resend i wykonać syntetyczną dostawę.
 
 ### Etap 13B — bezpieczeństwo, prawo i operacje
 
@@ -2872,6 +3155,7 @@ linkiem klientowym do tej samej trasy, który pozostawiał ekran potwierdzenia.
 łącznej pozycji 13B; FTZ-03B jest już lokalnie zamknięte, lecz produkcyjny
 ClamAV pozostaje otwarty. Przed ruchem rzeczywistym migracja, sekret limitera,
 Turnstile i smoke nadal wymagają wdrożenia na docelowym środowisku.
+release aplikacji i smoke nadal wymagają wdrożenia na docelowym środowisku.
 
 - [x] Zapisać ADR-040 i rollback dla serwerowej bramy publicznego API.
 - [x] Zastąpić wildcard dokładnym tenantowym CORS z `Vary: Origin`.
@@ -2891,6 +3175,11 @@ Turnstile i smoke nadal wymagają wdrożenia na docelowym środowisku.
 produkcyjnego GO: brakuje utworzenia managed widgetu Cloudflare, hostów
 `app.kwotum.pl` i Fortez, osobnych sekretów środowisk, prawnego zatwierdzenia
 dostawcy oraz smoke na rzeczywistym embedzie.
+**Stan 2026-08-10:** implementacja i gate lokalny ukończone. Managed widget
+Cloudflare obejmuje dokładne hosty `app.kwotum.pl`, `fortez-przyczepy.pl` i
+`www.fortez-przyczepy.pl`, a site key i sekret mają w Vercel zakres wyłącznie
+Production. Nie oznacza to produkcyjnego GO: nadal brakuje wdrożenia release'u,
+CSP Fortez, prawnego zatwierdzenia dostawcy i smoke na rzeczywistym embedzie.
 
 - [x] Zapisać ADR-041 z fail-closed, rollbackiem i fallbackiem starego kanału.
 - [x] Dodać publiczny runtime config bez zapisu site key w snapshotcie procesu.
@@ -2900,6 +3189,8 @@ dostawcy oraz smoke na rzeczywistym embedzie.
 - [x] Pokryć brak tokenu, replay, host/action mismatch, expiry, outage i retry.
 - [x] Przejść Playwright mobile/desktop, axe, overflow i świeży token po retry.
 - [ ] Skonfigurować Cloudflare/Vercel, CSP Fortez i wykonać produkcyjny smoke.
+- [x] Skonfigurować managed widget Cloudflare i klucze Vercel Production only.
+- [ ] Wdrożyć release, zaktualizować CSP Fortez i wykonać produkcyjny smoke.
 
 ### Etap 13C — rehearsal i release candidate
 
@@ -2912,6 +3203,172 @@ dostawcy oraz smoke na rzeczywistym embedzie.
 - [ ] Zebrać udokumentowane approval Product/Engineering/Security/Legal/Ops.
 
 ### Etap 13D — kontrolowany pilot produkcyjny
+
+#### Podetap FTZ-05 — publiczna treść procesu Fortez
+
+**Stan 2026-08-11:** wersja 2 procesu „Dobór przyczepy Neptun” jest opublikowana
+z poprawnym tytułem i wprowadzeniem. Hotfix granicy PostgREST/RPC normalizujący
+`null` z przycisku „Pomiń” został wdrożony i potwierdzony syntetycznym submitem.
+Lead powstał, a dokładnie jeden alert firmy został dostarczony przez Resend.
+UAT ujawnił następnie błąd prezentacji: brief i panel pokazywały techniczne
+klucze opcji. Etap 13E zachowuje te klucze dla logiki, dodaje historyczną
+projekcję etykiet oraz wersjonowany biały renderer e-mail v2. Migracja
+`20260811000300` i release `c74f38e28d20775c7dfa5b6730eb0d5336d48aef`
+zostały wdrożone 2026-08-11. Istniejący lead pokazuje komplet dziewięciu
+czytelnych odpowiedzi bez `opcja_`, produkcyjne `/health` i `/ready` zwracają
+HTTP 200, a pierwszy wznowiony cykl cron zakończył się powodzeniem przy pustych
+kolejkach. Zakończonego alertu UAT nie wysłano ponownie.
+
+##### Korekta FTZ-05R — wiarygodny status resume i odporność storage
+
+- [x] Oddzielić wynik API resume/create od lokalnego storage i analityki.
+- [x] Przywracać `active + synced` po poprawnym resume aktualnego snapshotu,
+      także gdy zapis hosta albo wysłanie eventu analytics zawiedzie.
+- [x] Zachować `active + offline` i lokalne odpowiedzi przy rzeczywistym
+      błędzie sieci podczas resume.
+- [x] Dodać best-effort `localStorage` z pamięciowym fallbackiem bieżącej karty
+      oraz bezpiecznym `clear/load/save` bez surowych wyjątków.
+- [x] Zapisywać idempotentnie, pomijając zmianę obejmującą wyłącznie `savedAt`.
+- [x] Wyłączyć automatyczną reakcję na cross-tab `storage`; pilotaż wspiera
+      jedną aktywną kartę na sesję, a synchronizacja wielu kart wymaga osobnego
+      protokołu i pozostaje poza tym etapem.
+- [x] Po zdarzeniu `online` ponowić deduplikowane resume albo pierwszy create w
+      tej samej instancji kontrolera, po zakończeniu trwającej inicjalizacji;
+      ponawialny błąd sieci zachowuje snapshot, a 404/410 z endpointu głównej
+      sesji (`resume`, `save`, `result`, `upload` lub `submit`) usuwa wygasły
+      token, dane kontaktowe i zgody.
+- [x] Zapamiętać wejściowy `publicId`, aby retry działał także po pierwszym
+      nieudanym utworzeniu sesji.
+- [x] Chronić initial resume i reconnect przed przestarzałą odpowiedzią po
+      nowszym answer/back/submit oraz serializować retry create z restartem.
+- [x] Przypisać flush do właściciela sesji, aby wiszący zapis wygasłej sesji nie
+      blokował zapisu nowej ani nie zmieniał jej statusu; po submit zwalniać
+      pamięciowy draft kontaktu i referencje do plików.
+- [x] Serializować przeciwstawne decyzje analytics i nie pozwalać staremu
+      eventowi usunąć pierwszego eventu ponownie uruchomionej sesji.
+- [x] Dodać unit dla quota, analytics, resume 200, prawdziwej awarii sieci,
+      serialnego online retry podczas initial resume/create, 404/410, braku
+      reakcji na `storage` podczas submitu, wyścigów stale resume/create/submit
+      oraz E2E produkcyjnego buildu dla reload/resume.
+- [ ] Przed szerszym rolloutem dodać jawne uzgodnienie odroczonego 404/410,
+      które wróciło równolegle z submit, jeśli sam submit następnie zawiedzie.
+- [ ] Przed szerszym rolloutem dodać ograniczone czasowo `AbortSignal` dla
+      requestów initialize/reconnect, aby uszkodzony transport nie wisiał bez
+      końca.
+- [ ] Przed szerszym rolloutem dodać anulowanie/generację lifecycle dla
+      nietypowego detach/reattach custom elementu; nie blokuje to statycznego
+      embedu pilota Fortez.
+
+**Stan lokalny 2026-08-11 — CODE COMPLETE, RELEASE OPEN:** logi produkcyjne
+potwierdziły `OPTIONS 204` i `GET 200 /sessions/current`, gdy Safari pokazało
+status offline. Potwierdzoną przyczyną w kodzie było odziedziczenie `offline`
+ustawionego przed resume; przy pustej kolejce nic nie przełączało go później na
+`synced`. Osobna seria kilkudziesięciu `GET 200` co około 0,5–0,9 s jest
+wyłącznie dowodem obserwacyjnym i nie potwierdzono, że źródłem był widget.
+Korekta nie próbuje scalać stanu wielu kart: widget nie nasłuchuje `storage`, a
+kontrakt pilota wymaga jednej aktywnej karty na sesję. Nie zmieniono API, modelu
+danych, tenant scope ani schematu lub zakresu danych telemetrii. Lokalnie
+przeszły format, lint i typecheck całego monorepo, 22 zadania unit (w tym 66 testów
+widgetu), build 16/16, SAST, secret scan oraz 5/5 testów Chromium widgetu.
+Jednorazowy adekwatny przebieg WebKit również zakończył się wynikiem 5/5;
+tymczasowa konfiguracja i wygenerowane screenshoty nie należą do zmiany.
+Callbacki `error`, `expired`, `timeout` i `unsupported` Turnstile mają testy
+jednostkowe; realny timeout lub niedostępność ładowania zewnętrznego skryptu
+pozostają osobnym gate przed szerszym rolloutem.
+Wdrożenie wymaga review, zielonego CI i osobnego release'u; ten lokalny etap nie
+zmienia produkcji.
+
+##### Korekta FTZ-05B — branding wnętrza embedu Fortez
+
+**Stan lokalny 2026-08-11 — CODE COMPLETE, RELEASE OPEN:** produkcyjny UAT
+ujawnił, że dotychczasowy kontrakt obejmował tylko launcher. Wnętrze pokazywało
+inicjały tytułu procesu, domyślny zielony motyw Kwotum i tekstowy przycisk
+zamknięcia nachodzący na status. ADR-044 wprowadza ograniczony kontrakt
+atrybutów marki i ról `--wyceno-widget-*` bez zmiany API, manifestu, bazy, RLS
+ani sesji. Lokalny preset Fortez używa własnego logo z tego samego originu,
+lżejsze nagłówki Arial/Helvetica o wadze 500, aktualny pomarańcz z kontrastowym
+ciemnym tekstem, kanciaste kontrolki i grafitowy backdrop.
+
+- [x] Zapisać ADR-044 i granicę między konfiguracją embedu a przyszłym
+      brandingiem przechowywanym w panelu.
+- [x] Dodać bezpieczne `brand-name`, `brand-subtitle` i `brand-logo-url` z
+      same-origin HTTP(S), fallbackiem inicjałów i bez restartu sesji.
+- [x] Udostępnić wyłącznie allowlistowane role wnętrza, zachowując izolację
+      Shadow DOM oraz domyślne wartości Kwotum.
+- [x] Umieścić kwadratowe zamknięcie `×` strukturalnie w nagłówku obok statusu.
+- [x] Dodać negatywne testy URL/XSS, hostile-host CSS, computed styles,
+      odrzucenie `url(...)` w rolach kolorów, zachowanie niewysłanej odpowiedzi
+      i fokusu po zmianie marki, geometrię nagłówka, Escape i zwrot fokusu.
+- [x] Przygotować lokalny preset Fortez i artefakt Chromium desktop bez danych
+      osobowych ani wysłania leada.
+- [x] Przejść automatyczny Chromium i WebKit/Safari, mobile 390/320,
+      forced-colors, pełne gate'y i niezależny review bez P0/P1.
+- [ ] Potwierdzić ręczny zoom przeglądarki 200% na produkcyjnym embedzie; test
+      320 px i powiększenie bazowego tekstu są zielone, ale nie zastępują
+      rzeczywistego zoomu Safari.
+- [ ] Wdrożyć wersję Kwotum, następnie minimalną zmianę `index.html` Fortez,
+      wykonać produkcyjny UAT i zachować natychmiastowy rollback.
+
+##### Korekta FTZ-05C — czytelna ścieżka inline Fortez
+
+**Stan lokalny 2026-08-13 — GOTOWE DO WDROŻENIA:** feedback z produkcyjnego
+embedu pokazał, że użytkownik nie widzi związku między wyborem odpowiedzi a
+odległą akcją „Dalej”. Wysokość pełnoekranowej karty zostawiała dużą pustą
+przestrzeń, a pasek porównania zasłaniał dół aktywnego formularza. Zakres nie
+zmienia procesu, API, sesji, tenant scope ani danych leada.
+
+- [x] Zablokować załącznik 3338 × 1962 i SHA-256
+      `237a48fd339ae123fae6677348b84bf3362a4a727fe530951290a777c3401266`
+      jako referencję problemu.
+- [x] Nadać jawnemu `inline-layout="compact"` naturalną wysokość i przenieść
+      akcję bezpośrednio pod odpowiedzi bez zmiany popupu/fullscreen/hosted.
+- [x] Dodać jawne prowadzenie: liczba pytań, stan wymaganej odpowiedzi,
+      potwierdzenie gotowości oraz wizualna zapowiedź następnego kroku.
+- [x] Zachować ręczne zatwierdzenie zamiast ryzykownego auto-advance.
+- [x] Przejść E2E desktop/mobile, axe, overflow, pełny gate i visual QA:
+      68 testów widgetu, 183 testy web, Chromium 1440/390, axe, build,
+      format, lint, typecheck oraz skany SAST/secrets są zielone.
+- [x] Wdrożyć widget przed zmianą strony Fortez, sprawdzić produkcję i rollback.
+
+##### Korekta FTZ-05D — zintegrowana ciemna powierzchnia Fortez
+
+**Stan lokalny 2026-08-13 — CODE COMPLETE, RELEASE OPEN:** kolejny feedback z
+produkcyjnej sekcji pokazał, że mimo poprawnej ścieżki biały panel nadal
+wyglądał jak obca aplikacja wklejona na grafitowe tło. Zakres dotyczy wyłącznie
+prezentacji inline; nie zmienia procesu, API, sesji, danych leada ani hosted
+linku.
+
+- [x] Zablokować produkcyjny załącznik 3338 × 1962 i SHA-256
+      `237a48fd339ae123fae6677348b84bf3362a4a727fe530951290a777c3401266`
+      jako stan `before`.
+- [x] Dodać jawny `inline-layout="integrated"` bez karty, powtórzonego logo i
+      drugiego wprowadzenia, zachowując status zapisu oraz progress.
+- [x] Przenieść opcjonalną zgodę analityczną za aktywne pytanie w DOM i
+      wizualnie, bez zmiany jej znaczenia lub endpointu.
+- [x] Dodać ciemny, kontrastowy preset Fortez z kanciastymi kontrolkami,
+      pomarańczowym stanem wyboru i pełnym widokiem mobile.
+- [x] Pokryć wariant testem unit, Chromium 1440/390, axe i overflow; domyślny
+      inline, compact, popup, fullscreen i hosted pozostają bez zmian.
+- [ ] Przejść pełny gate, wdrożyć Kwotum przed minimalnym `index.html` Fortez,
+      wykonać produkcyjny UAT i zachować rollback.
+
+- [x] Ujawnić publiczny tytuł i wprowadzenie w builderze z limitami schematu.
+- [x] Rozdzielić walidację treści formularza od walidacji aktywnego pytania.
+- [x] Dodać regresję autosave/reload, klawiatury, axe, mobile i overflow.
+- [x] Wdrożyć hotfix treści, ustawić poprawne dane Fortez i opublikować wersję 2.
+- [x] Wdrożyć i zweryfikować hotfix „Pomiń” dla pól opcjonalnych.
+- [x] Wykonać syntetyczny submit, potwierdzić lead i dostawę alertu firmy.
+- [x] Wdrożyć Etap 13E, potwierdzić czytelne etykiety w istniejącym leadzie i
+      renderer e-mail v2 bez ponownej wysyłki zakończonego alertu UAT.
+- [x] Dodać jawne `api-base` do generowanego embedu i konektora WordPress oraz
+      pokryć inline, popup, fullscreen, hosted link, shortcode i blok Gutenberg
+      testami regresji bez ujawnienia credentialu.
+- [x] Przygotować i lokalnie zweryfikować lazy initialization popup/fullscreen,
+      kompatybilny fallback `api-base` oraz ograniczony on-brand kontrakt
+      launchera bez zmiany wnętrza procesu; wdrożenie release'u nadal
+      poprzedza embed Fortez.
+- [x] Osadzić popup na stronie Fortez po technicznym i prawnym GO; stary kanał
+      kontaktu pozostaje dostępny.
 
 - [ ] Uruchomić jedną organizację z ograniczonym ruchem i możliwością
       natychmiastowego wyłączenia embedu.

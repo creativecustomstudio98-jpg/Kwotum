@@ -167,8 +167,11 @@ przypięty do tej samej wersji. Szczegóły: `docs/ESTIMATION_ENGINE.md`.
 Migracja `20260725000200_stage7_lead_pipeline.sql` dodaje tenantowe `leads`,
 `lead_answers`, `consent_records`, `lead_files`, `lead_notes` i
 `lead_status_history`. Lead zachowuje snapshot nazw procesu, kontaktu i
-serwerowego wyniku; odpowiedzi zachowują tytuły pytań z wersji. Jedna sesja ma
-co najwyżej jeden lead, a jej odpowiedzi stają się niezmienne po submit.
+serwerowego wyniku; odpowiedzi zachowują tytuły pytań z wersji, surową wartość
+potrzebną logice oraz czytelną projekcję etykiet z przypiętego immutable
+snapshotu. Jedna sesja ma co najwyżej jeden lead, a jej odpowiedzi stają się
+niezmienne po submit. Zgodnie z ADR-043 role operacyjne czytają projekcję przez
+RLS leada bez uzyskania dostępu do edytorskiego `flow_versions`.
 
 Publiczne funkcje mają wyłącznie wąski zakres rezerwacji/potwierdzenia pliku i
 atomowego submitu. Bezpośrednie tabele nie mają grantów anonimowych. Członkowie
@@ -190,6 +193,21 @@ tenanta, ale nie ma bezpośredniego zapisu. Rola workera może wywołać tylko
 funkcje claim/complete/fail; claim stosuje `SKIP LOCKED`, lock token i odzyskuje
 próby zawieszone dłużej niż 15 minut. Każda próba trafia do osobnego rekordu.
 Szczegóły: `docs/NOTIFICATIONS.md`.
+
+### Stan lokalny Etapu 13A — operacje outboxu
+
+Migracja `20260811000100_stage13a_notification_operations.sql` dodaje
+prywatny `app_private.worker_heartbeats` oraz trzy narrow RPC service role:
+start runu, zakończenie runu i zagregowany probe. Singleton per
+`notifications`/`cron|manual` zapisuje wyłącznie UUID technicznego runu, czasy,
+wynik i cztery liczniki. Nie ma tenant ID, odbiorcy, tematu, treści ani danych
+leada. Zwykłe role nie mają grantu do tabeli ani funkcji.
+
+Probe liczy oczekujące, przetwarzane, zawieszone i terminalnie błędne rekordy
+obu outboxów oraz wiek najstarszego `pending/retry`. Aplikacja mapuje agregaty
+na zamknięte stany monitoringu. Migracja jest forward-only, a rollback
+zatrzymuje scheduler i pozostawia heartbeat oraz kolejki w bazie. Szczegóły:
+`docs/NOTIFICATION_OPERATIONS.md` i ADR-042.
 
 ### Stan wdrożenia Etapu 12ZK
 
@@ -318,6 +336,23 @@ przejścia są walidowane na przypiętym immutable snapshotcie. Test
 `widget_sessions.sql` obejmuje token plaintext, bezpośredni odczyt, expiry,
 retry, konflikt, błędną opcję, próbę przeskoczenia trasy oraz ograniczenia
 odpowiedzi manifestu v2.
+
+### Hotfix Etapu 13D — opcjonalne „Pomiń” przez publiczne API
+
+Migracja `20260811000200_stage13d_optional_skip_json_null.sql` normalizuje SQL
+`NULL`, które PostgREST przekazuje dla wartości `null` w wywołaniu RPC, do
+JSONB `null` używanego przez domenę sesji. Normalizacja odbywa się przed
+walidacją i rozwiązywaniem trasy: opcjonalny krok jest usuwany z odpowiedzi,
+natomiast wymagany krok nadal kończy się `check_violation`. Nie zmienia tabel,
+sygnatury RPC, grantów ani historycznych danych i zachowuje wyłączny grant
+`service_role` wprowadzony przez bramę publicznego API.
+
+Migracja jest forward-only i zgodna z rollbackiem aplikacji. Rollback
+operacyjny zatrzymuje nowy release aplikacji, ale pozostawia normalizację w
+bazie; jej cofnięcie wymagałoby osobnej migracji naprawczej i ponownie
+otworzyłoby błąd 503 dla „Pomiń”. Test integracyjny wywołuje funkcję z
+rzeczywistym SQL `NULL`, potwierdza bezpieczny skip pola opcjonalnego oraz
+odrzucenie skipu pola wymaganego.
 
 ## Indeksy początkowe
 

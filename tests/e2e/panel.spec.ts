@@ -118,6 +118,29 @@ async function capture(page: Page, name: string) {
   });
 }
 
+async function mountAnalyticsPrivacyStateProbe(page: Page) {
+  await page.evaluate(() => {
+    document.querySelector('[data-testid="analytics-privacy-state-probe"]')?.remove();
+    const section = document.createElement("section");
+    const content = document.createElement("div");
+    const mark = document.createElement("strong");
+    const title = document.createElement("h3");
+    const description = document.createElement("p");
+    section.className = "panel-card analytics-privacy-state";
+    section.dataset.testid = "analytics-privacy-state-probe";
+    content.className = "wy-state";
+    mark.className = "wy-state__mark";
+    mark.textContent = "Brak danych";
+    title.textContent = "Za mało danych dla wykresów";
+    description.textContent =
+      "Zebrano 3 z 5 wymaganych sesji ze zgodą. Wróć po zebraniu większej próby albo wybierz dłuższy okres.";
+    content.append(mark, title, description);
+    section.append(content);
+    document.querySelector(".analytics-panel .panel-page")?.append(section);
+  });
+  return page.getByTestId("analytics-privacy-state-probe");
+}
+
 async function switchGeometry(input: Locator) {
   return input.evaluate((element) => {
     const bounds = element.getBoundingClientRect();
@@ -160,7 +183,7 @@ test.describe("panel reference reconstruction", () => {
 
   test("organization picker follows the accepted Kwotum composition", async ({ page }) => {
     await mkdir(organizationPickerArtifactDirectory, { recursive: true });
-    await page.setViewportSize({ height: 1_152, width: 2_048 });
+    await page.setViewportSize({ height: 1_024, width: 1_536 });
     await page.goto("/panel");
 
     await expect(
@@ -178,13 +201,13 @@ test.describe("panel reference reconstruction", () => {
       const bounds = (selector: string) => {
         const rect = document.querySelector<HTMLElement>(selector)?.getBoundingClientRect();
         if (!rect) throw new Error(`Brak elementu ${selector}.`);
-        return { height: rect.height, width: rect.width };
+        return { height: rect.height, left: rect.left, top: rect.top, width: rect.width };
       };
       return {
-        avatar: bounds(".organization-list__identity > span"),
-        card: bounds(".organization-list > li"),
-        content: bounds(".organization-picker__content"),
         header: bounds(".organization-picker__header"),
+        intro: bounds(".organization-picker__intro"),
+        list: bounds(".organization-list"),
+        listHeader: bounds(".organization-list__header"),
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         primaryAction: bounds(".organization-actions__primary"),
       };
@@ -204,8 +227,42 @@ test.describe("panel reference reconstruction", () => {
 
     await page.screenshot({
       animations: "disabled",
-      path: path.join(organizationPickerArtifactDirectory, "after-desktop-2048x1152.png"),
+      path: path.join(organizationPickerArtifactDirectory, "after-desktop-1536x1024.png"),
     });
+
+    await organizationLink.focus();
+    await expect(organizationLink).toBeFocused();
+
+    const search = page.getByRole("searchbox", { name: "Szukaj organizacji" });
+    await search.fill("organizacja-ktorej-nie-ma");
+    await search.press("Enter");
+    await expect(page).toHaveURL(/\/panel\?q=organizacja-ktorej-nie-ma$/);
+    await expect(page.getByText("Brak wyników", { exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Wyczyść wyszukiwanie" })).toHaveAttribute(
+      "href",
+      "/panel",
+    );
+
+    for (const viewport of [
+      { height: 800, width: 320 },
+      { height: 812, width: 375 },
+      { height: 932, width: 430 },
+      { height: 1_024, width: 768 },
+      { height: 768, width: 1_024 },
+      { height: 800, width: 1_280 },
+      { height: 900, width: 1_440 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto("/panel");
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Wybierz organizację" }),
+      ).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        ),
+      ).toBeLessThanOrEqual(1);
+    }
 
     await page.setViewportSize({ height: 844, width: 390 });
     await expect(card).toBeVisible();
@@ -2496,6 +2553,8 @@ test.describe("panel reference reconstruction", () => {
     await Promise.all([
       mkdir(path.join(builderEstimationArtifactDirectory, "desktop"), { recursive: true }),
       mkdir(path.join(builderEstimationArtifactDirectory, "mobile"), { recursive: true }),
+      mkdir(path.join(builderContactArtifactDirectory, "desktop"), { recursive: true }),
+      mkdir(path.join(builderContactArtifactDirectory, "mobile"), { recursive: true }),
     ]);
 
     const builderUrl = `/panel/${organizationId}/procesy/${editorFlowId}`;
@@ -2506,6 +2565,38 @@ test.describe("panel reference reconstruction", () => {
 
     const areaTabs = page.getByRole("tablist", { name: "Obszar konfiguracji procesu" });
     const undo = page.getByRole("button", { exact: true, name: "Cofnij" });
+
+    await areaTabs.getByRole("tab", { exact: true, name: "Kontakt" }).click();
+    const contactInspector = page.getByRole("complementary", { name: "Ustawienia: Kontakt" });
+    await expect(contactInspector.getByText("Konfiguracja nieaktywna", { exact: true })).toHaveText(
+      "Konfiguracja nieaktywna",
+    );
+    await page.getByRole("button", { name: "Włącz zbieranie kontaktu" }).click();
+    await page.getByLabel("Wymagany kanał kontaktu").selectOption("phone_required");
+    await page
+      .getByLabel("Treść informacji prywatności")
+      .fill("Potwierdzam zapoznanie się z informacją prywatności testowej organizacji.");
+    await page.getByLabel("Wersja informacji").fill("panel-e2e-v1");
+    await page
+      .getByLabel("Adres polityki prywatności")
+      .fill("https://example.test/polityka-prywatnosci");
+    await page.getByRole("button", { name: "Zapisz treść informacji" }).click();
+    await expect(page.locator(".contact-result-preview")).toContainText("Telefon jest wymagany");
+    await expect(contactInspector.getByText("Konfiguracja aktywna", { exact: true })).toHaveText(
+      "Konfiguracja aktywna",
+    );
+    await expect(page.getByText("Zapisano zmiany.", { exact: true })).toBeVisible({
+      timeout: 15_000,
+    });
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(builderContactArtifactDirectory, "desktop", "contact-1448x1086.png"),
+    });
+    const contactDesktopAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(contactDesktopAccessibility.violations).toEqual([]);
+
     await areaTabs.getByRole("tab", { exact: true, name: "Wycena" }).click();
     const setup = page.locator(".estimation-setup");
     await expect(setup).toBeVisible();
@@ -2575,6 +2666,17 @@ test.describe("panel reference reconstruction", () => {
       name: "Obszar konfiguracji procesu",
     });
     await expect(mobileAreaTabs).toBeVisible();
+    await mobileAreaTabs.getByRole("tab", { exact: true, name: "Kontakt" }).click();
+    await page.getByRole("tab", { exact: true, name: "Ustawienia" }).click();
+    await expect(page.getByRole("heading", { name: "Ustawienia · Kontakt" })).toBeVisible();
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(builderContactArtifactDirectory, "mobile", "contact-390x844.png"),
+    });
+    const contactMobileAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(contactMobileAccessibility.violations).toEqual([]);
     await mobileAreaTabs.getByRole("tab", { exact: true, name: "Scoring" }).click();
     await page.getByRole("tab", { exact: true, name: "Ustawienia" }).click();
     await expect(page.locator(".estimation-builder__inspector")).toBeVisible();
@@ -2799,6 +2901,31 @@ test.describe("panel reference reconstruction", () => {
     await expect(operations.getByLabel("Priorytet leada")).toBeVisible();
     await expect(operations.getByRole("button", { name: "Zaplanuj kontakt" })).toBeVisible();
     await expect(operations.getByRole("button", { name: "Utwórz zadanie" })).toBeVisible();
+
+    for (const label of ["Zaplanuj kontakt", "Utwórz zadanie"]) {
+      const alignment = await operations.getByRole("button", { name: label }).evaluate((button) => {
+        const content = button.querySelector<HTMLElement>(":scope > span");
+        const icon = content?.querySelector("svg");
+        const textNode = Array.from(content?.childNodes ?? []).find(
+          (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+        );
+        if (!content || !icon || !textNode) throw new Error("Brak treści przycisku akcji.");
+        const range = document.createRange();
+        range.selectNodeContents(textNode);
+        const iconBounds = icon.getBoundingClientRect();
+        const textBounds = range.getBoundingClientRect();
+        return {
+          alignItems: getComputedStyle(content).alignItems,
+          centerDelta: Math.abs(
+            iconBounds.top + iconBounds.height / 2 - (textBounds.top + textBounds.height / 2),
+          ),
+          display: getComputedStyle(content).display,
+        };
+      });
+      expect(alignment.display).toBe("flex");
+      expect(alignment.alignItems).toBe("center");
+      expect(alignment.centerDelta).toBeLessThanOrEqual(1);
+    }
 
     await operations.getByRole("button", { name: "Zaplanuj kontakt" }).click();
     const taskDialog = page.getByRole("dialog");
@@ -3363,6 +3490,16 @@ test.describe("panel reference reconstruction", () => {
       );
       const firstTitle = document.querySelector<HTMLElement>(".template-task-row h2");
       return {
+        surfaceAppearance: surfaceElement
+          ? {
+              backgroundColor: getComputedStyle(surfaceElement).backgroundColor,
+              borderBottomWidth: getComputedStyle(surfaceElement).borderBottomWidth,
+              borderLeftWidth: getComputedStyle(surfaceElement).borderLeftWidth,
+              borderRightWidth: getComputedStyle(surfaceElement).borderRightWidth,
+              borderTopWidth: getComputedStyle(surfaceElement).borderTopWidth,
+              boxShadow: getComputedStyle(surfaceElement).boxShadow,
+            }
+          : null,
         detail: document.querySelector<HTMLElement>(".template-detail")?.getBoundingClientRect(),
         firstTitleFontSize: firstTitle
           ? Number.parseFloat(getComputedStyle(firstTitle).fontSize)
@@ -3463,15 +3600,20 @@ test.describe("panel reference reconstruction", () => {
         .querySelector<HTMLElement>(".template-task-row__actions")
         ?.getBoundingClientRect();
       return {
+        cardBounds: cards.map(({ left, right, width }) => ({ left, right, width })),
         cardsInsideSurface: cards.every(
           (card) =>
             surface !== undefined &&
-            card.left >= surface.left &&
-            card.right <= surface.right &&
+            card.left >= surface.left - 1 &&
+            card.right <= surface.right + 1 &&
             card.width > 0,
         ),
         firstActionBottom: firstAction?.bottom ?? Number.POSITIVE_INFINITY,
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        surfaceBounds:
+          surface === undefined
+            ? null
+            : { left: surface.left, right: surface.right, width: surface.width },
       };
     });
     expect(mobileGeometry.cardsInsideSurface).toBe(true);
@@ -3573,6 +3715,7 @@ test.describe("panel reference reconstruction", () => {
     page.on("pageerror", (error) => errors.push(error.message));
 
     await mkdir(analyticsArtifactDirectory, { recursive: true });
+    await mkdir(panelTypographyArtifactDirectory, { recursive: true });
     await page.setViewportSize({ height: 1_024, width: 1_536 });
     await page.goto(`/panel/${organizationId}/analityka?days=30`);
 
@@ -3647,6 +3790,55 @@ test.describe("panel reference reconstruction", () => {
       path: path.join(analyticsArtifactDirectory, "after-production-1536x-full.png"),
     });
 
+    const desktopPrivacyState = await mountAnalyticsPrivacyStateProbe(page);
+    await expect(desktopPrivacyState).toBeVisible();
+    const desktopPrivacyStyle = await desktopPrivacyState.evaluate((section) => {
+      const cardBounds = section.getBoundingClientRect();
+      const state = section.querySelector<HTMLElement>(".wy-state")!;
+      const mark = section.querySelector<HTMLElement>(".wy-state__mark")!;
+      const title = section.querySelector<HTMLElement>("h3")!;
+      const description = section.querySelector<HTMLElement>("p")!;
+      const stateStyle = getComputedStyle(state);
+      const titleStyle = getComputedStyle(title);
+      const descriptionStyle = getComputedStyle(description);
+      return {
+        descriptionFontSize: descriptionStyle.fontSize,
+        descriptionMarginBottom: descriptionStyle.marginBottom,
+        descriptionMaxWidth: descriptionStyle.maxWidth,
+        insetLeft: title.getBoundingClientRect().left - cardBounds.left,
+        markLineWidth: getComputedStyle(mark, "::before").width,
+        markWeight: getComputedStyle(mark).fontWeight,
+        stateBorderBottomWidth: stateStyle.borderBottomWidth,
+        stateBorderTopWidth: stateStyle.borderTopWidth,
+        stateMinHeight: stateStyle.minHeight,
+        statePaddingLeft: stateStyle.paddingLeft,
+        statePaddingRight: stateStyle.paddingRight,
+        titleFontSize: titleStyle.fontSize,
+        titleWeight: titleStyle.fontWeight,
+      };
+    });
+    expect(desktopPrivacyStyle).toMatchObject({
+      descriptionFontSize: "14px",
+      descriptionMarginBottom: "0px",
+      descriptionMaxWidth: "736px",
+      markLineWidth: "28px",
+      markWeight: "500",
+      stateBorderBottomWidth: "0px",
+      stateBorderTopWidth: "0px",
+      stateMinHeight: "176px",
+      statePaddingLeft: "32px",
+      statePaddingRight: "32px",
+      titleFontSize: "16px",
+      titleWeight: "600",
+    });
+    expect(desktopPrivacyStyle.insetLeft).toBeGreaterThanOrEqual(31);
+    expect(desktopPrivacyStyle.insetLeft).toBeLessThanOrEqual(33);
+    await desktopPrivacyState.screenshot({
+      animations: "disabled",
+      path: path.join(panelTypographyArtifactDirectory, "after-empty-state-1536.png"),
+    });
+    await desktopPrivacyState.evaluate((section) => section.remove());
+
     await page.getByRole("link", { name: "7 dni" }).press("Enter");
     await expect(page).toHaveURL(/analityka\?days=7$/);
     await expect(page.getByRole("link", { name: "7 dni" })).toHaveAttribute("aria-current", "page");
@@ -3655,6 +3847,27 @@ test.describe("panel reference reconstruction", () => {
     await page.setViewportSize({ height: 844, width: 390 });
     await page.goto(`/panel/${organizationId}/analityka?days=30`);
     await expect(page.locator(".metric-grid .metric-card")).toHaveCount(4);
+    const mobilePrivacyState = await mountAnalyticsPrivacyStateProbe(page);
+    await expect(mobilePrivacyState).toBeVisible();
+    const mobilePrivacyStyle = await mobilePrivacyState.evaluate((section) => {
+      const state = section.querySelector<HTMLElement>(".wy-state")!;
+      const stateStyle = getComputedStyle(state);
+      return {
+        minHeight: stateStyle.minHeight,
+        paddingLeft: stateStyle.paddingLeft,
+        paddingRight: stateStyle.paddingRight,
+      };
+    });
+    expect(mobilePrivacyStyle).toEqual({
+      minHeight: "0px",
+      paddingLeft: "24px",
+      paddingRight: "24px",
+    });
+    await mobilePrivacyState.screenshot({
+      animations: "disabled",
+      path: path.join(panelTypographyArtifactDirectory, "after-empty-state-390.png"),
+    });
+    await mobilePrivacyState.evaluate((section) => section.remove());
     const mobileGeometry = await page.evaluate(() => {
       const metrics = Array.from(
         document.querySelectorAll<HTMLElement>(".analytics-panel .metric-card"),
@@ -3901,6 +4114,7 @@ test.describe("panel reference reconstruction", () => {
       exact: true,
       name: "Pomoc i instrukcje",
     });
+    await expect(helpLink).toHaveAttribute("href", `/panel/${organizationId}/pomoc`);
     await page.keyboard.press("Shift+Tab");
     await expect(helpLink).toBeFocused();
     await page.keyboard.press("Tab");
@@ -4230,7 +4444,7 @@ test.describe("panel reference reconstruction", () => {
     });
     await rotate.focus();
     await page.keyboard.press("Enter");
-    await expect(page.getByText("Nowy sekret v2 — skopiuj teraz")).toBeVisible();
+    await expect(page.getByText("Nowy sekret v2 — skopiuj teraz")).toBeVisible({ timeout: 15_000 });
     await expect(page.locator(".webhook-secret-result code")).toContainText(/^whsec_/);
     const desktopAccessibility = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])

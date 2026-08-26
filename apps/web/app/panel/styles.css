@@ -1105,7 +1105,7 @@
   background: transparent;
 }
 
-.organization-picker__header > a {
+.organization-picker__brand {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
@@ -1157,8 +1157,8 @@
   line-height: 1.5;
 }
 
-.organization-list {
-  margin: 0;
+.organization-picker__benefits {
+  margin: 2.85rem 0 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 25rem), 1fr));
@@ -1249,10 +1249,24 @@
   color: #667085;
   font-size: 0.78rem;
   line-height: 1.35;
-  list-style: none;
 }
 
-.organization-list__meta li {
+.organization-list__identity-copy small,
+.organization-list__role small,
+.organization-list__activity time {
+  color: var(--kw-organization-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.organization-list__status-cell {
+  justify-items: start;
+}
+
+.organization-list__status {
+  min-height: 1.9rem;
+  padding: 0.3rem 0.72rem;
+  border-radius: 0.42rem;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -3967,6 +3981,49 @@
   gap: 1rem;
 }
 
+.question-inspector__form-copy {
+  margin: -1rem -1rem 0;
+  padding: 1rem;
+  border-bottom: 1px solid var(--wy-color-border);
+  display: grid;
+  gap: 0.85rem;
+  background: var(--wy-color-surface-subtle);
+}
+
+.question-inspector__form-copy > label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--wy-color-text-primary);
+  font-size: 0.7rem;
+  font-weight: var(--wy-font-weight-semibold);
+}
+
+.question-inspector__section-heading {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.question-inspector__section-heading h3,
+.question-inspector__section-heading p {
+  margin: 0;
+}
+
+.question-inspector__section-heading h3 {
+  color: var(--wy-color-text-primary);
+  font-size: 0.78rem;
+}
+
+.question-inspector__section-heading p {
+  color: var(--wy-color-text-muted);
+  font-size: 0.65rem;
+  font-weight: var(--wy-font-weight-regular);
+  line-height: 1.45;
+}
+
+.question-inspector__section-heading--question {
+  margin-top: -0.1rem;
+}
+
 .question-inspector > label,
 .question-options,
 .conditional-logic label {
@@ -5531,6 +5588,17 @@
   .panel-mobile-navigation__icon {
     transition: none;
   }
+
+  .organization-picker__search,
+  .organization-list__row {
+    transition: none;
+  }
+
+  .organization-picker__loading-logout,
+  .organization-picker__loading-toolbar span,
+  .organization-picker__loading-list span {
+    animation: none;
+  }
 }
 
 @media (forced-colors: active) {
@@ -5544,6 +5612,27 @@
   .form-preview__progress i,
   .funnel-bars li > div {
     border: 1px solid CanvasText;
+  }
+
+  .organization-picker__search,
+  .organization-picker__help,
+  .organization-picker__benefit-icon,
+  .organization-picker__help-icon,
+  .organization-list,
+  .organization-list__rows > li,
+  .organization-picker__empty {
+    border: 1px solid CanvasText;
+  }
+
+  .organization-picker,
+  .organization-picker__header,
+  .organization-picker__intro,
+  .organization-picker__workspace,
+  .organization-list,
+  .organization-list__row,
+  .organization-picker__empty {
+    background: Canvas;
+    color: CanvasText;
   }
 
   .panel-rail {

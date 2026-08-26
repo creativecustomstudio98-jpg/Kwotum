@@ -332,6 +332,12 @@ export function FlowBuilder({
   const activeStepIssues = editorValidation.issues.filter(
     (issue) => issue.stepKey === activeStep.key,
   );
+  const publicTitleIssue = editorValidation.issues.find(
+    (issue) => issue.field === "publicTitle" && issue.stepKey === null,
+  );
+  const introIssue = editorValidation.issues.find(
+    (issue) => issue.field === "intro" && issue.stepKey === null,
+  );
   const saveBlockingIssue = editorValidation.issues.find((issue) => issue.field !== "graph");
   const nameIssue = editorValidation.issues.find((issue) => issue.field === "name");
   const displayedSaveStatus: BuilderSaveStatus = publishPending
@@ -1134,7 +1140,7 @@ export function FlowBuilder({
 
         {builderArea === "form" && inspectorOpen ? (
           <aside
-            aria-label="Ustawienia pytania"
+            aria-label="Ustawienia formularza i pytania"
             className={`flow-builder__inspector ${mode === "inspector" ? "is-mobile-active" : ""}`}
             data-layout-region="builder-inspector"
             id="builder-inspector-panel"
@@ -1157,6 +1163,61 @@ export function FlowBuilder({
               </button>
             </div>
             <div className="question-inspector">
+              <section
+                aria-labelledby="flow-public-copy-title"
+                className="question-inspector__form-copy"
+              >
+                <div className="question-inspector__section-heading">
+                  <h3 id="flow-public-copy-title">Treść formularza</h3>
+                  <p>Widoczna klientowi w linku i formularzu osadzonym na stronie.</p>
+                </div>
+                <label>
+                  <span>Tytuł formularza</span>
+                  <input
+                    aria-describedby={publicTitleIssue ? "flow-public-title-error" : undefined}
+                    aria-invalid={publicTitleIssue ? true : undefined}
+                    data-editor-field="public-title"
+                    maxLength={160}
+                    onChange={(event) => {
+                      const title = event.currentTarget.value;
+                      setDocument((current) => ({ ...current, title }), "flow-public-title");
+                    }}
+                    value={document.title}
+                  />
+                  <small>{document.title.length}/160</small>
+                </label>
+                {publicTitleIssue ? (
+                  <small className="builder-field-error" id="flow-public-title-error">
+                    <PanelIcon name="warning" />
+                    {publicTitleIssue.message}
+                  </small>
+                ) : null}
+                <label>
+                  <span>Wprowadzenie</span>
+                  <textarea
+                    aria-describedby={introIssue ? "flow-public-intro-error" : undefined}
+                    aria-invalid={introIssue ? true : undefined}
+                    data-editor-field="intro"
+                    maxLength={800}
+                    onChange={(event) => {
+                      const intro = event.currentTarget.value;
+                      setDocument((current) => ({ ...current, intro }), "flow-public-intro");
+                    }}
+                    value={document.intro}
+                  />
+                  <small>{document.intro.length}/800</small>
+                </label>
+                {introIssue ? (
+                  <small className="builder-field-error" id="flow-public-intro-error">
+                    <PanelIcon name="warning" />
+                    {introIssue.message}
+                  </small>
+                ) : null}
+              </section>
+              <div className="question-inspector__section-heading question-inspector__section-heading--question">
+                <h3>Wybrane pytanie</h3>
+                <p>Wybrane pytanie: {activeStep.key}</p>
+              </div>
               {activeStepIssues.length > 0 ? (
                 <section
                   aria-labelledby="active-question-errors-title"
@@ -2363,6 +2424,16 @@ export function FlowBuilder({
     if (!issue) return;
     if (issue.field === "name") {
       documentQuerySelector<HTMLInputElement>(".flow-builder__identity input")?.focus();
+      return;
+    }
+    if (issue.field === "publicTitle" || issue.field === "intro") {
+      setBuilderArea("form");
+      setInspectorOpen(true);
+      setMode("inspector");
+      window.requestAnimationFrame(() => {
+        const field = issue.field === "publicTitle" ? "public-title" : "intro";
+        documentQuerySelector<HTMLElement>(`[data-editor-field="${field}"]`)?.focus();
+      });
       return;
     }
     const issueSectionKey = issue.sectionKey;

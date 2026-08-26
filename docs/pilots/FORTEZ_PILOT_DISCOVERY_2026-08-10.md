@@ -2,6 +2,8 @@
 
 **Status:** discovery techniczne ukończone; prawdziwe dane nadal `NO-GO`  
 **Data kontroli:** 2026-08-10  
+**Status:** discovery techniczne ukończone; prawdziwe dane nadal `NO-GO`
+**Data kontroli:** 2026-08-10
 **Zakres:** jedna organizacja, jeden proces, kontrolowany ruch, równoległy
 kanał kontaktu i możliwość natychmiastowego wyłączenia
 
@@ -24,6 +26,14 @@ Przed UAT trzeba wdrożyć wersjonowaną politykę kontaktu `phone_required` ora
 tenantowy adres alertów niezależny od konta użytkownika. Zmiana wymaga ADR,
 migracji forward-only, tenantowego RLS, testów negatywnych i kompatybilności z
 istniejącymi procesami `email_required`.
+
+**Aktualizacja 2026-08-11:** migracje FTZ-01/FTZ-02 są zastosowane na
+produkcji, a tenant Fortez ma skonfigurowany niezależny adres dostawy poza
+repozytorium. Podczas przygotowania draftu wykryto brak kontrolki buildera dla
+`phone_required`; poprawka z osobnym obszarem Kontakt, wersjonowaną informacją
+prywatności i serwerowym przeliczaniem hashy consentu przechodzi lokalny gate.
+Prawdziwe dane pozostają `NO-GO` do wdrożenia tej poprawki, schedulera,
+monitoringu, review prawnego, warsztatu i pełnego UAT dostawy.
 
 ## 2. Potwierdzony stan strony Fortez
 
@@ -217,6 +227,7 @@ mutacją. Nagłówek Origin nie zastępuje rate limitu ani Turnstile.
 | FTZ-02 | P0 / lokalnie zamknięty           | alert firmy jest związany z Ownerem panelu                                     | tenantowy adres alertów z RLS, walidacją, audytem i testem drugiego tenanta; czeka na deploy       |
 | FTZ-03 | P0 / FTZ-03A+B lokalnie zamknięte | allowlista, rozproszony limit i Turnstile Siteverify są gotowe; brak wdrożenia | skonfigurować Cloudflare/Vercel, wdrożyć migrację/sekrety i wykonać smoke origin/429/replay/submit |
 | FTZ-04 | P0                                | outbox aplikacji nie ma produkcyjnego schedulera i alertów                     | scheduler, osobny sekret, probe kolejki, alert wieku i syntetyczna dostawa                         |
+| FTZ-04 | P0 / implementacja lokalna        | scheduler, heartbeat i probe są gotowe w kodzie; brak wdrożenia i alertu       | migracja/release, osobne sekrety, aktywny alert wieku i syntetyczna dostawa na jednym SHA          |
 | FTZ-05 | P0                                | brak monitoringu submitu i kolejki oraz restore drill                          | uptime/error tracking bez PII, backup point, odtworzenie i podpisany wynik                         |
 | FTZ-06 | P0                                | brak zatwierdzonych ról stron, DPA i treści informacji                         | review prawny i zaakceptowane wersje/hashy przed prawdziwymi danymi                                |
 | FTZ-07 | P1                                | CSP Fortez nie dopuszcza Kwotum                                                | minimalna zmiana CSP i test na kopii/stagingu                                                      |

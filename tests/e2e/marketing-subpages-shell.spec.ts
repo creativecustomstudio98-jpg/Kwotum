@@ -4,11 +4,13 @@ import { expect, test } from "@playwright/test";
 import { indexedRoutes } from "../../apps/web/lib/marketing/content";
 
 const representativeRoutes = [
-  { active: "Produkt", path: "/produkt" },
-  { active: "Cennik", path: "/cennik" },
-  { active: "Branże", path: "/branze/meble-na-wymiar" },
-  { active: null, path: "/polityka-prywatnosci" },
+  { active: "Produkt", breadcrumbs: false, path: "/produkt" },
+  { active: "Cennik", breadcrumbs: true, path: "/cennik" },
+  { active: "Branże", breadcrumbs: true, path: "/branze/meble-na-wymiar" },
+  { active: null, breadcrumbs: true, path: "/polityka-prywatnosci" },
 ] as const;
+
+const routesWithEditorialHero = new Set(["/produkt", "/jak-dziala", "/dla-agencji", "/branze"]);
 
 const shellViewports = [
   { height: 1_000, width: 1_440 },
@@ -41,7 +43,11 @@ test.describe("marketing subpages R1 shell", () => {
         await expect(header).toBeVisible();
         await expect(header.getByRole("link", { name: "Kwotum — strona główna" })).toBeVisible();
         await expect(header.locator(".marketing-brand__mark img")).toHaveCount(1);
-        await expect(breadcrumbs).toBeVisible();
+        if (route.breadcrumbs) {
+          await expect(breadcrumbs).toBeVisible();
+        } else {
+          await expect(breadcrumbs).toHaveCount(0);
+        }
         await expect(footer).toBeVisible();
 
         const geometry = await page.evaluate(() => {
@@ -61,7 +67,11 @@ test.describe("marketing subpages R1 shell", () => {
           };
         });
 
-        for (const region of [geometry.header, geometry.breadcrumbs, geometry.footer]) {
+        const alignedRegions = route.breadcrumbs
+          ? [geometry.header, geometry.breadcrumbs, geometry.footer]
+          : [geometry.header, geometry.footer];
+
+        for (const region of alignedRegions) {
           expect(region).not.toBeNull();
           expect(region?.left ?? 0).toBeGreaterThanOrEqual(11);
           expect(region?.right ?? geometry.viewport).toBeLessThanOrEqual(geometry.viewport - 11);
@@ -113,9 +123,7 @@ test.describe("marketing subpages R1 shell", () => {
     await skipLink.press("Enter");
     await expect(page.locator("#main-content")).toBeFocused();
 
-    const ctaActions = page.locator(
-      ".marketing-cta-band .marketing-actions a, #product-final-cta .marketing-actions a",
-    );
+    const ctaActions = page.locator("#product-final-cta a");
     await expect(ctaActions).toHaveCount(2);
     const actionWidths = await ctaActions.evaluateAll((actions) =>
       actions.map((action) => action.getBoundingClientRect().width),
@@ -139,7 +147,12 @@ test.describe("marketing subpages R1 shell", () => {
         await page.goto(route);
         await expect(page.locator(".marketing-header--subpage")).toBeVisible();
         await expect(page.locator(".marketing-brand__mark img").first()).toBeVisible();
-        await expect(page.getByRole("navigation", { name: "Okruszki" })).toBeVisible();
+        const breadcrumbs = page.getByRole("navigation", { name: "Okruszki" });
+        if (routesWithEditorialHero.has(route)) {
+          await expect(breadcrumbs).toHaveCount(0);
+        } else {
+          await expect(breadcrumbs).toBeVisible();
+        }
         expect(
           await page.evaluate(
             () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

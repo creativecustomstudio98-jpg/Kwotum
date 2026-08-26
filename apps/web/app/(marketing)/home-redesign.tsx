@@ -113,12 +113,16 @@ export function HomeRedesign() {
             <p className={styles.eyebrow} data-intro="up" data-reveal-delay="1">
               Platforma kwalifikacji leadów
             </p>
-            <h1 data-intro="up" data-reveal-delay="2">
+            <h1 className="wy-marketing-heading-1" data-intro="up" data-reveal-delay="2">
               <strong>Kwalifikuj zapytania</strong>
               <span>zanim zadzwonisz</span>
               <span>do klienta</span>
             </h1>
-            <p className={styles.heroDescription} data-intro="up" data-reveal-delay="3">
+            <p
+              className={`${styles.heroDescription} wy-marketing-lead`}
+              data-intro="up"
+              data-reveal-delay="3"
+            >
               Zamieniamy niekompletne zapytania w gotowe do działania leady z budżetem, terminem,
               lokalizacją, plikami i zalecanym kolejnym krokiem.
             </p>
@@ -170,7 +174,7 @@ export function HomeRedesign() {
         <div className={styles.processSectionInner}>
           <header className={styles.processHeading}>
             <p className={styles.eyebrow}>Proste i skuteczne</p>
-            <h2 data-reveal="up" id="flow-story-title">
+            <h2 className="wy-marketing-heading-2" data-reveal="up" id="flow-story-title">
               <strong>Od niepełnego zapytania</strong>
               <span>do gotowego leada</span>
             </h2>
@@ -188,8 +192,8 @@ export function HomeRedesign() {
                   <span className={styles.processIcon}>
                     <ProcessStepGlyph kind={step.icon} />
                   </span>
-                  <h3>{step.title}</h3>
-                  <p>{step.description}</p>
+                  <h3 className="wy-marketing-heading-3">{step.title}</h3>
+                  <p className="wy-marketing-body">{step.description}</p>
                 </article>
                 {index < processSteps.length - 1 ? (
                   <span aria-hidden="true" className={styles.processConnector}>
@@ -211,11 +215,11 @@ export function HomeRedesign() {
         <div className={styles.keyInformationInner}>
           <header className={styles.keyInformationHeading}>
             <p className={styles.eyebrow}>Wszystko pod kontrolą</p>
-            <h2 id="key-information-title">
+            <h2 className="wy-marketing-heading-2" id="key-information-title">
               <strong>Wszystkie kluczowe informacje</strong>
               <span>w jednym miejscu</span>
             </h2>
-            <p>
+            <p className="wy-marketing-lead">
               Masz pełen wgląd w budżet, termin, dokumenty i wynik kwalifikacji.
               <span>Szybciej podejmujesz decyzje i sprawniej działasz.</span>
             </p>
@@ -230,7 +234,7 @@ export function HomeRedesign() {
               <span className={styles.keyInformationIcon}>
                 <KeyInformationGlyph kind="budget" />
               </span>
-              <h3>Budżet</h3>
+              <h3 className="wy-marketing-heading-3">Budżet</h3>
               <p className={styles.keyInformationValue}>20 000 – 40 000 zł</p>
             </article>
 
@@ -238,7 +242,7 @@ export function HomeRedesign() {
               <span className={styles.keyInformationIcon}>
                 <KeyInformationGlyph kind="term" />
               </span>
-              <h3>Termin realizacji</h3>
+              <h3 className="wy-marketing-heading-3">Termin realizacji</h3>
               <p className={styles.keyInformationValue}>Czerwiec 2024</p>
             </article>
 
@@ -246,7 +250,7 @@ export function HomeRedesign() {
               <span className={styles.keyInformationIcon}>
                 <KeyInformationGlyph kind="files" />
               </span>
-              <h3>Pliki i zdjęcia</h3>
+              <h3 className="wy-marketing-heading-3">Pliki i zdjęcia</h3>
               <div aria-hidden="true" className={styles.keyInformationThumbnails}>
                 <span className={styles.planThumbnail} />
                 <span className={styles.photoThumbnail}>
@@ -274,7 +278,7 @@ export function HomeRedesign() {
               <span className={styles.keyInformationIcon}>
                 <KeyInformationGlyph kind="score" />
               </span>
-              <h3>Wynik kwalifikacji</h3>
+              <h3 className="wy-marketing-heading-3">Wynik kwalifikacji</h3>
               <div
                 aria-label="Przykładowy wynik kwalifikacji: 87 na 100"
                 className={styles.keyScore}
@@ -296,7 +300,9 @@ export function HomeRedesign() {
         <div className={styles.leadExampleInner}>
           <header className={styles.leadExampleHeading}>
             <p className={styles.eyebrow}>Przykładowy lead</p>
-            <h2 id="decision-title">Kuchnia na wymiar – Kraków</h2>
+            <h2 className="wy-marketing-heading-2" id="decision-title">
+              Kuchnia na wymiar – Kraków
+            </h2>
           </header>
           <DecisionDocument />
         </div>
@@ -311,8 +317,10 @@ export function HomeRedesign() {
         <div className={styles.integrationInner}>
           <header className={styles.integrationHeading}>
             <p className={styles.eyebrow}>Integracje i automatyzacje</p>
-            <h2 id="integrations-title">Kwotum działa z Twoim obecnym procesem</h2>
-            <p>
+            <h2 className="wy-marketing-heading-2" id="integrations-title">
+              Kwotum działa z Twoim obecnym procesem
+            </h2>
+            <p className="wy-marketing-lead">
               Przesyłaj leady tam, gdzie ich potrzebujesz. Bez skomplikowanej konfiguracji
               <span>i bez przebudowy Twojej strony.</span>
             </p>
@@ -442,8 +450,10 @@ export function HomeRedesign() {
         <div className={styles.pricingInner}>
           <header className={styles.pricingHeading}>
             <p className={styles.eyebrow}>Przejrzyste zasady</p>
-            <h2 id="pricing-title">Prosty start, który rośnie razem z Tobą</h2>
-            <p>
+            <h2 className="wy-marketing-heading-2" id="pricing-title">
+              Prosty start, który rośnie razem z Tobą
+            </h2>
+            <p className="wy-marketing-lead">
               Zaczynasz od jednego procesu i wspólnie ustalamy zakres.
               <span>Bez niezatwierdzonych cen, limitów i długoterminowych zobowiązań.</span>
             </p>
@@ -506,8 +516,10 @@ export function HomeRedesign() {
           <div className={styles.faqMain}>
             <header className={styles.faqHeading}>
               <p className={styles.eyebrow}>FAQ</p>
-              <h2 id="faq-title">Najczęściej zadawane pytania</h2>
-              <p>
+              <h2 className="wy-marketing-heading-2" id="faq-title">
+                Najczęściej zadawane pytania
+              </h2>
+              <p className="wy-marketing-lead">
                 Masz pytanie? Sprawdź odpowiedzi na najczęstsze pytania albo poznaj istniejące
                 materiały produktu.
               </p>
@@ -533,8 +545,10 @@ export function HomeRedesign() {
             <span aria-hidden="true" className={styles.faqSupportIcon}>
               <SupportHeadsetGlyph />
             </span>
-            <h3 id="faq-support-title">Potrzebujesz pomocy?</h3>
-            <p className={styles.faqSupportIntro}>
+            <h3 className="wy-marketing-heading-3" id="faq-support-title">
+              Potrzebujesz pomocy?
+            </h3>
+            <p className={`${styles.faqSupportIntro} wy-marketing-body`}>
               Skorzystaj z istniejących materiałów produktu i wybierz kolejny krok odpowiedni dla
               Twojego procesu.
             </p>
@@ -594,8 +608,10 @@ export function HomeRedesign() {
 
           <div className={styles.finalCtaCopy}>
             <p className={styles.eyebrow}>Uporządkowany proces, lepszy brief</p>
-            <h2 id="final-cta-title">Gotowy, aby kwalifikować leady jak najlepiej?</h2>
-            <p>
+            <h2 className="wy-marketing-heading-2" id="final-cta-title">
+              Gotowy, aby kwalifikować leady jak najlepiej?
+            </h2>
+            <p className="wy-marketing-lead">
               Zobacz działający proces na przykładowym leadzie i sprawdź, jak Kwotum porządkuje
               budżet, termin, lokalizację, pliki i kolejny krok.
             </p>
@@ -627,7 +643,7 @@ export function HomeRedesign() {
             />
 
             <article className={styles.finalScoreCard}>
-              <h3>Co wyjaśnia wynik kwalifikacji</h3>
+              <h3 className="wy-marketing-heading-3">Co wyjaśnia wynik kwalifikacji</h3>
               <div className={styles.finalScoreBody}>
                 <ul>
                   {finalCtaReasons.map(([label, state]) => (
@@ -679,7 +695,7 @@ function FinalSnapshotCard({
 }) {
   return (
     <article className={styles.finalSnapshotCard}>
-      <h3>{label}</h3>
+      <h3 className="wy-marketing-heading-3">{label}</h3>
       <p>
         <strong>{value}</strong>
         <span>{suffix}</span>
@@ -819,8 +835,8 @@ function IntegrationChannel({
         <IntegrationGlyph kind={icon} />
       </span>
       <div>
-        <h3>{title}</h3>
-        <p>{description}</p>
+        <h3 className="wy-marketing-heading-3">{title}</h3>
+        <p className="wy-marketing-body">{description}</p>
       </div>
     </article>
   );
@@ -890,7 +906,7 @@ function PricingCard({
           <PricingGlyph kind={icon} />
         </span>
         <div>
-          <h3>{title}</h3>
+          <h3 className="wy-marketing-heading-3">{title}</h3>
           <strong>{value}</strong>
         </div>
         {badge ? <span className={styles.pricingBadge}>{badge}</span> : null}

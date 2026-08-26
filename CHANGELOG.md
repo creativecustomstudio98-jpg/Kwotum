@@ -119,6 +119,172 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
   właściciela. Ten sam wariant zasila teraz faviconę, Apple touch icon,
   marketing, auth, panel, demonstracje i wiadomości; sufiks pliku `-v3` odcina
   cache wcześniejszego assetu bez zmiany geometrii istniejących layoutów.
+- Pozycja „Pomoc” prowadzi teraz do wewnętrznego, tenantowego poradnika panelu
+  zamiast na stronę marketingową. Centrum pomocy obejmuje 19 instrukcji o
+  rzeczywistych funkcjach Kwotum, wyszukiwanie bez rozróżniania polskich
+  znaków, szybkie ścieżki i dostępne klawiaturą sekcje. Zakres treści jest
+  filtrowany według roli i capabilities, więc Sprzedaż nie widzi instrukcji
+  administracyjnych, buildera ani integracji. Widoki loading, error, desktop i
+  mobile zachowują noindex, tenant scope oraz brak fikcyjnych kanałów wsparcia.
+  W szczegółach leada ikony akcji „Zaplanuj kontakt” i „Utwórz zadanie” są
+  teraz geometrycznie wyśrodkowane z tekstem.
+
+- Sidebar używa teraz spokojnych, systemowych wag 400/500/600 zamiast
+  arbitralnych wartości 520–650, bez zmiany geometrii, ikon i aktywnego skosu.
+  Stan małej próby analityki ma 32 px wewnętrznego marginesu na desktopie,
+  24 px na mobile oraz czytelniejszą hierarchię 16/14 px bez zbędnych linii i
+  przypadkowego łamania opisu. Dane, próg prywatności i treść komunikatu nie
+  uległy zmianie.
+
+- Biblioteka szablonów nie jest już osadzona w dodatkowej białej karcie.
+  Nagłówek, filtry, KPI, karty i podgląd leżą bezpośrednio na powierzchni
+  workspace; ten sam układ obowiązuje w stanach loading i error. Funkcje,
+  dane, wewnętrzne obramowania oraz responsywność pozostają bez zmian.
+
+- Ekran `/panel` odwzorowuje finalną referencję wyboru organizacji: header
+  80 px, lewy panel informacyjny, działającą wyszukiwarkę oraz tabelaryczne
+  wiersze z rzeczywistą rolą, statusem i ostatnią aktywnością. Używa aktualnego
+  logo i zieleni Kwotum, zachowuje RLS, tenant scope, onboarding i logout, a na
+  mobile przechodzi w dostępne karty bez poziomego overflow.
+
+- Jasna powierzchnia aktywnej pozycji sidebara kończy się teraz 16 px przed
+  prawą krawędzią w wariancie rozwiniętym. W zwiniętym zaczyna się równo z
+  lewym brzegiem bez zaokrąglenia, a prawy skos kończy się 10 px przed prawym
+  brzegiem raila. Routing, focus, wymiary 256/72 px i mobilna nawigacja
+  pozostają bez zmian.
+
+- Tranzytywne `nanoid` jest przypięte do `3.3.18`, która usuwa podatność
+  GHSA-2v37-7h3g-55p8 wykrytą przez gate zależności.
+
+- Desktopowy sidebar panelu Kwotum ma teraz finalną geometrię 256/72 px,
+  płaskie tło `#0d2b24`, lokalny Instrument Sans, grupy Praca/Narzędzia/System
+  oraz aktywną zakładkę z dwoma prawymi ścięciami. Zachowano routing,
+  capabilities, tenant scope, mobilną nawigację i dotychczasowy klucz
+  preferencji zwinięcia; usunięto gradienty, poświaty, glass i fikcyjny stan
+  nieprzeczytanych powiadomień.
+
+- Jawny wariant `inline-layout="integrated"` osadza proces bez obcej karty,
+  powtórzonego logo i drugiego wprowadzenia. Zachowuje kompaktową wysokość,
+  status zapisu, progress i pełną semantykę formularza, a zgodę na zbiorczą
+  analitykę umieszcza po aktywnym pytaniu. Nowe role `color-scheme` i koloru
+  błędu pozwalają zbudować dostępny ciemny preset bez wpływu na domyślny wygląd
+  Kwotum, popup, fullscreen lub hosted link.
+
+- Osadzenie inline z jawnym `inline-layout="compact"` ma naturalną wysokość
+  zamiast pustej powierzchni 720 px, bez zmiany pełnego hosted linku. Akcja
+  znajduje się bezpośrednio pod odpowiedziami, wymagane pytanie
+  blokuje „Dalej” do chwili podania odpowiedzi, a krótka wskazówka potwierdza,
+  kiedy można przejść dalej. Pierwszy ekran pokazuje liczbę pytań, a przycisk
+  wizualnie zapowiada następne pytanie albo podsumowanie bez zmiany dostępnej
+  nazwy i obsługi klawiaturą.
+
+- Osadzony widget ma teraz ograniczony, wielokrotnego użytku kontrakt brandingu
+  wnętrza bez osłabiania Shadow DOM: tekstową nazwę i podtytuł, same-origin
+  HTTP(S) logo z bezpiecznym fallbackiem oraz allowlistowane role
+  `--wyceno-widget-*` dla typografii, kolorów i geometrii. Atrybuty marki nie
+  restartują sesji ani nie zastępują aktywnego formularza. Przy prawdziwym
+  wordmarku nazwa pozostaje dostępna semantycznie, ale nie jest wizualnie
+  dublowana. Popup używa prawdziwego slotu nagłówka dla statusu i kwadratowego
+  `×`, więc zamknięcie nie nachodzi już na treść; akcja pozostaje wizualnie
+  związana z odpowiedziami. Referencyjny preset Fortez używa własnego logo,
+  lżejszych nagłówków Arial/Helvetica o wadze 500, pomarańczu z kontrastowym
+  ciemnym tekstem, kanciastych
+  kontrolek oraz grafitowego backdropu.
+
+- Wznowienie zapisanej sesji widgetu po poprawnym `GET 200` aktualnego snapshotu
+  wraca teraz jawnie do stanu `synced`; awaria `localStorage` lub analityki nie
+  podszywa się pod utratę sieci i nie wyłącza aktywnego formularza. Magazyn hosta ma pamięciowy
+  fallback bieżącej karty, zapisuje idempotentnie bez zdarzeń wywołanych samą
+  zmianą `savedAt`, a zdarzenie `online` deduplikowanie ponawia resume/create w
+  tej samej instancji kontrolera, po zakończeniu trwającej inicjalizacji.
+  Odpowiedzi przestarzałego resume nie cofają nowszej odpowiedzi, nawigacji ani
+  trwającego submitu, a retry pierwszego create jest serializowane z restartem.
+  Flush jest przypisany do właściciela sesji, więc opóźniony zapis wygasłej
+  sesji nie blokuje ani nie zmienia nowej; zakończony submit zwalnia także
+  pamięciowy draft danych kontaktowych i referencje do plików.
+  Ponawialny błąd sieci zachowuje snapshot, a odpowiedź 404/410 z endpointu
+  głównej sesji (`resume`, `save`, `result`, `upload` lub `submit`) usuwa wygasły
+  token, dane kontaktowe i zgody oraz blokuje dalszy automatyczny retry, o ile
+  nie trwa submit lub nie pokazano już jego sukcesu. Wynik submitu ma wtedy
+  pierwszeństwo, a ewentualne wygaśnięcie zostanie rozpoznane przy następnym
+  żądaniu głównej sesji lub przeładowaniu.
+  Poboczna analityka pozostaje best-effort; decyzje zgody są serializowane, a
+  stare zakończenie eventu nie usuwa kolejki nowej sesji. Retry pamięta wejściowy
+  `publicId`, a UI nie pokazuje surowej treści wyjątku submitu. Callbacki błędu,
+  wygaśnięcia, timeoutu i braku wsparcia Turnstile mają typowane, bezpieczne
+  stany i zawsze usuwają instancję challenge.
+  Automatyczna reakcja na cross-tab `storage` została wyłączona; pilotaż
+  obsługuje jedną aktywną kartę na sesję, bez niejawnego scalania kart.
+- Generator kodu instalacyjnego i konektor WordPress dodają teraz jawne
+  `api-base` wyprowadzone odpowiednio z kanonicznego `APP_URL` albo przypiętego,
+  zwalidowanego `WYCENO_CONNECTOR_API_ORIGIN`. Osadzenia inline, popup,
+  fullscreen, shortcode i blok Gutenberg kierują dzięki temu publiczne API do
+  Kwotum zamiast do originu strony gospodarza; hosted link zachowuje
+  dotychczasowy kontrakt, a credential nadal nie trafia do HTML.
+- Popup i fullscreen widgetu tworzą lub wznawiają sesję dopiero po kliknięciu
+  launchera; samo wyświetlenie CTA nie dotyka `localStorage` ani publicznego
+  API. Stan po kliknięciu pokazuje jawny loading i zachowuje dialog, zdarzenia,
+  Escape oraz zwrot fokusu. Kompatybilny fallback `api-base` używa originu
+  modułu zamiast domeny gospodarza. Launcher udostępnia ograniczone zmienne
+  `--wyceno-launcher-*` dla on-brand kolorów i promienia narożników bez
+  otwierania stylowania wnętrza Shadow DOM.
+- Stage13E wdrożono produkcyjnie migracją `20260811000300` i immutable SHA
+  `c74f38e28d20775c7dfa5b6730eb0d5336d48aef`. Smoke potwierdził HTTP 200 dla
+  `/health` i `/ready`, czytelne etykiety dziewięciu odpowiedzi istniejącego
+  leada, brak `opcja_` w panelu oraz zdrowy pierwszy cykl cron po wznowieniu.
+  Nie utworzono nowego leada i nie ponowiono dostarczonego alertu UAT.
+- Brief leada rozdziela teraz surowe klucze odpowiedzi od czytelnej projekcji
+  etykiet utrwalonej z immutable wersji procesu. Forward-only migracja
+  backfilluje istniejące leady, chroni nowe inserty triggerem i przekazuje
+  etykiety do panelu oraz kolejnych claimów powiadomień bez zmiany routingu,
+  pricingu, scoringu ani historycznie dostarczonych wiadomości.
+- Wiadomości transakcyjne używają teraz białego, tabelowego układu z inline
+  CSS, hybrydowego wrappera MSO, zoptymalizowanego znaku Kwotum PNG pod
+  absolutnym adresem HTTPS, tekstowego wordmarku i czytelnego renderu mobilnego.
+  Nowy projekt ma wersję v2, a zamrożone renderery v1 pozostają dostępne dla
+  deterministycznych retry. Alert firmy pokazuje telefon jako pierwszy, pomija
+  nieobecne kanały kontaktu oraz całe puste sekcje ceny i score zamiast
+  eksponować „Nie podano” lub „Nie obliczono”.
+
+- Zapis odpowiedzi normalizuje teraz SQL `NULL` przekazany przez PostgREST do
+  jawnego JSON-owego `null`, zanim sprawdzi wymaganie, trasę i zapis sesji.
+  Dzięki temu „Pomiń” działa dla pól opcjonalnych bez stanu offline, ale nadal
+  nie może ominąć pola wymaganego. Regresję pokrywa produkcyjnie zgodny test RPC.
+
+- Builder udostępnia teraz osobne pola „Tytuł formularza” i „Wprowadzenie” dla
+  publicznego hosted linku oraz embedu. Walidacja rozróżnia treść otwarcia od
+  tytułu aktywnego pytania, prowadzi fokus do właściwego pola i zachowuje
+  autosave, undo/redo oraz istniejącą geometrię trzech kolumn. Zmiana zamyka
+  regresję UAT pierwszego pilota, w której proces Fortez zachował treść
+  „Meble na wymiar” z bazowego szablonu.
+
+- FTZ-04 dodaje pięciominutowy Vercel Cron dla aplikacyjnego outboxu z osobnym
+  `CRON_SECRET`, zachowuje ręczny worker z niezależnym sekretem oraz zapisuje
+  prywatny heartbeat bez PII. Chroniony probe wykrywa brak, błąd i zawieszenie
+  schedulera, kolejkę starszą niż 10 minut, stale lock i terminalne `failed`.
+  Migracja, sekrety Production, niezależny alert i syntetyczna dostawa nadal
+  muszą zostać wdrożone przed zamknięciem bramki pilota.
+
+- Status w inspektorze zakładki `Kontakt` odzwierciedla teraz zapisany stan
+  konfiguracji kontaktu zamiast niezależnego stanu modułu wyceny; E2E chroni
+  oba stany przed regresją.
+- Builder procesu udostępnia teraz Ownerowi/Adminowi osobną zakładkę
+  `Kontakt`: wybór `email_required` / `phone_required`, wersjonowaną informację
+  prywatności, bezpieczny URL polityki i jawny przełącznik załączników.
+  Domyślnie zachowuje zgodność `email_required`, nie dodaje zgody marketingowej
+  i ostrzega przed plikami bez produkcyjnego skanera malware. Serwer przelicza
+  SHA-256 treści informacji i zgody przy każdym zapisie/publikacji, więc klient
+  panelu nie może utrwalić niespójnego dowodu consentu. E2E potwierdza
+  phone-first, zapis, publikację, axe i cleanup syntetycznego tenanta.
+- Zastąpiono poprzedni symbol dokładnym znakiem Kwotum V3 dostarczonym przez
+  właściciela. Wersjonowane assety zasilają faviconę, Apple touch icon,
+  marketing, auth, panel, demonstracje oraz wiadomości, bez zmiany tenantowego
+  brandingu formularzy klientów.
+- Etap 12ZK dodaje wersjonowaną politykę kontaktu `email_required` /
+  `phone_required`, tenantowy adres alertów zarządzany przez Ownera/Admina,
+  phone-first submit bez fałszywego potwierdzenia e-mail oraz kompletny brief z
+  telefonem i odpowiedziami w alercie firmy. Migracja zachowuje kompatybilność
+  snapshotów v1, forced RLS i audit bez kopiowania adresu odbiorcy.
 - FTZ-03B dodaje adaptacyjny Cloudflare Turnstile do finalnego submitu leada:
   explicit render z `interaction-only`, token pobierany po uploadzie,
   obowiązkowe serwerowe Siteverify z action/hostname/freshness oraz fail-closed
@@ -127,6 +293,9 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
   token i surowy IP nie są utrwalane. Unit/route/Playwright potwierdzają brak
   zapisu przed weryfikacją i świeży token po retry; konfiguracja Cloudflare,
   Vercel, CSP Fortez, legal review i produkcyjny smoke nadal blokują pilot.
+  zapisu przed weryfikacją i świeży token po retry. Managed widget i klucze
+  Vercel Production only są skonfigurowane; wdrożenie, CSP Fortez, legal review
+  i produkcyjny smoke nadal blokują pilot.
 - FTZ-03A zastępuje wildcard CORS dokładną tenantową allowlistą originów,
   odcina bezpośredni dostęp `anon` i `authenticated` do RPC publicznego
   formularza oraz dodaje serwerową bramę z atomowym limiterem PostgreSQL per
@@ -815,8 +984,8 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
   inline, popup, fullscreen i hosted link.
 - Allowlistowany manifest, atomowe utworzenie sesji, hashowany token,
   siedmiodniowe expiry, rewizje i idempotentne mutacje odpowiedzi.
-- Autosave, wznowienie, kolejka odporna na utratę sieci, synchronizacja kart i
-  serwerowa walidacja routingu na immutable snapshotcie.
+- Autosave, wznowienie, kolejka odporna na utratę sieci, kontrola konfliktów
+  rewizji i serwerowa walidacja routingu na immutable snapshotcie.
 - Publiczne Route Handlers v1 z walidacją Zod, stabilnymi błędami, CORS,
   request ID i tokenem poza URL.
 - Testy widgetu dla XSS, uszkodzonego storage, offline, mobile, klawiatury,

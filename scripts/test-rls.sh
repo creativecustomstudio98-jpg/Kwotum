@@ -51,6 +51,7 @@ psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/notification_delivery.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/webhook_delivery.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/flow_invitations.sql"
+psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/notification_operations.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/analytics.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/wordpress_connector.sql"
 psql "${postgres_url}" -v ON_ERROR_STOP=1 -f "${repository_root}/supabase/tests/data_governance.sql"

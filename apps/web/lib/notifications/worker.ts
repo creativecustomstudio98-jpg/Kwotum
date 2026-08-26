@@ -1,6 +1,7 @@
 import { parseServerEnv } from "@wyceno/config/env";
-import type { Database, Json, NotificationErrorCode, NotificationKind } from "@wyceno/database";
+import type { Database, Json, NotificationErrorCode } from "@wyceno/database";
 import {
+  notificationTemplateMatchesKind,
   renderNotificationEmail,
   ResendEmailDeliveryAdapter,
   TestEmailDeliveryAdapter,
@@ -56,10 +57,6 @@ function notificationPrice(claim: ClaimedNotification): string | null {
   return `${minimum}–${formatMinorAmount(claim.price_max_minor, claim.price_currency)}`;
 }
 
-function expectedTemplate(kind: NotificationKind): string {
-  return kind === "lead_company_alert" ? "lead-company-v1" : "lead-customer-v1";
-}
-
 function answerText(answer: Json): string | null {
   if (typeof answer === "string") return answer;
   if (typeof answer === "number") return new Intl.NumberFormat("pl-PL").format(answer);
@@ -108,7 +105,7 @@ export async function processNotificationBatch(
   let retrying = 0;
   let sent = 0;
   for (const claim of claims) {
-    if (claim.template_version !== expectedTemplate(claim.kind)) {
+    if (!notificationTemplateMatchesKind(claim.kind, claim.template_version)) {
       await input.repository.fail(claim, {
         errorCode: "configuration",
         provider,
@@ -134,6 +131,7 @@ export async function processNotificationBatch(
         organizationId: claim.organization_id,
         price: notificationPrice(claim),
         score: claim.score,
+        templateVersion: claim.template_version,
       });
     } catch {
       await input.repository.fail(claim, {

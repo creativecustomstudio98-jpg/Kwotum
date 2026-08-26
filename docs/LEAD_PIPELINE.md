@@ -54,7 +54,8 @@ potwierdzenia i pliki, po czym w jednej transakcji:
 
 1. ponownie liczy pricing i scoring z odpowiedzi sesji;
 2. zapisuje lead i snapshot nazw procesu;
-3. kopiuje odpowiedzi wraz z tytułami pytań;
+3. kopiuje surowe odpowiedzi wraz z tytułami pytań i utrwala ich czytelne
+   etykiety z przypiętego immutable snapshotu;
 4. zapisuje potwierdzenia i przypina zweryfikowane pliki;
 5. dopisuje początkowy status `new`.
 
@@ -65,6 +66,9 @@ chronione triggerem przed zmianą.
 
 Publiczna odpowiedź zawiera wyłącznie `leadPublicId` i `submittedAt`. Kontakt,
 tenant ID, odpowiedzi, cena i scoring nie wracają do strony gospodarza.
+Surowe klucze opcji pozostają źródłem logiki i audytu, natomiast panel oraz
+brief używają `display_answer`. Etykiety są przypięte do wersji procesu leada,
+więc późniejsza edycja draftu nie zmienia historycznego zgłoszenia.
 
 ## Pliki
 

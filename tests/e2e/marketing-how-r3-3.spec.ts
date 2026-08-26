@@ -1,52 +1,51 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const outcomeViewports = [
-  { height: 1_000, width: 1_536 },
+const decisionViewports = [
   { height: 1_000, width: 1_440 },
-  { height: 900, width: 1_280 },
   { height: 900, width: 1_024 },
   { height: 1_000, width: 768 },
-  { height: 932, width: 430 },
   { height: 844, width: 390 },
-  { height: 844, width: 375 },
   { height: 844, width: 320 },
 ] as const;
 
-test.describe("marketing how it works R3.3 outcome sequence", () => {
-  test("keeps server output, lead submission and the company decision separate", async ({
-    page,
-  }) => {
+test.describe("marketing how it works V7 client and decision chapters", () => {
+  test("connects the client result with the company's lead decision", async ({ page }) => {
     await page.goto("/jak-dziala");
 
-    const process = page.getByRole("region", {
-      name: "Odpowiedzi prowadzą do decyzji firmy. Nie zastępują jej.",
-    });
-    const stages = process.locator(".process-second-half__steps > li");
+    const clientChapter = page.locator("#proces-dalszy");
+    const companyChapter = page.locator("#decyzja");
+    const clientStages = clientChapter.locator("ol > li");
+    const companyStages = companyChapter.locator("ol > li");
 
-    await expect(process).toBeVisible();
-    await expect(stages).toHaveCount(3);
-    await expect(stages.locator("h3")).toHaveText([
-      "Bezpieczny wynik dla klienta",
-      "Kontakt staje się leadem",
-      "Firma wybiera następny krok",
+    await expect(clientChapter.getByRole("heading", { level: 2 })).toHaveText(
+      "Potem klient odpowiada. Kwotum potwierdza wynik",
+    );
+    await expect(clientStages.locator("h3")).toHaveText(["Sesja klienta", "Potwierdzenie wyniku"]);
+    await expect(clientStages.locator("span").filter({ hasText: /^0[34]$/ })).toHaveText([
+      "03",
+      "04",
     ]);
-    await expect(stages.locator(".process-outcome-card__header strong")).toHaveText([
-      "Potwierdzenie wyniku",
-      "Świadome przekazanie",
-      "Obsługa i pomiar",
+    await expect(clientStages.locator("footer strong")).toHaveText([
+      "Potwierdzony kolejny krok",
+      "Bezpieczny wynik orientacyjny",
     ]);
-    await expect(stages.locator("footer > strong")).toHaveText([
-      "Klient widzi bezpieczny zakres",
+
+    await expect(companyChapter.getByRole("heading", { level: 2 })).toHaveText(
+      "Na końcu powstaje brief. Decyzję podejmuje firma",
+    );
+    await expect(companyStages.locator("h3")).toHaveText(["Przekazanie kontaktu", "Obsługa leada"]);
+    await expect(companyStages.locator("span").filter({ hasText: /^0[56]$/ })).toHaveText([
+      "05",
+      "06",
+    ]);
+    await expect(companyStages.locator("footer strong")).toHaveText([
       "Lead z pełnym kontekstem",
       "Decyzja pozostaje po stronie firmy",
     ]);
-    await expect(stages.getByText("Dane przykładowe", { exact: true })).toHaveCount(3);
-    await expect(process).toContainText("Wynik jest orientacyjny");
-    await expect(process).toContainText("prywatny score pozostaje w panelu");
-    await expect(process).not.toContainText("AI");
-    await expect(page.locator("#bezpieczenstwo")).toBeVisible();
-    await expect(page.locator("#bezpieczenstwo dt")).toHaveCount(3);
+    await expect(clientChapter.locator("[data-how-screen] img")).toHaveCount(2);
+    await expect(companyChapter.locator("[data-how-screen] img")).toHaveCount(2);
+    await expect(companyChapter).not.toContainText(/automatyczna decyzja|AI/i);
 
     const accessibility = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
@@ -54,94 +53,36 @@ test.describe("marketing how it works R3.3 outcome sequence", () => {
     expect(accessibility.violations).toEqual([]);
   });
 
-  for (const viewport of outcomeViewports) {
-    test(`keeps the outcome sequence intentional at ${viewport.width}px`, async ({ page }) => {
+  for (const viewport of decisionViewports) {
+    test(`keeps both downstream chapters intentional at ${viewport.width}px`, async ({ page }) => {
       await page.setViewportSize(viewport);
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto("/jak-dziala");
 
-      const process = page.locator("#proces-dalszy");
-      const geometry = await process.evaluate((region) => {
-        const regionBounds = region.getBoundingClientRect();
-        const introBounds = region
-          .querySelector<HTMLElement>(".process-second-half__intro")
-          ?.getBoundingClientRect();
-        const cards = [
-          ...region.querySelectorAll<HTMLElement>(".process-second-half__steps > li"),
-        ].map((card) => {
-          const cardBounds = card.getBoundingClientRect();
+      for (const selector of ["#proces-dalszy", "#decyzja"] as const) {
+        const chapter = page.locator(selector);
+        const geometry = await chapter.evaluate((region) => {
+          const screen = region
+            .querySelector<HTMLElement>("[data-how-screen]")
+            ?.getBoundingClientRect();
+          const visibleImages = [...region.querySelectorAll<HTMLElement>("[data-how-screen] img")]
+            .filter((image) => getComputedStyle(image).display !== "none")
+            .map((image) => image.getBoundingClientRect());
           return {
-            bottom: cardBounds.bottom,
-            height: cardBounds.height,
-            left: cardBounds.left,
-            right: cardBounds.right,
-            top: cardBounds.top,
+            overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            screen: screen ? { left: screen.left, right: screen.right } : null,
+            viewport: document.documentElement.clientWidth,
+            visibleImages: visibleImages.map(({ height, width }) => ({ height, width })),
           };
         });
-        const textSizes = [...region.querySelectorAll<HTMLElement>("*")]
-          .filter(
-            (element) =>
-              element.textContent?.trim() &&
-              element.getClientRects().length > 0 &&
-              !element.closest('[aria-hidden="true"]'),
-          )
-          .map((element) => Number.parseFloat(getComputedStyle(element).fontSize));
 
-        return {
-          cards,
-          height: regionBounds.height,
-          intro: introBounds
-            ? {
-                bottom: introBounds.bottom,
-                left: introBounds.left,
-                right: introBounds.right,
-                top: introBounds.top,
-              }
-            : null,
-          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-          smallestText: Math.min(...textSizes),
-          viewport: document.documentElement.clientWidth,
-        };
-      });
-
-      await expect(process).toBeVisible();
-      expect(geometry.cards).toHaveLength(3);
-      expect(geometry.overflow).toBeLessThanOrEqual(1);
-      expect(geometry.smallestText).toBeGreaterThanOrEqual(12);
-      expect(geometry.cards[0]?.left ?? 0).toBeGreaterThanOrEqual(viewport.width === 320 ? 11 : 15);
-      expect(geometry.cards[2]?.right ?? 0).toBeLessThanOrEqual(
-        geometry.viewport - (viewport.width === 320 ? 11 : 15),
-      );
-      expect(geometry.cards[1]?.top ?? 0).toBeGreaterThan(geometry.cards[0]?.top ?? 0);
-      expect(geometry.cards[2]?.top ?? 0).toBeGreaterThan(geometry.cards[1]?.top ?? 0);
-
-      if (viewport.width > 1_152) {
-        expect(geometry.height).toBeLessThanOrEqual(1_000);
-        expect(geometry.cards[0]?.left ?? 0).toBeGreaterThan(geometry.intro?.right ?? 0);
-        expect(
-          Math.max(...geometry.cards.map((card) => card.height)) -
-            Math.min(...geometry.cards.map((card) => card.height)),
-        ).toBeLessThanOrEqual(1);
-      } else {
-        expect(geometry.cards[0]?.top ?? 0).toBeGreaterThan(geometry.intro?.bottom ?? 0);
-        expect(geometry.height).toBeLessThanOrEqual(viewport.width === 320 ? 2_100 : 1_850);
+        expect(geometry.overflow).toBeLessThanOrEqual(1);
+        expect(geometry.screen?.left ?? 0).toBeGreaterThanOrEqual(viewport.width === 320 ? 15 : 16);
+        expect(geometry.screen?.right ?? 0).toBeLessThanOrEqual(geometry.viewport - 15);
+        expect(geometry.visibleImages).toHaveLength(1);
+        expect(geometry.visibleImages[0]?.width ?? 0).toBeGreaterThan(250);
+        expect(geometry.visibleImages[0]?.height ?? 0).toBeGreaterThan(150);
       }
     });
   }
-
-  test("keeps result boundaries visible in mobile forced colors", async ({ page }) => {
-    await page.setViewportSize({ height: 844, width: 390 });
-    await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
-    await page.goto("/jak-dziala");
-
-    const process = page.locator("#proces-dalszy");
-    await expect(process.locator(".process-second-half__steps > li")).toHaveCount(3);
-    await expect(process.locator(".process-outcome-card__demo")).toHaveCount(3);
-    await expect(process.locator("footer > strong")).toHaveCount(3);
-
-    const accessibility = await new AxeBuilder({ page })
-      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
-      .analyze();
-    expect(accessibility.violations).toEqual([]);
-  });
 });

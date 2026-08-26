@@ -17,8 +17,10 @@ export default function WordPressPage() {
         <div className="marketing-page-hero__grid">
           <div className="marketing-page-hero__copy">
             <p className="wy-kicker marketing-eyebrow">WordPress</p>
-            <h1>Kalkulator na stronie. Dane leadów poza WordPressem.</h1>
-            <p>
+            <h1 className="wy-marketing-heading-1">
+              Kalkulator na stronie. Dane leadów poza WordPressem.
+            </h1>
+            <p className="wy-marketing-lead">
               Cienka wtyczka łączy stronę z opublikowanym procesem i osadza go jako shortcode, blok
               albo popup. Panel Kwotum pozostaje źródłem danych.
             </p>
@@ -45,7 +47,9 @@ export default function WordPressPage() {
         <div className="marketing-container">
           <div className="marketing-section__heading">
             <p className="wy-kicker marketing-eyebrow">Architektura integracji</p>
-            <h2>Wąskie połączenie zamiast drugiej bazy leadów.</h2>
+            <h2 className="wy-marketing-heading-2">
+              Wąskie połączenie zamiast drugiej bazy leadów.
+            </h2>
           </div>
           <ol className="wordpress-flow">
             <li>
@@ -75,7 +79,9 @@ export default function WordPressPage() {
         <div className="marketing-container">
           <div className="marketing-section__heading">
             <p className="wy-kicker marketing-eyebrow">Gotowy zakres konektora</p>
-            <h2>Mała powierzchnia, jawne kontrole bezpieczeństwa.</h2>
+            <h2 className="wy-marketing-heading-2">
+              Mała powierzchnia, jawne kontrole bezpieczeństwa.
+            </h2>
           </div>
           <ul className="marketing-list">
             <li>Capability i nonce dla każdej operacji administracyjnej</li>

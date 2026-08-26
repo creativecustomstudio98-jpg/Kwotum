@@ -17,6 +17,7 @@ if (! shortcode_exists('wyceno')) {
 $html = do_shortcode('[wyceno id="' . $flow_id . '" mode="popup" height="640"]');
 if (
     ! str_contains($html, '<wyceno-widget')
+    || ! str_contains($html, 'api-base="https://api.wyceno.test"')
     || ! str_contains($html, 'mode="popup"')
     || str_contains($html, 'credential')
 ) {
@@ -32,7 +33,10 @@ $block = render_block([
     'innerContent' => [],
     'innerHTML' => '',
 ]);
-if (! str_contains($block, 'public-id="' . $flow_id . '"')) {
+if (
+    ! str_contains($block, 'public-id="' . $flow_id . '"')
+    || ! str_contains($block, 'api-base="https://api.wyceno.test"')
+) {
     throw new RuntimeException('Dynamic Gutenberg render failed.');
 }
 echo 'Actual WordPress integration smoke passed.' . PHP_EOL;

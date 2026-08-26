@@ -3,7 +3,7 @@ import type { WidgetAnswer, WidgetContextInput, WidgetManifest, WidgetStep } fro
 import { WidgetSessionController, type WidgetState } from "./controller.js";
 import { createPresentationIcon } from "./presentation-icon.js";
 import { PreviewWidgetApi } from "./preview.js";
-import { LocalWidgetStorage, MemoryWidgetStorage, widgetStorageKey } from "./storage.js";
+import { LocalWidgetStorage, MemoryWidgetStorage } from "./storage.js";
 import { requestTurnstileToken } from "./turnstile.js";
 
 const elementName = "wyceno-widget";
@@ -11,6 +11,27 @@ const publicIdPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 type WidgetMode = "fullscreen" | "inline" | "popup";
+
+function idleWidgetState(): WidgetState {
+  return {
+    analyticsConsent: null,
+    analyticsError: null,
+    answers: {},
+    context: [],
+    contextConfirmed: true,
+    contextError: null,
+    currentStep: null,
+    errorMessage: null,
+    history: [],
+    manifest: null,
+    result: null,
+    status: "idle",
+    submission: null,
+    syncStatus: "synced",
+    uploadedFiles: [],
+    validationStepKey: null,
+  };
+}
 
 function create<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -31,6 +52,43 @@ function dispatchWidgetEvent(element: HTMLElement, name: string, detail?: unknow
       ...(detail === undefined ? {} : { detail }),
     }),
   );
+}
+
+export function resolveWidgetApiBase(
+  explicitBase: string | null,
+  moduleUrl: string,
+  pageOrigin: string,
+): string {
+  if (explicitBase) return explicitBase;
+  const parsedModuleUrl = new URL(moduleUrl);
+  return parsedModuleUrl.protocol === "http:" || parsedModuleUrl.protocol === "https:"
+    ? parsedModuleUrl.origin
+    : pageOrigin;
+}
+
+export function resolveBrandLogoUrl(value: string | null, pageUrl: string): string | null {
+  const candidateValue = value?.trim();
+  if (!candidateValue || candidateValue.length > 2_048) return null;
+  try {
+    const page = new URL(pageUrl);
+    const candidate = new URL(candidateValue, page);
+    if (
+      (candidate.protocol !== "http:" && candidate.protocol !== "https:") ||
+      candidate.origin !== page.origin ||
+      candidate.username !== "" ||
+      candidate.password !== ""
+    ) {
+      return null;
+    }
+    return candidate.href;
+  } catch {
+    return null;
+  }
+}
+
+function normalizedBrandText(value: string | null, fallback: string, maxLength: number): string {
+  const normalized = value?.trim().replace(/\s+/g, " ") ?? "";
+  return normalized ? normalized.slice(0, maxLength) : fallback;
 }
 
 function initials(value: string): string {
@@ -65,6 +123,9 @@ function normalizeContextInput(value: unknown): WidgetContextInput {
 export class WycenoWidgetElement extends HTMLElement {
   static observedAttributes = [
     "api-base",
+    "brand-logo-url",
+    "brand-name",
+    "brand-subtitle",
     "button-label",
     "context-values",
     "mode",
@@ -85,13 +146,17 @@ export class WycenoWidgetElement extends HTMLElement {
     privacyAccepted: false,
   };
   #contactStarted = false;
+  #connected = false;
   #contextDraft: Record<string, string> = {};
   #contextValues: WidgetContextInput = {};
   #dialog: HTMLDialogElement | null = null;
   #lastStatus: WidgetState["status"] = "idle";
   #lastStepKey: string | null = null;
+  #launched = false;
+  #localStorage: LocalWidgetStorage | null = null;
   #previewAssetUrls: Readonly<Record<string, string>> = {};
   #previewManifest: WidgetManifest | null = null;
+  #renderedState: WidgetState | null = null;
   #resizeObserver: ResizeObserver | null = null;
   #started = false;
   #unsubscribe: (() => void) | null = null;
@@ -126,8 +191,8 @@ export class WycenoWidgetElement extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this.#connected = true;
     window.addEventListener("online", this.#handleOnline);
-    window.addEventListener("storage", this.#handleStorage);
     this.#resizeObserver = new ResizeObserver((entries) => {
       const height = Math.ceil(
         entries[0]?.contentRect.height ?? this.getBoundingClientRect().height,
@@ -135,18 +200,40 @@ export class WycenoWidgetElement extends HTMLElement {
       dispatchWidgetEvent(this, "resize", { height });
     });
     this.#resizeObserver.observe(this);
-    void this.#initialize();
+    if (this.#shouldDeferInitialization()) {
+      this.#renderDeferredLauncher();
+    } else {
+      void this.#initialize();
+    }
   }
 
   disconnectedCallback(): void {
+    this.#connected = false;
     window.removeEventListener("online", this.#handleOnline);
-    window.removeEventListener("storage", this.#handleStorage);
     this.#resizeObserver?.disconnect();
     this.#unsubscribe?.();
   }
 
-  attributeChangedCallback(): void {
-    if (this.isConnected) void this.#initialize();
+  attributeChangedCallback(name: string, previous: string | null, next: string | null): void {
+    if (!this.#connected || !this.isConnected || previous === next) return;
+    if (name === "brand-logo-url" || name === "brand-name" || name === "brand-subtitle") {
+      if (this.#shouldDeferInitialization()) this.#renderDeferredLauncher();
+      else this.#updateRenderedBranding();
+      return;
+    }
+    if (name === "button-label") {
+      this.#updateLauncherLabel();
+      return;
+    }
+    if (name === "mode" && this.#controller) {
+      this.#render(this.#controller.state);
+      return;
+    }
+    if (this.#shouldDeferInitialization()) {
+      this.#renderDeferredLauncher();
+      return;
+    }
+    void this.#initialize();
   }
 
   get mode(): WidgetMode {
@@ -164,6 +251,17 @@ export class WycenoWidgetElement extends HTMLElement {
     if (this.isConnected) void this.#initialize();
   }
 
+  get compactInline(): boolean {
+    return (
+      this.mode === "inline" &&
+      (this.getAttribute("inline-layout") === "compact" || this.integratedInline)
+    );
+  }
+
+  get integratedInline(): boolean {
+    return this.mode === "inline" && this.getAttribute("inline-layout") === "integrated";
+  }
+
   get previewManifest(): WidgetManifest | null {
     return this.#previewManifest;
   }
@@ -179,11 +277,50 @@ export class WycenoWidgetElement extends HTMLElement {
 
   set previewManifest(value: WidgetManifest | null) {
     this.#previewManifest = value ? structuredClone(value) : null;
-    if (this.isConnected) void this.#initialize();
+    if (!this.isConnected) return;
+    if (this.#shouldDeferInitialization()) {
+      this.#renderDeferredLauncher();
+      return;
+    }
+    void this.#initialize();
   }
 
   get previewMode(): boolean {
     return this.hasAttribute("preview") && this.#previewManifest !== null;
+  }
+
+  #shouldDeferInitialization(): boolean {
+    return this.mode !== "inline" && !this.#launched && this.#controller === null;
+  }
+
+  #resetContactDraft(): void {
+    this.#contactDraft = {
+      email: "",
+      files: [],
+      marketingEmailAccepted: false,
+      name: "",
+      phone: "",
+      preferredContactChannel: "",
+      preferredContactWindow: "",
+      privacyAccepted: false,
+    };
+    this.#contactStarted = false;
+  }
+
+  #renderDeferredLauncher(): void {
+    const publicId = this.getAttribute("public-id") ?? "";
+    if (!publicIdPattern.test(publicId)) {
+      this.#renderStandaloneError("Brakuje poprawnego identyfikatora procesu.");
+      return;
+    }
+    const state = idleWidgetState();
+    const container = create("div", this.#shellClassName());
+    container.append(this.#createLauncher());
+    this.#shadow.querySelector(".wyceno-shell")?.remove();
+    this.#shadow.append(container);
+    this.#dialog = null;
+    this.#lastStatus = state.status;
+    this.#renderedState = state;
   }
 
   async #initialize(): Promise<void> {
@@ -192,9 +329,14 @@ export class WycenoWidgetElement extends HTMLElement {
       this.#renderStandaloneError("Brakuje poprawnego identyfikatora procesu.");
       return;
     }
+    if (this.#controller) this.#resetContactDraft();
     this.#unsubscribe?.();
     this.#lastStepKey = null;
-    const baseUrl = this.getAttribute("api-base") ?? window.location.origin;
+    const baseUrl = resolveWidgetApiBase(
+      this.getAttribute("api-base"),
+      import.meta.url,
+      window.location.origin,
+    );
     const attributeContext = this.getAttribute("context-values");
     if (attributeContext) {
       try {
@@ -211,7 +353,7 @@ export class WycenoWidgetElement extends HTMLElement {
         )
       : new WidgetSessionController(
           new HttpWidgetApi(baseUrl),
-          new LocalWidgetStorage(),
+          (this.#localStorage ??= new LocalWidgetStorage()),
           this.#contextValues,
         );
     this.#unsubscribe = this.#controller.subscribe((state) => this.#render(state));
@@ -219,15 +361,7 @@ export class WycenoWidgetElement extends HTMLElement {
   }
 
   readonly #handleOnline = (): void => {
-    void this.#controller?.flush();
-  };
-
-  readonly #handleStorage = (event: StorageEvent): void => {
-    if (this.previewMode) return;
-    const publicId = this.getAttribute("public-id");
-    if (publicId && event.key === widgetStorageKey(publicId) && event.newValue) {
-      void this.#initialize();
-    }
+    void this.#controller?.reconnect();
   };
 
   #render(state: WidgetState): void {
@@ -236,24 +370,32 @@ export class WycenoWidgetElement extends HTMLElement {
       this.#lastStepKey !== null &&
       renderedStepKey !== null &&
       renderedStepKey !== this.#lastStepKey;
+    if (
+      (state.status === "expired" || state.status === "submitted") &&
+      this.#lastStatus !== state.status
+    ) {
+      this.#resetContactDraft();
+    }
+    if (this.#renderedState && this.#isSyncOnlyUpdate(this.#renderedState, state)) {
+      const sync = this.#shadow.querySelector<HTMLElement>(".wyceno-sync");
+      if (sync) sync.textContent = this.#syncStatusLabel(state.syncStatus);
+      this.#renderedState = state;
+      return;
+    }
     const dialogWasOpen = this.#dialog?.open === true;
-    const container = create("div", `wyceno-shell wyceno-shell--${this.mode}`);
+    const container = create("div", this.#shellClassName());
     if (this.mode === "inline") {
       container.append(this.#renderContent(state));
     } else {
-      const launcher = create(
-        "button",
-        "wyceno-launcher",
-        this.getAttribute("button-label") ?? "Rozpocznij wycenę",
-      );
-      launcher.type = "button";
-      launcher.addEventListener("click", () => this.#openDialog());
+      const launcher = this.#createLauncher();
       container.append(launcher);
 
       const dialog = create("dialog", `wyceno-dialog wyceno-dialog--${this.mode}`);
-      const close = create("button", "wyceno-close", "Zamknij");
+      dialog.setAttribute("aria-label", "Formularz zapytania");
+      const close = create("button", "wyceno-close", "×");
       close.type = "button";
       close.setAttribute("aria-label", "Zamknij formularz");
+      close.title = "Zamknij";
       close.addEventListener("click", () => dialog.close());
       dialog.addEventListener("close", () => {
         if (this.#started && this.#controller?.state.status === "active") {
@@ -262,7 +404,7 @@ export class WycenoWidgetElement extends HTMLElement {
         launcher.focus();
         dispatchWidgetEvent(this, "closed");
       });
-      dialog.append(close, this.#renderContent(state));
+      dialog.append(this.#renderContent(state, close));
       container.append(dialog);
       this.#dialog = dialog;
     }
@@ -290,18 +432,79 @@ export class WycenoWidgetElement extends HTMLElement {
       queueMicrotask(() => {
         const progress = this.#shadow.querySelector<HTMLElement>(".wyceno-progress-region");
         const fieldset = this.#shadow.querySelector<HTMLElement>(".wyceno-form fieldset");
-        (progress ?? fieldset)?.scrollIntoView({ behavior: "instant", block: "start" });
+        const scrollTarget = progress ?? fieldset;
+        // Nie każde środowisko osadzenia implementuje scrollIntoView.
+        if (typeof scrollTarget?.scrollIntoView === "function") {
+          scrollTarget.scrollIntoView({ behavior: "instant", block: "start" });
+        }
         fieldset?.focus({ preventScroll: true });
       });
     }
     this.#lastStatus = state.status;
+    this.#renderedState = state;
+  }
+
+  #createLauncher(): HTMLButtonElement {
+    const launcher = create(
+      "button",
+      "wyceno-launcher",
+      this.getAttribute("button-label") ?? "Rozpocznij wycenę",
+    );
+    launcher.type = "button";
+    launcher.addEventListener("click", () => this.#openDialog());
+    return launcher;
+  }
+
+  #updateLauncherLabel(): void {
+    const launcher = this.#shadow.querySelector<HTMLButtonElement>(".wyceno-launcher");
+    if (launcher) {
+      launcher.textContent = this.getAttribute("button-label") ?? "Rozpocznij wycenę";
+    }
+  }
+
+  #updateRenderedBranding(): void {
+    const currentBrand = this.#shadow.querySelector<HTMLElement>(".wyceno-header .wyceno-brand");
+    if (!currentBrand) return;
+    currentBrand.replaceWith(this.#renderBrand(this.#controller?.state.manifest ?? null));
+  }
+
+  #isSyncOnlyUpdate(previous: WidgetState, next: WidgetState): boolean {
+    return (
+      previous.syncStatus !== next.syncStatus &&
+      previous.analyticsConsent === next.analyticsConsent &&
+      previous.analyticsError === next.analyticsError &&
+      previous.answers === next.answers &&
+      previous.currentStep === next.currentStep &&
+      previous.errorMessage === next.errorMessage &&
+      previous.history === next.history &&
+      previous.manifest === next.manifest &&
+      previous.result === next.result &&
+      previous.status === next.status &&
+      previous.submission === next.submission &&
+      previous.uploadedFiles === next.uploadedFiles
+    );
+  }
+
+  #syncStatusLabel(syncStatus: WidgetState["syncStatus"]): string {
+    if (this.previewMode) return "Podgląd lokalny — nic nie zapisujemy.";
+    if (syncStatus === "offline") {
+      return "Brak połączenia — odpowiedź jest zachowana na tym urządzeniu.";
+    }
+    return syncStatus === "saving" ? "Zapisujemy odpowiedź…" : "Postęp zapisany.";
   }
 
   #openDialog(): void {
-    this.#dialog?.showModal();
+    const initialization = this.#controller ? null : this.#initialize();
+    this.#launched = true;
+    if (this.#dialog && !this.#dialog.open) this.#dialog.showModal();
     this.#dialog?.querySelector<HTMLElement>("button, input, textarea")?.focus();
-    this.#controller?.trackAnalytics("widget_opened");
-    this.#controller?.trackAnalytics("cta_clicked");
+
+    const trackOpen = (): void => {
+      this.#controller?.trackAnalytics("widget_opened");
+      this.#controller?.trackAnalytics("cta_clicked");
+    };
+    if (initialization) void initialization.then(trackOpen);
+    else trackOpen();
   }
 
   #renderContext(state: WidgetState): HTMLElement {
@@ -391,8 +594,9 @@ export class WycenoWidgetElement extends HTMLElement {
     return section;
   }
 
-  #renderContent(state: WidgetState): HTMLElement {
+  #renderContent(state: WidgetState, close?: HTMLButtonElement): HTMLElement {
     const content = create("section", "wyceno-card");
+    content.dataset.status = state.status;
     content.setAttribute(
       "aria-busy",
       state.status === "loading_manifest" ||
@@ -412,8 +616,14 @@ export class WycenoWidgetElement extends HTMLElement {
       content.append(previewNotice);
     }
 
+    const manifest = state.manifest;
+    if (manifest || close) content.append(this.#renderHeader(state, manifest, close));
+
     if (state.status === "loading_manifest" || state.status === "idle") {
-      content.append(create("p", "wyceno-status", "Uruchamiamy formularz…"));
+      const loading = create("p", "wyceno-status", "Uruchamiamy formularz…");
+      loading.setAttribute("role", "status");
+      loading.setAttribute("aria-live", "polite");
+      content.append(loading);
       return content;
     }
 
@@ -436,51 +646,16 @@ export class WycenoWidgetElement extends HTMLElement {
       return content;
     }
 
-    const manifest = state.manifest;
     if (!manifest) return content;
     const quickForm = manifest.experienceMode === "quick_form";
     const visualConfigurator = manifest.experienceMode === "visual_configurator";
     if (quickForm) content.classList.add("wyceno-card--quick");
     if (visualConfigurator) content.classList.add("wyceno-card--visual");
 
-    const header = create("header", "wyceno-header");
-    const brand = create("div", "wyceno-brand");
-    const companyName = manifest.branding?.companyName ?? manifest.title;
     if (manifest.branding) {
       content.style.setProperty("--wyceno-tenant-accent", manifest.branding.accentColor);
       content.style.setProperty("--wyceno-tenant-accent-text", manifest.branding.accentTextColor);
     }
-    const brandMark = create("span", "wyceno-brand-mark", initials(companyName));
-    if (manifest.branding?.logoUrl) {
-      const logo = create("img", "wyceno-brand-logo");
-      logo.alt = `Logo ${companyName}`;
-      logo.decoding = "async";
-      logo.height = 40;
-      logo.src = manifest.branding.logoUrl;
-      logo.width = 40;
-      brandMark.replaceChildren(logo);
-    }
-    brand.append(brandMark);
-    const brandCopy = create("div");
-    brandCopy.append(create("strong", undefined, companyName));
-    brandCopy.append(create("small", undefined, manifest.title));
-    brand.append(brandCopy);
-    header.append(brand);
-
-    const sync = create("p", "wyceno-sync");
-    sync.setAttribute("role", "status");
-    sync.setAttribute("aria-live", "polite");
-    sync.textContent = this.previewMode
-      ? "Podgląd lokalny — nic nie zapisujemy."
-      : state.syncStatus === "offline"
-        ? "Brak połączenia — odpowiedź jest zachowana na tym urządzeniu."
-        : state.syncStatus === "saving"
-          ? "Zapisujemy odpowiedź…"
-          : quickForm
-            ? "Zapisano bezpiecznie."
-            : "Postęp zapisany.";
-    header.append(sync);
-    content.append(header);
 
     if (state.context.length > 0) {
       content.append(this.#renderContext(state));
@@ -521,10 +696,12 @@ export class WycenoWidgetElement extends HTMLElement {
           ? "wyceno-stage wyceno-stage--visual"
           : "wyceno-stage",
     );
-    if (state.history.length === 0 && state.status === "active") {
+    if (state.history.length === 0 && state.status === "active" && !this.integratedInline) {
       const introduction = create("div", "wyceno-introduction");
       if (!quickForm && !visualConfigurator) {
-        introduction.append(create("p", "wyceno-eyebrow", "Pierwszy krok"));
+        introduction.append(
+          create("p", "wyceno-eyebrow", `Krótki dobór · ${manifest.steps.length} pytań`),
+        );
       }
       introduction.append(create("h1", undefined, manifest.title));
       introduction.append(create("p", "wyceno-intro", manifest.intro));
@@ -542,9 +719,14 @@ export class WycenoWidgetElement extends HTMLElement {
       }
       stage.append(introduction);
     }
-    if (!quickForm && !visualConfigurator && !this.previewMode) {
-      stage.append(this.#renderAnalyticsConsent(state));
-    }
+    const analyticsConsent =
+      this.previewMode || quickForm || visualConfigurator
+        ? null
+        : this.#renderAnalyticsConsent(state);
+    const appendAnalyticsConsent = (): void => {
+      if (analyticsConsent && !analyticsConsent.isConnected) stage.append(analyticsConsent);
+    };
+    if (!this.integratedInline) appendAnalyticsConsent();
     content.append(stage);
 
     if (state.status === "calculating_result") {
@@ -561,6 +743,7 @@ export class WycenoWidgetElement extends HTMLElement {
         ),
       );
       stage.append(status);
+      appendAnalyticsConsent();
       return content;
     }
 
@@ -643,6 +826,7 @@ export class WycenoWidgetElement extends HTMLElement {
           );
         }
         stage.append(confirmation);
+        appendAnalyticsConsent();
         return content;
       }
       if (state.status === "submitting") {
@@ -653,6 +837,7 @@ export class WycenoWidgetElement extends HTMLElement {
             "Bezpiecznie zapisujemy pliki, odpowiedzi i dane kontaktowe…",
           ),
         );
+        appendAnalyticsConsent();
         return content;
       }
       if ((calculated?.action ?? manifest.result.action ?? "capture_lead") === "no_lead") {
@@ -665,6 +850,7 @@ export class WycenoWidgetElement extends HTMLElement {
       } else if (manifest.leadCapture) {
         stage.append(this.#renderLeadCapture(state));
       }
+      appendAnalyticsConsent();
       return content;
     }
 
@@ -685,7 +871,84 @@ export class WycenoWidgetElement extends HTMLElement {
         stage.append(form);
       }
     }
+    appendAnalyticsConsent();
     return content;
+  }
+
+  #renderHeader(
+    state: WidgetState,
+    manifest: WidgetManifest | null,
+    close?: HTMLButtonElement,
+  ): HTMLElement {
+    const header = create("header", "wyceno-header");
+    header.append(this.#renderBrand(manifest));
+
+    const actions = create("div", "wyceno-header-actions");
+    if (manifest) {
+      const sync = create("p", "wyceno-sync");
+      sync.setAttribute("role", "status");
+      sync.setAttribute("aria-live", "polite");
+      sync.textContent = this.#syncStatusLabel(state.syncStatus);
+      actions.append(sync);
+    }
+    if (close) actions.append(close);
+    header.append(actions);
+    return header;
+  }
+
+  #renderBrand(manifest: WidgetManifest | null): HTMLElement {
+    const fallbackName = manifest?.title ?? "Formularz zapytania";
+    const explicitName = this.getAttribute("brand-name");
+    const brandName = normalizedBrandText(explicitName, fallbackName, 120);
+    const subtitle = normalizedBrandText(
+      this.getAttribute("brand-subtitle"),
+      explicitName ? (manifest?.title ?? "Proces zapytania") : "Proces zapytania",
+      160,
+    );
+    const brand = create("div", "wyceno-brand");
+    const hasLogo =
+      resolveBrandLogoUrl(this.getAttribute("brand-logo-url"), window.location.href) !== null;
+    if (hasLogo) brand.classList.add("wyceno-brand--with-logo");
+    brand.append(
+      this.#renderBrandMark(brandName, () => {
+        brand.classList.remove("wyceno-brand--with-logo");
+      }),
+    );
+    const brandCopy = create("div", "wyceno-brand-copy");
+    brandCopy.append(create("strong", undefined, brandName));
+    brandCopy.append(create("small", undefined, subtitle));
+    brand.append(brandCopy);
+    return brand;
+  }
+
+  #renderBrandMark(brandName: string, onLogoError: () => void): HTMLElement {
+    const fallback = (): HTMLSpanElement => {
+      const mark = create("span", "wyceno-brand-mark", initials(brandName));
+      mark.setAttribute("aria-hidden", "true");
+      return mark;
+    };
+    const logoUrl = resolveBrandLogoUrl(this.getAttribute("brand-logo-url"), window.location.href);
+    if (!logoUrl) return fallback();
+
+    const wrapper = create("span", "wyceno-brand-logo");
+    const logo = create("img");
+    logo.alt = "";
+    logo.crossOrigin = "anonymous";
+    logo.decoding = "async";
+    logo.height = 52;
+    logo.referrerPolicy = "no-referrer";
+    logo.src = logoUrl;
+    logo.width = 160;
+    logo.addEventListener(
+      "error",
+      () => {
+        onLogoError();
+        wrapper.replaceWith(fallback());
+      },
+      { once: true },
+    );
+    wrapper.append(logo);
+    return wrapper;
   }
 
   #renderAnswerSummary(state: WidgetState): HTMLElement {
@@ -1034,6 +1297,9 @@ export class WycenoWidgetElement extends HTMLElement {
     if (state.errorMessage) error.textContent = state.errorMessage;
     fieldset.append(error);
 
+    const guidance = create("p", "wyceno-step-guidance");
+    guidance.id = `wyceno-guidance-${step.key}`;
+
     const actions = create("div", "wyceno-actions");
     if (state.history.length > 0) {
       const back = create("button", "wyceno-secondary", "Wstecz");
@@ -1053,16 +1319,44 @@ export class WycenoWidgetElement extends HTMLElement {
       unknown.addEventListener("click", () => this.#submitAnswer("__unknown__"));
       actions.append(unknown);
     }
-    const next = create("button", "wyceno-primary", "Dalej");
+    const next = create("button", "wyceno-primary");
     next.type = "submit";
+    next.setAttribute("aria-describedby", guidance.id);
+    next.append(create("span", undefined, "Dalej"));
+    const nextDetail = create(
+      "span",
+      "wyceno-primary-detail",
+      state.manifest?.steps.at(-1)?.key === step.key ? "Podsumowanie" : "Następne pytanie",
+    );
+    nextDetail.setAttribute("aria-hidden", "true");
+    next.append(nextDetail);
     actions.append(next);
 
-    form.append(fieldset, actions);
+    const refreshGuidance = (): void => {
+      const answer = this.#readAnswer(form, step);
+      const hasAnswer = Array.isArray(answer) ? answer.length > 0 : answer !== null;
+      next.disabled = step.required && !hasAnswer;
+      guidance.classList.toggle("is-ready", hasAnswer);
+      guidance.textContent = hasAnswer
+        ? "Gotowe — przejdź do następnego kroku."
+        : step.allowUnknown
+          ? "Wybierz odpowiedź albo użyj opcji „Nie wiem”."
+          : step.required
+            ? step.type === "multiple_choice"
+              ? "Wybierz co najmniej jedną odpowiedź."
+              : "Wybierz lub wpisz odpowiedź, aby przejść dalej."
+            : "Odpowiedz albo pomiń to pytanie.";
+    };
+
+    form.append(fieldset, guidance, actions);
+    form.addEventListener("input", refreshGuidance);
+    form.addEventListener("change", refreshGuidance);
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       const answer = this.#readAnswer(form, step);
       this.#submitAnswer(answer);
     });
+    refreshGuidance();
     return form;
   }
 
@@ -1301,6 +1595,11 @@ export class WycenoWidgetElement extends HTMLElement {
     const shell = create("div", "wyceno-shell wyceno-shell--inline");
     shell.append(alert);
     this.#shadow.append(shell);
+    this.#dialog = null;
+  }
+
+  #shellClassName(): string {
+    return `wyceno-shell wyceno-shell--${this.mode}${this.compactInline ? " wyceno-shell--inline-compact" : ""}${this.integratedInline ? " wyceno-shell--inline-integrated" : ""}`;
   }
 }
 

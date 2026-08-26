@@ -21,15 +21,15 @@ test.describe("security headers and browser attack surface", () => {
     expect(await page.locator("script").allTextContents()).not.toContain(payload);
   });
 
-  test("public CORS preflight exposes only the documented stateless methods", async ({
+  test("public CORS preflight rejects an insecure origin without wildcard access", async ({
     request,
   }) => {
     const response = await request.fetch(
       "/api/v1/public/flows/10000000-0000-4000-8000-000000000001/manifest",
-      { method: "OPTIONS" },
+      { headers: { Origin: "http://untrusted.example" }, method: "OPTIONS" },
     );
-    expect(response.status()).toBe(204);
-    expect(response.headers()["access-control-allow-origin"]).toBe("*");
+    expect(response.status()).toBe(403);
+    expect(response.headers()["access-control-allow-origin"]).toBeUndefined();
     expect(response.headers()["access-control-allow-methods"]).toBe("GET, POST, PUT, OPTIONS");
     expect(response.headers()["access-control-allow-credentials"]).toBeUndefined();
   });

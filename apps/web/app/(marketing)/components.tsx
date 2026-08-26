@@ -66,7 +66,7 @@ export function MarketingHero({
     <section className="marketing-hero marketing-container">
       <div className="marketing-hero__copy">
         <p className="wy-kicker marketing-eyebrow">{eyebrow}</p>
-        <h1>{title}</h1>
+        <h1 className="wy-marketing-heading-1">{title}</h1>
         {children}
       </div>
     </section>
@@ -116,8 +116,8 @@ export function CtaBand({ description, title }: { description: string; title: st
     <section className="marketing-container marketing-cta-band">
       <div>
         <p className="wy-kicker marketing-eyebrow">Następny krok</p>
-        <h2>{title}</h2>
-        <p>{description}</p>
+        <h2 className="wy-marketing-heading-2">{title}</h2>
+        <p className="wy-marketing-lead">{description}</p>
       </div>
       <div className="marketing-actions">
         <Link className="marketing-button marketing-button--light" href="/jak-dziala">

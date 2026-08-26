@@ -52,6 +52,10 @@ allowlistę originów, prywatne rozproszone kubełki limitera, audytowany zapis
 Owner/Admin oraz serwerowy guard. Odbiera `anon` i `authenticated` bezpośrednie
 wykonywanie RPC formularza; Route Handlery wykonują je jako service role
 wyłącznie po pozytywnym guardzie.
+Migracja `20260811000200_stage13d_optional_skip_json_null.sql` normalizuje SQL
+`NULL` przekazywany przez PostgREST do JSONB `null` przed walidacją odpowiedzi.
+Pozwala to pominąć wyłącznie krok opcjonalny, bez zmiany danych, sygnatury RPC
+ani minimalnych grantów `service_role`.
 
 Pliki wdrożonych migracji są niezmienne. Korekty wykonujemy nową migracją.
 Rollback aplikacji nie cofa automatycznie schematu; przed produkcyjnym
@@ -90,6 +94,13 @@ prób pozostają dla historii, retencji i DSAR; stosujemy nową migrację napraw
 Wyłącznie w pustym środowisku nowa migracja może cofnąć granty i wrapper,
 przywrócić poprzednią funkcję submitu, a następnie usunąć polityki, triggery,
 tabele i enumy w odwrotnej kolejności.
+
+Migracja `20260811000100_stage13a_notification_operations.sql` jest
+forward-only i nie zmienia danych leadów ani treści outboxu. Rollback zaczyna
+się od wyłączenia Vercel Cron, następnie przywraca poprzedni artefakt aplikacji.
+Prywatny heartbeat pozostaje w bazie; funkcji i tabeli nie usuwamy ręcznie.
+Korekta grantów, progów lub schematu wymaga nowej migracji. Szczegóły operacyjne
+są w `docs/NOTIFICATION_OPERATIONS.md`.
 
 Rollback Etapu 9 zaczyna się od wyłączenia wysyłania zdarzeń w widżecie oraz
 ukrycia dashboardu, przy zachowaniu obsługi decyzji odmowy i wycofania zgody.
@@ -142,3 +153,24 @@ kontraktu; preferowany jest jednak rollback do wersji obsługującej guard.
 Konfiguracja `public_flow_origins` pozostaje jako audyt, a wygasłe rekordy
 `app_private.public_request_buckets` mogą zostać usunięte bez utraty danych
 biznesowych. Wdrożonego pliku migracji nie edytujemy ani nie cofamy.
+
+Rollback hotfixu Etapu 13D pozostawia znormalizowane zachowanie funkcji w
+bazie, ponieważ jest kompatybilne ze starszą aplikacją i nie zmienia danych.
+Ewentualna korekta wymaga nowej migracji `create or replace function`; ręczne
+przywrócenie poprzedniego body ponownie otworzyłoby błąd 503 dla „Pomiń”.
+
+Rollback projekcji odpowiedzi Etapu 13E nie usuwa `display_answer`, backfillu
+ani triggera. Poprzednia aplikacja może bezpiecznie ignorować nowe pole, a
+trigger nadal uzupełnia je przy insertach wykonywanych przez starszy submit.
+Jeżeli resolver wymaga korekty, najpierw blokujemy nowe wysłania formularza,
+wdrażamy nową migrację naprawczą z ponownym kontrolowanym backfillem, a dopiero
+potem wznawiamy ruch. Surowe `lead_answers.answer` pozostaje nienaruszonym
+źródłem routingu, obliczeń i audytu.
+
+Ta sama migracja dopuszcza wersje v1 i v2 szablonów, lecz nowe rekordy tworzy
+jako v2. Podczas rollout workerów nie cofamy migracji ani nie przepisujemy
+rekordów kolejki. Zatrzymujemy scheduler przed migracją, wdrażamy aplikację
+obsługującą oba kontrakty i wznawiamy scheduler dopiero po smoke. Rollback
+aplikacji wymaga pozostawienia workerów zatrzymanych do czasu forward-only
+migracji naprawczej przełączającej nowe enqueue z powrotem na wersję obsługiwaną
+przez poprzedni artefakt; istniejące rekordy v1 i v2 zachowują własną wersję.

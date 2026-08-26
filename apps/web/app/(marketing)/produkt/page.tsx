@@ -1,557 +1,404 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { marketingMetadata } from "../../../lib/marketing/metadata";
-import { ArrowIcon, Breadcrumbs } from "../components";
+import styles from "./product-page.module.css";
 
 export const metadata = marketingMetadata(
   "System kwalifikacji zapytań dla firm usługowych",
-  "Poznaj Kwotum: procesy, wersjonowanie, serwerowy pricing i scoring, widget, leady, pliki, powiadomienia oraz analityka.",
+  "Poznaj Kwotum: od własnego procesu i formularza na stronie do uporządkowanego leada z budżetem, terminem, lokalizacją i materiałami.",
   "/produkt",
 );
 
+const builderFacts = [
+  "Własna kolejność pytań i sekcji",
+  "Warunki przejścia oraz reguły wyniku",
+  "Podgląd przed publikacją zmian",
+] as const;
+
+const widgetFacts = [
+  "Widżet, WordPress albo osobny link",
+  "Automatycznie zapisywany postęp",
+  "Jasno opisany wynik orientacyjny",
+] as const;
+
+const leadFacts = [
+  "Zakres, budżet, termin i lokalizacja",
+  "Odpowiedzi oraz materiały klienta",
+  "Widoczne powody dopasowania",
+] as const;
+
+const journey = [
+  ["01", "Budowa procesu", "#proces"],
+  ["02", "Widok klienta", "#doswiadczenie-klienta"],
+  ["03", "Gotowy lead", "#lead"],
+  ["04", "Zakres decyzji", "#odpowiedzialnosc"],
+] as const;
+
 export default function ProductPage() {
   return (
-    <>
-      <section
-        aria-labelledby="product-hero-title"
-        className="marketing-container marketing-page-hero product-page-hero"
-      >
-        <Breadcrumbs items={[{ href: "/", label: "Start" }, { label: "Produkt" }]} />
-        <div className="product-page-hero__layout">
-          <div className="marketing-page-hero__copy">
-            <p className="wy-kicker marketing-eyebrow">System kwalifikacji zapytań</p>
-            <h1 id="product-hero-title">
-              Jeden proces od konfiguracji do <span>gotowego leada.</span>
+    <div className={`${styles.page} wy-marketing-v7-theme`}>
+      <section aria-labelledby="product-title" className={styles.hero} data-product-hero>
+        <div className={styles.heroGrid}>
+          <div className={styles.heroCopy}>
+            <p className={styles.eyebrow}>Produkt Kwotum</p>
+            <h1 className="wy-marketing-heading-1" id="product-title">
+              <strong>Od pierwszego pytania</strong>
+              <span>do leada gotowego do rozmowy</span>
             </h1>
-            <p>
-              Firma buduje pytania i reguły, publikuje niezmienną wersję i osadza ten sam proces na
-              stronie. Kwotum potwierdza wynik na serwerze i zapisuje lead razem z pełnym kontekstem
-              zapytania.
+            <p className={`${styles.heroDescription} wy-marketing-lead`}>
+              Jeden proces prowadzi klienta, porządkuje odpowiedzi i przekazuje firmie kompletny
+              kontekst zapytania — bez przepisywania danych między formularzem, pocztą i arkuszem.
             </p>
-            <div className="marketing-actions">
-              <Link className="marketing-button" href="/jak-dziala">
-                Przejdź przez proces <ArrowIcon />
+            <div className={styles.actions} data-product-actions>
+              <Link className={styles.primaryAction} href="/jak-dziala">
+                Zobacz, jak działa
               </Link>
-              <Link className="marketing-button marketing-button--secondary" href="/funkcje">
-                Zobacz funkcje
+              <Link className={styles.secondaryAction} href="/cennik">
+                Program pilotażowy
               </Link>
             </div>
-            <aside className="product-page-hero__scope" aria-label="Zakres MVP">
-              <strong>Zakres MVP</strong>
-              <p>
-                Formularz, orientacyjny wynik, kwalifikacja, leady, powiadomienia i analityka. Bez
-                płatności i pełnego CRM.
-              </p>
-            </aside>
+            <ul aria-label="Najważniejsze właściwości produktu" className={styles.heroFacts}>
+              <li>
+                <CheckGlyph /> Własny proces
+              </li>
+              <li>
+                <CheckGlyph /> Bez integracji IT
+              </li>
+              <li>
+                <CheckGlyph /> Dla firm usługowych
+              </li>
+            </ul>
           </div>
 
-          <figure
-            aria-labelledby="product-flow-proof-title"
-            className="product-flow-proof"
-            data-product-hero-proof
-          >
-            <figcaption>
-              <span>Mapa produktu</span>
-              <strong id="product-flow-proof-title">Od wersji roboczej do gotowego leada</strong>
-              <small>Dane demonstracyjne</small>
-            </figcaption>
-            <ol>
-              <li>
-                <header>
-                  <span>01</span>
-                  <ProductFlowIcon kind="configure" />
-                </header>
-                <strong>Konfiguracja</strong>
-                <p>Firma ustala pytania, warunki oraz reguły wyniku.</p>
-                <ul>
-                  <li>Pytania i logika</li>
-                  <li>Reguły wyniku</li>
-                  <li>Treści i zgody</li>
-                </ul>
-                <em>Wersja robocza</em>
-              </li>
-              <li>
-                <header>
-                  <span>02</span>
-                  <ProductFlowIcon kind="publish" />
-                </header>
-                <strong>Publikacja</strong>
-                <p>Publikacja zamyka snapshot używany przez aktywne sesje.</p>
-                <ul>
-                  <li>Niezmienna wersja</li>
-                  <li>Widget i hosted link</li>
-                  <li>Połączenie WordPress</li>
-                </ul>
-                <em>Proces dostępny</em>
-              </li>
-              <li>
-                <header>
-                  <span>03</span>
-                  <ProductFlowIcon kind="lead" />
-                </header>
-                <strong>Gotowy lead</strong>
-                <p>Serwer potwierdza wynik i zapisuje kompletny kontekst.</p>
-                <ul>
-                  <li>Odpowiedzi i kontakt</li>
-                  <li>Budżet, termin i pliki</li>
-                  <li>Powody dopasowania</li>
-                </ul>
-                <em>Gotowy do kontaktu</em>
-              </li>
-            </ol>
-            <footer aria-label="Podział odpowiedzialności w procesie">
-              <span>Przeglądarka prowadzi</span>
-              <span>Serwer potwierdza</span>
-              <span>Firma podejmuje decyzję</span>
-            </footer>
-          </figure>
+          <HeroProductScene />
         </div>
-      </section>
 
-      <section
-        aria-labelledby="product-map-title"
-        className="marketing-section marketing-section--surface product-map-section"
-        id="mapa-produktu"
-      >
-        <div className="marketing-container product-map product-map--r2">
-          <header className="marketing-section__heading product-map__heading">
-            <div>
-              <p className="wy-kicker marketing-eyebrow">Jedna ścieżka danych</p>
-              <h2 id="product-map-title">
-                Każdy moduł dokłada kontekst do <span>jednego rekordu leada.</span>
-              </h2>
-            </div>
-            <p>
-              Pytania, wynik i kontakt nie żyją w osobnych narzędziach. Opublikowana wersja prowadzi
-              sesję, serwer potwierdza rezultat, a panel zachowuje pełny kontekst decyzji.
-            </p>
-          </header>
-
-          <ProductSystemMap />
-        </div>
-      </section>
-
-      <section
-        aria-labelledby="product-boundaries-title"
-        className="marketing-section marketing-section--dark product-boundaries-section"
-        id="granice"
-      >
-        <div className="marketing-container product-boundaries product-boundaries--r2">
-          <header className="product-boundaries__heading">
-            <div>
-              <p className="wy-kicker marketing-eyebrow">Kontrakt produktu</p>
-              <h2 id="product-boundaries-title">
-                Kwotum porządkuje proces. <span>Decyzja nadal należy do firmy.</span>
-              </h2>
-            </div>
-            <p>
-              System zbiera dane i potwierdza wynik jawnych reguł. Nie zastępuje oferty, CRM-u ani
-              oceny handlowca.
-            </p>
-          </header>
-
-          <ol aria-label="Granice odpowiedzialności produktu" className="product-boundaries__grid">
-            <li data-product-boundary>
-              <header>
-                <ProductBoundaryIcon kind="estimate" />
-                <span>01 · Wynik</span>
-                <strong>Orientacyjny wynik</strong>
-              </header>
-              <dl>
-                <div>
-                  <dt>Kwotum</dt>
-                  <dd>Potwierdza rezultat zapisanych reguł.</dd>
-                </div>
-                <div>
-                  <dt>Firma</dt>
-                  <dd>Weryfikuje zakres i przygotowuje finalną ofertę.</dd>
-                </div>
-              </dl>
-            </li>
-            <li data-product-boundary>
-              <header>
-                <ProductBoundaryIcon kind="lead" />
-                <span>02 · Obsługa</span>
-                <strong>Uporządkowany lead</strong>
-              </header>
-              <dl>
-                <div>
-                  <dt>Kwotum</dt>
-                  <dd>Zapisuje kontekst oraz status zapytania.</dd>
-                </div>
-                <div>
-                  <dt>Firma</dt>
-                  <dd>Prowadzi sprzedaż i realizację zlecenia.</dd>
-                </div>
-              </dl>
-            </li>
-            <li data-product-boundary>
-              <header>
-                <ProductBoundaryIcon kind="rules" />
-                <span>03 · Kontrola</span>
-                <strong>Jawne reguły</strong>
-              </header>
-              <dl>
-                <div>
-                  <dt>Kwotum</dt>
-                  <dd>Liczy tylko jawne, ograniczone warunki.</dd>
-                </div>
-                <div>
-                  <dt>Firma</dt>
-                  <dd>Ustala kryteria i podejmuje decyzję.</dd>
-                </div>
-              </dl>
-            </li>
+        <nav aria-label="Etapy produktu" className={styles.journeyRail} data-product-section-nav>
+          <p>Od konfiguracji do decyzji</p>
+          <ol>
+            {journey.map(([number, label, href]) => (
+              <li key={href}>
+                <Link href={href}>
+                  <span>{number}</span>
+                  <strong>{label}</strong>
+                  <i aria-hidden="true">→</i>
+                </Link>
+              </li>
+            ))}
           </ol>
+        </nav>
+      </section>
 
-          <footer aria-label="Najważniejsza granica produktu">
-            <span>Najważniejsza granica</span>
-            <strong>Niewiążący wynik zawsze wymaga weryfikacji firmy.</strong>
-          </footer>
+      <ProductChapter
+        description="Edytor odtwarza sposób kwalifikacji, który naprawdę działa w firmie. Zamiast ogólnego formularza powstaje proces oparty na realnym zakresie usługi."
+        eyebrow="Budowa procesu"
+        facts={builderFacts}
+        heading={
+          <>
+            <strong>Najpierw ustalasz,</strong>
+            <span>o co naprawdę trzeba zapytać</span>
+          </>
+        }
+        id="proces"
+        imageAlt="Edytor procesu Kwotum z listą sekcji, podglądem formularza i ustawieniami pytania"
+        imageHeight={1025}
+        imageSrc="/images/product/builder-kwotum-v1.webp"
+        imageWidth={1400}
+        mobileHeight={600}
+        mobileSrc="/images/product/builder-kwotum-mobile-v1.webp"
+        number="01"
+      />
+
+      <ProductChapter
+        description="Klient odpowiada na pytania we właściwej kolejności. Po zakończeniu otrzymuje orientacyjny wynik oraz prostą informację, co wydarzy się dalej."
+        eyebrow="Po stronie klienta"
+        facts={widgetFacts}
+        heading={
+          <>
+            <strong>Krótki proces dla klienta.</strong>
+            <span>Pełny kontekst dla firmy</span>
+          </>
+        }
+        id="doswiadczenie-klienta"
+        imageAlt="Widok wyniku procesu Kwotum z orientacyjnym przedziałem i formularzem kontaktowym"
+        imageHeight={1025}
+        imageSrc="/images/product/widget-result-kwotum-v1.webp"
+        imageWidth={1350}
+        mobileHeight={600}
+        mobileSrc="/images/product/widget-result-kwotum-mobile-v1.webp"
+        number="02"
+        tinted
+      />
+
+      <ProductChapter
+        description="Handlowiec od razu widzi usługę, zakres, budżet, termin, lokalizację i materiały — razem z wyjaśnieniem, dlaczego zapytanie pasuje."
+        eyebrow="Po stronie firmy"
+        facts={leadFacts}
+        heading={
+          <>
+            <strong>Wszystkie odpowiedzi</strong>
+            <span>w jednym, czytelnym rekordzie</span>
+          </>
+        }
+        id="lead"
+        imageAlt="Szczegóły leada w Kwotum z budżetem, terminem, lokalizacją i materiałami"
+        imageHeight={1025}
+        imageSrc="/images/product/lead-detail-kwotum-v1.webp"
+        imageWidth={1210}
+        mobileHeight={650}
+        mobileSrc="/images/product/lead-detail-kwotum-mobile-v1.webp"
+        number="03"
+      />
+
+      <section
+        aria-labelledby="responsibility-title"
+        className={styles.responsibility}
+        id="odpowiedzialnosc"
+      >
+        <header className={styles.sectionHeading}>
+          <p className={styles.eyebrow}>Zakres odpowiedzialności</p>
+          <h2 className="wy-marketing-heading-2" id="responsibility-title">
+            <strong>System porządkuje decyzję.</strong>
+            <span>Nie podejmuje jej za firmę</span>
+          </h2>
+          <p>
+            Kwotum przygotowuje wiarygodny kontekst do rozmowy. Ostateczna weryfikacja, oferta i
+            realizacja zawsze pozostają po stronie firmy.
+          </p>
+        </header>
+
+        <div className={styles.responsibilityPanel}>
+          <article data-product-responsibility>
+            <span className={styles.responsibilityNumber}>01</span>
+            <div>
+              <p>Odpowiada Kwotum</p>
+              <h3 className="wy-marketing-heading-3">Porządkuje i wyjaśnia</h3>
+              <ul>
+                <li>
+                  <CheckGlyph /> prowadzi proces i zapisuje odpowiedzi,
+                </li>
+                <li>
+                  <CheckGlyph /> potwierdza wynik reguł po stronie serwera,
+                </li>
+                <li>
+                  <CheckGlyph /> tworzy uporządkowany rekord leada.
+                </li>
+              </ul>
+            </div>
+          </article>
+          <article data-product-responsibility>
+            <span className={styles.responsibilityNumber}>02</span>
+            <div>
+              <p>Odpowiada firma</p>
+              <h3 className="wy-marketing-heading-3">Weryfikuje i decyduje</h3>
+              <ul>
+                <li>
+                  <CheckGlyph /> ustala pytania i kryteria kwalifikacji,
+                </li>
+                <li>
+                  <CheckGlyph /> weryfikuje zakres przed przygotowaniem oferty,
+                </li>
+                <li>
+                  <CheckGlyph /> prowadzi kontakt, sprzedaż i realizację.
+                </li>
+              </ul>
+            </div>
+          </article>
+          <p className={styles.disclaimer}>
+            Wynik prezentowany klientowi jest orientacyjny i nie stanowi wiążącej oferty.
+          </p>
         </div>
       </section>
 
-      <ProductFinalCta />
-    </>
+      <section
+        aria-labelledby="product-cta-title"
+        className={styles.finalCta}
+        id="product-final-cta"
+      >
+        <div className={styles.finalPanel}>
+          <div className={styles.finalBrand}>
+            <Image alt="" aria-hidden="true" height={30} src="/kwotum-logo-v3.png" width={30} />
+            <strong>kwotum</strong>
+          </div>
+          <div className={styles.finalCopy}>
+            <p className={styles.eyebrow}>Następny krok</p>
+            <h2 className="wy-marketing-heading-2" id="product-cta-title">
+              Zobacz cały proces na konkretnym przykładzie.
+            </h2>
+            <p className="wy-marketing-lead">
+              Przejdź od pierwszego pytania klienta do informacji, które otrzymuje firma po wysłaniu
+              formularza.
+            </p>
+            <div className={styles.actions}>
+              <Link className={styles.primaryAction} href="/jak-dziala">
+                Przejdź przez proces
+              </Link>
+              <Link className={styles.secondaryAction} href="/branze">
+                Zobacz zastosowania
+              </Link>
+            </div>
+          </div>
+          <ul aria-label="Zakres przykładowego procesu" className={styles.finalFacts}>
+            <li>
+              <strong>5</strong>
+              <span>grup informacji o leadzie</span>
+            </li>
+            <li>
+              <strong>1</strong>
+              <span>uporządkowany rekord</span>
+            </li>
+            <li>
+              <strong>100%</strong>
+              <span>wyjaśnialne reguły wyniku</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
   );
 }
 
-function ProductSystemMap() {
+function HeroProductScene() {
   return (
-    <figure
-      aria-labelledby="product-system-map-title"
-      className="product-system-map"
-      data-product-map-proof
-    >
-      <figcaption>
-        <span>Mapa zależności</span>
-        <strong id="product-system-map-title">Od definicji procesu do decyzji firmy</strong>
-        <small>Dane demonstracyjne</small>
-      </figcaption>
-
-      <div className="product-system-map__body">
-        <ol aria-label="Etapy prowadzące do rekordu leada" className="product-system-map__stages">
-          <li data-product-map-stage>
-            <ProductMapIcon kind="builder" />
-            <div>
-              <span>01 · Definicja</span>
-              <strong>Builder i wersje</strong>
-              <p>Draft zmienia się swobodnie. Publikacja zamyka używany snapshot.</p>
-              <em>Proces opublikowany</em>
-            </div>
-          </li>
-          <li data-product-map-stage>
-            <ProductMapIcon kind="widget" />
-            <div>
-              <span>02 · Sesja</span>
-              <strong>Widget i hosted link</strong>
-              <p>Ten sam manifest prowadzi pytania i zapisuje odpowiedzi aktywnej sesji.</p>
-              <em>Odpowiedzi zebrane</em>
-            </div>
-          </li>
-          <li data-product-map-stage>
-            <ProductMapIcon kind="score" />
-            <div>
-              <span>03 · Potwierdzenie</span>
-              <strong>Pricing i scoring</strong>
-              <p>Serwer ponownie liczy jawne, ograniczone reguły przed zapisem.</p>
-              <em>Wynik potwierdzony</em>
-            </div>
-          </li>
-        </ol>
-
-        <span aria-hidden="true" className="product-system-map__connector">
-          →
-        </span>
-
-        <section
-          aria-label="Demonstracyjny rekord leada"
-          className="product-lead-record"
-          data-product-lead-record
-        >
-          <header>
-            <div>
-              <span>Lead pipeline</span>
-              <strong>Lead L-2026-0152</strong>
-            </div>
-            <em>Gotowy do kontaktu</em>
-          </header>
-          <div className="product-lead-record__title">
-            <span>Kuchnia na wymiar</span>
-            <small>Nowe zapytanie · dane demonstracyjne</small>
-          </div>
-          <dl>
-            <div>
-              <dt>Budżet</dt>
-              <dd>30–45 tys. zł</dd>
-            </div>
-            <div>
-              <dt>Termin</dt>
-              <dd>Do 3 miesięcy</dd>
-            </div>
-            <div>
-              <dt>Lokalizacja</dt>
-              <dd>Warszawa</dd>
-            </div>
-            <div>
-              <dt>Załączniki</dt>
-              <dd>2 pliki</dd>
-            </div>
-          </dl>
-          <aside aria-label="Ocena dopasowania" className="product-lead-record__score">
-            <div>
-              <span>Dopasowanie</span>
-              <strong>
-                85<small>/100</small>
-              </strong>
-            </div>
-            <ul>
-              <li>Budżet zgodny z ofertą</li>
-              <li>Termin realny do realizacji</li>
-              <li>Zakres projektu w ofercie</li>
-            </ul>
-          </aside>
-          <footer>
-            <span>Następny krok</span>
-            <strong>Przygotuj pierwszą rozmowę</strong>
-          </footer>
-        </section>
-
-        <span aria-hidden="true" className="product-system-map__connector">
-          →
-        </span>
-
-        <ul aria-label="Działania po zapisaniu leada" className="product-system-map__outputs">
-          <li data-product-map-output>
-            <ProductMapIcon kind="notification" />
-            <div>
-              <span>Po zapisie</span>
-              <strong>Powiadomienia</strong>
-              <p>Outbox oddziela zapis leada od dostawy wiadomości.</p>
-            </div>
-          </li>
-          <li data-product-map-output>
-            <ProductMapIcon kind="analytics" />
-            <div>
-              <span>Po zgodzie</span>
-              <strong>Analityka</strong>
-              <p>Agregaty pokazują konwersję i drop-off z ochroną małej próby.</p>
-            </div>
-          </li>
-          <li className="product-system-map__decision">
-            <span>Decyzja należy do firmy</span>
-            <strong>System porządkuje. Handlowiec ocenia kolejny krok.</strong>
-          </li>
-        </ul>
+    <figure className={styles.heroScene} data-product-hero-proof>
+      <div className={styles.sceneGlow} />
+      <div className={styles.dashboardFrame}>
+        <ScreenChrome label="Panel firmy" />
+        <Image
+          alt="Panel Kwotum z przeglądem leadów, procesów i wyników"
+          className={styles.dashboardImage}
+          height={650}
+          priority
+          sizes="(max-width: 640px) 1px, 760px"
+          src="/images/product/dashboard-kwotum-v1.webp"
+          width={1184}
+        />
       </div>
-
-      <footer aria-label="Zasady integralności rekordu">
-        <span>Jedna wersja procesu</span>
-        <span>Wynik potwierdzony na serwerze</span>
-        <span>Jeden uporządkowany rekord</span>
-      </footer>
+      <div className={styles.mobileFrame}>
+        <span aria-hidden="true" className={styles.mobileCamera} />
+        <Image
+          alt="Mobilna lista leadów w panelu Kwotum"
+          className={styles.mobileImage}
+          height={600}
+          priority
+          sizes="(max-width: 640px) calc(100vw - 32px), 220px"
+          src="/images/product/dashboard-kwotum-mobile-v1.webp"
+          width={390}
+        />
+      </div>
+      <figcaption>
+        <span>Panel Kwotum</span>
+        <span>Dane demonstracyjne</span>
+      </figcaption>
     </figure>
   );
 }
 
-function ProductBoundaryIcon({ kind }: { kind: "estimate" | "lead" | "rules" }) {
-  if (kind === "estimate") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M7 3.5h8l3 3V20.5H7z" />
-        <path d="M15 3.5v4h4M10 11h5M10 14.5h3.5" />
-      </svg>
-    );
-  }
+function ProductChapter({
+  description,
+  eyebrow,
+  facts,
+  heading,
+  id,
+  imageAlt,
+  imageHeight,
+  imageSrc,
+  imageWidth,
+  mobileHeight,
+  mobileSrc,
+  number,
+  tinted = false,
+}: {
+  description: string;
+  eyebrow: string;
+  facts: readonly string[];
+  heading: React.ReactNode;
+  id: string;
+  imageAlt: string;
+  imageHeight: number;
+  imageSrc: string;
+  imageWidth: number;
+  mobileHeight: number;
+  mobileSrc: string;
+  number: string;
+  tinted?: boolean;
+}) {
+  const titleId = `${id}-title`;
 
-  if (kind === "lead") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <circle cx="9" cy="8" r="3" />
-        <path d="M3.8 18.5c.6-3.2 2.4-4.8 5.2-4.8s4.6 1.6 5.2 4.8M16 10.5l1.5 1.5 3-3" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24">
-      <path d="M5 7h14M5 17h14M8 4v6M16 14v6" />
-      <circle cx="8" cy="7" r="2" />
-      <circle cx="16" cy="17" r="2" />
-    </svg>
-  );
-}
-
-function ProductFinalCta() {
   return (
     <section
-      aria-labelledby="product-final-cta-title"
-      className="marketing-section product-final-cta"
-      id="product-final-cta"
+      aria-labelledby={titleId}
+      className={`${styles.chapter} ${tinted ? styles.chapterTinted : ""}`}
+      data-product-feature
+      id={id}
     >
-      <div className="marketing-container product-final-cta__panel">
-        <div className="product-final-cta__copy">
-          <p className="wy-kicker marketing-eyebrow">Następny krok</p>
-          <h2 id="product-final-cta-title">
-            Zobacz cały proces na <span>realnym zapytaniu.</span>
-          </h2>
-          <p>
-            Przejdź przez sześć etapów od konfiguracji do gotowego leada. Jeśli pracujesz już w
-            programie pilotażowym, otwórz panel.
-          </p>
-          <div className="marketing-actions">
-            <Link className="marketing-button" href="/jak-dziala">
-              Zobacz cały proces <ArrowIcon />
-            </Link>
-            <Link
-              className="marketing-button marketing-button--secondary"
-              href="/logowanie"
-              prefetch={false}
-            >
-              Przejdź do panelu
-            </Link>
-          </div>
-          <ul aria-label="Zasady procesu">
-            <li>Jawne reguły</li>
-            <li>Wynik orientacyjny</li>
-            <li>Decyzja firmy</li>
-          </ul>
-        </div>
+      <header className={styles.sectionHeading}>
+        <p className={styles.eyebrow}>{eyebrow}</p>
+        <h2 className="wy-marketing-heading-2" id={titleId}>
+          {heading}
+        </h2>
+        <p className="wy-marketing-lead">{description}</p>
+      </header>
 
-        <aside aria-labelledby="product-overview-title" data-product-overview>
-          <header>
-            <span>Overview produktu</span>
-            <strong id="product-overview-title">Kwotum w jednym widoku</strong>
-          </header>
-          <ol>
-            <li>
-              <ProductOverviewIcon kind="version" />
-              <div>
-                <strong>Jedna wersja procesu</strong>
-                <p>Publikacja zamyka snapshot używany przez aktywną sesję.</p>
-              </div>
-            </li>
-            <li>
-              <ProductOverviewIcon kind="record" />
-              <div>
-                <strong>Jeden pełny rekord</strong>
-                <p>Odpowiedzi, budżet, termin, pliki i powody dopasowania.</p>
-              </div>
-            </li>
-            <li>
-              <ProductOverviewIcon kind="decision" />
-              <div>
-                <strong>Jasna odpowiedzialność</strong>
-                <p>Serwer potwierdza wynik. Firma wybiera kolejny krok.</p>
-              </div>
-            </li>
-          </ol>
-          <footer>
-            <span>Cel procesu</span>
-            <strong>Lepsza pierwsza rozmowa</strong>
-          </footer>
-        </aside>
-      </div>
+      <figure className={styles.productStage} data-product-screen>
+        <span aria-hidden="true" className={styles.stageNumber}>
+          {number}
+        </span>
+        <div className={styles.screenWindow}>
+          <ScreenChrome label="Kwotum" />
+          <Image
+            alt={imageAlt}
+            className={styles.desktopScreenImage}
+            height={imageHeight}
+            sizes="(max-width: 760px) 1px, 1260px"
+            src={imageSrc}
+            width={imageWidth}
+          />
+          <Image
+            alt={imageAlt}
+            className={styles.mobileScreenImage}
+            height={mobileHeight}
+            sizes="(max-width: 760px) calc(100vw - 48px), 1px"
+            src={mobileSrc}
+            width={390}
+          />
+        </div>
+        <figcaption>Dane demonstracyjne</figcaption>
+      </figure>
+
+      <ul aria-label={`Najważniejsze możliwości: ${eyebrow}`} className={styles.factRail}>
+        {facts.map((fact, index) => (
+          <li key={fact}>
+            <span>0{index + 1}</span>
+            <strong>{fact}</strong>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
 
-function ProductOverviewIcon({ kind }: { kind: "decision" | "record" | "version" }) {
-  if (kind === "version") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M6 4.5h12v15H6zM9 8h6M9 12h6M9 16h3" />
-        <path d="m14.5 15.5 1.5 1.5 3-3" />
-      </svg>
-    );
-  }
-
-  if (kind === "record") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M5 5.5h14v14H5zM8 9h8M8 12.5h5M8 16h4" />
-        <circle cx="16.5" cy="15.5" r="2" />
-      </svg>
-    );
-  }
-
+function ScreenChrome({ label }: { label: string }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24">
-      <circle cx="9" cy="12" r="4" />
-      <path d="m13 12 2.2 2.2L20 9.5M7.5 12l1.2 1.2L11 10.8" />
-    </svg>
+    <div aria-hidden="true" className={styles.screenChrome}>
+      <span>
+        <i />
+        <i />
+        <i />
+      </span>
+      <strong>{label}</strong>
+      <span />
+    </div>
   );
 }
 
-function ProductMapIcon({
-  kind,
-}: {
-  kind: "analytics" | "builder" | "notification" | "score" | "widget";
-}) {
-  if (kind === "builder") {
-    return (
-      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-        <path d="M6 4.5h12v15H6zM9 8h6M9 12h3M9 16h6" />
-        <circle cx="15.5" cy="12" r="1.5" />
-      </svg>
-    );
-  }
-
-  if (kind === "widget") {
-    return (
-      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-        <rect height="15" rx="2" width="18" x="3" y="4.5" />
-        <path d="M3 8.5h18M7 6.5h.01M10 6.5h.01M8 12h8M8 15.5h5" />
-      </svg>
-    );
-  }
-
-  if (kind === "score") {
-    return (
-      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-        <path d="M5 17.5a8 8 0 1 1 14 0M12 12l4-3" />
-        <circle cx="12" cy="12" r="1.5" />
-      </svg>
-    );
-  }
-
-  if (kind === "notification") {
-    return (
-      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-        <path d="M7 10a5 5 0 0 1 10 0v4l2 2H5l2-2zM10 19h4" />
-      </svg>
-    );
-  }
-
+function CheckGlyph() {
   return (
-    <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-      <path d="M5 18.5v-5M10 18.5v-9M15 18.5v-4M20 18.5v-12" />
-    </svg>
-  );
-}
-
-function ProductFlowIcon({ kind }: { kind: "configure" | "lead" | "publish" }) {
-  if (kind === "configure") {
-    return (
-      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-        <path d="M5 4.5h14v15H5zM8 8h8M8 12h5M8 16h7" />
-        <circle cx="16.5" cy="12" r="1.5" />
+    <span aria-hidden="true" className={styles.checkGlyph}>
+      <svg fill="none" viewBox="0 0 16 16">
+        <path d="m3.5 8.2 2.7 2.7 6.3-6.3" />
       </svg>
-    );
-  }
-
-  if (kind === "publish") {
-    return (
-      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-        <path d="M5 18.5h14v-8H5zM12 3.5v11M8.5 7l3.5-3.5L15.5 7" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-      <path d="M6 3.5h9l3 3v14H6zM15 3.5v3h3M9 11h6M9 14.5h3" />
-      <path d="m13.5 17 1.5 1.5 3-3" />
-    </svg>
+    </span>
   );
 }

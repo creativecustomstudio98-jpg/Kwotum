@@ -43,26 +43,40 @@ oknie awarii między dostawcą a zapisem statusu.
 
 `@wyceno/email` zawiera wersjonowane szablony:
 
-- `lead-customer-v1`;
-- `lead-company-v1`;
-- `flow-invitation-v1`.
+- historyczne, zamrożone `lead-customer-v1`, `lead-company-v1` i
+  `flow-invitation-v1`, używane wyłącznie do deterministycznego retry
+  istniejących rekordów;
+- bieżące `lead-customer-v2`, `lead-company-v2` i `flow-invitation-v2`, używane
+  przez nowe rekordy outboxu.
 
 Każdy render zwraca temat, pełny HTML i odpowiednik tekstowy. HTML ma język
 polski, tytuł, jeden główny region i nagłówek pierwszego poziomu; treść pozostaje
 czytelna bez CSS. Dane dynamiczne są escapowane, a temat usuwa znaki sterujące.
+Szablony v2 mają jawne białe tło, tabelowy układ, inline CSS i hybrydowy wrapper
+640 px dla klasycznego Outlooka. Dekoracyjny znak Kwotum jest małym rastrowym
+PNG pod absolutnym adresem HTTPS i ma pusty tekst alternatywny; sąsiadujący
+tekstowy wordmark przekazuje nazwę marki również przy zablokowanych obrazach i
+bez podwójnego odczytu przez czytnik ekranu.
 Wiadomość klienta nie zawiera prywatnego score ani linku do panelu. Wiadomość
 firmy jest samodzielnym briefem: zawiera dostępne dane kontaktowe, w tym telefon
 leada phone-first, oraz zapisane odpowiedzi. Link do tenantowego szczegółu
+leada phone-first, oraz zapisane odpowiedzi. Brief korzysta z czytelnej
+projekcji etykiet utrwalonej z immutable wersji procesu, a nie z technicznych
+kluczy opcji ani bieżącego draftu. Nieobecne opcjonalne kanały, cena i score są
+pomijane zamiast prezentowania pustych sekcji. Link do tenantowego szczegółu
 pozostaje dodatkową akcją, nie warunkiem obsługi leada.
 
-`flow-invitation-v1` służy do wysłania klientowi aktualnego hosted flow przed
+`flow-invitation-v2` służy do wysłania klientowi aktualnego hosted flow przed
 powstaniem leada. Zawiera nazwę firmy i procesu, opcjonalne imię oraz osobistą
 wiadomość i zwykły link `/f/{publicId}`. Nie zawiera score, prywatnych reguł,
 identyfikatora zaproszenia, PII w URL, piksela śledzącego ani deklaracji o
 otwarciu wiadomości.
 
 Zmiana treści lub kontraktu danych wymaga nowej wersji szablonu, testów obu
-formatów i kompatybilnego odczytu istniejących rekordów outboxu.
+formatów i kompatybilnego odczytu istniejących rekordów outboxu. Worker wybiera
+renderer wyłącznie z utrwalonego `template_version` i odrzuca niedopasowanie
+rodzaju wiadomości do wersji. Wdrożenie v2 nie aktualizuje rekordów v1 ani ich
+stabilnych kluczy idempotencji.
 
 ## Konfiguracja i uruchomienie
 
@@ -72,6 +86,8 @@ Wymagane zmienne server-side:
 EMAIL_DELIVERY_MODE=test
 EMAIL_FROM=powiadomienia@example.test
 NOTIFICATION_WORKER_SECRET=minimum-32-znaki-losowego-sekretu
+CRON_SECRET=minimum-32-znaki-odrebnego-sekretu-schedulera
+MONITORING_PROBE_SECRET=minimum-32-znaki-odrebnego-sekretu-monitoringu
 ```
 
 Tryb `test` uruchamia rzeczywisty renderer, kolejkę i zapis statusów, lecz nie
@@ -90,7 +106,7 @@ Produkcyjny nadawca może zawierać bezpieczną nazwę prezentacyjną, np.
 nowej linii i niepoprawny adres, aby nagłówek nie mógł zostać rozszerzony przez
 iniekcję.
 
-Scheduler wywołuje:
+Ręczny operator wywołuje:
 
 ```http
 POST /api/v1/internal/notifications/process
@@ -99,7 +115,14 @@ Authorization: Bearer <NOTIFICATION_WORKER_SECRET>
 
 Odpowiedź zawiera wyłącznie liczniki `claimed`, `sent`, `retrying` i `failed`.
 Endpoint zawsze używa `private, no-store`; błąd nie ujawnia odbiorcy, tematu ani
-treści. Scheduler i jego alerty produkcyjne powstają przy wdrożeniu Etapu 13.
+treści.
+
+Vercel Cron wywołuje ten sam route metodą GET co pięć minut i uwierzytelnia się
+odrębnym `CRON_SECRET`. Prywatny probe
+`GET /api/v1/internal/notifications/health` wymaga jeszcze innego
+`MONITORING_PROBE_SECRET`, zwraca wyłącznie agregaty i 503 dla przekroczonych
+progów. Pełny kontrakt, kolejność wdrożenia i runbook opisuje
+`NOTIFICATION_OPERATIONS.md`.
 
 Ten sam chroniony endpoint przetwarza również osobny outbox
 `flow_invitations`. Odpowiedź sumuje bezpieczne liczniki obu kolejek. Worker
@@ -115,10 +138,11 @@ eksport/usunięcie i procedura DSAR. Do logów i odpowiedzi workera nie trafiaj�
 e-maile, imiona, tematy, treści ani odpowiedzi leada. Dozwolone są wyłącznie
 liczniki, techniczne identyfikatory, status, kod błędu i czas.
 
-Adapter Resend jest gotowy technicznie, ale pozostaje wyłączony produkcyjnie do
-zatwierdzenia DPA, subprocesorów, regionów i transferów. Resend dokumentuje
-przechowywanie danych konta, metadanych e-mail i logów API w USA także wtedy,
-gdy region wysyłkowy jest ustawiony na UE.
+Adapter Resend został uruchomiony produkcyjnie wyłącznie dla kontrolowanej,
+syntetycznej dostawy UAT. Przyjmowanie rzeczywistych danych pilota pozostaje
+zablokowane do zatwierdzenia DPA, subprocesorów, regionów i transferów. Resend
+dokumentuje przechowywanie danych konta, metadanych e-mail i logów API w USA
+także wtedy, gdy region wysyłkowy jest ustawiony na UE.
 
 ## Weryfikacja
 
@@ -130,7 +154,8 @@ gdy region wysyłkowy jest ustawiony na UE.
   uprawnienia konfiguracji odbiorcy, izolację tenantów,
   minimalne granty, retry oraz historię prób;
 - statusy są widoczne w tenantowym szczególe leada;
-- `flow-invitation-v1` ma testy HTML/text, escapowania i braku trackingu;
+- szablony v1 mają test zamrożonego kontraktu, a v2 testy HTML/text, białej
+  powierzchni, logo HTTPS, wrappera MSO, escapowania i braku trackingu;
 - worker zaproszeń ma test sent/retry/configuration bez ruchu sieciowego;
 - `supabase/tests/flow_invitations.sql` sprawdza idempotencję, aktualną
   publikację, role, drugi tenant, minimalne granty i historię prób;

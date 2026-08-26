@@ -390,6 +390,74 @@ end;
 $$;
 
 do $$
+declare
+  created jsonb;
+  raw_token text;
+  resumed jsonb;
+  saved jsonb;
+begin
+  created := public.create_widget_session(test_support.widget_public_id());
+  raw_token := created ->> 'token';
+
+  perform public.save_widget_answer(
+    raw_token,
+    '93000000-0000-4000-8000-000000000001',
+    0,
+    'service',
+    '"premium"'::jsonb,
+    'details'
+  );
+
+  -- PostgREST maps a request JSON null to SQL NULL for the jsonb RPC
+  -- argument. The database must preserve the optional-skip semantics.
+  saved := public.save_widget_answer(
+    raw_token,
+    '93000000-0000-4000-8000-000000000002',
+    1,
+    'details',
+    null,
+    'location'
+  );
+  resumed := public.resume_widget_session(raw_token);
+  if saved ->> 'currentStepKey' <> 'location'
+    or (saved ->> 'revision')::integer <> 2
+    or resumed #> '{answers,details}' is not null
+    or resumed ->> 'currentStepKey' <> 'location'
+  then
+    raise exception 'SQL NULL did not skip an optional answer safely: % / %',
+      saved,
+      resumed;
+  end if;
+
+  created := public.create_widget_session(test_support.widget_public_id());
+  raw_token := created ->> 'token';
+  perform public.save_widget_answer(
+    raw_token,
+    '93000000-0000-4000-8000-000000000003',
+    0,
+    'service',
+    '"standard"'::jsonb,
+    'location'
+  );
+
+  begin
+    perform public.save_widget_answer(
+      raw_token,
+      '93000000-0000-4000-8000-000000000004',
+      1,
+      'location',
+      null,
+      null
+    );
+    raise exception 'SQL NULL bypassed a required answer';
+  exception
+    when check_violation then
+      null;
+  end;
+end;
+$$;
+
+do $$
 begin
   begin
     perform count(*) from public.widget_sessions;

@@ -52,9 +52,20 @@ zachowują własne kompozycje do czasu osobnego etapu.
 | Instalacja  | pełny bezstanowy preview, wysyłka hosted linku, historia, inline, popup, fullscreen, hosted, WordPress | kontrolki muszą wykonywać realne działania; preview nie tworzy sesji ani leada |
 | Integracje  | webhook i WordPress                                                                                    | sekrety tylko po stronie serwera                                               |
 | Ustawienia  | organizacja, zespół, branding, prywatność, retencja                                                    | autoryzacja serwerowa                                                          |
+| Pomoc       | wyszukiwanie, spis treści i instrukcje rzeczywistych modułów                                           | zakres filtrowany capability; bez fikcyjnego supportu                          |
 | Stany       | loading, empty, error, permission, stale, offline widget                                               | bez utraty kontekstu i danych                                                  |
 
 ## Najnowsze nadpisania wizualne
+
+### Wybór organizacji
+
+Zaakceptowany obraz z 2026-08-13 zastępuje starszą kompozycję wyłącznie na
+`/panel`: header 80 px, lewy panel informacyjny 484 px oraz prawa lista z
+wyszukiwarką i kolumnami organizacja/rola/status/aktywność. Paleta i znak są
+aktualne dla Kwotum. Firmy, domeny, role, statusy i daty z referencji nie są
+danymi produktu; ekran pokazuje wyłącznie aktywne członkostwa użytkownika i
+nie rozszerza tenant scope. Cały wiersz jest linkiem, a mobile zmienia go w
+kartę zachowując kolejność DOM.
 
 ### Builder desktop
 

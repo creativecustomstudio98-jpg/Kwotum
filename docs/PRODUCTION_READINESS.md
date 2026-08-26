@@ -1,7 +1,7 @@
 # Gotowość produkcyjna Kwotum
 
 **Status:** kanoniczny raport wykonawczy  
-**Ostatni przegląd:** 2026-08-10
+**Ostatni przegląd:** 2026-08-11
 
 **Decyzja:** **NO-GO** dla prawdziwych danych i pierwszego płacącego klienta
 

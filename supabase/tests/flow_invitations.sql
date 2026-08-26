@@ -82,6 +82,38 @@ end;
 $$;
 
 reset role;
+
+do $$
+begin
+  if exists (
+    select 1
+    from public.flow_invitations
+    where template_version <> 'flow-invitation-v2'
+  ) then
+    raise exception 'new flow invitation did not use the v2 template';
+  end if;
+
+  update public.flow_invitations
+  set template_version = 'flow-invitation-v1';
+  if exists (
+    select 1
+    from public.flow_invitations
+    where template_version <> 'flow-invitation-v1'
+  ) then
+    raise exception 'legacy v1 invitation template is no longer legal';
+  end if;
+
+  begin
+    update public.flow_invitations
+    set template_version = 'flow-invitation-v3';
+    raise exception 'flow invitation accepted an unknown template version';
+  exception
+    when check_violation then
+      null;
+  end;
+end;
+$$;
+
 set role service_role;
 
 do $$

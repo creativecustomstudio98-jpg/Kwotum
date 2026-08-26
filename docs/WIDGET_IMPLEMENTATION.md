@@ -11,7 +11,7 @@ Ten sam renderer obsługuje osadzenie i hosted link `/f/:publicId`.
 
 `@wyceno/widget` kompiluje natywne moduły ES bez frameworka runtime. Build
 aplikacji kopiuje wersjonowany artefakt do `/widget/v1/` i zatrzymuje się po
-przekroczeniu 90 KiB gzip JavaScriptu. Aktualny pomiar wynosi około 13,9 KiB
+przekroczeniu 90 KiB gzip JavaScriptu. Aktualny pomiar wynosi około 23,4 KiB
 gzip.
 
 Minimalne osadzenie:
@@ -31,6 +31,156 @@ powtórnym użyciu. Shadow DOM oraz osobny arkusz `widget.css` izolują kontrolk
 od CSS strony gospodarza. Hosted link ma `noindex`.
 
 ## Manifest v1, v2 i v3
+
+Tryb `inline` inicjalizuje sesję po podłączeniu elementu. Tryby `popup` i
+`fullscreen` przed kliknięciem launchera renderują wyłącznie przycisk: nie
+odczytują ani nie zapisują `localStorage` i nie wywołują publicznego API.
+Kliknięcie otwiera natywny `dialog`, pokazuje stan „Uruchamiamy formularz…” i
+dopiero wtedy tworzy albo wznawia sesję. `wyceno:ready` nadal oznacza gotowy
+manifest, a `wyceno:closed` zachowuje zwrot fokusu do launchera.
+
+Osadzenie inline może jawnie ustawić `inline-layout="compact"`. Tylko ten
+wariant nie dziedziczy minimalnej wysokości pełnoekranowego procesu: karta i
+formularz rosną wraz z treścią, a akcje pozostają bezpośrednio pod bieżącą
+odpowiedzią. Hosted link i zwykły `mode="inline"` zachowują pełną powierzchnię.
+Dla pytania wymaganego „Dalej” jest nieaktywne do chwili wybrania
+lub wpisania odpowiedzi; wskazówka obok akcji wyjaśnia wymagany krok i po
+uzupełnieniu potwierdza gotowość. Nie stosujemy automatycznego przejścia po
+kliknięciu opcji, ponieważ użytkownik musi móc poprawić wybór przed zapisem,
+a obsługa klawiaturą i czytnikiem ekranu pozostaje przewidywalna.
+
+`inline-layout="integrated"` rozszerza kontrakt kompaktowy dla sekcji, w której
+host zapewnia już tytuł, instrukcję i identyfikację firmy. Wariant usuwa
+wizualną kartę, powtórzony region marki i drugie wprowadzenie, ale zachowuje
+status zapisu, progress, legendę pytania, walidację i wszystkie kontrolki.
+Zgoda analityczna pozostaje opcjonalna i dostępna klawiaturą, lecz jest
+renderowana po aktywnym formularzu, aby nie udawała pierwszego obowiązkowego
+kroku. Integrator musi przekazać kompletny, kontrastowy zestaw powierzchni,
+tekstu, obramowań i fokusu; brak tokenów nadal daje bezpieczne wartości Kwotum.
+
+`api-base` powinien jawnie wskazywać origin Kwotum w kodzie instalacyjnym.
+Renderer ma kompatybilny fallback do originu własnego modułu, dzięki czemu
+starszy cross-origin embed nie próbuje wywoływać API domeny gospodarza.
+
+### On-brand launcher popupu
+
+Etykietę ustawia atrybut `button-label`. Kolory i geometria launchera mają
+ograniczony publiczny kontrakt CSS custom properties dziedziczonych przez
+Shadow DOM:
+
+| Właściwość                                 | Domyślna wartość            |
+| ------------------------------------------ | --------------------------- |
+| `--wyceno-launcher-background-color`       | akcent Kwotum               |
+| `--wyceno-launcher-border-color`           | akcent Kwotum               |
+| `--wyceno-launcher-text-color`             | `#ffffff`                   |
+| `--wyceno-launcher-border-radius`          | `5px`                       |
+| `--wyceno-launcher-hover-background-color` | kolor tła launchera         |
+| `--wyceno-launcher-hover-border-color`     | kolor obramowania launchera |
+| `--wyceno-launcher-ring-color`             | jasny akcent Kwotum         |
+
+Przykład kanciastego launchera w kolorze marki gospodarza:
+
+```css
+wyceno-widget.firma-cta {
+  --wyceno-launcher-background-color: #b84000;
+  --wyceno-launcher-border-color: #873000;
+  --wyceno-launcher-hover-background-color: #9f3800;
+  --wyceno-launcher-hover-border-color: #762900;
+  --wyceno-launcher-ring-color: #f3a36e;
+  --wyceno-launcher-border-radius: 0;
+}
+```
+
+```html
+<wyceno-widget
+  class="firma-cta"
+  public-id="LOSOWY_PUBLICZNY_UUID"
+  api-base="https://app.example"
+  mode="popup"
+  button-label="Pomóż mi dobrać rozwiązanie"
+></wyceno-widget>
+```
+
+Integrator odpowiada za kontrast własnych kolorów w stanach default, hover i
+focus. Zmienne `--wyceno-launcher-*` dotyczą wyłącznie launchera.
+
+### Ograniczony branding wnętrza embedu
+
+Osadzony widget może otrzymać tekstową nazwę marki, podtytuł i logo z originu
+strony gospodarza:
+
+```html
+<wyceno-widget
+  public-id="LOSOWY_PUBLICZNY_UUID"
+  api-base="https://app.example"
+  mode="popup"
+  brand-name="Firma"
+  brand-subtitle="Autoryzowany partner"
+  brand-logo-url="/img/logo-firmy.svg"
+></wyceno-widget>
+```
+
+`brand-logo-url` może być względnym lub absolutnym adresem HTTP(S), ale po
+rozwiązaniu musi wskazywać dokładnie origin hosta i nie może zawierać
+credentiali. `javascript:`, `data:`, obcy origin, błędny URL i URL z
+`user:password@` są odrzucane bez requestu. Obraz używa anonimowego CORS i
+`referrerpolicy="no-referrer"`. Walidowany jest URL pierwszego requestu;
+redirect HTTP jest późniejszą decyzją przeglądarki, dlatego integrator musi
+wskazać statyczny, nieprzekierowujący asset i ograniczyć `img-src` CSP strony.
+Obraz ma pusty `alt`, ponieważ w tym samym regionie zawsze pozostaje dostępna
+tekstowa `brand-name`. Przy poprawnym wordmarku nazwa jest wizualnie ukryta, aby
+jej nie dublować, a obok logo widoczny jest podtytuł. Po błędzie ładowania
+renderer pokazuje inicjały i ponownie ujawnia nazwę. Nazwa i podtytuł trafiają
+wyłącznie do `textContent`. Zmiana tych atrybutów podmienia tylko region marki —
+nie tworzy ani nie wznawia ponownie sesji, nie zastępuje formularza i nie usuwa
+niewysłanej odpowiedzi ani fokusu.
+
+Wnętrze nadal jest izolowane przez Shadow DOM. Integrator może ustawić tylko
+role z poniższej allowlisty; nie otrzymuje selektorów, `::part`, raw CSS, HTML
+ani skryptu wewnętrznego procesu:
+
+| Właściwość                               | Rola                                          |
+| ---------------------------------------- | --------------------------------------------- |
+| `--wyceno-widget-color-scheme`           | natywne kontrolki w motywie `light` / `dark`  |
+| `--wyceno-widget-font-family`            | tekst i kontrolki                             |
+| `--wyceno-widget-heading-font-family`    | nagłówki oraz legendy                         |
+| `--wyceno-widget-heading-font-weight`    | waga nagłówków                                |
+| `--wyceno-widget-heading-letter-spacing` | tracking nagłówków                            |
+| `--wyceno-widget-primary`                | wypełnione CTA, progress i zaznaczenie        |
+| `--wyceno-widget-primary-hover`          | hover wypełnionego CTA                        |
+| `--wyceno-widget-primary-text`           | tekst na wypełnionym CTA                      |
+| `--wyceno-widget-accent-text`            | kontrastowy akcent dla linków i małego tekstu |
+| `--wyceno-widget-primary-soft`           | tło zaznaczenia i ring CTA                    |
+| `--wyceno-widget-text`                   | tekst podstawowy                              |
+| `--wyceno-widget-muted`                  | tekst pomocniczy i status                     |
+| `--wyceno-widget-surface`                | powierzchnia formularza                       |
+| `--wyceno-widget-soft`                   | neutralne tło drugiego poziomu                |
+| `--wyceno-widget-border`                 | zwykłe obramowanie                            |
+| `--wyceno-widget-border-strong`          | mocne obramowanie opcji                       |
+| `--wyceno-widget-secondary-border`       | ramka secondary i zamknięcia                  |
+| `--wyceno-widget-error`                  | czytelny komunikat błędu                      |
+| `--wyceno-widget-control-radius`         | pola, opcje i przyciski                       |
+| `--wyceno-widget-panel-radius`           | karta procesu                                 |
+| `--wyceno-widget-symbol-radius`          | znak wyniku                                   |
+| `--wyceno-widget-panel-shadow`           | cień karty                                    |
+| `--wyceno-widget-backdrop`               | tło modalne popupu/fullscreen                 |
+| `--wyceno-widget-logo-width`             | szerokość logo desktop (domyślnie `160px`)    |
+| `--wyceno-widget-logo-width-mobile`      | szerokość logo do 700 px (domyślnie `122px`)  |
+
+Kolor wypełnienia i kolor małego tekstu są celowo rozdzielone: jaskrawy akcent
+może mieć dobry kontrast z ciemnym tekstem na CTA, ale niewystarczający jako
+mały tekst na bieli. Integrator odpowiada za WCAG AA całego przekazanego
+zestawu. Wartości domyślne zachowują wygląd Kwotum i kompatybilność starszych
+embedów. Role kolorystyczne są mapowane wyłącznie do właściwości CSS typu
+`color`, `background-color` i `border-color`; wartość `url(...)` jest
+odrzucana przez gramatykę właściwości i nie wykonuje requestu.
+
+Ten kontrakt jest konfiguracją konkretnego embedu. Nie trafia do publicznego
+manifestu i nie zmienia hosted linku. Automatyczny branding tenanta we
+wszystkich powierzchniach wymaga osobnego modelu danych, kontrolowanego storage,
+RLS oraz testu dwóch organizacji zgodnie z ADR-044.
+
+## Manifest v1 i v2
 
 Manifest jest jawną projekcją immutable snapshotu, a nie zwróconym draftem.
 Allowlista obejmuje:
@@ -121,7 +271,8 @@ Każdy zapis odpowiedzi ma:
 
 Klient nie może przeskoczyć do dowolnego kroku. Baza odrzuca cel różny od
 wyniku reguł. Powrót do wcześniejszej odpowiedzi przycina późniejszą gałąź i
-jej odpowiedzi. Dwie karty uzgadniają nowszą rewizję przez wznowienie.
+jej odpowiedzi. Konflikt pojedynczej wspieranej karty pobiera nowszą rewizję
+przez wznowienie i ponawia jej lokalną kolejkę.
 
 Przeglądarka przechowuje ograniczony snapshot sesji i kolejkę w `localStorage`
 originu strony gospodarza. Pozwala to zachować odpowiedź przy chwilowej utracie
@@ -129,6 +280,17 @@ sieci i wznowić proces. Shadow DOM nie jest granicą bezpieczeństwa JavaScript
 skrypty działające w tym samym originie hosta mogą odczytać jego storage.
 Dlatego token ma zakres tylko jednej sesji, sesja wygasa, dane są walidowane
 przy odczycie, a integrator musi kontrolować skrypty third-party i CSP.
+
+Storage hosta jest pomocą w odtwarzaniu, a nie sygnałem dostępności API.
+`QuotaExceededError`, tryb prywatny lub polityka hosta nie przerywają aktywnej
+sesji: bieżąca instancja zachowuje snapshot w pamięci i kontynuuje formularz.
+Zapis pomija zmianę obejmującą wyłącznie techniczne `savedAt`, aby nie wykonywać
+zbędnych operacji host storage.
+
+Pilotaż wspiera jedną aktywną kartę na sesję. Widget nie reaguje automatycznie
+na cross-tab `storage` i nie scala równoległych snapshotów. Wiele aktywnych kart
+dla tej samej sesji pozostaje niewspierane do czasu zaprojektowania osobnego,
+wersjonowanego protokołu synchronizacji.
 
 ## State machine i błędy
 
@@ -145,6 +307,43 @@ braku sieci pozostaje w `calculating_result`, zachowuje odpowiedzi i ponawia
 
 Widget pokazuje jawny loading, komunikat niedostępności, możliwość rozpoczęcia
 od nowa po wygaśnięciu oraz status zapisu przez `aria-live`.
+
+Udany serwerowy resume przy niezmienionej lokalnej generacji przywraca `synced`,
+nawet gdy późniejszy zapis lokalny albo first-party analytics zawiedzie. Nowsza
+oczekująca mutacja zachowuje jednak swój stan `saving` lub `offline` i nie jest
+nadpisywana odpowiedzią starszego resume. Błąd żądania resume pozostawia
+odtworzony lokalny formularz jako `active + offline`; nie pokazujemy w UI
+surowych wyjątków transportu, storage ani providera.
+Każdy resume zapamiętuje tożsamość sesji, rewizję i lokalną generację mutacji.
+Odpowiedź, która wróci po nowszym answer, back albo rozpoczęciu submitu, nie
+nadpisuje już bieżących odpowiedzi, kroku ani statusu. Sam udany resume może
+potwierdzić `synced` po lokalnym back, jeśli rewizja i kolejka nie zmieniły się.
+Po odzyskaniu sieci zdarzenie `online` najpierw ponawia pending flush, a jeśli
+stan nadal jest offline albo pierwszy create był recoverable, ta sama instancja
+kontrolera wykonuje jedno deduplikowane resume/create po zakończeniu trwającej
+inicjalizacji. Retry create pokazuje loading i jest serializowane z restartem.
+Ponawialny błąd sieci nie czyści snapshotu. Odpowiedź 404/410 z endpointu
+głównej sesji (`resume`, `save`, `result`, `upload` lub `submit`) usuwa wygasły
+token, snapshot, dane kontaktowe, pliki i zgody oraz przechodzi do jawnego
+`expired`, bez kolejnego automatycznego retry. Równoległy submit i pokazany już
+`submitted` mają pierwszeństwo, aby spóźnione resume nie ukryło wyniku wysłania;
+jeśli submit zawiedzie, wygaśnięcie zostanie rozpoznane przy następnym żądaniu
+głównej sesji albo przeładowaniu. Poboczna analityka pozostaje best-effort i
+sama nie wygasza aktywnego formularza. Przeciwstawne zmiany zgody analytics są
+wysyłane kolejno, z natychmiastowym lokalnym pierwszeństwem odmowy.
+Flush jest deduplikowany wyłącznie dla konkretnego właściciela sesji. Po
+restarcie nowa sesja uruchamia własny zapis bez czekania na stary request, a
+stare zakończenie nie zmienia jej statusu ani storage. Best-effort analytics
+również nie blokuje ścieżki save/result/reconnect. Po `submitted` widget zwalnia
+pamięciowy draft danych kontaktowych, zgody i referencje do plików.
+
+Przed szerszym rolloutem pozostają trzy jawne zadania: natychmiastowe uzgodnienie
+odroczonego expiry po nieudanym równoległym submit oraz ograniczone czasowo
+`AbortSignal` dla initialize/reconnect. Pilotaż pozostaje zależny od timeoutów
+transportu przeglądarki i ponowienia po `online` lub przeładowaniu.
+Nietypowy detach/reattach custom elementu wymaga ponadto osobnej generacji lub
+anulowania lifecycle, aby stary request nie dotknął współdzielonego storage;
+statyczny embed pilota Fortez nie wykonuje takiej operacji.
 
 ## API
 
@@ -194,6 +393,11 @@ Pokrycie:
 - Playwright: hosted flow, mobile, utrata sieci, axe WCAG A/AA, popup, focus
   return, agresywny CSS hosta, kontakt/upload/submit oraz wygaśnięty token
   Turnstile, brak wywołania API przed tokenem i retry ze świeżym tokenem.
+
+Callbacki `error`, `expired`, `timeout` i `unsupported` Turnstile mają testy
+jednostkowe i zwalniają instancję challenge. Realny timeout lub niedostępność
+ładowania zewnętrznego skryptu pozostają osobnym gate przed rolloutem szerszym
+niż pilotaż.
 
 Ręczny VoiceOver/NVDA, realne CSP kilku hostów i macierz starszych przeglądarek
 pozostają obowiązkowe przed produkcją.

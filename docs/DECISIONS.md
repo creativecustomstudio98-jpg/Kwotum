@@ -1277,6 +1277,138 @@ implementacji lokalnej.
 
 ## ADR-042: finalny sidebar Kwotum 256/72 i lokalny Instrument Sans
 
+## ADR-042: odseparowany Vercel Cron, prywatny heartbeat i probe outboxu
+
+**Status:** accepted dla lokalnej implementacji FTZ-04 na podstawie polecenia
+kontynuacji właściciela produktu z 2026-08-11
+
+**Decyzja:** produkcyjny outbox `notifications` i `flow_invitations` jest
+przetwarzany co pięć minut przez Vercel Cron. Ponieważ Vercel wykonuje cron jako
+HTTP GET i automatycznie przekazuje tylko `CRON_SECRET`, istniejący ręczny POST
+z `NOTIFICATION_WORKER_SECRET` pozostaje bez zmian, a GET otrzymuje odrębne
+uwierzytelnienie. Oba wywołania korzystają z tej samej idempotentnej logiki
+claim/retry i nie ufają nagłówkowi User-Agent jako kontroli dostępu.
+
+Baza utrzymuje jeden prywatny heartbeat na źródło `cron`/`manual`, z UUID
+bieżącego runu, czasami, wynikiem i wyłącznie zagregowanymi licznikami. Start
+nowego runu zastępuje bieżący token; późne zakończenie starszego, nakładającego
+się runu nie może nadpisać nowszego stanu. Narrow RPC są dostępne wyłącznie dla
+service role. Osobny `MONITORING_PROBE_SECRET` chroni zagregowany probe kolejki;
+nie współdzieli uprawnień z cronem ani ręcznym workerem.
+
+Probe zwraca 503 dla brakującego/starego/nieudanego/zawieszonego schedulera,
+wieku `pending/retry` ponad 10 minut, locku ponad 15 minut i nierozwiązanego
+`failed`. Nie zwraca tenantów, odbiorców, treści, payloadów ani danych
+dostawcy. Readiness aplikacji nie zależy od outboxu, aby awaria dostawy e-mail
+nie wycofywała zdrowych instancji obsługujących formularz.
+
+**Dlaczego:** sam fakt regularnego wejścia na route nie dowodzi, że worker
+kończy się sukcesem, a Vercel nie ponawia nieudanego cron joba. Wspólny sekret
+rozszerzałby skutki kompromitacji, a publiczny szczegółowy probe ujawniałby stan
+biznesowy kolejki. Heartbeat w bazie działa niezależnie od bezstanowej instancji
+i pozwala zewnętrznemu monitorowi wykryć zarówno ciszę schedulera, jak i
+narastanie kolejki.
+
+**Konsekwencje:** `CRON_SECRET`, `MONITORING_PROBE_SECRET` i
+`NOTIFICATION_WORKER_SECRET` muszą być różnymi, Production-only sekretami.
+Vercel Pro Trial pozwala na cykl pięciominutowy, ale downgrade do Hobby łamie
+kontrakt; przed końcem triala wymagany jest plan Pro/Enterprise lub zatwierdzony
+zastępczy scheduler. Migracja jest forward-only. Rollback zatrzymuje cron przed
+cofnięciem aplikacji i pozostawia kolejki oraz heartbeat w bazie. FTZ-04 nie
+jest zamknięte, dopóki migracja, sekrety, niezależny alert i syntetyczna dostawa
+nie zostaną potwierdzone na jednym immutable SHA.
+
+## ADR-043: historyczna projekcja odpowiedzi leada do prezentacji
+
+**Status:** accepted dla korekty jakości briefu pierwszego pilotażu Fortez na
+podstawie produkcyjnego UAT z 2026-08-11
+
+**Decyzja:** `lead_answers.answer` pozostaje niezmienioną, surową odpowiedzią
+sesji. Klucze opcji są nadal źródłem dla routingu, pricingu, scoringu, audytu i
+integracji. Osobne `lead_answers.display_answer` przechowuje tenantową projekcję
+przeznaczoną wyłącznie do prezentacji w panelu i powiadomieniach. Projekcja
+powstaje przy zapisie odpowiedzi leada z etykiet
+opcji w dokładnie tym immutable `flow_versions.snapshot`, na który wskazuje
+lead. Nie korzysta z bieżącego draftu ani późniejszej publikacji procesu.
+
+Wybór pojedynczy i wielokrotny zachowują odpowiednio etykietę oraz kolejność
+etykiet, a techniczny sentinel `__unknown__` jest prezentowany jako „Do
+ustalenia”. Tekst, liczba i wartość logiczna zachowują swój typ. Brak pasującej
+etykiety nie usuwa odpowiedzi: kontrolowany fallback zachowuje surową wartość.
+Migracja backfilluje istniejące leady przez złożony tenantowy join i ustawia
+projekcję triggerem dla nowych insertów, także gdy przez krótki czas działa
+poprzednia wersja aplikacji. Panel czyta pole przez dotychczasowe RLS
+`lead_answers`; nie rozszerzamy Sales dostępu do edytorskich `flow_versions`.
+
+**Dlaczego:** techniczne klucze są stabilnym kontraktem logiki, ale nie są
+czytelną odpowiedzią dla firmy. Nadpisanie surowego pola zniszczyłoby
+wyjaśnialność obliczeń, a rozwiązywanie etykiet z aktualnego draftu mogłoby
+zmieniać historyczny brief. Odczyt snapshotu bezpośrednio przez panel
+rozszerzałby uprawnienia ról operacyjnych i powielał logikę w wielu
+powierzchniach.
+
+**Konsekwencje:** migracja jest forward-only. Rollback aplikacji może
+ignorować nowe pole, podczas gdy trigger nadal utrzymuje spójną projekcję;
+kolumny ani backfillu nie usuwamy. Każdy nowy typ odpowiedzi lub zmiana
+kontraktu opcji wymaga parytetowego testu surowej wartości i prezentacji.
+Historycznej wiadomości już dostarczonej przez providera nie da się zmienić;
+poprawka obejmuje panel istniejącego leada oraz kolejne claimy outboxu bez
+automatycznego ponawiania zakończonej dostawy. Nowy biały renderer jest
+utrwalony jako `lead-customer-v2`, `lead-company-v2` i `flow-invitation-v2`.
+Rekordy v1 pozostają legalne i zawsze korzystają z zamrożonych rendererów v1,
+aby retry z tym samym kluczem idempotencji nie zmieniało treści. Rollout wymaga
+krótkiej pauzy workerów pomiędzy migracją włączającą nowe wersje a wdrożeniem
+aplikacji obsługującej oba kontrakty.
+
+## ADR-044: ograniczony branding wnętrza osadzonego widgetu
+
+**Status:** accepted dla poprawki wizualnej pierwszego pilotażu Fortez na
+podstawie produkcyjnego UAT z 2026-08-11
+
+**Decyzja:** osadzony `<wyceno-widget>` otrzymuje opcjonalne, prezentacyjne
+atrybuty `brand-name`, `brand-subtitle` i `brand-logo-url` oraz jawny zestaw
+zmiennych CSS `--wyceno-widget-*` opisujących role kolorów, typografii,
+geometrii, cienia, tła dialogu i szerokości logo. Renderer mapuje wyłącznie te
+role na prywatne tokeny wewnątrz Shadow DOM; nie udostępnia `::part`, surowego
+arkusza CSS, HTML ani skryptu klienta.
+
+Logo może być względnym lub absolutnym adresem HTTP(S) bez danych logowania,
+ale po rozwiązaniu musi mieć ten sam origin co strona gospodarza. Jest
+renderowane jako dekoracyjny obraz obok tekstowej nazwy marki, z inicjałami
+nazwy jako kontrolowanym fallbackiem. Nieudany, niedozwolony lub brakujący URL
+nie wykonuje kodu, a obraz nie przekazuje nagłówka `Referer` i jest ładowany w
+trybie anonimowego CORS. Walidacja obejmuje URL pierwszego requestu; redirecty
+HTTP pozostają odpowiedzialnością serwera gospodarza i jego `img-src` CSP.
+Integrator musi wskazać statyczny, nieprzekierowujący asset. Nazwa i podtytuł
+są zawsze wstawiane przez `textContent`.
+
+Kontrakt dotyczy instalacji na stronie gospodarza. Nie zmienia publicznego
+manifestu, wersji procesu, bazy, RLS, hosted linku ani podglądu w panelu.
+Automatyczne przechowywanie brandingu tenanta i jego publikacja na wszystkich
+powierzchniach pozostają osobnym etapem wymagającym kontrolowanego storage,
+walidacji Owner/Admin, publicznej projekcji bez `organization_id` i testów
+izolacji dwóch tenantów.
+
+**Dlaczego:** Shadow DOM prawidłowo chroni formularz przed agresywnym CSS
+gospodarza, ale dotychczas pozwalał dopasować wyłącznie launcher. Wnętrze
+pozostawało zielone, używało zastępczych inicjałów tytułu procesu i nie mogło
+pokazać logo klienta. Próba przebicia izolacji selektorami strony byłaby krucha,
+a dodanie Fortez do kodu SaaS złamałoby wielodostępność. Ograniczone role dają
+powtarzalny kontrakt dla kolejnych instalacji bez rozszerzania dostępu do danych
+ani uruchamiania dowolnego kodu.
+
+**Konsekwencje:** integrator odpowiada za kontrast przekazanych wartości, a
+testy referencyjnych presetów muszą potwierdzać WCAG AA. Domyślne wartości
+Kwotum zachowują kompatybilność istniejących embedów. Zmiana atrybutów marki nie
+może restartować sesji ani zastępować DOM aktywnego formularza. Role kolorów są
+używane wyłącznie w właściwościach akceptujących kolor, więc wartość `url(...)`
+jest nieważna i nie uruchamia pobrania. Popup ma strukturalny slot nagłówka dla
+statusu i przycisku zamknięcia, dzięki czemu kontrolki nie nachodzą na siebie.
+Migracja nie jest potrzebna; rollback polega na usunięciu nowych atrybutów i
+zmiennych z embedu oraz cofnięciu wersji widgetu.
+
+## ADR-045: finalny sidebar Kwotum 256/72 i lokalny Instrument Sans
+
 **Status:** accepted dla etapu P1 rebrandingu panelu na podstawie
 zaakceptowanej referencji i specyfikacji właściciela z 2026-08-13
 
@@ -1293,6 +1425,19 @@ komponentu zdefiniowanym centralnie w `packages/ui`, a nie drugim ogólnym
 systemem kolorów. Istniejące role `--wy-*` nadal sterują pozostałymi
 powierzchniami. Aktywna pozycja zachowuje fokus na nieprzyciętym linku, a
 kształt tworzy pseudo-element. Collapse zachowuje techniczny klucz
+Kwotum: 256 px w stanie rozwiniętym, 72 px w stanie zwiniętym, tło `#0d2b24`,
+trzy nazwane grupy oraz jasną aktywną zakładkę zakończoną dwoma ścięciami.
+W stanie rozwiniętym aktywna powierzchnia kończy się 16 px przed prawą
+krawędzią sidebara. W stanie zwiniętym zaczyna się równo z lewą krawędzią
+raila, bez lewego zaokrąglenia, a prawy skos kończy się 10 px przed jego prawą
+krawędzią. Nie używa gradientu,
+poświaty, blur, tekstury, cienia ani powierzchni glass. App shell ma jedno źródło szerokości
+`--kw-sidebar-width`; trasy i ekrany nie otrzymują lokalnych `margin-left`.
+
+Tokeny `--kw-sidebar-*` są ograniczonym, semantycznym kontraktem komponentu
+zdefiniowanym centralnie w `packages/ui`. Istniejące role `--wy-*` nadal sterują
+pozostałymi powierzchniami. Aktywna pozycja zachowuje fokus na nieprzyciętym
+linku, a kształt tworzy pseudo-element. Collapse zachowuje techniczny klucz
 `lorum:panel-sidebar-collapsed` wymagany przez ADR-033. Poniżej 56 rem nadal
 działa dotychczasowa mobilna dolna nawigacja i dialog „Więcej”.
 
@@ -1311,6 +1456,11 @@ rozszerzania funkcji produktu.
 
 **Konsekwencje:** testy shellu i buildera muszą przyjąć 256/72 px oraz ponownie
 zmierzyć dostępny workspace. Nazwa `Dashboard` zmienia się na `Przegląd`
+sprzeczny z zaakceptowanym kierunkiem Kwotum. Nowa referencja rozstrzyga
+charakter marki i dokładną geometrię obu stanów bez rozszerzania funkcji.
+
+**Konsekwencje:** testy shellu i buildera przyjmują 256/72 px oraz ponownie
+mierzą dostępny workspace. Nazwa `Dashboard` zmienia się na `Przegląd`
 wyłącznie w nawigacji; istniejąca trasa organizacji pozostaje bez zmian.
 Serwerowe źródła organizacji, profilu, capabilities, auth i tenant scope nie są
 modyfikowane. Rollback usuwa font i tokeny P1, przywraca 240/78 oraz poprzedni
@@ -1618,3 +1768,223 @@ odwracalnymi etapami.
 testów, builda, E2E, axe i responsive. Rollback M1–M10 przywraca wyłącznie
 tokeny, CSS i kompozycję danego modułu; nie wymaga migracji danych ani zmiany
 identyfikatorów technicznych.
+**Korekta geometrii 2026-08-13:** nowszy zaakceptowany zrzut właściciela,
+3338 × 1962 px, SHA-256
+`b08ac479744086b70850339e9a3b427dfb6509d443745887f91565989be55e4d`,
+zastępuje wcześniejszą interpretację wyłącznie w zakończeniu aktywnej pozycji.
+Jasna powierzchnia nie dochodzi już do prawego brzegu; skos pozostaje wewnątrz
+sidebara. Link, focus, routing i geometria app shellu pozostają bez zmian.
+
+Finalny zaakceptowany crop zwiniętego wariantu, 236 × 200 px, SHA-256
+`a35d9b646ed18fc1d85c23c01e8ee5da6f4a697011b652051cd43a942360334d`,
+doprecyzowuje wyjątek: po collapse jasna powierzchnia zaczyna się równo z lewą
+krawędzią raila, bez lewego zaokrąglenia, a prawy skos pozostaje wewnątrz.
+
+## ADR-046: finalny ekran wyboru organizacji oparty o aktywne członkostwo
+
+**Status:** accepted dla Etapu 12ZN na podstawie zaakceptowanej referencji
+1536 × 1024 z 2026-08-13
+
+**Decyzja:** trasa `/panel` używa odrębnej kompozycji wyboru organizacji:
+globalnego headera 80 px, lewego panelu 484 px oraz prawego obszaru z działającą
+wyszukiwarką i tabelarycznymi wierszami. Referencyjny fiolet zostaje zmapowany
+na aktualną zieleń Kwotum, a znak na logo V3. Firmy, domeny, role, statusy i
+daty widoczne na obrazie nie są kopiowane.
+
+Źródłem wierszy pozostają wyłącznie aktywne `organization_members` bieżącego
+użytkownika i nieusunięte `organizations` dostępne przez istniejące RLS.
+Wyświetlana rola jest mapą istniejących `owner/admin/sales`, a status wynika z
+członkostwa. Ostatnia aktywność pozostaje najnowszym dostępnym timestampem leada
+albo procesu; proces jest odczytywany tylko dla Ownera/Admina. Wyszukiwanie
+`GET ?q=` filtruje już pobraną tenantową listę po nazwie i slugu, bez nowego
+publicznego endpointu. Cały wiersz jest jednym linkiem do `/panel/[id]`.
+
+**Dlaczego:** poprzednia szeroka karta z metrykami i dwoma CTA nie odpowiadała
+zaakceptowanej hierarchii. Nowa referencja rozstrzyga geometrię i prezentację,
+ale zgodnie z `UI_SCREEN_SPEC.md` nie może tworzyć przykładowych organizacji,
+nowych ról ani dodatkowych uprawnień.
+
+**Konsekwencje:** liczba wierszy zależy od realnych członkostw, więc produkcja
+nie jest sztucznie dopełniana do pięciu pozycji z obrazu. Istniejący redirect
+Ownera/Admina do onboardingu pojedynczej organizacji bez procesu i serwerowy
+logout pozostają bez zmian. Poniżej 70 rem intro przechodzi nad listę; poniżej
+46 rem wiersz staje się kartą z tą samą kolejnością DOM. Rollback przywraca
+poprzedni JSX i CSS bez migracji, zmiany danych ani preferencji użytkownika.
+
+## ADR-047: podstrona produktu zgodna z systemem landing page V7
+
+**Status:** accepted dla korekty R2.V7 na podstawie porównania zaakceptowanej
+strony głównej i odrzuconej kompozycji `/produkt` z 2026-08-15
+
+**Decyzja:** `/produkt` używa dokładnie tego samego systemu wizualnego V7 co
+zaakceptowana strona główna: `wy-marketing-v7-theme`, chłodnego canvasu,
+dwukolumnowego hero copy + proof, pigułkowej etykiety, nagłówka z kontrolowanym
+podziałem bold/regular, sygnałowego raila oraz wycentrowanych nagłówków
+rozdziałów. Strona nie korzysta z ogólnego template'u `marketing-page-hero`,
+szerokich białych pasów ani naprzemiennego układu tekst/screenshot.
+
+Narracja obejmuje cztery etapy: konfigurację, doświadczenie klienta, gotowy
+lead i granicę decyzji. Trzy rozdziały produktowe mają po jednej dominującej
+scenie z rzeczywistym ekranem aplikacji i jednym krótkim railem dowodów.
+Screenshoty pochodzą wyłącznie z repozytoryjnych artefaktów visual QA, używają
+danych demonstracyjnych i są podpisane jako demonstracyjne. Nie wolno
+zastępować ich wygenerowaną ilustracją ani syntetyczną makietą panelu.
+
+Desktop i mobile używają osobnych kadrów tego samego zadania. Telefon nie
+pomniejsza desktopowego panelu: pokazuje rzeczywisty mobilny widok edytora,
+wyniku i szczegółów leada. Tła radialne, pigułki, promienie, obramowania i cienie
+są dozwolone wyłącznie w formie oraz intensywności już zaakceptowanej na home
+V7 i używają wspólnych tokenów z `packages/ui`. Sekcja odpowiedzialności jest
+jasnym, ograniczonym panelem zamiast pełnoszerokościowego ciemnego pasa.
+Forced-colors mapuje powierzchnie na `Canvas/CanvasText`.
+
+**Dlaczego:** płaska korekta redakcyjna usunęła cechy template'u, ale stworzyła
+drugi, odrębny język strony: zbyt białe szerokie pasy, doklejone screenshoty,
+ciężki ciemny blok i inny rytm typografii. Właściciel wskazał brak dopasowania
+do strony głównej. V7 jest istniejącym, zaakceptowanym źródłem geometrii i
+hierarchii, dlatego podstrona ma być jego rozwinięciem, a nie kolejnym stylem.
+
+**Konsekwencje:** zmiana nie dotyka API, auth, tenant scope, RLS, pricingu,
+scoringu, widgetu ani danych. Publiczne assety są statycznymi, bezpiecznie
+przyciętymi kopiami syntetycznych renderów QA; nie zawierają prywatnych notatek,
+adresów e-mail ani danych organizacji pilotażowej. Testy R2 mierzą sześć
+viewportów, brak overflow, właściwy kadr desktop/mobile, działające CTA,
+klawiaturę, axe i forced-colors. Visual QA zestawia `/produkt` bezpośrednio z
+zaakceptowanym pełnym renderem home V7 w 1440/390 px. Rollback przywraca
+poprzedni `page.tsx` i moduł CSS; nie wymaga migracji.
+
+## ADR-048: `/jak-dziala` jako ciągła historia procesu w systemie V7
+
+**Status:** accepted dla korekty R3.V7 na podstawie zaakceptowanej strony
+głównej i podstrony `/produkt` z 2026-08-15
+
+**Decyzja:** `/jak-dziala` używa systemu marketingowego V7 i opowiada jeden
+ciągły proces zamiast składać trasę z niezależnych, równorzędnych kart. Hero
+pokazuje rzeczywisty wynik klienta i rzeczywisty rekord leada po dwóch stronach
+jawnej granicy serwera. Sześć etapów jest widocznych od początku w jednym railu,
+a dalsza narracja ma trzy rozdziały po dwa etapy: przygotowanie i publikacja,
+sesja i wynik oraz przekazanie kontaktu i decyzja firmy.
+
+Każdy rozdział ma jedną dominującą scenę z prawdziwego ekranu produktu oraz
+krótki zapis właściciela, działania i rezultatu. Numeracja jest globalna 01–06;
+nie resetuje się w rozdziałach. Desktop i mobile używają osobnych kadrów tego
+samego zadania. Assety pochodzą z zatwierdzonego zestawu `/produkt`, zawierają
+wyłącznie dane demonstracyjne i nie są generowaną makietą interfejsu.
+
+Model bezpieczeństwa pozostaje jedną zintegrowaną powierzchnią z trzema
+niezależnymi warstwami: aplikacją i API, PostgreSQL z RLS oraz prywatnym
+storage. Nie używa certyfikatów, gwarancji ani stwierdzeń o stuprocentowym
+bezpieczeństwie. Finał strony pozostaje jasny i prowadzi wyłącznie do
+istniejących tras `/branze` oraz `/logowanie`. Cała treść jest dostępna bez
+JavaScriptu; wcześniejsze mobilne `details` nie są potrzebne, ponieważ krótka
+treść etapów i właściwy ekran tworzą jedną kolejność czytania.
+
+**Dlaczego:** poprzedni R3 był technicznie poprawny, lecz wizualnie należał do
+innego systemu niż zaakceptowane home V7 i `/produkt`: powtarzał wiele kart,
+ciemny blok outcome oraz lokalne wzorce progressive disclosure. Właściciel po
+akceptacji `/produkt` wskazał `/jak-dziala` jako następny ekran do dopasowania.
+Nowa kompozycja zachowuje kompletność informacji, ale podporządkowuje ją jednej
+historii i rzeczywistym powierzchniom produktu.
+
+**Konsekwencje:** zmiana nie dotyka API, auth, tenant scope, RLS, pricingu,
+scoringu, widgetu ani danych. Sześć dedykowanych zestawów E2E mierzy treść,
+kolejność sekcji, prawidłowe kadry, brak overflow, tryb bez JavaScriptu,
+forced-colors i axe na 320–1536 px. Minimalny tekst pozostaje co najmniej 12 px.
+Rollback przywraca poprzedni `page.tsx`, CSS i testy R3; nie wymaga migracji.
+
+## ADR-049: `/branze` jako redakcyjny indeks pięciu realnych kontekstów
+
+**Status:** accepted dla lokalnej korekty R7.V7; finalny odbiór wizualny
+właściciela pozostaje otwarty
+
+**Decyzja:** `/branze` używa systemu marketingowego V7 i pozostaje wejściem do
+pięciu istniejących tras branżowych. Hero zestawia te zastosowania na jednej
+panoramie z istniejącego, repozytoryjnego assetu. Następna sekcja pozwala
+przełączać branżę w jednym redakcyjnym układzie fotografia + opis + trzy
+prawdziwe pytania. Pełny indeks poniżej zawsze renderuje wszystkie pięć nazw,
+opisów, pytań i linków także bez JavaScriptu.
+
+Interaktywny moduł nie może imitować dashboardu ani osobnego produktu. Nie
+używa score, demonstracyjnej tabeli leada, badge'y statusu, schematu procesu,
+kart zagnieżdżonych w kartach ani syntetycznych rysunków interfejsu. Pierwszy
+lokalny wariant oparty na takim układzie został jawnie odrzucony i usunięty.
+Wybrany wariant ma jedną dominującą fotografię, ciemną powierzchnię tekstową i
+cienką nawigację pięciu branż. Zakładki obsługują strzałki, Home i End, a
+każda prowadzi do istniejącej trasy szczegółowej.
+
+**Dlaczego:** wcześniejsza strona była technicznie poprawna, ale rozpoczynała
+się pseudo-panelem, a pierwszy wariant V7 powtórzył błąd jako trzykolumnowy
+mini-dashboard. Oba rozwiązania konkurowały z treścią i wyglądały jak
+uniwersalny szablon SaaS. Redakcyjny układ pozwala porównać realne różnice
+między usługami bez udawania nowej funkcji produktu.
+
+**Konsekwencje:** nie zmieniają się API, auth, tenant scope, RLS, pricing,
+scoring, widget, model danych ani pięć tras szczegółowych. Nie dodano nowej
+zależności ani wygenerowanego obrazu. Asset branżowy pozostaje statyczny i nie
+zawiera danych klientów. Testy R7.V7 mierzą osiem viewportów 320–1536 px,
+minimalny tekst 12 px, brak overflow, działanie linków, klawiaturę, axe,
+forced-colors i wersję bez JavaScriptu. Rollback przywraca poprzedni `page.tsx`,
+moduł CSS i test R7.1; migracja nie jest potrzebna.
+
+## ADR-050: `/dla-agencji` jako jedna historia przekazania procesu i danych
+
+**Status:** accepted dla lokalnej korekty R5.V7; finalny odbiór wizualny
+właściciela pozostaje otwarty
+
+**Decyzja:** `/dla-agencji` używa systemu marketingowego V7 i prowadzi przez
+jedną kolejność: model wdrożenia, granicę danych, izolację widgetu i następny
+krok. Hero pokazuje rzeczywisty ekran panelu Kwotum, a kolejne rozdziały
+używają istniejących kadrów edytora procesu, szczegółu leada i wyniku widgetu.
+Nie powstają osobne mini-dashboardy, fikcyjne osoby ani kontrolki bez działania.
+
+Właścicielem leadów pozostaje organizacja klienta. Macierz Owner/Admin/Sales
+odtwarza rzeczywisty kontrakt uprawnień, a opis granicy danych zachowuje trzy
+warstwy kontroli: aktywną organizację, serwerowy `TenantContext` oraz RLS.
+Agencja nie otrzymuje dostępu tylko dlatego, że wdraża proces. Sekcja widgetu
+opisuje natywny element, mały loader, własne style i wąski kontrakt zdarzeń.
+Shadow DOM jest przedstawiony wyłącznie jako izolacja CSS, a nie granica
+bezpieczeństwa JavaScriptu.
+
+**Dlaczego:** wcześniejsze etapy R5.1–R5.4 były poprawne funkcjonalnie i
+bezpieczne, ale składały trasę z czterech niezależnych proofów należących do
+starszego systemu wizualnego. Beżowe powierzchnie, tablicowy plan, imitacja
+panelu ról i code-native makieta strony z widgetem wyglądały jak zestaw
+uniwersalnych sekcji SaaS. Nowa kompozycja zachowuje wszystkie kontrakty, lecz
+przenosi je do jednej redakcyjnej narracji zgodnej z zaakceptowanymi home V7,
+`/produkt`, `/jak-dziala` i `/branze`.
+
+**Konsekwencje:** zmiana nie dotyka API, auth, tenant scope, RLS, modelu danych,
+pricingu, scoringu ani runtime widgetu. Nie dodano zależności ani danych
+klientów; użyte assety zawierają wyłącznie dane demonstracyjne. Unified gate
+R5.V7 mierzy osiem viewportów 320–1536 px, prawdziwą macierz ról, brak overflow,
+minimum 12 px tekstu, klawiaturę, axe, forced-colors i kompletność treści bez
+JavaScriptu. Rollback przywraca poprzedni `page.tsx`, cztery komponenty R5,
+ich moduły CSS i testy R5.1–R5.4; migracja nie jest potrzebna.
+
+## ADR-051: jedna responsywna skala typografii dla marketingu
+
+**Status:** accepted dla korekty przekrojowej R12.T z 2026-08-15
+
+**Decyzja:** wszystkie publiczne trasy marketingowe korzystają z jednej skali
+treści zdefiniowanej w `packages/ui`: H1 ma 60/48/42 px, H2 48/40/36 px, H3
+20/20/18 px, opis sekcji 18/17/16 px, a tekst podstawowy 16 px odpowiednio dla
+desktopu, tabletu i mobile. Wspólne role mają klasy
+`wy-marketing-heading-1/2/3`, `wy-marketing-lead`, `wy-marketing-body` i
+`wy-marketing-kicker`; lokalne moduły odpowiadają za kompozycję, kolor i
+odstępy, ale nie definiują ponownie rozmiaru tych ról.
+
+Nagłówki wewnątrz demonstracyjnych ekranów produktu, formularzy, rekordów
+leada i innych code-native proofów nie dziedziczą skali strony. Są elementami
+pokazywanego interfejsu i zachowują własną, mniejszą hierarchię UI. Wyjątek nie
+obejmuje redakcyjnych kart, nagłówków sekcji ani CTA.
+
+**Dlaczego:** audyt działających tras wykazał H1 od około 48 do 75 px, H2 od
+około 17 do 64 px i różne rozmiary opisów w zależności od lokalnego arkusza.
+Powodowało to zmianę hierarchii między podstronami i wzmacniało wrażenie
+składania serwisu z niezależnych szablonów.
+
+**Konsekwencje:** nowy gate przechodzi przez 21 tras w 1440, 1024 i 390 px,
+sprawdza dokładny computed font-size każdej wspólnej roli, brak nieoznaczonych
+nagłówków treści i brak poziomego overflow. Zmiana nie dotyka copy, API, auth,
+tenant scope, danych ani runtime widgetu. Rollback usuwa wspólne role i ich
+przypisania; nie wymaga migracji.

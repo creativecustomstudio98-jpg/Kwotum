@@ -1,0 +1,14 @@
+[
+  {
+    "documentOverflow": 0,
+    "label": "1280x800",
+    "railHeight": 800,
+    "railWidth": 256
+  },
+  {
+    "documentOverflow": 0,
+    "label": "1024x768",
+    "railHeight": 768,
+    "railWidth": 256
+  }
+]

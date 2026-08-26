@@ -56,8 +56,10 @@ export default function IntegrationsPage() {
 
         <header className="integrations-reference-section__heading">
           <p className="wy-kicker marketing-eyebrow">Integracje i publikacja</p>
-          <h1 id="integrations-title">Kwotum działa z Twoim obecnym procesem</h1>
-          <p>
+          <h1 className="wy-marketing-heading-1" id="integrations-title">
+            Kwotum działa z Twoim obecnym procesem
+          </h1>
+          <p className="wy-marketing-lead">
             Publikuj ten sam proces tam, gdzie zaczynają klienci. Bez drugiej bazy leadów i bez
             przenoszenia danych do strony.
           </p>

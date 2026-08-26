@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { mkdir } from "node:fs/promises";
+import { copyFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 
 const organizationId = process.env.PANEL_E2E_ORGANIZATION_ID;
@@ -10,7 +10,7 @@ const flowId = process.env.PANEL_E2E_FLOW_ID;
 const artifactRoot = process.env.PANEL_E2E_ARTIFACT_ROOT
   ? path.resolve(process.env.PANEL_E2E_ARTIFACT_ROOT)
   : path.resolve("artifacts/visual-qa");
-const artifactDirectory = path.join(artifactRoot, "panel-minimal-v1/baseline/public-request-guard");
+const artifactDirectory = path.join(artifactRoot, "13b-ftz03a-public-guard");
 
 async function signIn(page: Page) {
   if (!organizationId || !panelEmail || !panelPassword) {
@@ -43,6 +43,7 @@ test("origin configuration and public API guard are tenant-scoped", async ({ pag
   });
   const beforePath = path.join(artifactDirectory, "before.png");
   await page.screenshot({ animations: "disabled", path: beforePath });
+  await copyFile(beforePath, path.join(artifactDirectory, "reference.png"));
   await beforeStyle.evaluate((style) => style.remove());
   const originInput = page.getByLabel("Originy witryn — po jednym w wierszu");
   await originInput.fill("https://example.test\nhttps://www.example.test");

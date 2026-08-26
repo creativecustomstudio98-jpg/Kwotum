@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { requireTenantContext } from "../../../../lib/auth/tenant-context";
+import { normalizeFlowConsentHashes } from "../../../../lib/flows/consent-hash";
 import {
   createFlowFromTemplate,
   FlowDraftConflictError,
@@ -91,8 +92,9 @@ export async function saveFlowDraftRequestAction(input: unknown): Promise<FlowAc
   }
   try {
     const context = await requireTenantContext(parsed.data.organizationId);
+    const document = normalizeFlowConsentHashes(parsed.data.document);
     const revision = await saveFlowDraft(context, {
-      document: parsed.data.document,
+      document,
       expectedDraftRevision: parsed.data.expectedDraftRevision,
       flowId: parsed.data.flowId,
       name: parsed.data.name,
@@ -110,8 +112,9 @@ export async function publishFlowDraftRequestAction(input: unknown): Promise<Flo
   }
   try {
     const context = await requireTenantContext(parsed.data.organizationId);
+    const document = normalizeFlowConsentHashes(parsed.data.document);
     const revision = await saveFlowDraft(context, {
-      document: parsed.data.document,
+      document,
       expectedDraftRevision: parsed.data.expectedDraftRevision,
       flowId: parsed.data.flowId,
       name: parsed.data.name,

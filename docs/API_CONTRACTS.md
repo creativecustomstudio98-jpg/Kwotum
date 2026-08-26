@@ -120,6 +120,10 @@ batcha generyczne 503; odpowiedzi mają `private, no-store`.
 
 ## Wewnętrzny worker powiadomień
 
+`GET /api/v1/internal/notifications/process` jest wyłącznie ścieżką Vercel
+Cron i wymaga `Authorization: Bearer <CRON_SECRET>`. Nie zastępuje ręcznego
+kontraktu poniżej i nie współdzieli z nim sekretu.
+
 `POST /api/v1/internal/notifications/process` wymaga server-side
 `Authorization: Bearer <NOTIFICATION_WORKER_SECRET>`. Nie jest endpointem
 panelu ani publicznego widgetu. Sukces zwraca wyłącznie:
@@ -132,6 +136,12 @@ Brak dostępu zwraca `UNAUTHORIZED`/401, a błąd batcha
 `NOTIFICATION_PROCESSING_FAILED`/503. Wszystkie warianty mają
 `Cache-Control: private, no-store` i nie ujawniają PII, treści ani danych
 dostawcy. Kontrakt retry i konfiguracji opisuje `docs/NOTIFICATIONS.md`.
+
+`GET /api/v1/internal/notifications/health` wymaga
+`Authorization: Bearer <MONITORING_PROBE_SECRET>`. Zwraca wyłącznie zamknięte
+kody problemów, heartbeat, liczniki i wiek kolejek; 200 oznacza zdrowy outbox,
+a 503 brak/starość/błąd schedulera, starą kolejkę, stale lock, rekord `failed`
+albo błąd zależności. Szczegóły i progi: `docs/NOTIFICATION_OPERATIONS.md`.
 
 ## Prywatność i worker retencji
 

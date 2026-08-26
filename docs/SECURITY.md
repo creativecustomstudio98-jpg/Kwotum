@@ -199,6 +199,10 @@ mimo że FTZ-03B jest zamknięte lokalnie.
 Pozostałe ryzyko PX4: przed produkcją trzeba skonfigurować i zweryfikować
 prywatny skaner malware, zatwierdzić prawa do realnych fotografii oraz przyjąć
 politykę usuwania i retencji assetów używanych przez historyczne wersje.
+Pozostałe ryzyko FTZ-03: managed widget, dokładne hostname'y i klucze Vercel
+Production only są skonfigurowane, lecz release nie został jeszcze wdrożony,
+nie wykonano smoke na rzeczywistej domenie Fortez, a Cloudflare wymaga
+zatwierdzenia jako dostawca. To nadal blokuje produkcyjny GO.
 
 ## Kontrole webhooka Etapu 12ZF
 
@@ -266,6 +270,13 @@ Pozostałe ryzyko: dostawa jest co najmniej jednokrotna, a skuteczność
 idempotency zależy także od dostawcy. Produkcyjne włączenie wymaga rotowalnego
 sekretu workera, scheduler alertów, zatwierdzonego providera/DPA/transferów i
 zweryfikowanej domeny nadawcy.
+
+Lokalny FTZ-04 rozdziela sekret automatycznego GET, ręcznego POST i probe,
+zapisuje heartbeat bez PII w `app_private` oraz odbiera `anon` i
+`authenticated` wszystkie RPC operacyjne. Probe zwraca wyłącznie agregaty i
+zamknięte kody; nie jest częścią publicznej readiness. Produkcyjne ryzyko
+pozostaje otwarte do wdrożenia migracji, rotowalnych sekretów, niezależnego
+alertu i syntetycznej dostawy na jednym SHA.
 
 ## Kontrole wdrożone w Etapie 9
 

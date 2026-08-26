@@ -6,13 +6,16 @@ import {
   type EstimationCondition,
   type FlowDocument,
   type FlowStep,
+  type LeadCapture,
 } from "@wyceno/validation";
-import { type KeyboardEvent, type SetStateAction, useMemo, useState } from "react";
+import { type FormEvent, type KeyboardEvent, type SetStateAction, useMemo, useState } from "react";
 
 import { PanelIcon } from "../../../panel-icon";
 
-export type FlowBuilderArea = "form" | "pricing" | "result" | "scoring";
+export type FlowBuilderArea = "contact" | "form" | "pricing" | "result" | "scoring";
 export type FlowBuilderPane = "inspector" | "preview" | "questions";
+
+type LeadCaptureV2 = Extract<LeadCapture, { leadCaptureSchemaVersion: 2 }>;
 
 type PricingRule = Estimation["pricing"]["rules"][number];
 type ScoringRule = Estimation["scoring"]["rules"][number];
@@ -21,10 +24,15 @@ type Currency = Estimation["pricing"]["currency"];
 const maximumMinorAmount = 9_000_000_000_000;
 const flowBuilderAreas = [
   ["form", "Formularz"],
+  ["contact", "Kontakt"],
   ["pricing", "Wycena"],
   ["scoring", "Scoring"],
   ["result", "Wynik"],
 ] as const;
+
+const defaultPrivacyLabel =
+  "Potwierdzam zapoznanie się z informacją o przetwarzaniu danych w celu obsługi zapytania.";
+const defaultPrivacyVersion = "draft-v1";
 const currencyCodes: readonly Currency[] = [
   "PLN",
   "EUR",
@@ -144,11 +152,13 @@ export function EstimationEditorWorkspace({
     <>
       <aside
         aria-label={
-          area === "pricing"
-            ? "Reguły wyceny"
-            : area === "scoring"
-              ? "Reguły scoringu"
-              : "Elementy wyniku"
+          area === "contact"
+            ? "Elementy kontaktu"
+            : area === "pricing"
+              ? "Reguły wyceny"
+              : area === "scoring"
+                ? "Reguły scoringu"
+                : "Elementy wyniku"
         }
         className={`flow-builder__questions estimation-builder__outline ${mobilePane === "questions" ? "is-mobile-active" : ""}`}
         data-layout-region="builder-questions"
@@ -160,7 +170,9 @@ export function EstimationEditorWorkspace({
             <p>{areaDescription(area)}</p>
           </div>
         </div>
-        {area === "pricing" ? (
+        {area === "contact" ? (
+          <ContactOutline leadCapture={document.leadCapture} />
+        ) : area === "pricing" ? (
           <PricingOutline
             activeRuleId={activePricingRuleId}
             estimation={estimation}
@@ -203,11 +215,19 @@ export function EstimationEditorWorkspace({
       >
         <div className="flow-builder__panel-heading">
           <div>
-            <h2>Podgląd wyniku</h2>
-            <p>Scoring pozostaje prywatny i nie jest pokazywany klientowi.</p>
+            <h2>{area === "contact" ? "Podgląd kontaktu" : "Podgląd wyniku"}</h2>
+            <p>
+              {area === "contact"
+                ? "Sprawdź wymagane dane i treść informacji prywatności."
+                : "Scoring pozostaje prywatny i nie jest pokazywany klientowi."}
+            </p>
           </div>
         </div>
-        <ResultPreview document={document} preview={preview} />
+        {area === "contact" ? (
+          <ContactPreview leadCapture={document.leadCapture} />
+        ) : (
+          <ResultPreview document={document} preview={preview} />
+        )}
       </section>
 
       <aside
@@ -219,10 +239,24 @@ export function EstimationEditorWorkspace({
         <div className="flow-builder__panel-heading">
           <div>
             <h2>Ustawienia · {areaTitle(area)}</h2>
-            <p>{estimation ? "Konfiguracja aktywna" : "Konfiguracja nieaktywna"}</p>
+            <p>
+              {area === "contact"
+                ? asLeadCaptureV2(document.leadCapture)
+                  ? "Konfiguracja aktywna"
+                  : "Konfiguracja nieaktywna"
+                : estimation
+                  ? "Konfiguracja aktywna"
+                  : "Konfiguracja nieaktywna"}
+            </p>
           </div>
         </div>
-        {area === "result" ? (
+        {area === "contact" ? (
+          <ContactSettings
+            document={document}
+            key={contactSettingsKey(document.leadCapture)}
+            onDocumentChange={onDocumentChange}
+          />
+        ) : area === "result" ? (
           <ResultSettings document={document} onDocumentChange={onDocumentChange} />
         ) : !estimation ? (
           <EstimationSetup
@@ -420,6 +454,274 @@ function ResultOutline({
           <small>{document.result.nextStepLabel}</small>
         </p>
       </div>
+    </div>
+  );
+}
+
+function ContactOutline({ leadCapture }: Readonly<{ leadCapture: FlowDocument["leadCapture"] }>) {
+  const capture = asLeadCaptureV2(leadCapture);
+  return (
+    <div className="estimation-builder__result-outline">
+      <div>
+        <span>1</span>
+        <p>
+          <strong>Dane kontaktowe</strong>
+          <small>
+            {!capture
+              ? "Konfiguracja wyłączona"
+              : capture.contactPolicy === "phone_required"
+                ? "Telefon wymagany, e-mail opcjonalny"
+                : "E-mail wymagany, telefon opcjonalny"}
+          </small>
+        </p>
+      </div>
+      <div>
+        <span>2</span>
+        <p>
+          <strong>Informacja prywatności</strong>
+          <small>{capture?.privacyNotice.version ?? "Brak wersji"}</small>
+        </p>
+      </div>
+      <div>
+        <span>3</span>
+        <p>
+          <strong>Załączniki</strong>
+          <small>{capture?.filesEnabled ? "Dozwolone" : "Wyłączone"}</small>
+        </p>
+      </div>
+      <div>
+        <span>4</span>
+        <p>
+          <strong>Marketing</strong>
+          <small>
+            {capture?.marketingEmailConsent
+              ? "Osobna zgoda skonfigurowana"
+              : "Brak zgody marketingowej"}
+          </small>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ContactPreview({ leadCapture }: Readonly<{ leadCapture: FlowDocument["leadCapture"] }>) {
+  const capture = asLeadCaptureV2(leadCapture);
+  const phoneRequired = capture?.contactPolicy === "phone_required";
+  return (
+    <div className="estimation-result-preview contact-result-preview">
+      <p className="estimation-result-preview__eyebrow">Ostatni krok</p>
+      <h3>Dane kontaktowe</h3>
+      <p>
+        {!capture
+          ? "Włącz zbieranie kontaktu, aby utworzyć lead po zakończeniu procesu."
+          : phoneRequired
+            ? "Telefon jest wymagany. Imię i e-mail możesz podać opcjonalnie."
+            : "E-mail jest wymagany. Imię i telefon możesz podać opcjonalnie."}
+      </p>
+      <div className="estimation-result-preview__summary">
+        <span>Imię lub nazwa kontaktowa · opcjonalnie</span>
+        <span>{phoneRequired ? "Telefon · wymagany" : "Telefon · opcjonalnie"}</span>
+        <span>{phoneRequired ? "E-mail · opcjonalnie" : "E-mail · wymagany"}</span>
+      </div>
+      {capture ? <p>{capture.privacyNotice.label}</p> : null}
+      <p className="estimation-result-preview__next">
+        {capture?.filesEnabled ? "Załączniki są dozwolone." : "Załączniki są wyłączone."}
+      </p>
+      <p className="estimation-result-preview__brand">Powered by Kwotum</p>
+    </div>
+  );
+}
+
+function ContactSettings({
+  document,
+  onDocumentChange,
+}: Readonly<{
+  document: FlowDocument;
+  onDocumentChange: (update: SetStateAction<FlowDocument>, group?: string) => void;
+}>) {
+  const capture = asLeadCaptureV2(document.leadCapture);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const [privacyLabel, setPrivacyLabel] = useState(
+    capture?.privacyNotice.label ?? defaultPrivacyLabel,
+  );
+  const [privacyVersion, setPrivacyVersion] = useState(
+    capture?.privacyNotice.version ?? defaultPrivacyVersion,
+  );
+  const [policyUrl, setPolicyUrl] = useState(capture?.privacyNotice.policyUrl ?? "");
+
+  const policyUrlValid = isValidOptionalHttpsUrl(policyUrl);
+  const privacyFormValid =
+    privacyLabel.trim().length >= 10 &&
+    privacyLabel.trim().length <= 500 &&
+    privacyVersion.trim().length >= 1 &&
+    privacyVersion.trim().length <= 80 &&
+    policyUrlValid;
+
+  const applyPrivacy = async (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+    if (!privacyFormValid) return;
+    setPending(true);
+    setError(null);
+    try {
+      const textHash = await sha256Hex(privacyLabel.trim());
+      onDocumentChange((current) => {
+        const currentCapture = asLeadCaptureV2(current.leadCapture);
+        if (!currentCapture) return current;
+        return {
+          ...current,
+          leadCapture: {
+            ...currentCapture,
+            privacyNotice: {
+              label: privacyLabel.trim(),
+              ...(policyUrl.trim() ? { policyUrl: policyUrl.trim() } : {}),
+              textHash,
+              version: privacyVersion.trim(),
+            },
+          },
+        };
+      }, "contact-privacy");
+    } catch {
+      setError("Nie udało się przygotować wersji informacji prywatności.");
+    } finally {
+      setPending(false);
+    }
+  };
+
+  if (!capture) {
+    return (
+      <div className="estimation-settings estimation-setup">
+        <section className="estimation-settings__intro">
+          <span aria-hidden="true">@</span>
+          <h3>Włącz bezpieczne dane kontaktowe</h3>
+          <p>
+            Wybierz wymagany kanał i zapisz wersjonowaną informację prywatności przed publikacją.
+          </p>
+        </section>
+        <button
+          className="panel-primary-button"
+          disabled={pending}
+          onClick={() => {
+            setPending(true);
+            setError(null);
+            void sha256Hex(defaultPrivacyLabel)
+              .then((textHash) => {
+                onDocumentChange((current) => ({
+                  ...current,
+                  leadCapture: {
+                    contactPolicy: "email_required",
+                    filesEnabled: false,
+                    leadCaptureSchemaVersion: 2,
+                    privacyNotice: {
+                      label: defaultPrivacyLabel,
+                      textHash,
+                      version: defaultPrivacyVersion,
+                    },
+                  },
+                }));
+              })
+              .catch(() => {
+                setError("Nie udało się włączyć konfiguracji kontaktu.");
+              })
+              .finally(() => setPending(false));
+          }}
+          type="button"
+        >
+          {pending ? "Włączam…" : "Włącz zbieranie kontaktu"}
+        </button>
+        {error ? <p className="builder-field-error">{error}</p> : null}
+      </div>
+    );
+  }
+
+  const updateCapture = (update: (current: LeadCaptureV2) => LeadCaptureV2) =>
+    onDocumentChange((current) => {
+      const currentCapture = asLeadCaptureV2(current.leadCapture);
+      return currentCapture ? { ...current, leadCapture: update(currentCapture) } : current;
+    });
+
+  return (
+    <div className="estimation-settings contact-settings">
+      <label>
+        <span>Wymagany kanał kontaktu</span>
+        <select
+          onChange={(event) => {
+            const contactPolicy = event.currentTarget.value as LeadCaptureV2["contactPolicy"];
+            updateCapture((current) => ({ ...current, contactPolicy }));
+          }}
+          value={capture.contactPolicy}
+        >
+          <option value="email_required">E-mail wymagany, telefon opcjonalny</option>
+          <option value="phone_required">Telefon wymagany, e-mail opcjonalny</option>
+        </select>
+        <small>Wymaganie jest zapisane w niezmiennej wersji opublikowanego procesu.</small>
+      </label>
+
+      <label className="question-inspector__switch">
+        <span>
+          <strong>Załączniki</strong>
+          <small>W pierwszym pilotażu pozostaw wyłączone bez produkcyjnego skanera malware.</small>
+        </span>
+        <input
+          checked={capture.filesEnabled}
+          onChange={(event) => {
+            const filesEnabled = event.currentTarget.checked;
+            updateCapture((current) => ({ ...current, filesEnabled }));
+          }}
+          type="checkbox"
+        />
+      </label>
+
+      <form className="estimation-settings" onSubmit={(event) => void applyPrivacy(event)}>
+        <label>
+          <span>Treść informacji prywatności</span>
+          <textarea
+            maxLength={500}
+            minLength={10}
+            onChange={(event) => setPrivacyLabel(event.currentTarget.value)}
+            rows={5}
+            value={privacyLabel}
+          />
+          <small>{privacyLabel.length}/500</small>
+        </label>
+        <label>
+          <span>Wersja informacji</span>
+          <input
+            maxLength={80}
+            onChange={(event) => setPrivacyVersion(event.currentTarget.value)}
+            value={privacyVersion}
+          />
+        </label>
+        <label>
+          <span>Adres polityki prywatności</span>
+          <input
+            aria-invalid={!policyUrlValid || undefined}
+            inputMode="url"
+            maxLength={500}
+            onChange={(event) => setPolicyUrl(event.currentTarget.value)}
+            placeholder="https://firma.pl/polityka-prywatnosci"
+            type="url"
+            value={policyUrl}
+          />
+          <small>Opcjonalny, ale musi używać HTTPS.</small>
+        </label>
+        {!policyUrlValid ? (
+          <p className="builder-field-error">Adres polityki musi używać HTTPS.</p>
+        ) : null}
+        <button
+          className="panel-primary-button"
+          disabled={!privacyFormValid || pending}
+          type="submit"
+        >
+          {pending ? "Zapisuję wersję…" : "Zapisz treść informacji"}
+        </button>
+      </form>
+
+      <p className="contact-settings__legal-note">
+        Zgoda marketingowa pozostaje osobna i domyślnie wyłączona. Publikacja wymaga akceptacji
+        treści przez właściwą osobę.
+      </p>
+      {error ? <p className="builder-field-error">{error}</p> : null}
     </div>
   );
 }
@@ -1689,15 +1991,47 @@ function MajorMoneyInput({
 }
 
 function areaTitle(area: Exclude<FlowBuilderArea, "form">): string {
+  if (area === "contact") return "Kontakt";
   if (area === "pricing") return "Wycena";
   if (area === "scoring") return "Scoring";
   return "Wynik";
 }
 
 function areaDescription(area: Exclude<FlowBuilderArea, "form">): string {
+  if (area === "contact") return "Kanał kontaktu i informacja prywatności";
   if (area === "pricing") return "Baza i uporządkowane reguły ceny";
   if (area === "scoring") return "Prywatna kwalifikacja 0–100";
   return "Publiczne zakończenie procesu";
+}
+
+function asLeadCaptureV2(leadCapture: FlowDocument["leadCapture"]): LeadCaptureV2 | null {
+  if (!leadCapture) return null;
+  if (leadCapture.leadCaptureSchemaVersion === 2) return leadCapture;
+  return {
+    ...leadCapture,
+    contactPolicy: "email_required",
+    leadCaptureSchemaVersion: 2,
+  };
+}
+
+function contactSettingsKey(leadCapture: FlowDocument["leadCapture"]): string {
+  if (!leadCapture) return "contact-disabled";
+  const notice = leadCapture.privacyNotice;
+  return [notice.textHash, notice.version, notice.policyUrl ?? ""].join(":");
+}
+
+function isValidOptionalHttpsUrl(value: string): boolean {
+  if (!value.trim()) return true;
+  try {
+    return new URL(value.trim()).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+async function sha256Hex(value: string): Promise<string> {
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function defaultConditionValue(step: FlowStep): boolean | number | string {
