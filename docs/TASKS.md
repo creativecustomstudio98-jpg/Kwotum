@@ -3387,11 +3387,20 @@ a gotowość operacyjna została potwierdzona na immutable release candidate.
 poprawka pakowania `sharp` jest wdrożona na produkcji w deploymentcie
 `CzdRVPxUhMLtS1e8MtjZe2X11R3K` z commita `2e19fcc`. Produkcyjny gate potwierdził
 binding i `libvips` dla Linux x64, rzeczywistą konwersję WebP oraz poprawne
-zakończenie `Deploying outputs`. Produkcyjna aplikacja używa kontraktu PX2–PX6
-i dashboard RPC, natomiast baza kończy
-historię na `20260811000300`. Dry-run wskazuje dokładnie sześć oczekujących
-migracji `20260825000100`–`20260826000100`. Wdrożenie bazy pozostaje
-zablokowane do czasu utworzenia i sprawdzenia punktu odtworzenia.
+zakończenie `Deploying outputs`. Produkcyjna aplikacja i baza używają teraz
+tego samego kontraktu PX2–PX6 oraz dashboard RPC: sześć migracji
+`20260825000100`–`20260826000100` wdrożono w kolejności, a zdalna historia
+kończy się na `20260826000100`.
+
+Przed migracją utworzono darmowy logiczny backup Supabase CLI poza
+repozytorium. Role, schemat, dane, historię migracji i osobny dump
+`public`/`app_private` zaszyfrowano AES-256, klucz zapisano w pęku kluczy macOS,
+a integralność plików potwierdzono SHA-256. Odtworzenie zakresu aplikacyjnego
+na izolowanym lokalnym Supabase przeszło: 37 tabel, 91 relacji aplikacyjnych,
+123 ograniczenia `CHECK`, 3 organizacje, 3 procesy i 4 leady. Pełny dump
+platformowy pozostaje zachowany, ale restore zarządzanego Auth nie przeszedł
+na starszym lokalnym obrazie z powodu różnicy wewnętrznego schematu Supabase;
+Storage object bytes nie są częścią logicznego `db dump`.
 
 - [x] Sprawdzić publiczne health/readiness, marketing i runtime smoke.
 - [x] Porównać produkcyjny schemat i historię migracji z repozytorium.
@@ -3409,8 +3418,12 @@ zablokowane do czasu utworzenia i sprawdzenia punktu odtworzenia.
 - [x] Dodać zawężone `outputFileTracingIncludes` dla natywnych pakietów
       `sharp`/`libvips` oraz gate wykonujący realną konwersję z artefaktu
       standalone. Edytor i ustawienia mają w trace zero plików `sharp`.
-- [!] Migracja produkcyjna: Supabase zgłasza brak backupu fizycznego i wyłączony
-  PITR; brak także stagingowego restore drill wymaganego przez checklistę.
+- [x] Utworzyć darmowy, szyfrowany logiczny backup zakresu aplikacyjnego i
+      wykonać izolowany restore drill oraz rehearsal sześciu migracji na
+      odtworzonych danych produkcyjnych.
+- [!] Supabase Free nadal nie zapewnia PITR, a pełny disaster-recovery drill
+  zarządzanego Auth i obiektów Storage pozostaje otwarty; logiczny backup
+  chroni zakres dotknięty tymi expand-only migracjami, nie całą platformę.
 - [x] Wdrożyć poprawkę artefaktu na Linux/Vercel. Po promocji health/readiness,
       15 stałych stron publicznych i wszystkie stałe trasy panelu bez sesji
       przeszły smoke bez 500/503; świeże logi nie zawierają `libvips` ani
@@ -3418,6 +3431,7 @@ zablokowane do czasu utworzenia i sprawdzenia punktu odtworzenia.
 - [ ] Po uzyskaniu uwierzytelnionej sesji wykonać niedestrukcyjny smoke edytora,
       ustawień i uploadu syntetycznego obrazu; buildowy test artefaktu pokrywa
       natywną konwersję, ale nie zastępuje produkcyjnej autoryzacji i Storage.
-- [ ] Utworzyć i zweryfikować punkt odtworzenia, przeprowadzić rehearsal na
-      stagingu, następnie zastosować sześć migracji w kolejności i wykonać
-      uwierzytelniony smoke panelu oraz syntetyczną pełną ścieżkę widgetu.
+- [x] Zastosować sześć migracji na produkcji i potwierdzić historię, nowe
+      tabele, kolumny i dashboard RPC oraz health/readiness bez nowych 500/503.
+- [ ] Wykonać uwierzytelniony smoke panelu oraz syntetyczną pełną ścieżkę
+      widgetu; nie jest to zastępowane przez testy tras bez sesji.

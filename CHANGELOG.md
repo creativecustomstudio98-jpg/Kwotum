@@ -6,6 +6,10 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Fixed
 
+- Usunięto drift produkcyjnego schematu: po szyfrowanym logicznym backupie,
+  odtworzeniu zakresu aplikacyjnego i rehearsal na danych produkcyjnych
+  wdrożono migracje PX2–PX6 oraz dashboardu do `20260826000100`. Produkcyjne
+  health/readiness i kontrola nowych obiektów przeszły bez świeżych 500/503.
 - Odseparowano natywny `sharp` od tras panelu używających wyłącznie biblioteki
   mediów i dodano predeployment gate artefaktu. Build potwierdza obecność
   bindingu oraz `libvips` dla platformy runnera, wykonuje rzeczywistą konwersję
