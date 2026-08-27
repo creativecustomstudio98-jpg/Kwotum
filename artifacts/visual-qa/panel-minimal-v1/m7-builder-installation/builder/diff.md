@@ -4,13 +4,13 @@
 
 PASS, 19/20.
 
-| Kryterium                   | Punkty |
-| --------------------------- | -----: |
-| kompletność regionów        |    4/4 |
-| geometria i proporcje       |    4/4 |
-| typografia i spacing        |    4/4 |
-| gęstość danych oraz stany   |    4/4 |
-| transformacja mobile        |    3/4 |
+| Kryterium                 | Punkty |
+| ------------------------- | -----: |
+| kompletność regionów      |    4/4 |
+| geometria i proporcje     |    4/4 |
+| typografia i spacing      |    4/4 |
+| gęstość danych oraz stany |    4/4 |
+| transformacja mobile      |    3/4 |
 
 Mobile świadomie pokazuje tylko jeden z trzech paneli roboczych naraz. Dwa
 długie tracki segmentów pozostają osiągalne i nie tworzą overflow, ale zajmują

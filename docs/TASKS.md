@@ -312,7 +312,7 @@ pionowe wykresy dashboardu/analityki oraz zwartą szerokość ustawień.
 Playwright przeszedł 2/2 scenariusze chronionego panelu z realnym logowaniem,
 publikacją, axe, kontrolą konsoli/HTTP i brakiem overflow dla 1448 × 1086,
 1536 × 1024, 768 × 1000, 390 × 844 i 430 × 932. Historyczne cropy, rendery i
-porównania zostały wycofane przez ADR-049; pełny zapis pozostaje w Git. Nie
+porównania zostały wycofane przez ADR-058; pełny zapis pozostaje w Git. Nie
 zmieniono API, migracji, polityk RLS ani równoległego zakresu Etapu 12K.
 `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` i formatowanie plików
 panelu przechodzą. Pełny `pnpm format:check` zatrzymują wyłącznie dwa
@@ -737,7 +737,7 @@ PostgreSQL/RLS i WordPress oraz `pnpm build` przechodzą. Repozytoryjne
 > **Zapis historyczny panelu 12M–12ZL:** nazwa Lorum, geometrie 208/78 i
 > 240/78, stare obrazy, mikrotekst, topbary, sześć równorzędnych KPI oraz
 > wszystkie wizualne gate'y poniższych ukończonych etapów zostały zastąpione
-> przez ADR-049 i Etap 12ZM. Zachowane pozostają wyłącznie wyniki funkcjonalne,
+> przez ADR-058 i Etap 12ZM. Zachowane pozostają wyłącznie wyniki funkcjonalne,
 > bezpieczeństwa i dostępności. Kolejnej pracy nie wolno opierać na tym bloku.
 
 ## Etap 12M — wspólny, zwijany sidebar panelu Lorum
@@ -754,7 +754,7 @@ PostgreSQL/RLS i WordPress oraz `pnpm build` przechodzą. Repozytoryjne
 - [x] Dodać izolowany test E2E przejścia 208 → 78 → 208, persystencji między
       trasami i braku overflow na 390 px.
 - [x] Zapisać ówczesne reference, before, after, overlay, difference i raport;
-      obrazy wycofano po przyjęciu ADR-049.
+      obrazy wycofano po przyjęciu ADR-058.
 
 **Gate:** dashboard, leady i pozostałe chronione route’y renderują ten sam
 komponent oraz tę samą geometrię; zmienia się wyłącznie aktywny link. Desktop
@@ -801,7 +801,7 @@ potwierdziło 240 px, 78 px, ukrycie raila i dolną nawigację przy 425 px oraz
 0 px overflow. Lint, typecheck, 85/85 testów web i build przechodzą. Izolowany
 Playwright pozostaje poprawnie pominięty bez sekretów `PANEL_E2E_*`; nie
 uruchomiono alternatywnego logowania ani atrap danych. Raport i obrazy tej
-wersji zostały wycofane przez ADR-049; zachowano wynik historyczny.
+wersji zostały wycofane przez ADR-058; zachowano wynik historyczny.
 
 ### Korekta 12M-Y — referencyjny wybór organizacji Kwotum
 
@@ -823,13 +823,13 @@ pokazuje realnie 1 aktywny proces, 37 leadów do obsługi i aktywność dzisiaj.
 Mobile przy aktywnym viewportcie 510 px ma 0 px overflow, trzy metadane oraz
 dwa równe przyciski. Lint, typecheck, 88/88 testów web i produkcyjny build 39
 tras przechodzą. Izolowany E2E pozostaje warunkowy na `PANEL_E2E_*`. Raport i
-obrazy starego kierunku zostały wycofane przez ADR-049; zachowano wynik
+obrazy starego kierunku zostały wycofane przez ADR-058; zachowano wynik
 funkcjonalny.
 
 ## Etap 12N — referencyjna lista Procesy / Formularze
 
 - [x] Wyciąć dokładny crop ekranu procesów z ówczesnej planszy V6 i zapisać
-      jego kontrakt. Plansza została później wycofana przez ADR-049.
+      jego kontrakt. Plansza została później wycofana przez ADR-058.
 - [x] Zamrozić pełny render `before` przy 1536 × 1024.
 - [x] Zastąpić ciężką tabelę zwartą listą pięciu pełnowierszowych linków.
 - [x] Zachować prawdziwe tenantowe nazwy, liczbę pytań, wersję, status, datę
@@ -844,7 +844,7 @@ funkcjonalny.
 - [x] Zachować wspólny, zwijany sidebar Lorum i mobilną dolną nawigację.
 - [x] Sprawdzić 1536 × 1024 i 390 × 844, klawiaturę, WCAG oraz brak overflow.
 - [x] Zapisać ówczesne reference, before, after, overlay, difference i raport;
-      obrazy wycofano po przyjęciu ADR-049.
+      obrazy wycofano po przyjęciu ADR-058.
 
 **Gate:** `/panel/[organizationId]/procesy` używa pięciu zwartych wierszy bez
 klasycznego nagłówka tabeli; cały wiersz jest dostępnym linkiem do właściwego
@@ -878,7 +878,7 @@ portalu błędu.
 - [x] Zachować notatki, status, kontakt, odpowiedzi, pliki, historię i retencję.
 - [x] Sprawdzić desktop, mobile, kontrast, axe i działanie formularzy.
 - [x] Zapisać ówczesne before, reference, after, overlay, difference i raport;
-      obrazy wycofano po przyjęciu ADR-049.
+      obrazy wycofano po przyjęciu ADR-058.
 
 **Gate:** dokument leada ma 1280 px w workspace 1328 px, panel wyniku 916 px,
 a prawa kolumna 419 px przy 1536 × 1024. Na 390 × 844 dokument, wynik, prawa
@@ -905,7 +905,7 @@ problemy kontrastu zostały naprawione. Izolowany E2E i axe przechodzą 1/1.
 - [x] Ujednolicić loading oraz error state z właściwą powierzchnią.
 - [x] Sprawdzić produkcyjny desktop, 390 px, 320 px i axe.
 - [x] Zapisać ówczesne before, reference, after, overlay, difference i raport;
-      obrazy wycofano po przyjęciu ADR-049.
+      obrazy wycofano po przyjęciu ADR-058.
 
 **Gate:** przy 1536 × 1024 powierzchnia ma 1280 px w workspace 1328 px,
 wszystkie pięć kart ma wspólne `y`, około 240 px szerokości i obrazy 92 px.
@@ -979,7 +979,7 @@ formatowanie, a produkcyjny build landingu przeszedł.
 - [x] Sprawdzić produkcyjny desktop, 390 px, 320 px, klawiaturę, axe i brak
       poziomego overflow.
 - [x] Zapisać ówczesne reference, before, after, overlay, difference i raport;
-      obrazy wycofano po przyjęciu ADR-049.
+      obrazy wycofano po przyjęciu ADR-058.
 
 **Gate:** `/panel/[organizationId]/analityka` zachowuje wspólny sidebar Lorum,
 topbar 78 px i cztery karty KPI po 118 px przy 1536 × 1024. Wykres ma 30
@@ -1038,7 +1038,7 @@ offline i popup. Macierz 1536/1440/1024/768/390/320 px nie wykazała overflow;
 768 px jest także efektywną szerokością kontroli przy 200% zoomie z 1536 px.
 Axe, reduced motion, forced colors, klawiatura, lint, typecheck, unit/RLS/
 WordPress, build, Prettier oraz lokalne skany SAST/sekretów przechodzą.
-Historyczne dowody sześciu powierzchni panelu zostały usunięte przez ADR-049.
+Historyczne dowody sześciu powierzchni panelu zostały usunięte przez ADR-058.
 W `artifacts/visual-qa/12s-remaining-screens/` zachowano wyłącznie osobne dowody
 auth i widgetu; wynik funkcjonalny panelu pozostaje zapisem tego etapu.
 
@@ -1095,7 +1095,7 @@ priorytetyzuje uwagę, KPI 2 × 3 oraz najnowsze leady i mieści wszystkie pola
 bez poziomego przewijania. Produkcyjny Playwright desktop/mobile oraz axe
 przechodzą 1/1. Lint, typecheck, 103 testy unit, RLS, WordPress, format,
 lokalne skany bezpieczeństwa i build są zielone. Historyczne obrazy odbiorowe
-zostały wycofane przez ADR-049; wynik testów pozostaje zapisem etapu.
+zostały wycofane przez ADR-058; wynik testów pozostaje zapisem etapu.
 
 ## Etap 12U — kontrakt profesjonalnego buildera v2
 
@@ -1203,7 +1203,7 @@ pozostaje zielony.
       blokadę tła, reduced motion i forced colors.
 - [x] Sprawdzić 320 / 390 / 430 / 768 px, axe, brak overflow i pełny pipeline.
 - [x] Zapisać ówczesne reference, before, after, overlay, difference i raport;
-      obrazy wycofano po przyjęciu ADR-049.
+      obrazy wycofano po przyjęciu ADR-058.
 
 **Gate podetapu:** mobilny panel nie pokazuje sidebara ani przewijanego paska.
 Biała nawigacja ma maksymalnie pięć równych pozycji, zawsze mieści się przy
@@ -1245,7 +1245,7 @@ w obu przebiegach.
 - [x] Dodać automatyczne asercje geometrii, overflow, klawiatury i axe dla
       1448 / 768 / 390 px oraz sprawdzić długie polskie treści i zoom 200%.
 - [x] Zapisać ówczesne `reference`, `before`, `after`, overlay, difference i
-      raport; obrazy wycofano po przyjęciu ADR-049.
+      raport; obrazy wycofano po przyjęciu ADR-058.
 - [x] Uruchomić pełny pipeline, wykonać self-review i zapisać końcowy status.
 
 **Gate:** przy 1448 × 1086 i zwiniętym wspólnym sidebarze Lorum granice
@@ -1616,7 +1616,7 @@ WordPress, SAST, secret scan i build 8/8 z 39 trasami przechodzą. Etap 12ZD
 zsynchronizował test granic z rzeczywistym polem liczbowym fixture'u, poprawił
 semantykę i kontrast analityki oraz wymusił standalone zamiast zastanego
 `next dev`; pełny panel przechodzi 15/15. Końcowe obrazy tego kierunku zostały
-później wycofane przez ADR-049.
+później wycofane przez ADR-058.
 
 ## Etap 12ZD — zamrożony baseline repozytorium
 
@@ -2486,7 +2486,7 @@ przeszedł 18/18 na produkcyjnym standalone buildzie; obejmuje publikację,
 anulowanie destrukcyjnej zmiany, desktop 1448 px, mobile 390 px, reflow 320 px,
 klawiaturę, cele 44 px, axe, forced colors, brak błędów runtime i zero overflow.
 Syntetyczny tenant został usunięty bez pozostałości. Historyczne obrazy
-odbiorowe zostały później wycofane przez ADR-049.
+odbiorowe zostały później wycofane przez ADR-058.
 
 Pełny gate ma zielone: format, lint 8/8, typecheck 8/8, 185 testów unit,
 PostgreSQL/RLS z niezależnym przeliczeniem estymacji i negatywnymi przypadkami
@@ -2604,7 +2604,7 @@ alertów, warsztatu, DPA, UAT oraz podpisanego GO.
 phone-only submit, brak potwierdzenia klienta bez e-maila, adres snapshotowany w
 outboxie oraz odmowy Sales/suspended/drugiego tenanta. Format, lint, typecheck,
 unit/RLS/WordPress, build i izolowany E2E ustawień 1536/390 px są zielone;
-historyczny odbiór wyniósł 19/20, a obrazy wycofano przez ADR-049.
+historyczny odbiór wyniósł 19/20, a obrazy wycofano przez ADR-058.
 Gate produkcyjny jest otwarty do wdrożenia, schedulera, monitoringu i
 syntetycznej dostawy.
 
@@ -2698,7 +2698,7 @@ typecheck i build są zielone. Produkcyjny E2E Chromium przechodzi razem z
 axe, trwałością statusu/właściciela/priorytetu, notatką z autorem i datą,
 utworzeniem oraz zamknięciem zadania, historią i kontrolą reflow bez overflow
 dla 1536 × 1024 oraz 390 × 844. Historyczne obrazy dowodowe zostały później
-wycofane przez ADR-049.
+wycofane przez ADR-058.
 
 ## Podetap 12ZJ — lokalny kontrakt runtime readiness
 
@@ -2734,7 +2734,7 @@ się przed zamknięciem poprzedniego.
       responsive oraz zachowania bezpieczeństwa bez zmiany runtime.
 - [x] M0: usunąć poprzednie referencje panelu, zastąpione raporty i historyczne
       artefakty po utworzeniu odzyskiwalnej kopii.
-- [x] M0: przyjąć ADR-049, skonsolidować aktywną dokumentację i przygotować
+- [x] M0: przyjąć ADR-058, skonsolidować aktywną dokumentację i przygotować
       bezpieczny plan M1–M10.
 - [x] M1: wdrożyć Instrument Sans w tenantowym `.wy-panel-theme` oraz jasny,
       neutralny shell na centralnych tokenach, zachowując geometrię 256/72 i
@@ -2837,7 +2837,7 @@ nie pozwala wdrażać nieskalibrowanych cen, scoringu ani rekomendacji produktu.
 
 - [x] Wykonać audyt dokumentacji, kodu, widgetu, buildera, publicznej strony i
       artefaktów visual QA.
-- [x] Przyjąć ADR-043: jeden bezpieczny silnik i trzy tryby doświadczenia:
+- [x] Przyjąć ADR-052: jeden bezpieczny silnik i trzy tryby doświadczenia:
       `quick_form`, `guided_brief`, `visual_configurator`.
 - [x] Zdefiniować zasady list, kart tekstowych, ikon, zdjęć i fallbacków.
 - [x] Zdefiniować granice context/prefill, kontaktu, outcome, brandingu i
@@ -2854,7 +2854,7 @@ nie pozwala wdrażać nieskalibrowanych cen, scoringu ani rekomendacji produktu.
 **Stan 2026-08-25:** część dokumentacyjna PX1 jest ukończona, research pozostaje
 otwarty. Właściciel polecił kontynuację wyłącznie lokalną, dlatego model PX2
 został wdrożony ostrożnie w istniejącym worktree bez deployu. Właściciel
-następnie polecił przejść do kolejnego etapu; zgodnie z ADR-044 zaakceptowano
+następnie polecił przejść do kolejnego etapu; zgodnie z ADR-053 zaakceptowano
 przeniesienie rejestru assetów jako twardej bramy wejścia do PX4, bez uznawania
 brakującego kryterium za spełnione. Szczegóły zawiera
 `docs/product-experience-v1/PX2_IMPLEMENTATION_REPORT.md`.

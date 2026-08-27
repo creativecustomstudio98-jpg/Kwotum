@@ -1527,6 +1527,8 @@ button:disabled {
 
   .wyceno-stage--visual .wyceno-introduction h1 {
     font-size: 1.75rem;
+  }
+
   .wyceno-shell--inline-integrated .wyceno-card {
     min-height: 0;
   }

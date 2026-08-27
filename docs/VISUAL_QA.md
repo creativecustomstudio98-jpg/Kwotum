@@ -133,7 +133,7 @@ Jedynym aktywnym kontraktem panelu jest
 `ui/panel-minimal-v1/README.md`, a jedynymi aktywnymi obrazami są dwa pliki
 w `ui/panel-minimal-v1/reference/`, zablokowane w
 `ui/REFERENCE_MANIFEST.md`. Poprzednie referencje i artefakty panelu zostały
-wycofane na mocy ADR-049.
+wycofane na mocy ADR-058.
 
 Artefakty kolejnych etapów M1–M10 trafiają do:
 

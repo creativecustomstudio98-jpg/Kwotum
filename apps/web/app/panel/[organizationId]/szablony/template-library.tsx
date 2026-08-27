@@ -77,6 +77,10 @@ export function TemplateLibrary({
     if (!historyState || typeof historyState !== "object") return;
     const savedSlug = (historyState as Record<string, unknown>)[selectedTemplateHistoryKey];
     if (typeof savedSlug === "string" && templates.some(({ slug }) => slug === savedSlug)) {
+      // Odtworzenie wyboru z History API: stan zewnętrzny czytamy dopiero po
+      // hydracji, bo na serwerze nie ma window.history. Lazy initializer
+      // rozjechałby HTML serwera z klientem.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedSlug(savedSlug);
     }
   }, [templates]);
