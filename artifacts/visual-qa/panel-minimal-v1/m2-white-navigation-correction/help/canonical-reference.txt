@@ -1,0 +1,5 @@
+Nowszy zrzut właściciela z produkcyjnej Pomocy, 2026-08-27.
+Rozmiar: 3338 × 1982 px.
+SHA-256: 975a1d083f948998999d998cb6fd7b7ee668145316ffbf4e6b093b39cfd4e4b3
+Zakres nadpisania: cała powierzchnia panelu pozostaje biała; zielonoszary canvas, zewnętrzna rama i cień strony są odrzucone.
+Oryginał nie jest przechowywany w repozytorium, ponieważ pochodzi z zalogowanego panelu produkcyjnego.

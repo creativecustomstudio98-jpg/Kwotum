@@ -2741,6 +2741,9 @@ się przed zamknięciem poprzedniego.
       zachowania P1.
 - [x] M2: ujednolicić pasek kontekstu, page intro, breadcrumbs i route-based
       menu wewnętrzne ustawień oraz integracji.
+- [x] M2.W: po przeglądzie produkcji przywrócić jeden biały canvas, skrócić
+      segmentowy filtr Leadów do szerokości treści, usunąć pełną linię spod
+      menu tras Ustawień/Integracji i lokalne tło całej Pomocy.
 - [x] M3: przebudować wyłącznie dashboard przy zachowaniu zapytań, helperów,
       progów prywatności i wszystkich realnych wartości.
 - [x] M4: ujednolicić współdzielone kontrolki i ich pełne stany.
@@ -2749,6 +2752,13 @@ się przed zamknięciem poprzedniego.
 - [ ] M7: odświeżyć builder i instalację bez zmiany kontraktu domenowego.
 - [ ] M8: przenieść analitykę do nowego języka wizualnego.
 - [ ] M9: uporządkować ustawienia, integracje, onboarding i wybór organizacji.
+- [ ] M9.1: przebudować najpierw Integracje — stan, konfigurację, połączenia i
+      historię — redukując linie bez zmiany kontraktów bezpieczeństwa.
+- [ ] M9.2: po gate M9.1 uporządkować Ustawienia według zadań, bez generycznych
+      kart i bez nowych pól domeny.
+- [ ] M9.3: po gate M9.2 uprościć Pomoc na białym canvasie, zachowując role,
+      wyszukiwanie i działające instrukcje.
+- [ ] M9.4: po gate M9.3 dopracować onboarding i wybór organizacji.
 - [ ] M10: skonsolidować stany, usunąć zastąpiony CSS i zamknąć pełny gate.
 
 **Gate M0 2026-08-26:** referencja główna 1199 × 842 px ma SHA-256
@@ -2826,6 +2836,18 @@ typecheck 8/8, PostgreSQL/RLS, WordPress oraz build 16/16 są zielone; cleanup
 fixture'u pozostawił 0 rekordów. Raporty:
 `artifacts/visual-qa/panel-minimal-v1/m5-lists/`. Następny dozwolony etap to
 M6; workspace szczegółu leada nie został rozpoczęty.
+
+**Gate korekty M2.W 2026-08-27 — PASS:** nowsze zrzuty właściciela zostały
+zablokowane hashami bez kopiowania produkcyjnych danych do repozytorium.
+Filtr Leadów zajmuje 577,84 z 1184 px, menu Ustawień 324,81 z 1136 px, a menu
+Integracji 154,30 z 1136 px. Pomoc i workspace mają biały canvas, granicę
+zewnętrzną 0 px i brak cienia. Wszystkie cztery ekrany mają 0 px overflow przy
+390 × 844; celowany E2E i axe przechodzą, a cleanup pozostawia 0 rekordów.
+Format, lint i typecheck 8/8, unit 22/22 (web 226/226, UI 45/45), PostgreSQL/RLS,
+WordPress i build 16/16 są zielone. Raport:
+`artifacts/visual-qa/panel-minimal-v1/m2-white-navigation-correction/diff.md`.
+Korekta nie otwiera M9 przed jego formalnym miejscem w sekwencji; plan M9.1–M9.4
+jest zapisany, ale żaden z tych etapów nie został rozpoczęty.
 
 ## Etap 12ZN — Adaptive Intake: szybki formularz, prowadzony brief i konfigurator
 

@@ -2,7 +2,7 @@
 
 **Status:** kanoniczny kontrakt nowego kierunku panelu
 **Data blokady:** 2026-08-26
-**Bieżący etap:** M5 zamknięty; następny dozwolony etap to M6
+**Bieżący stan:** M2.W zamknięty; formalny następny etap pozostaje zgodny z backlogiem
 **Zakres:** panel administracyjny; bez zmiany logiki produktu, danych i uprawnień
 
 ## 1. Cel
@@ -420,6 +420,11 @@ organizacji. Menu kontekstowe pochodzi z M2. Bez nowych pól domeny.
 
 **Gate:** capability i role, server validation, CSRF/request IDs tam, gdzie
 obowiązują, sekrety niewidoczne w kliencie, loading/empty/error i 18/20.
+
+Plan M9 został doprecyzowany po przeglądzie produkcji z 2026-08-27 i jest
+prowadzony sekwencyjnie jako Integracje → Ustawienia → Pomoc → wejście do
+panelu. Kanoniczny podział, chronione zachowania i gate'y:
+`M9_SYSTEM_PAGES_PLAN_2026-08-27.md`.
 
 ### M10 — stany i konsolidacja
 

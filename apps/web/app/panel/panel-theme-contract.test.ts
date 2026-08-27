@@ -10,7 +10,19 @@ const panelStyles = [
   readFileSync(new URL("./styles.css", import.meta.url), "utf8"),
   readFileSync(new URL("./reference-fidelity.css", import.meta.url), "utf8"),
 ].join("\n");
+const panelBaseStyles = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+const panelReferenceStyles = readFileSync(
+  new URL("./reference-fidelity.css", import.meta.url),
+  "utf8",
+);
 const panelThemeRule = sharedTheme.match(/\.wy-panel-theme\s*\{([^}]*)\}/)?.[1];
+
+function rules(source: string, selector: string): string[] {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return [...source.matchAll(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`, "g"))].map(
+    (match) => match[1] ?? "",
+  );
+}
 
 if (!panelThemeRule) {
   throw new Error("Brak reguły .wy-panel-theme w pakiecie UI.");
@@ -36,5 +48,26 @@ describe("kontrakt wizualny panelu M1", () => {
 
     expect(numericWeights.length).toBeGreaterThan(0);
     expect(numericWeights.filter((weight) => ![400, 500, 600, 700].includes(weight))).toEqual([]);
+  });
+
+  it("utrzymuje bialy canvas i nawigacje o szerokosci tresci", () => {
+    expect(rules(panelBaseStyles, ".panel-page-header__navigation")).not.toEqual(
+      expect.arrayContaining([expect.stringContaining("border-bottom")]),
+    );
+    expect(rules(panelBaseStyles, ".panel-module-navigation__track")).toEqual(
+      expect.arrayContaining([expect.stringContaining("min-width: max-content")]),
+    );
+    expect(
+      rules(
+        panelReferenceStyles,
+        ".lead-list-surface > .lead-filters.record-tabs.lead-filters--segmented",
+      ),
+    ).toEqual(expect.arrayContaining([expect.stringContaining("width: fit-content")]));
+    expect(rules(panelReferenceStyles, ".help-center-panel")).toEqual(
+      expect.arrayContaining([expect.stringContaining("background: var(--wy-color-surface)")]),
+    );
+    expect(rules(panelReferenceStyles, ".help-center")).toEqual(
+      expect.arrayContaining([expect.stringContaining("border: 0")]),
+    );
   });
 });

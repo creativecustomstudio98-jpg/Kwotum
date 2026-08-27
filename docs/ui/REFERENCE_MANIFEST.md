@@ -5,7 +5,7 @@
 
 Ten plik zawiera wyłącznie referencje, które nadal sterują przyszłą pracą.
 Historyczne obrazy panelu i ich pakiety źródłowe zostały usunięte po decyzji
-ADR-049. Historia śledzonych plików pozostaje w Git, a pozostałe materiały w
+ADR-058. Historia śledzonych plików pozostaje w Git, a pozostałe materiały w
 tymczasowej kopii M0; żadna z tych kopii nie może przywracać poprzedniego
 kierunku bez nowej decyzji.
 
@@ -39,7 +39,7 @@ komponentu w `/design-system` znajduje się w
 ## Panel administracyjny — Minimal V1
 
 **Kontrakt:** `panel-minimal-v1/README.md`
-**Decyzja:** ADR-049
+**Decyzja:** ADR-058
 
 | Plik                                                                               |    Rozmiar | SHA-256                                                            | Rola                                                                           |
 | ---------------------------------------------------------------------------------- | ---------: | ------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
@@ -60,6 +60,22 @@ pixel diffu z powodu perspektywy i cropu. Trzeci obraz nadpisuje wyłącznie
 geometrię przełączników wielowariantowych: jeden spokojny track, sąsiadujące
 segmenty i jednoznaczny aktywny segment. Jego ciemne tło, poświata, treść i
 kolory nie są częścią panelu; implementacja używa jasnych tokenów Minimal V1.
+
+### Korekta białego canvasa i nawigacji 2026-08-27
+
+Cztery nowsze zrzuty właściciela nadpisują wyłącznie pokazane regiony:
+
+| ID   |     Rozmiar | SHA-256                                                            | Zakres                                                   |
+| ---- | ----------: | ------------------------------------------------------------------ | -------------------------------------------------------- |
+| PN-1 | 3840 × 2486 | `6f123b976464e8de3c5506c3316fa8be8d0eafe5b71c6d87d777504085d62bd7` | filtr Leadów ma szerokość treści, nie całego workspace'u |
+| PN-2 |   470 × 206 | `ea930569c9e7ed7f64c1e7c60cd459f00f3818de8ab671931320cd3da6316cb5` | zakładki Integracji bez dominującej linii przez stronę   |
+| PN-3 | 3338 × 1982 | `befb4246aa6b4aeee3ac51844043b43f2017e7c8df23dc80e6a597f8a70510fb` | zwarte menu tras Ustawień bez pustej belki               |
+| PN-4 | 3338 × 1982 | `975a1d083f948998999d998cb6fd7b7ee668145316ffbf4e6b093b39cfd4e4b3` | Pomoc na białym canvasie bez ramy i cienia całej strony  |
+
+Oryginały nie są przechowywane w repozytorium, ponieważ pochodzą z
+zalogowanego panelu i zawierają dane produkcyjne. Hashe, pomiary i syntetyczne
+QA znajdują się w
+`artifacts/visual-qa/panel-minimal-v1/m2-white-navigation-correction/`.
 
 Wymagane artefakty każdego etapu:
 

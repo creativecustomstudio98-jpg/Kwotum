@@ -40,6 +40,13 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Skorygowano nawigację wewnętrzną panelu na podstawie przeglądu produkcji:
+  filtr statusów Leadów ma teraz zwartą szerokość treści, zakładki Ustawień i
+  Integracji nie rysują pełnej linii przez workspace, a Pomoc używa jednego
+  białego canvasa bez zewnętrznej ramy i cienia. Zachowano routing, query
+  params, capabilities, dane i akcje; osobny plan M9 rozdziela dalszą pracę na
+  Integracje, Ustawienia, Pomoc i wejście do panelu.
+
 - Główne akcje panelu i marketingu korzystają z osobnych tokenów Kwotum:
   szmaragdu `#0B684A`, ciemniejszego hoveru, precyzyjnej granicy i promienia
   14 px. Pola, karty, statusy, ikony, destrukcyjne akcje i tenantowy widget

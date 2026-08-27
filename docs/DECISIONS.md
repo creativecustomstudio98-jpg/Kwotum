@@ -1975,6 +1975,17 @@ odwracalnymi etapami.
 testów, builda, E2E, axe i responsive. Rollback M1–M10 przywraca wyłącznie
 tokeny, CSS i kompozycję danego modułu; nie wymaga migracji danych ani zmiany
 identyfikatorów technicznych.
+
+**Korekta wizualna 2026-08-27:** cztery nowsze zrzuty produkcyjne właściciela
+nadpisują ADR-058 wyłącznie w pokazanych regionach nawigacji i powierzchni.
+Panel zachowuje jeden biały canvas. Pięć natychmiastowych filtrów Leadów
+pozostaje segmentami, ale track ma szerokość treści zamiast całego workspace'u.
+Ustawienia i Integracje pozostają zakładkami tras z krótkim wskaźnikiem
+aktywnej pozycji, bez pełnej dolnej linii przez stronę. Pomoc nie używa
+zielonoszarego tła, zewnętrznej ramy ani cienia całej strony. Zmiana nie dotyka
+routingu, capabilities, danych, RLS ani akcji; głęboka kompozycja tych ekranów
+pozostaje sekwencyjnym zakresem M9.
+
 **Korekta geometrii 2026-08-13:** nowszy zaakceptowany zrzut właściciela,
 3338 × 1962 px, SHA-256
 `b08ac479744086b70850339e9a3b427dfb6509d443745887f91565989be55e4d`,

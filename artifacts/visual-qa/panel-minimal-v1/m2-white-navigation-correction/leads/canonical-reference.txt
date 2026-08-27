@@ -1,0 +1,5 @@
+Nowszy zrzut właściciela z produkcyjnej listy Leadów, 2026-08-27.
+Rozmiar: 3840 × 2486 px.
+SHA-256: 6f123b976464e8de3c5506c3316fa8be8d0eafe5b71c6d87d777504085d62bd7
+Zakres nadpisania: filtr statusów nie może rozciągać pięciu opcji na całą szerokość workspace'u.
+Oryginał nie jest przechowywany w repozytorium, ponieważ zawiera dane produkcyjne i dane osobowe.

@@ -1,0 +1,5 @@
+Nowszy crop właściciela z produkcyjnych Integracji, 2026-08-27.
+Rozmiar: 470 × 206 px.
+SHA-256: ea930569c9e7ed7f64c1e7c60cd459f00f3818de8ab671931320cd3da6316cb5
+Zakres nadpisania: zakładki pozostają na białym canvasie, a pełna dolna linia nie może dominować regionu.
+Oryginał nie jest przechowywany w repozytorium; hash blokuje decyzję bez kopiowania zrzutu produkcji.

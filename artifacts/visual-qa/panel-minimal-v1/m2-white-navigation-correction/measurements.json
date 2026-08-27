@@ -1,0 +1,69 @@
+{
+  "help": {
+    "borderTopWidth": 0,
+    "boxShadow": "none",
+    "centerBackground": "rgb(255, 255, 255)",
+    "workspaceBackground": "rgb(255, 255, 255)"
+  },
+  "leads": {
+    "activeAfterContent": "\"\"",
+    "activeAfterDisplay": "none",
+    "activeAfterHeight": 2,
+    "activeAfterWidth": 0,
+    "activeBackgroundColor": "color(srgb 0.9 0.923137 0.91451)",
+    "activeBorderBottomWidth": 0,
+    "activeBorderRadius": 9,
+    "activeBoxShadow": "none",
+    "activeHeight": 44,
+    "horizontalGaps": [4, 4, 4, 4],
+    "inactiveBackgroundColor": "rgba(0, 0, 0, 0)",
+    "itemCount": 5,
+    "itemHeights": [44, 44, 44, 44, 44],
+    "itemsInsideTrack": true,
+    "itemWidths": [119.53125, 84.859375, 108.3125, 123.5, 117.640625],
+    "rowSpread": 0,
+    "trackBackgroundImage": "none",
+    "trackBorderRadius": 14,
+    "trackBoxShadow": "none",
+    "trackHeight": 52,
+    "trackOverflowX": "auto",
+    "trackWidth": 577.84375,
+    "surfaceWidth": 1184
+  },
+  "mobile": [
+    {
+      "name": "leads",
+      "overflow": 0
+    },
+    {
+      "name": "settings",
+      "overflow": 0
+    },
+    {
+      "name": "integrations",
+      "overflow": 0
+    },
+    {
+      "name": "help",
+      "overflow": 0
+    }
+  ],
+  "modules": {
+    "integrations": {
+      "activeCount": 1,
+      "containerWidth": 1136,
+      "documentOverflow": 0,
+      "trackWidth": 154.296875,
+      "wrapperBackground": "rgb(255, 255, 255)",
+      "wrapperBorderBottom": 0
+    },
+    "settings": {
+      "activeCount": 1,
+      "containerWidth": 1136,
+      "documentOverflow": 0,
+      "trackWidth": 324.8125,
+      "wrapperBackground": "rgb(255, 255, 255)",
+      "wrapperBorderBottom": 0
+    }
+  }
+}

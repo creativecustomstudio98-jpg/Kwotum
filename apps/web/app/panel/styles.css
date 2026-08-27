@@ -794,7 +794,6 @@
 
 .panel-page-header__navigation {
   padding-inline: clamp(1rem, 2vw, 1.5rem);
-  border-bottom: 1px solid var(--wy-color-border);
   background: var(--wy-color-surface);
 }
 
@@ -807,7 +806,7 @@
 
 .panel-module-navigation__track {
   width: max-content;
-  min-width: 100%;
+  min-width: max-content;
   display: flex;
   align-items: stretch;
   gap: 1.5rem;

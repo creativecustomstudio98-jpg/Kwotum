@@ -49,6 +49,10 @@ const m2ContextNavigationArtifactDirectory = path.join(
   artifactRoot,
   "panel-minimal-v1/m2-context-navigation",
 );
+const m2WhiteNavigationArtifactDirectory = path.join(
+  artifactRoot,
+  "panel-minimal-v1/m2-white-navigation-correction",
+);
 const m4ControlArtifactDirectory = path.join(artifactRoot, "panel-minimal-v1/m4-controls");
 const m5ListArtifactDirectory = path.join(artifactRoot, "panel-minimal-v1/m5-lists");
 const m5LeadArtifactDirectory = path.join(m5ListArtifactDirectory, "leads");
@@ -1205,6 +1209,187 @@ test.describe("panel reference reconstruction", () => {
           mobile: mobileGeometry,
           responsiveMatrix,
           switch: switchBefore,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+  });
+
+  test("M2 white canvas correction keeps inner navigation compact and accessible", async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    const screenDirectories = Object.fromEntries(
+      ["help", "integrations", "leads", "settings"].map((screen) => [
+        screen,
+        path.join(m2WhiteNavigationArtifactDirectory, screen),
+      ]),
+    );
+    await Promise.all(
+      Object.values(screenDirectories).map((directory) => mkdir(directory, { recursive: true })),
+    );
+
+    const legacyStyles = {
+      help: `
+        .help-center-panel { background: #f7f9f7; }
+        .help-center { border: 1px solid #dfe5e1; border-radius: 8px; box-shadow: 0 1px 2px rgb(0 45 28 / 3%); }
+      `,
+      module: `
+        .panel-page-header__navigation { border-bottom: 1px solid var(--wy-color-border); }
+        .panel-module-navigation__track { min-width: 100%; }
+      `,
+      leads: `
+        .lead-list-surface > .lead-filters.record-tabs.lead-filters--segmented {
+          width: 100%;
+          display: grid;
+          grid-template-columns: repeat(5, minmax(max-content, 1fr));
+        }
+      `,
+    } as const;
+
+    const screens = [
+      {
+        legacyCss: legacyStyles.leads,
+        name: "leads",
+        path: `/panel/${organizationId}/leady`,
+        ready: ".lead-list-surface",
+      },
+      {
+        legacyCss: legacyStyles.module,
+        name: "settings",
+        path: `/panel/${organizationId}/ustawienia`,
+        ready: ".settings-page__content",
+      },
+      {
+        legacyCss: legacyStyles.module,
+        name: "integrations",
+        path: `/panel/${organizationId}/integracje/wordpress`,
+        ready: "#wordpress-configuration",
+      },
+      {
+        legacyCss: legacyStyles.help,
+        name: "help",
+        path: `/panel/${organizationId}/pomoc`,
+        ready: ".help-center:not(.help-center--loading)",
+      },
+    ] as const;
+
+    await page.setViewportSize({ height: 900, width: 1_440 });
+    for (const screen of screens) {
+      await page.goto(screen.path);
+      await expect(page.locator(screen.ready).last()).toBeVisible();
+      await page.addStyleTag({ content: screen.legacyCss });
+      await page.screenshot({
+        animations: "disabled",
+        path: path.join(screenDirectories[screen.name], "before.png"),
+      });
+      await page.reload();
+      await expect(page.locator(screen.ready).last()).toBeVisible();
+      await page.screenshot({
+        animations: "disabled",
+        path: path.join(screenDirectories[screen.name], "after.png"),
+      });
+    }
+
+    await page.goto(`/panel/${organizationId}/leady`);
+    const leadSurface = page.locator(".lead-list-surface");
+    const leadFilter = page.getByRole("navigation", { name: "Filtr statusu" });
+    const leadGeometry = await readSegmentedControlGeometry(leadFilter);
+    const leadSurfaceWidth = await leadSurface.evaluate(
+      (element) => element.getBoundingClientRect().width,
+    );
+    expectSegmentedControlVisualContract(leadGeometry, { minimumTargetHeight: 44 });
+    expect(leadGeometry.itemCount).toBe(5);
+    expect(leadGeometry.itemsInsideTrack).toBe(true);
+    expect(leadGeometry.trackWidth).toBeLessThan(leadSurfaceWidth * 0.72);
+
+    const moduleMeasurements: Record<"integrations" | "settings", unknown> = {
+      integrations: null,
+      settings: null,
+    };
+    for (const screen of screens.filter(
+      (item): item is (typeof screens)[1] | (typeof screens)[2] =>
+        item.name === "settings" || item.name === "integrations",
+    )) {
+      await page.goto(screen.path);
+      const navigation = page
+        .getByRole("navigation", {
+          name: screen.name === "settings" ? "Sekcje ustawień" : "Rodzaje integracji",
+        })
+        .first();
+      await expect(navigation).toBeVisible();
+      const moduleGeometry = await navigation.evaluate((element) => {
+        const track = element.firstElementChild as HTMLElement | null;
+        const wrapper = element.parentElement;
+        return {
+          activeCount: element.querySelectorAll('a[aria-current="page"]').length,
+          containerWidth: element.getBoundingClientRect().width,
+          documentOverflow:
+            document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          trackWidth: track?.getBoundingClientRect().width ?? 0,
+          wrapperBackground: wrapper ? getComputedStyle(wrapper).backgroundColor : "",
+          wrapperBorderBottom: wrapper
+            ? Number.parseFloat(getComputedStyle(wrapper).borderBottomWidth)
+            : -1,
+        };
+      });
+      expect(moduleGeometry.activeCount).toBe(1);
+      expect(moduleGeometry.documentOverflow).toBeLessThanOrEqual(1);
+      expect(moduleGeometry.trackWidth).toBeLessThan(moduleGeometry.containerWidth * 0.62);
+      expect(moduleGeometry.wrapperBackground).toBe("rgb(255, 255, 255)");
+      expect(moduleGeometry.wrapperBorderBottom).toBe(0);
+      moduleMeasurements[screen.name] = moduleGeometry;
+    }
+
+    await page.goto(`/panel/${organizationId}/pomoc`);
+    const helpGeometry = await page
+      .locator(".help-center:not(.help-center--loading)")
+      .evaluate((element) => {
+        const centerStyle = getComputedStyle(element);
+        const workspace = element.closest(".help-center-panel");
+        return {
+          borderTopWidth: Number.parseFloat(centerStyle.borderTopWidth),
+          boxShadow: centerStyle.boxShadow,
+          centerBackground: centerStyle.backgroundColor,
+          workspaceBackground: workspace ? getComputedStyle(workspace).backgroundColor : "",
+        };
+      });
+    expect(helpGeometry).toEqual({
+      borderTopWidth: 0,
+      boxShadow: "none",
+      centerBackground: "rgb(255, 255, 255)",
+      workspaceBackground: "rgb(255, 255, 255)",
+    });
+
+    const mobileMeasurements: Array<{ name: string; overflow: number }> = [];
+    await page.setViewportSize({ height: 844, width: 390 });
+    for (const screen of screens) {
+      await page.goto(screen.path);
+      await expect(page.locator(screen.ready).last()).toBeVisible();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow, `${screen.name} mobile overflow`).toBeLessThanOrEqual(1);
+      mobileMeasurements.push({ name: screen.name, overflow });
+      await page.screenshot({
+        animations: "disabled",
+        path: path.join(screenDirectories[screen.name], "mobile-390x844.png"),
+      });
+      const accessibility = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze();
+      expect(accessibility.violations, `${screen.name} accessibility`).toEqual([]);
+    }
+
+    await writeFile(
+      path.join(m2WhiteNavigationArtifactDirectory, "measurements.json"),
+      `${JSON.stringify(
+        {
+          help: helpGeometry,
+          leads: { ...leadGeometry, surfaceWidth: leadSurfaceWidth },
+          mobile: mobileMeasurements,
+          modules: moduleMeasurements,
         },
         null,
         2,

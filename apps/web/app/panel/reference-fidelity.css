@@ -2827,7 +2827,7 @@
 .record-primary-action.wy-button {
   min-height: 40px;
   padding-inline: 14px;
-  border-radius: var(--wy-radius-md);
+  border-radius: var(--wy-radius-action);
   gap: 8px;
   box-shadow: none;
   font-size: 13px;
@@ -10905,14 +10905,14 @@
 }
 
 .lead-list-surface > .lead-filters.record-tabs.lead-filters--segmented {
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
   min-height: 52px;
   margin: 12px 0 0;
   padding: 4px;
   border: 0;
-  border-radius: 12px;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(max-content, 1fr));
+  border-radius: var(--wy-radius-action);
+  display: flex;
   align-items: stretch;
   gap: 4px;
   background: color-mix(in srgb, var(--wy-color-surface-muted) 86%, var(--wy-color-surface));
@@ -11976,7 +11976,7 @@
 /* Stage 12ZR — role-aware panel help center and lead action alignment */
 
 .help-center-panel {
-  background: #f7f9f7;
+  background: var(--wy-color-surface);
 }
 
 .help-center-panel > .panel-topbar {
@@ -11991,10 +11991,10 @@
 .help-center {
   width: 100%;
   min-width: 0;
-  border: 1px solid #dfe5e1;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 1px 2px rgb(0 45 28 / 3%);
+  border: 0;
+  border-radius: 0;
+  background: var(--wy-color-surface);
+  box-shadow: none;
 }
 
 .help-center__intro {
@@ -12533,7 +12533,7 @@
   }
 
   .help-center {
-    border-radius: 6px;
+    border-radius: 0;
   }
 
   .help-center__intro {
