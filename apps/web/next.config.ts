@@ -70,7 +70,6 @@ const nextConfig: NextConfig = {
   output: "standalone",
   outputFileTracingIncludes: {
     "/api/v1/organizations/\\[organizationId\\]/flow-assets": [
-      "../../node_modules/.pnpm/@img+sharp-*/node_modules/@img/sharp-*/**/*",
       "../../node_modules/.pnpm/@img+sharp-libvips-*/node_modules/@img/sharp-libvips-*/**/*",
     ],
   },
