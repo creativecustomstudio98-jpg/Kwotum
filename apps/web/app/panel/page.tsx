@@ -1,7 +1,5 @@
 import { Button, EmptyState, LinkButton } from "@wyceno/ui";
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { createClient } from "../../lib/supabase/server";
@@ -12,6 +10,7 @@ import {
   formatLastActivity,
   latestIsoDate,
 } from "./organization-picker-model";
+import { OrganizationPickerFrame } from "./organization-picker-frame";
 
 export const metadata: Metadata = {
   title: "Organizacje",
@@ -125,75 +124,64 @@ export default async function PanelPage() {
   }
 
   return (
-    <main className="organization-picker">
-      <header className="organization-picker__header">
-        <Link aria-label="Kwotum — strona główna" href="/">
-          <Image alt="" height={46} priority src="/kwotum-logo-v3.png" width={46} />
-          <strong>Kwotum</strong>
-        </Link>
+    <OrganizationPickerFrame
+      headerAction={
         <form action={signOut} className="organization-picker__logout">
           <Button size="small" type="submit" variant="secondary">
             Wyloguj się
           </Button>
         </form>
-      </header>
-      <div className="organization-picker__content">
-        <header className="organization-picker__intro">
-          <h1>Wybierz organizację</h1>
-          <p>Wybierz organizację, w której chcesz pracować</p>
-        </header>
-        {organizations.length === 0 ? (
-          <div className="panel-card">
-            <EmptyState
-              description="Administrator musi dodać Cię do aktywnej organizacji."
-              title="Brak dostępnych organizacji"
-            />
-          </div>
-        ) : (
-          <ul className="organization-list">
-            {organizations.map((organization) => {
-              const overview = overviewByOrganizationId.get(organization.id);
-              const activeFlowLabel =
-                overview?.activeFlowCount === null
-                  ? "Dostęp do leadów"
-                  : formatActiveProcessCount(overview?.activeFlowCount ?? 0);
-              const membership = memberships.find(
-                (item) => item.organization_id === organization.id,
-              );
+      }
+    >
+      {organizations.length === 0 ? (
+        <div className="organization-picker__state panel-card">
+          <EmptyState
+            description="Administrator musi dodać Cię do aktywnej organizacji."
+            title="Brak dostępnych organizacji"
+          />
+        </div>
+      ) : (
+        <ul className="organization-list">
+          {organizations.map((organization) => {
+            const overview = overviewByOrganizationId.get(organization.id);
+            const activeFlowLabel =
+              overview?.activeFlowCount === null
+                ? "Dostęp do leadów"
+                : formatActiveProcessCount(overview?.activeFlowCount ?? 0);
+            const membership = memberships.find((item) => item.organization_id === organization.id);
 
-              return (
-                <li className="organization-list__card" key={organization.id}>
-                  <div className="organization-list__identity">
-                    <span aria-hidden="true">{initials(organization.name)}</span>
-                    <div className="organization-list__copy">
-                      <strong>{organization.name}</strong>
-                      <small>{formatRole(membership?.role)}</small>
-                    </div>
+            return (
+              <li className="organization-list__card" key={organization.id}>
+                <div className="organization-list__identity">
+                  <span aria-hidden="true">{initials(organization.name)}</span>
+                  <div className="organization-list__copy">
+                    <strong>{organization.name}</strong>
+                    <small>{formatRole(membership?.role)}</small>
                   </div>
-                  <ul
-                    aria-label={`Podsumowanie organizacji ${organization.name}`}
-                    className="organization-list__meta"
+                </div>
+                <ul
+                  aria-label={`Podsumowanie organizacji ${organization.name}`}
+                  className="organization-list__meta"
+                >
+                  <li>{activeFlowLabel}</li>
+                  <li>{formatAttentionLeadCount(overview?.attentionLeadCount ?? 0)}</li>
+                  <li>{formatLastActivity(overview?.lastActivityAt ?? null)}</li>
+                </ul>
+                <div className="organization-actions">
+                  <LinkButton
+                    className="organization-actions__primary"
+                    href={`/panel/${organization.id}`}
+                    variant="secondary"
                   >
-                    <li>{activeFlowLabel}</li>
-                    <li>{formatAttentionLeadCount(overview?.attentionLeadCount ?? 0)}</li>
-                    <li>{formatLastActivity(overview?.lastActivityAt ?? null)}</li>
-                  </ul>
-                  <div className="organization-actions">
-                    <LinkButton
-                      className="organization-actions__primary"
-                      href={`/panel/${organization.id}`}
-                      variant="secondary"
-                    >
-                      Wybierz
-                    </LinkButton>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
-    </main>
+                    Wybierz
+                  </LinkButton>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </OrganizationPickerFrame>
   );
 }
 

@@ -6,6 +6,9 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Fixed
 
+- Ekran wyboru organizacji używa jednego frame'u dla ready, loading i error.
+  Usunięto podkreślenie oraz rozjazd logo, a skeleton zachowuje identyczne osie
+  intro, karty i akcji; pomiar streamingowego przejścia wykazuje CLS równy 0.
 - Produkcyjny build Turborepo wykonuje teraz lint i typecheck jako własne,
   blokujące zależności. Zastępuje to zdublowane natywne kontrole Vercela,
   których odseparowany runner nie potrafił zainstalować zależności monorepo;

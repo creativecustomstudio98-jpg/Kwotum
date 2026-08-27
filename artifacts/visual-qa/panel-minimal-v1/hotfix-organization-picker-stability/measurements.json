@@ -1,0 +1,99 @@
+{
+  "geometryDeltas": {
+    "action": {
+      "height": 0,
+      "left": 0,
+      "top": 0,
+      "width": 0
+    },
+    "brand": {
+      "height": 0,
+      "left": 0,
+      "top": 0,
+      "width": 0
+    },
+    "card": {
+      "height": 0,
+      "left": 0,
+      "top": 0,
+      "width": 0
+    },
+    "content": {
+      "height": 0,
+      "left": 0,
+      "top": 0,
+      "width": 0
+    },
+    "intro": {
+      "height": 0,
+      "left": 0,
+      "top": 0,
+      "width": 0
+    }
+  },
+  "layoutShiftScore": 0,
+  "loadingGeometry": {
+    "action": {
+      "height": 53.59375,
+      "left": 829,
+      "top": 671,
+      "width": 390
+    },
+    "brand": {
+      "height": 32,
+      "left": 48,
+      "top": 24,
+      "width": 102.328125
+    },
+    "card": {
+      "height": 432,
+      "left": 792,
+      "top": 327.984375,
+      "width": 464
+    },
+    "content": {
+      "height": 823.984375,
+      "left": 464,
+      "top": 0,
+      "width": 1120
+    },
+    "intro": {
+      "height": 95.984375,
+      "left": 464,
+      "top": 160,
+      "width": 1120
+    }
+  },
+  "readyGeometry": {
+    "action": {
+      "height": 53.59375,
+      "left": 829,
+      "top": 671,
+      "width": 390
+    },
+    "brand": {
+      "height": 32,
+      "left": 48,
+      "top": 24,
+      "width": 102.328125
+    },
+    "card": {
+      "height": 432,
+      "left": 792,
+      "top": 327.984375,
+      "width": 464
+    },
+    "content": {
+      "height": 823.984375,
+      "left": 464,
+      "top": 0,
+      "width": 1120
+    },
+    "intro": {
+      "height": 95.984375,
+      "left": 464,
+      "top": 160,
+      "width": 1120
+    }
+  }
+}
