@@ -2023,3 +2023,33 @@ celu dotykowego.
 **Konsekwencje:** M9.1 nie wymaga migracji ani nowej zależności. Loading,
 empty, connected i error korzystają z tej samej anatomii; mobile składa region
 do jednej kolumny. Rollback dotyczy wyłącznie komponentów i CSS Integracji.
+
+## ADR-060: zadaniowa anatomia Ustawień M9.2
+
+**Status:** accepted na podstawie referencji właściciela produktu z 2026-08-28
+
+**Decyzja:** obraz 997 × 1577 px, SHA-256
+`fa1a565edae9cbe4971a4d7791f7a0d5cbece171488f2f5ab2c67575850962eb`,
+nadpisuje ADR-058 wyłącznie dla trasy organizacyjnych Ustawień. Menu tras
+przyjmuje kompaktową postać segmentową z ikonami, tytuły sekcji znajdują się
+poza powierzchniami formularzy, a lokalna rama obejmuje wyłącznie powiązane
+pola i ich akcję. Pola zachowują wysokość 44 px, branding łączy podgląd z
+realnymi kontrolkami, a metadane granicy tenanta pozostają spokojnym regionem
+informacyjnym.
+
+Nie kopiujemy nazw, adresów, identyfikatorów, planu ani treści demonstracyjnej
+z obrazu. Widoczne przełączniki Slack/Webhook, usuwanie organizacji,
+import/eksport, klucze API i historia zmian nie stają się funkcjami produktu,
+ponieważ nie mają obecnie kompletnego kontraktu domenowego. Zapis, sukces i
+błąd pozostają lokalne dla właściwego formularza. Routing, capabilities,
+walidacja serwerowa, RLS i tenant scope nie ulegają zmianie.
+
+**Dlaczego:** dotychczasowe nagłówki wewnątrz każdej karty, powtarzane ramy i
+nierówny układ brandingu zacierały relację zadanie–formularz–zapis. Nowa
+anatomia zwiększa skanowalność i gęstość bez wprowadzania atrap ani prezentacji
+danych technicznych jako KPI.
+
+**Konsekwencje:** M9.2 nie wymaga migracji, nowej zależności ani zmiany modelu
+danych. Mobile składa wszystkie regiony do jednej kolumny, a komunikaty i
+uprawnienia zachowują dotychczasowe zachowanie. Rollback dotyczy wyłącznie
+kompozycji Ustawień, wariantu nawigacji i przypisanego CSS.

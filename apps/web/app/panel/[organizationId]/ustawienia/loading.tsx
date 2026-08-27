@@ -12,8 +12,17 @@ export default function OrganizationSettingsLoading() {
         navigation={<SettingsNavigation />}
         title="Ustawienia"
       />
-      <div className="panel-page">
-        <Skeleton label="Wczytywanie ustawień organizacji" lines={7} />
+      <div className="panel-page settings-page">
+        <div className="settings-page__content">
+          {[4, 4, 3, 2].map((lines, index) => (
+            <section className="settings-section" key={lines + index}>
+              <Skeleton label={`Wczytywanie sekcji ustawień ${index + 1}`} lines={1} />
+              <div className="settings-surface">
+                <Skeleton label="Wczytywanie danych sekcji" lines={lines} />
+              </div>
+            </section>
+          ))}
+        </div>
       </div>
     </main>
   );

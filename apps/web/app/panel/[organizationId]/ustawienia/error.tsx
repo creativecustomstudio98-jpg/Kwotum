@@ -18,12 +18,16 @@ export default function OrganizationSettingsError({
         navigation={<SettingsNavigation />}
         title="Ustawienia"
       />
-      <div className="panel-page">
-        <EmptyState
-          action={<Button onClick={reset}>Ponów</Button>}
-          description="Sprawdź aktywną organizację i uprawnienia właściciela."
-          title="Nie udało się wczytać ustawień organizacji"
-        />
+      <div className="panel-page settings-page">
+        <div className="settings-page__content">
+          <div className="settings-surface settings-error-surface">
+            <EmptyState
+              action={<Button onClick={reset}>Ponów</Button>}
+              description="Sprawdź aktywną organizację i uprawnienia właściciela."
+              title="Nie udało się wczytać ustawień organizacji"
+            />
+          </div>
+        </div>
       </div>
     </main>
   );

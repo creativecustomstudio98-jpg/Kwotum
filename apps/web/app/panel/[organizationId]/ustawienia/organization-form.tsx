@@ -28,7 +28,7 @@ export function OrganizationForm({
   const [state, action, pending] = useActionState(updateOrganizationAction, initialState);
 
   return (
-    <form action={action} className="organization-settings-form">
+    <form action={action} className="settings-form settings-organization-form">
       <input name="organizationId" type="hidden" value={organizationId} />
       <FormField
         hint="Ta nazwa jest widoczna w panelu i tenantowych komunikatach."
@@ -64,7 +64,7 @@ export function OrganizationForm({
       <FormField id="organization-role" label="Rola w organizacji">
         <Input disabled id="organization-role" readOnly value={roleLabel(role)} />
       </FormField>
-      <div className="organization-settings-form__actions">
+      <div className="settings-form__actions">
         <Button disabled={!editable} loading={pending} loadingLabel="Zapisuję…" type="submit">
           Zapisz zmiany
         </Button>

@@ -128,7 +128,7 @@ export function BrandingForm({
           ))}
         </Select>
       </FormField>
-      <div className="organization-settings-form__actions">
+      <div className="settings-form__actions branding-settings-form__actions">
         <Button disabled={!editable} loading={pending} loadingLabel="Zapisuję…" type="submit">
           Zapisz branding
         </Button>

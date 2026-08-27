@@ -1,0 +1,104 @@
+{
+  "accessibilityViolations": 0,
+  "forcedColorsOutline": 3,
+  "geometry": {
+    "input": {
+      "borderRadius": 8,
+      "borderWidth": 1,
+      "height": 44,
+      "width": 303.625
+    },
+    "navigation": {
+      "borderRadius": 999,
+      "borderWidth": 0,
+      "height": 46,
+      "width": 432.8125
+    },
+    "overflow": 0,
+    "surfaces": [
+      {
+        "borderRadius": 12,
+        "borderWidth": 1
+      },
+      {
+        "borderRadius": 12,
+        "borderWidth": 1
+      },
+      {
+        "borderRadius": 12,
+        "borderWidth": 1
+      },
+      {
+        "borderRadius": 12,
+        "borderWidth": 1
+      }
+    ]
+  },
+  "reference": {
+    "height": 1577,
+    "sha256": "fa1a565edae9cbe4971a4d7791f7a0d5cbece171488f2f5ab2c67575850962eb",
+    "width": 997
+  },
+  "responsiveMatrix": [
+    {
+      "height": 800,
+      "width": 320,
+      "overflow": 0,
+      "sectionColumns": 1
+    },
+    {
+      "height": 812,
+      "width": 375,
+      "overflow": 0,
+      "sectionColumns": 1
+    },
+    {
+      "height": 844,
+      "width": 390,
+      "overflow": 0,
+      "sectionColumns": 1
+    },
+    {
+      "height": 932,
+      "width": 430,
+      "overflow": 0,
+      "sectionColumns": 1
+    },
+    {
+      "height": 900,
+      "width": 720,
+      "overflow": 0,
+      "sectionColumns": 1
+    },
+    {
+      "height": 1024,
+      "width": 768,
+      "overflow": 0,
+      "sectionColumns": 2
+    },
+    {
+      "height": 768,
+      "width": 1024,
+      "overflow": 0,
+      "sectionColumns": 2
+    },
+    {
+      "height": 800,
+      "width": 1280,
+      "overflow": 0,
+      "sectionColumns": 2
+    },
+    {
+      "height": 900,
+      "width": 1440,
+      "overflow": 0,
+      "sectionColumns": 2
+    },
+    {
+      "height": 1024,
+      "width": 1536,
+      "overflow": 0,
+      "sectionColumns": 2
+    }
+  ]
+}

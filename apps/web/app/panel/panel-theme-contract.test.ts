@@ -15,6 +15,10 @@ const panelReferenceStyles = readFileSync(
   new URL("./reference-fidelity.css", import.meta.url),
   "utf8",
 );
+const settingsPageSource = readFileSync(
+  new URL("./[organizationId]/ustawienia/page.tsx", import.meta.url),
+  "utf8",
+);
 const panelThemeRule = sharedTheme.match(/\.wy-panel-theme\s*\{([^}]*)\}/)?.[1];
 
 function rules(source: string, selector: string): string[] {
@@ -98,5 +102,22 @@ describe("kontrakt wizualny panelu M1", () => {
         expect.stringContaining("min-height: 44px"),
       ]),
     );
+  });
+
+  it("utrzymuje zadaniowa anatomie Ustawien bez atrap funkcji", () => {
+    expect(rules(panelReferenceStyles, ".settings-surface")).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("border: 1px solid var(--wy-color-border)"),
+        expect.stringContaining("border-radius: 0.75rem"),
+      ]),
+    );
+    expect(panelReferenceStyles).toMatch(
+      /\.settings-form \.wy-input,\s*\.settings-form \.wy-select\s*\{[^}]*height: 44px;[^}]*min-height: 44px/,
+    );
+    expect(rules(panelReferenceStyles, ".settings-panel .settings-page__content")).toEqual(
+      expect.arrayContaining([expect.stringContaining("gap: 2rem")]),
+    );
+    expect(settingsPageSource).toContain('className="settings-section"');
+    expect(settingsPageSource).not.toMatch(/Slack|Usuń organizację|Eksportuj|Importuj/);
   });
 });

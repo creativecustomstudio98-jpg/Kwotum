@@ -1,6 +1,6 @@
 # M9 — plan profesjonalizacji Integracji, Ustawień i Pomocy
 
-**Status:** M9.1 ukończony; następnym zamkniętym etapem jest M9.2
+**Status:** M9.1 i M9.2 ukończone; następnym zamkniętym etapem jest M9.3
 **Data:** 2026-08-27
 **Zakres:** wyłącznie istniejące funkcje, dane, role i akcje panelu
 
@@ -75,6 +75,13 @@ formularzu.
 Gate M9.2: role i capability, walidacja serwerowa, przypadki negatywne drugiego
 tenanta, loading/success/error, klawiatura, zoom 200%, macierz responsive i
 brak zmiany wartości bez jawnego zapisu.
+
+**Wynik 2026-08-28:** M9.2 zamknięto na podstawie zaakceptowanej referencji
+997 × 1577 px. Wdrożono segmentowe menu z ikonami, zadaniowe sekcje z tytułami
+poza ramą, pola 44 px, zintegrowany podgląd brandingu, prawdziwy stan kanału
+email i spokojną granicę danych. Nie dodano funkcji demonstracyjnych z obrazu.
+Owner i Sales, realne zapisy, macierz 320–1536 px, axe i forced colors przeszły;
+szczegóły opisuje `M9_2_SETTINGS_IMPLEMENTATION_2026-08-28.md`.
 
 ### M9.3 — Pomoc
 

@@ -1,5 +1,8 @@
+import type { PanelIconName } from "./panel-icon";
+
 export type PanelContextNavigationItem = Readonly<{
   href: string;
+  icon?: PanelIconName;
   label: string;
 }>;
 
@@ -14,10 +17,20 @@ export function settingsNavigationItems(
   const organizationRoot = `/panel/${organizationId}`;
 
   return [
-    { href: `${organizationRoot}/ustawienia`, label: "Organizacja" },
-    { href: `${organizationRoot}/powiadomienia`, label: "Powiadomienia" },
+    { href: `${organizationRoot}/ustawienia`, icon: "settings", label: "Organizacja" },
+    {
+      href: `${organizationRoot}/powiadomienia`,
+      icon: "notification",
+      label: "Powiadomienia",
+    },
     ...(options.showPrivacy
-      ? [{ href: `${organizationRoot}/prywatnosc`, label: "Dane i prywatność" }]
+      ? [
+          {
+            href: `${organizationRoot}/prywatnosc`,
+            icon: "privacy" as const,
+            label: "Dane i prywatność",
+          },
+        ]
       : []),
   ];
 }

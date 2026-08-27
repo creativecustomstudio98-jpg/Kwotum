@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { requireTenantContext } from "../../../../lib/auth/tenant-context";
 import { getOrganizationSettings } from "../../../../lib/organizations/service";
 import { listFlowMediaAssets } from "../../../../lib/flows/media-assets";
+import { PanelIcon } from "../../panel-icon";
 import { PanelPageHeader } from "../../panel-page-header";
 import { SettingsNavigation } from "../settings-navigation";
 import { OrganizationForm } from "./organization-form";
@@ -44,8 +45,8 @@ export default async function OrganizationSettingsPage({
       />
       <div className="panel-page settings-page">
         <div className="settings-page__content">
-          <section className="panel-card settings-detail-card" aria-labelledby="company-data-title">
-            <div className="panel-card__header settings-detail-card__heading">
+          <section className="settings-section" aria-labelledby="company-data-title">
+            <div className="settings-section__heading">
               <div>
                 <h2 id="company-data-title">Dane organizacji</h2>
                 <p>Informacje widoczne w panelu oraz tenantowych wiadomościach systemowych.</p>
@@ -54,39 +55,40 @@ export default async function OrganizationSettingsPage({
                 {canEdit ? "Owner" : "Tylko odczyt"}
               </span>
             </div>
-            <OrganizationForm
-              currentUserEmail={settings.currentUserEmail}
-              editable={canEdit}
-              name={settings.name}
-              organizationId={organizationId}
-              role={settings.role}
-              slug={settings.slug}
-            />
+            <div className="settings-surface">
+              <OrganizationForm
+                currentUserEmail={settings.currentUserEmail}
+                editable={canEdit}
+                name={settings.name}
+                organizationId={organizationId}
+                role={settings.role}
+                slug={settings.slug}
+              />
+            </div>
           </section>
-          <section className="panel-card settings-detail-card" aria-labelledby="branding-title">
-            <div className="panel-card__header settings-detail-card__heading">
+          <section className="settings-section" aria-labelledby="branding-title">
+            <div className="settings-section__heading">
               <div>
                 <h2 id="branding-title">Branding widżetu</h2>
                 <p>Kontrolowana identyfikacja firmy bez własnego CSS, fontów ani skryptów.</p>
               </div>
               <span className="panel-status panel-status--qualified">Bezpieczny profil</span>
             </div>
-            <BrandingForm
-              accentColor={settings.brandAccentColor}
-              assets={brandingAssets}
-              displayName={settings.brandDisplayName}
-              editable={canEdit}
-              logoAssetId={settings.brandLogoAssetId}
-              organizationId={organizationId}
-              organizationName={settings.name}
-            />
+            <div className="settings-surface settings-surface--branding">
+              <BrandingForm
+                accentColor={settings.brandAccentColor}
+                assets={brandingAssets}
+                displayName={settings.brandDisplayName}
+                editable={canEdit}
+                logoAssetId={settings.brandLogoAssetId}
+                organizationId={organizationId}
+                organizationName={settings.name}
+              />
+            </div>
           </section>
           {canManageNotifications ? (
-            <section
-              className="panel-card settings-detail-card"
-              aria-labelledby="lead-delivery-title"
-            >
-              <div className="panel-card__header settings-detail-card__heading">
+            <section className="settings-section" aria-labelledby="lead-delivery-title">
+              <div className="settings-section__heading">
                 <div>
                   <h2 id="lead-delivery-title">Dostawa nowych leadów</h2>
                   <p>
@@ -95,28 +97,38 @@ export default async function OrganizationSettingsPage({
                 </div>
                 <span className="panel-status panel-status--qualified">Owner / Admin</span>
               </div>
-              <NotificationDeliveryForm
-                leadAlertEmail={settings.leadAlertEmail}
-                organizationId={organizationId}
-              />
+              <div className="settings-surface">
+                <NotificationDeliveryForm
+                  leadAlertEmail={settings.leadAlertEmail}
+                  organizationId={organizationId}
+                />
+              </div>
             </section>
           ) : null}
-          <section className="panel-card settings-identity-card">
-            <div>
-              <h2>Granica danych organizacji</h2>
-              <p>
-                Procesy, leady, analityka i integracje są zawsze odczytywane w kontekście tej
-                organizacji.
-              </p>
-            </div>
-            <dl>
+          <section className="settings-section" aria-labelledby="tenant-boundary-title">
+            <div className="settings-section__heading">
               <div>
-                <dt>Utworzono</dt>
-                <dd>{new Intl.DateTimeFormat("pl-PL").format(new Date(settings.createdAt))}</dd>
+                <h2 id="tenant-boundary-title">Granica danych organizacji</h2>
+                <p>
+                  Procesy, leady, analityka i integracje są odczytywane wyłącznie w kontekście tej
+                  organizacji.
+                </p>
               </div>
-              <div>
-                <dt>Tenant ID</dt>
-                <dd>{organizationId}</dd>
+            </div>
+            <dl className="settings-surface settings-identity-card">
+              <div className="settings-identity-card__item">
+                <PanelIcon height={18} name="calendar" width={18} />
+                <span>
+                  <dt>Utworzono</dt>
+                  <dd>{new Intl.DateTimeFormat("pl-PL").format(new Date(settings.createdAt))}</dd>
+                </span>
+              </div>
+              <div className="settings-identity-card__item">
+                <PanelIcon height={18} name="privacy" width={18} />
+                <span>
+                  <dt>Tenant ID</dt>
+                  <dd>{organizationId}</dd>
+                </span>
               </div>
             </dl>
           </section>

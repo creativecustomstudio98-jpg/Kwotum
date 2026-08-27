@@ -67,6 +67,7 @@ const m7BuilderArtifactDirectory = path.join(
   "panel-minimal-v1/m7-builder-installation/builder",
 );
 const m9IntegrationsArtifactDirectory = path.join(artifactRoot, "panel-minimal-v1/m9-integrations");
+const m9SettingsArtifactDirectory = path.join(artifactRoot, "panel-minimal-v1/m9-settings");
 const integrationsEmptyFixture = process.env.PANEL_VISUAL_QA_INTEGRATIONS_EMPTY === "1";
 const m5ResponsiveViewports = [
   { height: 800, width: 320 },
@@ -4884,6 +4885,217 @@ test.describe("panel reference reconstruction", () => {
       )}\n`,
     );
     expect(errors).toEqual([]);
+  });
+
+  test("M9.2 settings match the accepted task-based composition", async ({ page }) => {
+    test.setTimeout(90_000);
+    await mkdir(m9SettingsArtifactDirectory, { recursive: true });
+
+    const errors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") errors.push(message.text());
+    });
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("response", (response) => {
+      if (response.status() >= 500) errors.push(`${response.status()} ${response.url()}`);
+    });
+
+    const settingsUrl = `/panel/${organizationId}/ustawienia`;
+    await page.setViewportSize({ height: 1_577, width: 997 });
+    await page.goto(settingsUrl);
+    await expect(page.getByRole("heading", { level: 1, name: "Ustawienia" })).toBeVisible();
+
+    const navigation = page.getByRole("navigation", { name: "Sekcje ustawień" });
+    await expect(navigation).toHaveClass(/panel-module-navigation--segmented/);
+    await expect(navigation.getByRole("link")).toHaveCount(3);
+    await expect(navigation.locator("svg")).toHaveCount(3);
+    await expect(navigation.getByRole("link", { name: "Organizacja" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+
+    const sections = page.locator(".settings-section");
+    const surfaces = page.locator(".settings-surface");
+    await expect(sections).toHaveCount(4);
+    await expect(surfaces).toHaveCount(4);
+    for (const title of [
+      "Dane organizacji",
+      "Branding widżetu",
+      "Dostawa nowych leadów",
+      "Granica danych organizacji",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name: title })).toBeVisible();
+    }
+    await expect(page.getByText("Email", { exact: true })).toBeVisible();
+    await expect(page.getByText("Slack", { exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Usuń organizację" })).toHaveCount(0);
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(m9SettingsArtifactDirectory, "after-reference-997x1577.png"),
+    });
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(m9SettingsArtifactDirectory, "after-reference-997x-full.png"),
+    });
+
+    const nameInput = page.getByRole("textbox", { name: "Nazwa organizacji" });
+    const slugInput = page.getByRole("textbox", { name: "Identyfikator obszaru" });
+    const currentName = await nameInput.inputValue();
+    await expect(slugInput).toBeDisabled();
+    await nameInput.fill(`${currentName} — niezapisane`);
+    await page.reload();
+    await expect(nameInput).toHaveValue(currentName);
+
+    await nameInput.fill(`${currentName} M9.2`);
+    await page.getByRole("button", { name: "Zapisz zmiany" }).click();
+    await expect(page.getByText("Zapisano dane organizacji.")).toBeVisible();
+    await nameInput.fill(currentName);
+    await page.getByRole("button", { name: "Zapisz zmiany" }).click();
+    await expect(page.getByText("Zapisano dane organizacji.")).toBeVisible();
+
+    const displayNameInput = page.getByRole("textbox", { name: "Nazwa firmy w widżecie" });
+    await displayNameInput.fill("Pracownia testowa");
+    await page.getByRole("button", { name: "Zapisz branding" }).click();
+    await expect(page.getByText("Zapisano bezpieczny branding widżetu.")).toBeVisible();
+
+    const deliveryInput = page.getByRole("textbox", { name: "Adres odbiorczy nowych leadów" });
+    await deliveryInput.fill("leady@example.test");
+    await page.getByRole("button", { name: "Zapisz adres" }).click();
+    await expect(page.getByText("Zapisano adres dostawy leadów.")).toBeVisible();
+
+    const geometry = await page.evaluate(() => {
+      const bounds = (selector: string) => {
+        const element = document.querySelector<HTMLElement>(selector);
+        if (!element) throw new Error(`Brak elementu ${selector}.`);
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return {
+          borderRadius: Number.parseFloat(style.borderRadius),
+          borderWidth: Number.parseFloat(style.borderTopWidth),
+          height: rect.height,
+          width: rect.width,
+        };
+      };
+      return {
+        input: bounds(".settings-form .wy-input"),
+        navigation: bounds(
+          ".settings-panel .panel-module-navigation--segmented .panel-module-navigation__track",
+        ),
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        surfaces: Array.from(document.querySelectorAll<HTMLElement>(".settings-surface")).map(
+          (surface) => ({
+            borderRadius: Number.parseFloat(getComputedStyle(surface).borderRadius),
+            borderWidth: Number.parseFloat(getComputedStyle(surface).borderTopWidth),
+          }),
+        ),
+      };
+    });
+    expect(geometry.input.height).toBe(44);
+    expect(geometry.navigation.height).toBeGreaterThanOrEqual(44);
+    expect(geometry.navigation.width).toBeGreaterThanOrEqual(390);
+    expect(geometry.surfaces.every((surface) => surface.borderWidth === 1)).toBe(true);
+    expect(geometry.surfaces.every((surface) => surface.borderRadius >= 11)).toBe(true);
+    expect(geometry.overflow).toBeLessThanOrEqual(1);
+    const responsiveMatrix: Array<Readonly<Record<string, number | string>>> = [];
+    for (const viewport of m5ResponsiveViewports) {
+      await page.setViewportSize(viewport);
+      await page.goto(settingsUrl);
+      await expect(page.getByRole("heading", { level: 2, name: "Dane organizacji" })).toBeVisible();
+      const responsiveGeometry = await page.evaluate(() => ({
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        sectionColumns: getComputedStyle(
+          document.querySelector<HTMLElement>(".settings-organization-form")!,
+        ).gridTemplateColumns.split(" ").length,
+      }));
+      expect(responsiveGeometry.overflow, `${viewport.width}px overflow`).toBeLessThanOrEqual(1);
+      responsiveMatrix.push({ ...viewport, ...responsiveGeometry });
+      if (viewport.width === 1_440 || viewport.width === 390 || viewport.width === 320) {
+        await page.screenshot({
+          animations: "disabled",
+          path: path.join(
+            m9SettingsArtifactDirectory,
+            `${viewport.width === 1_440 ? "desktop" : "mobile"}-${viewport.width}x${viewport.height}.png`,
+          ),
+        });
+        if (viewport.width === 390) {
+          await page.screenshot({
+            animations: "disabled",
+            fullPage: true,
+            path: path.join(m9SettingsArtifactDirectory, "mobile-390x-full.png"),
+          });
+        }
+      }
+    }
+
+    await page.setViewportSize({ height: 844, width: 390 });
+    await page.goto(settingsUrl);
+    const mobileAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(mobileAccessibility.violations).toEqual([]);
+
+    await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
+    await page.setViewportSize({ height: 800, width: 320 });
+    await page.goto(settingsUrl);
+    const organizationTab = page
+      .getByRole("navigation", { name: "Sekcje ustawień" })
+      .getByRole("link", { name: "Organizacja" });
+    await organizationTab.focus();
+    const forcedColorsOutline = await organizationTab.evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).outlineWidth),
+    );
+    expect(forcedColorsOutline).toBeGreaterThanOrEqual(2);
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(m9SettingsArtifactDirectory, "forced-colors-320x800.png"),
+    });
+    await page.emulateMedia({ forcedColors: "none", reducedMotion: "reduce" });
+
+    await writeFile(
+      path.join(m9SettingsArtifactDirectory, "measurements.json"),
+      `${JSON.stringify(
+        {
+          accessibilityViolations: mobileAccessibility.violations.length,
+          forcedColorsOutline,
+          geometry,
+          reference: {
+            height: 1_577,
+            sha256: "fa1a565edae9cbe4971a4d7791f7a0d5cbece171488f2f5ab2c67575850962eb",
+            width: 997,
+          },
+          responsiveMatrix,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+    expect(errors).toEqual([]);
+  });
+
+  test("M9.2 keeps Settings read-only and hides delivery controls for Sales", async ({
+    browser,
+  }) => {
+    test.skip(!salesEmail || !salesPassword, "Test M9.2 roli Sales wymaga PANEL_E2E_SALES_*.");
+    if (!organizationId || !salesEmail || !salesPassword) {
+      throw new Error("Brak danych konta Sales dla testu M9.2.");
+    }
+
+    const salesContext = await browser.newContext({ viewport: { height: 900, width: 1_440 } });
+    try {
+      const salesPage = await salesContext.newPage();
+      await signInWithCredentials(salesPage, salesEmail, salesPassword, organizationId);
+      await salesPage.goto(`/panel/${organizationId}/ustawienia`);
+      await expect(salesPage.getByRole("textbox", { name: "Nazwa organizacji" })).toBeDisabled();
+      await expect(salesPage.getByRole("button", { name: "Zapisz zmiany" })).toBeDisabled();
+      await expect(salesPage.getByRole("button", { name: "Zapisz branding" })).toBeDisabled();
+      await expect(
+        salesPage.getByRole("heading", { level: 2, name: "Dostawa nowych leadów" }),
+      ).toHaveCount(0);
+      await expect(salesPage.getByRole("button", { name: "Zapisz adres" })).toHaveCount(0);
+    } finally {
+      await salesContext.close();
+    }
   });
 
   test("owner manages the webhook and reviews PII-free delivery states", async ({ page }) => {

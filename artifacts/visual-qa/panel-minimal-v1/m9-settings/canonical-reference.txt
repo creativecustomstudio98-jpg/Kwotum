@@ -1,0 +1,22 @@
+M9.2 — Ustawienia
+
+Zaakceptowana referencja właściciela produktu:
+- nazwa źródłowa: codex-clipboard-74e946b4-f152-49c9-8768-f97613e9847c.png
+- rozmiar: 997 × 1577 px
+- SHA-256: fa1a565edae9cbe4971a4d7791f7a0d5cbece171488f2f5ab2c67575850962eb
+
+Oryginalny plik nie jest kopiowany do repozytorium, ponieważ zawiera dane
+identyfikujące konto i organizację. Hash oraz wymiary pozwalają jednoznacznie
+zweryfikować źródło.
+
+Zakres referencji:
+- biały canvas i segmentowe menu tras z ikonami;
+- tytuły sekcji poza lokalnymi powierzchniami formularzy;
+- jedna rama grupująca pola i właściwą akcję;
+- podgląd brandingu w relacji z realnymi kontrolkami;
+- pola o wysokości 44 px i spokojne metadane granicy tenanta.
+
+Poza zakresem:
+- przykładowe nazwy, adresy, identyfikatory, plan i region;
+- Slack, nowe webhooki, usuwanie organizacji, import, eksport, API i historia;
+- nowe funkcje, dane, role, uprawnienia lub zmiany tenant scope.

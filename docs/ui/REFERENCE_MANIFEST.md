@@ -36,6 +36,23 @@ capabilities, RLS, tenant scope ani danych domenowych. Aktywne artefakty i
 raport znajdują się w `artifacts/visual-qa/panel-minimal-v1/m9-integrations/`
 oraz `panel-minimal-v1/M9_1_INTEGRATIONS_IMPLEMENTATION_2026-08-28.md`.
 
+## Ustawienia panelu — M9.2, 2026-08-28
+
+Zaakceptowany obraz 997 × 1577 px, SHA-256
+`fa1a565edae9cbe4971a4d7791f7a0d5cbece171488f2f5ab2c67575850962eb`,
+nadpisuje wcześniejszy kierunek wyłącznie dla trasy organizacyjnych Ustawień:
+segmentowego menu z ikonami, sekcji tytułowanych poza ramą, funkcjonalnych
+obramowań formularzy, kompozycji podglądu brandingu i pól 44 px. Oryginał nie
+jest przechowywany w repozytorium z powodu widocznych danych konta i
+organizacji; identyfikują go hash oraz wymiary.
+
+Obraz nie dodaje Slacka, dodatkowych webhooków, planu, regionu, usuwania
+organizacji, importu, eksportu, kluczy API ani historii zmian. Zachowane są
+wyłącznie istniejące dane, akcje, role, capabilities, walidacja serwerowa, RLS
+i tenant scope. Aktywne artefakty powstają w
+`artifacts/visual-qa/panel-minimal-v1/m9-settings/`, a raport w
+`panel-minimal-v1/M9_2_SETTINGS_IMPLEMENTATION_2026-08-28.md`.
+
 ## Główna akcja Kwotum — korekta tekstowa 2026-08-27
 
 Najnowsza decyzja właściciela nadpisuje wcześniejszy promień i kolor wyłącznie

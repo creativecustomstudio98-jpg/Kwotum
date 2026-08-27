@@ -44,6 +44,13 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- M9.2 przebudowuje organizacyjne Ustawienia według zaakceptowanej referencji:
+  segmentowe menu z ikonami, zadaniowe sekcje z lokalnymi ramami, pola 44 px,
+  zintegrowany podgląd brandingu, prawdziwy stan dostawy email i spokojne
+  metadane granicy tenanta. Zachowano lokalne komunikaty zapisu, role,
+  capabilities, walidację serwerową, RLS i tenant scope; nie dodano atrap
+  Slacka, importu, eksportu, API ani usuwania organizacji.
+
 - M9.1 przebudowuje WordPress i Webhooki według zaakceptowanej referencji:
   wspólny segmentowy przełącznik, biała dwukolumnowa powierzchnia stanu i
   konfiguracji, lokalne ramy podsekcji oraz pola URL o wysokości 44 px. Stany

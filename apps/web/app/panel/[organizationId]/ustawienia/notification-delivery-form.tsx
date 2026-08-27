@@ -3,6 +3,7 @@
 import { Button, FieldMessage, FormField, Input } from "@wyceno/ui";
 import { useActionState } from "react";
 
+import { PanelIcon } from "../../panel-icon";
 import { updateLeadAlertEmailAction, type OrganizationSettingsActionState } from "./actions";
 
 const initialState = {
@@ -17,7 +18,7 @@ export function NotificationDeliveryForm({
   const [state, action, pending] = useActionState(updateLeadAlertEmailAction, initialState);
 
   return (
-    <form action={action} className="organization-settings-form">
+    <form action={action} className="settings-form settings-delivery-form">
       <input name="organizationId" type="hidden" value={organizationId} />
       <FormField
         hint="Możesz użyć adresu z przekierowaniem. Odbiorca wiadomości nie musi mieć konta w panelu."
@@ -36,7 +37,23 @@ export function NotificationDeliveryForm({
           type="email"
         />
       </FormField>
-      <div className="organization-settings-form__actions">
+      <div className="settings-delivery-channel" aria-label="Kanał dostawy leadów">
+        <span className="settings-delivery-channel__icon">
+          <PanelIcon height={18} name="email" width={18} />
+        </span>
+        <span>
+          <strong>Email</strong>
+          <small>Powiadomienie po utworzeniu nowego leada</small>
+        </span>
+        <span
+          className={`panel-status ${
+            leadAlertEmail ? "panel-status--qualified" : "panel-status--neutral"
+          }`}
+        >
+          {leadAlertEmail ? "Aktywny" : "Do konfiguracji"}
+        </span>
+      </div>
+      <div className="settings-form__actions">
         <Button loading={pending} loadingLabel="Zapisuję…" type="submit">
           Zapisz adres
         </Button>

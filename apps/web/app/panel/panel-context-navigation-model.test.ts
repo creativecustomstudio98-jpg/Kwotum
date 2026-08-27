@@ -27,10 +27,34 @@ describe("panel context navigation model", () => {
 
   it("includes the privacy destination only when the tenant capability allows it", () => {
     expect(settingsNavigationItems(organizationId, { showPrivacy: false })).toEqual([
-      { href: `${organizationRoot}/ustawienia`, label: "Organizacja" },
-      { href: `${organizationRoot}/powiadomienia`, label: "Powiadomienia" },
+      {
+        href: `${organizationRoot}/ustawienia`,
+        icon: "settings",
+        label: "Organizacja",
+      },
+      {
+        href: `${organizationRoot}/powiadomienia`,
+        icon: "notification",
+        label: "Powiadomienia",
+      },
     ]);
-    expect(settingsNavigationItems(organizationId, { showPrivacy: true })).toHaveLength(3);
+    expect(settingsNavigationItems(organizationId, { showPrivacy: true })).toEqual([
+      {
+        href: `${organizationRoot}/ustawienia`,
+        icon: "settings",
+        label: "Organizacja",
+      },
+      {
+        href: `${organizationRoot}/powiadomienia`,
+        icon: "notification",
+        label: "Powiadomienia",
+      },
+      {
+        href: `${organizationRoot}/prywatnosc`,
+        icon: "privacy",
+        label: "Dane i prywatność",
+      },
+    ]);
   });
 
   it("builds each integration destination from its own capability", () => {

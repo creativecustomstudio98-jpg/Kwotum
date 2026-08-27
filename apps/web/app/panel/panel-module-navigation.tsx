@@ -8,6 +8,7 @@ import {
   isPanelContextNavigationItemActive,
   type PanelContextNavigationItem,
 } from "./panel-context-navigation-model";
+import { PanelNavigationIcon } from "./panel-navigation-icon";
 
 export function PanelModuleNavigation({
   ariaLabel,
@@ -43,6 +44,7 @@ export function PanelModuleNavigation({
               key={item.href}
               prefetch={false}
             >
+              {item.icon ? <PanelNavigationIcon height={16} name={item.icon} width={16} /> : null}
               {item.label}
             </Link>
           );
