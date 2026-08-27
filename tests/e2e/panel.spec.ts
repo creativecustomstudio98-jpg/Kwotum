@@ -22,8 +22,8 @@ const artifactRoot = process.env.PANEL_E2E_ARTIFACT_ROOT
 const panelMinimalArtifactRoot = path.join(artifactRoot, "panel-minimal-v1/baseline");
 const artifactDirectory = path.join(panelMinimalArtifactRoot, "routes");
 const organizationPickerArtifactDirectory = path.join(
-  panelMinimalArtifactRoot,
-  "organization-picker",
+  artifactRoot,
+  "panel-minimal-v1/hotfix-organization-picker-stability",
 );
 const leadDetailArtifactDirectory = path.join(panelMinimalArtifactRoot, "lead-detail");
 const analyticsArtifactDirectory = path.join(panelMinimalArtifactRoot, "analytics");
@@ -118,6 +118,25 @@ async function capture(page: Page, name: string) {
   });
 }
 
+async function readOrganizationPickerGeometry(page: Page, loading: boolean) {
+  return page.evaluate((isLoading) => {
+    const bounds = (selector: string) => {
+      const rect = document.querySelector<HTMLElement>(selector)?.getBoundingClientRect();
+      if (!rect) throw new Error(`Brak elementu ${selector}.`);
+      return { height: rect.height, left: rect.left, top: rect.top, width: rect.width };
+    };
+    return {
+      action: bounds(
+        isLoading ? ".organization-picker__loading-action" : ".organization-actions__primary",
+      ),
+      brand: bounds(".organization-picker__brand"),
+      card: bounds(".organization-list__card"),
+      content: bounds(".organization-picker__content"),
+      intro: bounds(".organization-picker__intro"),
+    };
+  }, loading);
+}
+
 async function mountAnalyticsPrivacyStateProbe(page: Page) {
   await page.evaluate(() => {
     document.querySelector('[data-testid="analytics-privacy-state-probe"]')?.remove();
@@ -183,19 +202,78 @@ test.describe("panel reference reconstruction", () => {
 
   test("organization picker follows the accepted Kwotum composition", async ({ page }) => {
     await mkdir(organizationPickerArtifactDirectory, { recursive: true });
-    await page.setViewportSize({ height: 1_024, width: 1_536 });
-    await page.goto("/panel");
+    await page.setViewportSize({ height: 1_216, width: 2_048 });
+    await page.addInitScript(() => {
+      const layoutShiftState = window as typeof window & { __kwotumLayoutShift?: number };
+      layoutShiftState.__kwotumLayoutShift = 0;
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const shift = entry as PerformanceEntry & { hadRecentInput?: boolean; value?: number };
+          if (!shift.hadRecentInput) {
+            layoutShiftState.__kwotumLayoutShift =
+              (layoutShiftState.__kwotumLayoutShift ?? 0) + (shift.value ?? 0);
+          }
+        }
+      }).observe({ buffered: true, type: "layout-shift" });
+    });
+    await page.goto("/panel", { waitUntil: "commit" });
+
+    await expect(page.locator("main[aria-busy='true']")).toBeVisible();
+    await expect(page.locator(".organization-picker__loading-avatar")).toHaveCSS(
+      "animation-name",
+      "none",
+    );
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(organizationPickerArtifactDirectory, "loading-desktop-2048x1216.png"),
+    });
+    const loadingGeometry = await readOrganizationPickerGeometry(page, true);
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Wybierz organizację" }),
     ).toBeVisible();
+    const brand = page.getByRole("link", { name: "Kwotum — strona główna" });
+    await expect(brand).toBeVisible();
     const card = page.locator(".organization-list > li").first();
+    const organizationLink = card.getByRole("link", { name: "Wybierz" });
     const summary = card.getByRole("list", { name: /Podsumowanie organizacji/ });
     await expect(summary.getByRole("listitem")).toHaveCount(3);
-    await expect(card.getByRole("link", { name: "Wybierz" })).toHaveAttribute(
-      "href",
-      `/panel/${organizationId}`,
+    await expect(organizationLink).toHaveAttribute("href", `/panel/${organizationId}`);
+
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(organizationPickerArtifactDirectory, "after-desktop-2048x1216.png"),
+    });
+    const readyGeometry = await readOrganizationPickerGeometry(page, false);
+    const layoutShiftScore = await page.evaluate(
+      () => (window as typeof window & { __kwotumLayoutShift?: number }).__kwotumLayoutShift ?? 0,
     );
+    const geometryDeltas = Object.fromEntries(
+      (["action", "brand", "card", "content", "intro"] as const).map((region) => [
+        region,
+        Object.fromEntries(
+          (["height", "left", "top", "width"] as const).map((property) => [
+            property,
+            Math.abs(loadingGeometry[region][property] - readyGeometry[region][property]),
+          ]),
+        ),
+      ]),
+    );
+    for (const region of Object.values(geometryDeltas)) {
+      for (const delta of Object.values(region)) expect(delta).toBeLessThanOrEqual(1);
+    }
+    await writeFile(
+      path.join(organizationPickerArtifactDirectory, "measurements.json"),
+      `${JSON.stringify(
+        { geometryDeltas, layoutShiftScore, loadingGeometry, readyGeometry },
+        null,
+        2,
+      )}\n`,
+    );
+
+    await page.setViewportSize({ height: 1_024, width: 1_536 });
 
     const desktop = await page.evaluate(() => {
       const bounds = (selector: string) => {
@@ -204,10 +282,16 @@ test.describe("panel reference reconstruction", () => {
         return { height: rect.height, left: rect.left, top: rect.top, width: rect.width };
       };
       return {
+        avatar: bounds(".organization-list__identity > span"),
+        brand: bounds(".organization-picker__brand"),
+        brandDecoration: getComputedStyle(
+          document.querySelector<HTMLElement>(".organization-picker__brand")!,
+        ).textDecorationLine,
+        card: bounds(".organization-list__card"),
+        content: bounds(".organization-picker__content"),
         header: bounds(".organization-picker__header"),
         intro: bounds(".organization-picker__intro"),
         list: bounds(".organization-list"),
-        listHeader: bounds(".organization-list__header"),
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         primaryAction: bounds(".organization-actions__primary"),
       };
@@ -221,27 +305,16 @@ test.describe("panel reference reconstruction", () => {
     expect(desktop.card.height).toBeLessThanOrEqual(434);
     expect(desktop.avatar.width).toBeGreaterThanOrEqual(82);
     expect(desktop.avatar.width).toBeLessThanOrEqual(86);
+    expect(desktop.brand.height).toBeGreaterThanOrEqual(31);
+    expect(desktop.brand.height).toBeLessThanOrEqual(33);
+    expect(desktop.brandDecoration).toBe("none");
     expect(desktop.primaryAction.height).toBeGreaterThanOrEqual(52);
     expect(desktop.primaryAction.width).toBeGreaterThanOrEqual(390);
     expect(desktop.overflow).toBeLessThanOrEqual(1);
-
-    await page.screenshot({
-      animations: "disabled",
-      path: path.join(organizationPickerArtifactDirectory, "after-desktop-1536x1024.png"),
-    });
+    expect(layoutShiftScore).toBeLessThanOrEqual(0.01);
 
     await organizationLink.focus();
     await expect(organizationLink).toBeFocused();
-
-    const search = page.getByRole("searchbox", { name: "Szukaj organizacji" });
-    await search.fill("organizacja-ktorej-nie-ma");
-    await search.press("Enter");
-    await expect(page).toHaveURL(/\/panel\?q=organizacja-ktorej-nie-ma$/);
-    await expect(page.getByText("Brak wyników", { exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Wyczyść wyszukiwanie" })).toHaveAttribute(
-      "href",
-      "/panel",
-    );
 
     for (const viewport of [
       { height: 800, width: 320 },
@@ -265,6 +338,7 @@ test.describe("panel reference reconstruction", () => {
     }
 
     await page.setViewportSize({ height: 844, width: 390 });
+    await page.goto("/panel");
     await expect(card).toBeVisible();
     await expect(card.getByRole("link", { name: "Wybierz" })).toBeVisible();
     await expect(card.getByRole("link")).toHaveCount(1);

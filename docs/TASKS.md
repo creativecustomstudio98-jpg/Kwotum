@@ -2827,6 +2827,16 @@ fixture'u pozostawił 0 rekordów. Raporty:
 `artifacts/visual-qa/panel-minimal-v1/m5-lists/`. Następny dozwolony etap to
 M6; workspace szczegółu leada nie został rozpoczęty.
 
+**Hotfix wyboru organizacji 2026-08-28 — PASS:** naprawiono regresję po
+częściowym połączeniu dwóch wersji `/panel`. Ready, loading i error korzystają
+z jednego współdzielonego frame'u; logo nie przejmuje globalnego podkreślenia,
+a streaming skeleton rezerwuje identyczną geometrię karty i akcji. Pomiar
+2048 × 1216 wykazał 0 px różnicy dla logo, intro, karty i akcji oraz CLS równy 0. Pełne unit 418/418, PostgreSQL/RLS i WordPress przeszły; target E2E przeszedł
+1/1, axe ma 0 naruszeń, macierz 320–1536 px nie ma overflow, build przeszedł
+16/16, a cleanup syntetycznego fixture'u pozostawił `0|0|0`. Raport i artefakty:
+`artifacts/visual-qa/panel-minimal-v1/hotfix-organization-picker-stability/`.
+Zakres nie rozpoczyna M9 i nie zmienia kolejności dalszych etapów.
+
 ## Etap 12ZN — Adaptive Intake: szybki formularz, prowadzony brief i konfigurator
 
 Program jest prowadzony przez kanoniczny pakiet

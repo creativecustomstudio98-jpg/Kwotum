@@ -6,6 +6,9 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Fixed
 
+- Ekran wyboru organizacji używa jednego frame'u dla ready, loading i error.
+  Usunięto podkreślenie oraz rozjazd logo, a skeleton zachowuje identyczne osie
+  intro, karty i akcji; pomiar streamingowego przejścia wykazuje CLS równy 0.
 - Usunięto drift produkcyjnego schematu: po szyfrowanym logicznym backupie,
   odtworzeniu zakresu aplikacyjnego i rehearsal na danych produkcyjnych
   wdrożono migracje PX2–PX6 oraz dashboardu do `20260826000100`. Produkcyjne
