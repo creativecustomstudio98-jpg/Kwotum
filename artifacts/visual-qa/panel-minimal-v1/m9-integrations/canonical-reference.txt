@@ -1,0 +1,23 @@
+M9.1 — Integracje
+
+Zaakceptowana referencja właściciela produktu:
+- nazwa źródłowa: ChatGPT Image 28 sie 2026, 00_02_54.png
+- rozmiar: 1651 × 953 px
+- SHA-256: d864f27cdb08a1b0c5110b04da97935863d42c8f7534359de6fccb2a4c479cc3
+
+Oryginalny plik nie jest kopiowany do repozytorium, ponieważ zawiera dane
+identyfikujące konto i organizację. Hash oraz wymiary pozwalają jednoznacznie
+zweryfikować źródło.
+
+Zakres referencji:
+- biały canvas panelu;
+- segmentowy wybór WordPress / Webhooki;
+- dwukolumnowa powierzchnia stanu i konfiguracji;
+- lokalne ramy podsekcji i ich pustych stanów;
+- kompaktowe pola formularzy;
+- spokojna hierarchia bez dekoracyjnych kart.
+
+Poza zakresem:
+- przykładowe nazwy, adresy, liczby i statusy;
+- nowe funkcje, dane, role lub uprawnienia;
+- zmiany HMAC, sekretów, walidacji URL, RLS albo tenant scope.

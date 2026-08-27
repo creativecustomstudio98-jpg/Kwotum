@@ -1,10 +1,10 @@
-import { EmptyState } from "@wyceno/ui";
 import type { Metadata } from "next";
 
 import { requireTenantContext } from "../../../../../lib/auth/tenant-context";
 import { getWebhookIntegration } from "../../../../../lib/webhooks/service";
 import { PanelIcon } from "../../../panel-icon";
 import { PanelPageHeader } from "../../../panel-page-header";
+import { IntegrationEmptyState } from "../integration-empty-state";
 import { IntegrationsNavigation } from "../../integrations-navigation";
 import { WebhookEndpointActions } from "./endpoint-actions";
 import { WebhookEndpointForm } from "./endpoint-form";
@@ -63,7 +63,7 @@ export default async function WebhookIntegrationPage({
         navigation={<IntegrationsNavigation />}
         title="Integracje"
       />
-      <div className="panel-page integrations-workspace">
+      <div className="panel-page integrations-workspace integrations-workspace--webhooks">
         <div className="integrations-primary-grid">
           <section
             className="panel-card integration-summary"
@@ -71,7 +71,7 @@ export default async function WebhookIntegrationPage({
           >
             <div className="integration-row">
               <span className="integration-row__icon">
-                <PanelIcon name="integration" />
+                <PanelIcon name="webhook" />
               </span>
               <div>
                 <h2 id="webhook-summary-title">
@@ -94,7 +94,7 @@ export default async function WebhookIntegrationPage({
                 przechowywany w bazie.
               </span>
             </div>
-            <dl className="webhook-summary-metrics">
+            <dl className="integration-summary-metrics webhook-summary-metrics">
               <div>
                 <dt>Dostarczone</dt>
                 <dd>{delivered}</dd>
@@ -117,9 +117,10 @@ export default async function WebhookIntegrationPage({
             <span className="panel-status panel-status--neutral">{endpoints.length} łącznie</span>
           </div>
           {endpoints.length === 0 ? (
-            <EmptyState
-              description="Dodaj publiczny URL HTTPS. DNS i wszystkie adresy IP zostaną sprawdzone przed zapisem."
-              title="Brak webhooków"
+            <IntegrationEmptyState
+              description="Dodaj pierwszy, aby zacząć otrzymywać zdarzenia."
+              icon="inbox"
+              title="Brak endpointów odbiorczych"
             />
           ) : (
             <ul className="webhook-endpoint-list">
@@ -158,6 +159,21 @@ export default async function WebhookIntegrationPage({
           )}
         </section>
 
+        {endpoints.length === 0 ? (
+          <section className="panel-card integration-empty-callout" aria-label="Stan webhooków">
+            <span>
+              <strong>Brak webhooków</strong>
+              <small>
+                Dodaj publiczny URL HTTPS. DNS i wszystkie adresy IP zostaną sprawdzone przed
+                zapisem.
+              </small>
+            </span>
+            <span aria-hidden="true" className="integration-empty-callout__icon">
+              <PanelIcon name="webhook" />
+            </span>
+          </section>
+        ) : null}
+
         <section className="panel-card integration-connections" aria-labelledby="deliveries-title">
           <div className="panel-card__header">
             <div>
@@ -167,9 +183,10 @@ export default async function WebhookIntegrationPage({
             <span className="panel-status panel-status--neutral">Ostatnie {deliveries.length}</span>
           </div>
           {deliveries.length === 0 ? (
-            <EmptyState
+            <IntegrationEmptyState
               description="Po teście lub nowym leadzie zobaczysz tu status, liczbę prób i kod HTTP."
-              title="Brak prób dostawy"
+              icon="history"
+              title="Brak historii dostaw"
             />
           ) : (
             <ul className="webhook-delivery-list">

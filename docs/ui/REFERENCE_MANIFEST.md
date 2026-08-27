@@ -1,7 +1,7 @@
 # Manifest aktywnych referencji UI Kwotum
 
 **Status:** kanoniczny  
-**Ostatnia aktualizacja:** 2026-08-27
+**Ostatnia aktualizacja:** 2026-08-28
 
 Ten plik zawiera wyłącznie referencje, które nadal sterują przyszłą pracą.
 Historyczne obrazy panelu i ich pakiety źródłowe zostały usunięte po decyzji
@@ -20,6 +20,21 @@ kierunku bez nowej decyzji.
 Referencja wizualna nie dodaje funkcji, danych, ról ani uprawnień. Nazwy,
 liczby i osoby na obrazie są przykładową treścią, dopóki wymagania produktu nie
 stanowią inaczej.
+
+## Integracje panelu — M9.1, 2026-08-28
+
+Zaakceptowany obraz 1651 × 953 px, SHA-256
+`d864f27cdb08a1b0c5110b04da97935863d42c8f7534359de6fccb2a4c479cc3`,
+nadpisuje wcześniejszy kierunek wyłącznie dla tras WordPress/Webhooki:
+segmentowego przełącznika, dwukolumnowej powierzchni stanu i konfiguracji,
+lokalnych obramowań podsekcji oraz kompaktowych pól. Oryginał nie jest
+przechowywany w repozytorium z powodu widocznych danych konta i organizacji;
+identyfikują go hash oraz wymiary.
+
+Obraz nie zmienia HMAC, sekretów, walidacji HTTPS/DNS/IP, request IDs, audytu,
+capabilities, RLS, tenant scope ani danych domenowych. Aktywne artefakty i
+raport znajdują się w `artifacts/visual-qa/panel-minimal-v1/m9-integrations/`
+oraz `panel-minimal-v1/M9_1_INTEGRATIONS_IMPLEMENTATION_2026-08-28.md`.
 
 ## Główna akcja Kwotum — korekta tekstowa 2026-08-27
 

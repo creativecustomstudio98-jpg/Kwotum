@@ -1,4 +1,4 @@
-import { Button, EmptyState, LinkButton } from "@wyceno/ui";
+import { Button } from "@wyceno/ui";
 import type { Metadata } from "next";
 
 import { requireTenantContext } from "../../../../../lib/auth/tenant-context";
@@ -6,6 +6,7 @@ import { getWordPressIntegration } from "../../../../../lib/wordpress/service";
 import { PanelIcon } from "../../../panel-icon";
 import { PanelPageHeader } from "../../../panel-page-header";
 import { IntegrationsNavigation } from "../../integrations-navigation";
+import { IntegrationEmptyState } from "../integration-empty-state";
 import { revokeWordPressConnectionAction } from "./actions";
 import { WordPressTokenForm } from "./token-form";
 
@@ -26,15 +27,11 @@ export default async function WordPressIntegrationPage({
   const { connections, organizationName } = await getWordPressIntegration(organizationId);
   const connected = connections.some((connection) => !connection.revokedAt);
   const activeConnections = connections.filter((connection) => !connection.revokedAt);
+  const revokedConnections = connections.filter((connection) => connection.revokedAt);
 
   return (
     <main className="panel-workspace wordpress-panel">
       <PanelPageHeader
-        actions={
-          <LinkButton href={`/panel/${organizationId}/procesy`} size="small" variant="secondary">
-            Przejdź do procesów
-          </LinkButton>
-        }
         breadcrumbs={[
           { href: `/panel/${organizationId}`, label: "Przegląd" },
           { label: "Integracje" },
@@ -69,6 +66,16 @@ export default async function WordPressIntegrationPage({
                 credential połączenia.
               </span>
             </div>
+            <dl className="integration-summary-metrics">
+              <div>
+                <dt>Połączone</dt>
+                <dd>{activeConnections.length}</dd>
+              </div>
+              <div>
+                <dt>Odłączone</dt>
+                <dd>{revokedConnections.length}</dd>
+              </div>
+            </dl>
           </section>
           <WordPressTokenForm organizationId={organizationId} />
         </div>
@@ -86,8 +93,9 @@ export default async function WordPressIntegrationPage({
             </span>
           </div>
           {connections.length === 0 ? (
-            <EmptyState
+            <IntegrationEmptyState
               description="Wygeneruj token i wklej go w ustawieniach wtyczki."
+              icon="inbox"
               title="Brak połączonych stron"
             />
           ) : (
@@ -126,6 +134,20 @@ export default async function WordPressIntegrationPage({
             </ul>
           )}
         </section>
+        {connections.length === 0 ? (
+          <section
+            className="panel-card integration-empty-callout"
+            aria-label="Stan połączeń WordPress"
+          >
+            <span>
+              <strong>WordPress nie jest jeszcze połączony</strong>
+              <small>Token jest jednorazowy, przypisany do originu i wygasa po 10 minutach.</small>
+            </span>
+            <span aria-hidden="true" className="integration-empty-callout__icon">
+              <PanelIcon name="integration" />
+            </span>
+          </section>
+        ) : null}
       </div>
     </main>
   );

@@ -70,4 +70,33 @@ describe("kontrakt wizualny panelu M1", () => {
       expect.arrayContaining([expect.stringContaining("border: 0")]),
     );
   });
+
+  it("utrzymuje referencyjny segmented control i lokalne ramy integracji", () => {
+    expect(
+      rules(panelBaseStyles, ".panel-module-navigation--segmented .panel-module-navigation__track"),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("border-radius: var(--wy-radius-pill)"),
+        expect.stringContaining("background: var(--wy-color-surface-muted)"),
+      ]),
+    );
+    expect(rules(panelReferenceStyles, ".integrations-primary-grid")).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("border: 1px solid var(--wy-color-border)"),
+        expect.stringContaining("border-radius: 12px"),
+      ]),
+    );
+    expect(rules(panelReferenceStyles, ".integration-connections")).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("border: 1px solid var(--wy-color-border)"),
+        expect.stringContaining("border-radius: 12px"),
+      ]),
+    );
+    expect(rules(panelReferenceStyles, ".integration-url-input")).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("height: 44px"),
+        expect.stringContaining("min-height: 44px"),
+      ]),
+    );
+  });
 });

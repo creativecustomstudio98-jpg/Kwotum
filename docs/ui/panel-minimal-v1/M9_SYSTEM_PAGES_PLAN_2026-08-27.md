@@ -1,6 +1,6 @@
 # M9 — plan profesjonalizacji Integracji, Ustawień i Pomocy
 
-**Status:** plan sekwencyjny po korekcie białego canvasa i nawigacji
+**Status:** M9.1 ukończony; następnym zamkniętym etapem jest M9.2
 **Data:** 2026-08-27
 **Zakres:** wyłącznie istniejące funkcje, dane, role i akcje panelu
 
@@ -44,6 +44,14 @@ HTTPS/DNS/IP, request ID, audyt, capability gating i tenant scope.
 Gate M9.1: WordPress i Webhooki dla loading/empty/connected/error, Owner/Admin
 oraz roli bez uprawnienia, desktop 1440 × 900, tablet 768 × 1024, mobile
 390 × 844 i 320 × 800, axe, forced colors, pełne akcje i cleanup fixture'u.
+
+**Wynik 2026-08-28:** M9.1 zamknięto na podstawie zaakceptowanej referencji
+1651 × 953 px. Wdrożono segmentowe przełączanie, jedną dwukolumnową
+powierzchnię stanu i konfiguracji, lokalne ramy podsekcji oraz pola 44 px.
+Connected i empty przeszły macierz responsive bez overflow, axe i forced
+colors; istniejące kontrakty webhooków i WordPressa pozostały bez zmian.
+Szczegóły, pomiary i rollback opisuje
+`M9_1_INTEGRATIONS_IMPLEMENTATION_2026-08-28.md`.
 
 ### M9.2 — Ustawienia
 

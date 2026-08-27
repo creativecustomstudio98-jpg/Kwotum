@@ -8122,21 +8122,25 @@
 .integrations-workspace {
   max-width: none;
   align-content: start;
-  gap: 30px;
+  gap: 24px;
 }
 
 .integrations-primary-grid {
   min-width: 0;
-  border-block: 1px solid var(--wy-color-border);
+  border: 1px solid var(--wy-color-border);
+  border-radius: 12px;
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
   gap: 0;
+  overflow: hidden;
+  background: var(--wy-color-surface);
 }
 
 .integrations-primary-grid > .panel-card {
   min-height: 0;
   border: 0;
   border-radius: 0;
+  background: var(--wy-color-surface);
   box-shadow: none;
 }
 
@@ -8152,26 +8156,28 @@
   border-bottom: 1px solid var(--wy-color-border);
 }
 
-.wordpress-panel .integration-row__icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 0;
-  background: transparent;
+.integrations-primary-grid .integration-row__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--wy-color-brand-soft);
+  color: var(--wy-color-brand);
 }
 
-.wordpress-panel .integration-row__icon svg {
-  width: 17px;
-  height: 17px;
+.integrations-primary-grid .integration-row__icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 .integration-security-note {
-  margin: 18px 20px;
-  padding: 1px 0 1px 12px;
+  min-height: 56px;
+  margin: 0;
+  padding: 13px 20px;
   border: 0;
-  border-left: 2px solid var(--wy-color-brand);
+  border-bottom: 1px solid var(--wy-color-border);
   border-radius: 0;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   background: transparent;
   color: var(--wy-color-text-secondary);
@@ -8180,49 +8186,52 @@
 }
 
 .integration-security-note svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex: 0 0 auto;
   color: var(--wy-color-brand);
 }
 
 .integrations-primary-grid .wordpress-card {
-  padding-bottom: 16px;
+  padding-bottom: 18px;
 }
 
 .integrations-primary-grid .wordpress-card .panel-card__header {
   min-height: 82px;
   padding: 16px 20px;
+  border-bottom: 0;
 }
 
 .integrations-primary-grid .wordpress-token-form {
-  padding: 16px 20px 0;
+  padding: 8px 20px 0;
   grid-template-columns: 1fr;
   align-content: start;
-  gap: 12px;
+  gap: 10px;
 }
 
 .integrations-primary-grid .wordpress-token-form > .wy-button {
   width: fit-content;
+  min-height: 44px;
   justify-self: end;
 }
 
 .integration-connections {
   min-height: 0;
-  border: 0;
-  border-block: 1px solid var(--wy-color-border);
-  border-radius: 0;
+  border: 1px solid var(--wy-color-border);
+  border-radius: 12px;
   box-shadow: none;
+  overflow: hidden;
 }
 
 .integration-connections .panel-card__header {
-  min-height: 68px;
-  padding: 14px 0;
+  min-height: 64px;
+  padding: 16px 24px 10px;
+  border-bottom: 0;
 }
 
 .integration-connections .connection-list li {
   min-height: 62px;
-  padding-inline: 0;
+  padding-inline: 16px;
 }
 
 .wordpress-panel .panel-status {
@@ -8238,23 +8247,33 @@
 }
 
 .integrations-primary-grid .webhook-card {
-  padding-bottom: 16px;
+  padding-bottom: 18px;
 }
 
 .integrations-primary-grid .webhook-card .panel-card__header {
   min-height: 82px;
   padding: 16px 20px;
+  border-bottom: 0;
 }
 
 .webhook-endpoint-form {
   display: grid;
-  gap: 12px;
-  padding: 16px 20px 0;
+  gap: 10px;
+  padding: 8px 20px 0;
 }
 
 .webhook-endpoint-form > .wy-button {
   width: fit-content;
+  min-height: 44px;
   justify-self: end;
+}
+
+.integration-url-input {
+  height: 44px;
+  min-height: 44px;
+  padding-block: 8px;
+  border-radius: 9px;
+  font-size: 13px;
 }
 
 .wordpress-token-message,
@@ -8285,44 +8304,136 @@
   font-size: 12px;
 }
 
-.webhook-summary-metrics {
+.integration-summary-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
-  border-top: 1px solid var(--wy-color-border);
 }
 
-.webhook-summary-metrics div {
+.integration-summary-metrics div {
   display: grid;
   gap: 3px;
   padding: 14px 20px;
 }
 
-.webhook-summary-metrics div + div {
+.integration-summary-metrics div + div {
   border-left: 1px solid var(--wy-color-border);
 }
 
-.webhook-summary-metrics dt {
+.integration-summary-metrics dt {
   color: var(--wy-color-text-muted);
   font-size: 12px;
 }
 
-.webhook-summary-metrics dd {
+.integration-summary-metrics dd {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
 }
 
-.webhook-endpoint-list,
-.webhook-delivery-list {
+.integration-empty-state {
+  min-height: 72px;
+  margin: 0 24px 16px;
+  padding: 12px 18px;
+  border: 1px solid var(--wy-color-border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--wy-color-surface);
+}
+
+.integration-empty-state__icon,
+.integration-empty-callout__icon {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--wy-color-border);
+  border-radius: 50%;
   display: grid;
-  margin: 0;
+  place-items: center;
+  flex: none;
+  background: var(--wy-color-surface-muted);
+  color: var(--wy-color-text-muted);
+}
+
+.integration-empty-state__icon svg,
+.integration-empty-callout__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.integration-empty-state__copy,
+.integration-empty-callout > span:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.integration-empty-state strong,
+.integration-empty-callout strong {
+  font-size: 12px;
+  font-weight: var(--wy-font-weight-semibold);
+}
+
+.integration-empty-state small,
+.integration-empty-callout small {
+  color: var(--wy-color-text-muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.integration-empty-callout,
+.integration-state-card {
+  border: 1px solid var(--wy-color-border);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.integration-empty-callout {
+  min-height: 84px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.integration-empty-callout__icon {
+  width: 44px;
+  height: 44px;
+}
+
+.integration-state-card {
+  min-height: 240px;
+  padding: 24px;
+}
+
+.integration-state-card .wy-state {
+  border: 0;
+}
+
+.webhook-endpoint-list,
+.webhook-delivery-list,
+.integration-connections .connection-list {
+  display: grid;
+  margin: 0 24px 16px;
   padding: 0;
+  border: 1px solid var(--wy-color-border);
+  border-radius: 10px;
+  overflow: hidden;
   list-style: none;
 }
 
 .webhook-endpoint-list > li,
-.webhook-delivery-list > li {
+.webhook-delivery-list > li,
+.integration-connections .connection-list > li {
+  border-top: 0;
+}
+
+.webhook-endpoint-list > li + li,
+.webhook-delivery-list > li + li,
+.integration-connections .connection-list > li + li {
   border-top: 1px solid var(--wy-color-border);
 }
 
@@ -8332,7 +8443,7 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
-  padding: 14px 0;
+  padding: 14px 16px;
 }
 
 .webhook-endpoint-main > span:nth-child(2),
@@ -8361,11 +8472,11 @@
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 8px;
-  padding-bottom: 14px;
+  padding: 0 16px 14px;
 }
 
 .webhook-endpoint-actions {
-  padding-bottom: 0;
+  padding: 0;
 }
 
 .webhook-endpoint-actions > .lead-action-error,
@@ -8381,7 +8492,7 @@
   align-items: center;
   gap: 14px;
   min-width: 0;
-  padding: 14px 0;
+  padding: 14px 16px;
 }
 
 .webhook-panel .panel-status--warning {
@@ -9376,7 +9487,38 @@
   }
 
   .integration-security-note {
+    padding-inline: 14px;
+  }
+
+  .integration-connections .panel-card__header,
+  .integration-empty-callout,
+  .integration-state-card {
+    padding-inline: 14px;
+  }
+
+  .integration-empty-state,
+  .webhook-endpoint-list,
+  .webhook-delivery-list,
+  .integration-connections .connection-list {
     margin-inline: 14px;
+  }
+
+  .wordpress-panel .panel-module-navigation--segmented,
+  .webhook-panel .panel-module-navigation--segmented,
+  .wordpress-panel .panel-module-navigation--segmented .panel-module-navigation__track,
+  .webhook-panel .panel-module-navigation--segmented .panel-module-navigation__track {
+    width: 100%;
+  }
+
+  .wordpress-panel .panel-module-navigation--segmented a,
+  .webhook-panel .panel-module-navigation--segmented a {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .integrations-primary-grid .wordpress-token-form > .wy-button,
+  .webhook-endpoint-form > .wy-button {
+    width: 100%;
   }
 
   .integration-connections .connection-list li {

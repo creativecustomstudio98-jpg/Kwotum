@@ -1997,3 +1997,29 @@ Finalny zaakceptowany crop zwiniętego wariantu, 236 × 200 px, SHA-256
 `a35d9b646ed18fc1d85c23c01e8ee5da6f4a697011b652051cd43a942360334d`,
 doprecyzowuje wyjątek: po collapse jasna powierzchnia zaczyna się równo z lewą
 krawędzią raila, bez lewego zaokrąglenia, a prawy skos pozostaje wewnątrz.
+
+## ADR-059: regionalna anatomia Integracji M9.1
+
+**Status:** accepted na podstawie referencji właściciela produktu z 2026-08-28
+
+**Decyzja:** obraz 1651 × 953 px, SHA-256
+`d864f27cdb08a1b0c5110b04da97935863d42c8f7534359de6fccb2a4c479cc3`,
+nadpisuje ADR-058 wyłącznie dla ekranów WordPress i Webhooki. Trasy używają
+wspólnego przełącznika segmentowego, jednej dwukolumnowej powierzchni stanu i
+konfiguracji, lokalnie obramowanych podsekcji oraz pól o wysokości 44 px.
+Panel pozostaje biały, a ramy są funkcjonalnym grupowaniem, nie dekoracją.
+
+Nie kopiujemy nazw, adresów ani wartości z obrazu. Nie zmieniamy routingu,
+capabilities, RLS, tenant scope, HMAC, sekretów, walidacji URL, request IDs,
+audytu ani kontraktu WordPress. Oryginał zawierający dane konta nie jest
+przechowywany w repozytorium; identyfikują go wymiary i hash.
+
+**Dlaczego:** dotychczasowa płaska siatka miała zbyt wiele konkurujących linii,
+za słabo wskazywała kolejność zadania i nie odpowiadała zaakceptowanemu
+przełączeniu WordPress/Webhooki. Lokalne ramy porządkują stan, formularz,
+połączenia i historię, a pole 44 px poprawia gęstość bez obniżenia minimalnego
+celu dotykowego.
+
+**Konsekwencje:** M9.1 nie wymaga migracji ani nowej zależności. Loading,
+empty, connected i error korzystają z tej samej anatomii; mobile składa region
+do jednej kolumny. Rollback dotyczy wyłącznie komponentów i CSS Integracji.

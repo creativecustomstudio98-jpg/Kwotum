@@ -30,6 +30,7 @@ export function WebhookEndpointForm({
         <FormField id="webhook-endpoint-url" label="URL odbiorcy">
           <Input
             autoComplete="url"
+            className="integration-url-input"
             name="url"
             placeholder="https://hooks.firma.pl/kwotum/leads"
             required

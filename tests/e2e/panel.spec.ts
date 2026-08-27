@@ -66,6 +66,8 @@ const m7BuilderArtifactDirectory = path.join(
   artifactRoot,
   "panel-minimal-v1/m7-builder-installation/builder",
 );
+const m9IntegrationsArtifactDirectory = path.join(artifactRoot, "panel-minimal-v1/m9-integrations");
+const integrationsEmptyFixture = process.env.PANEL_VISUAL_QA_INTEGRATIONS_EMPTY === "1";
 const m5ResponsiveViewports = [
   { height: 800, width: 320 },
   { height: 812, width: 375 },
@@ -4582,6 +4584,305 @@ test.describe("panel reference reconstruction", () => {
       expect(accessibility.violations, `${screen.name} accessibility`).toEqual([]);
     }
 
+    expect(errors).toEqual([]);
+  });
+
+  test("M9.1 empty integration states match the accepted reference", async ({ page }) => {
+    test.skip(!integrationsEmptyFixture, "Test wymaga pustego seedu Integracji.");
+    const webhookArtifacts = path.join(m9IntegrationsArtifactDirectory, "webhooks");
+    const wordpressArtifacts = path.join(m9IntegrationsArtifactDirectory, "wordpress");
+    await Promise.all([
+      mkdir(webhookArtifacts, { recursive: true }),
+      mkdir(wordpressArtifacts, { recursive: true }),
+    ]);
+
+    const routes = [
+      {
+        assertions: ["Brak endpointów odbiorczych", "Brak webhooków", "Brak historii dostaw"],
+        directory: webhookArtifacts,
+        name: "webhooks",
+        path: `/panel/${organizationId}/integracje/webhooki`,
+      },
+      {
+        assertions: ["Brak połączonych stron", "WordPress nie jest jeszcze połączony"],
+        directory: wordpressArtifacts,
+        name: "wordpress",
+        path: `/panel/${organizationId}/integracje/wordpress`,
+      },
+    ] as const;
+
+    for (const viewport of [
+      { height: 953, label: "empty-1651x953", width: 1_651 },
+      { height: 844, label: "empty-mobile-390x844", width: 390 },
+    ]) {
+      await page.setViewportSize(viewport);
+      for (const route of routes) {
+        await page.goto(route.path);
+        await expect(page.getByRole("heading", { level: 1, name: "Integracje" })).toBeVisible();
+        for (const label of route.assertions) {
+          await expect(page.getByText(label, { exact: true })).toBeVisible();
+        }
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          ),
+        ).toBeLessThanOrEqual(1);
+        await page.screenshot({
+          animations: "disabled",
+          fullPage: true,
+          path: path.join(route.directory, `${viewport.label}.png`),
+        });
+        if (viewport.width === 390) {
+          const accessibility = await new AxeBuilder({ page })
+            .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+            .analyze();
+          expect(accessibility.violations, `${route.name} empty accessibility`).toEqual([]);
+        }
+      }
+    }
+  });
+
+  test("M9.1 hides integrations and rejects direct access for Sales", async ({ browser }) => {
+    test.skip(!salesEmail || !salesPassword, "Test M9.1 roli Sales wymaga PANEL_E2E_SALES_*.");
+    if (!organizationId || !salesEmail || !salesPassword) {
+      throw new Error("Brak danych konta Sales dla testu M9.1.");
+    }
+
+    const salesContext = await browser.newContext({ viewport: { height: 900, width: 1_440 } });
+    try {
+      const salesPage = await salesContext.newPage();
+      await signInWithCredentials(salesPage, salesEmail, salesPassword, organizationId);
+
+      const panelNavigation = salesPage.getByRole("navigation", {
+        name: "Główna nawigacja panelu",
+      });
+      await expect(panelNavigation.getByRole("link", { name: "Integracje" })).toHaveCount(0);
+
+      await salesPage.goto(`/panel/${organizationId}/integracje/webhooki`);
+      await expect(
+        salesPage.getByRole("heading", { name: "Nie udało się pobrać webhooków" }),
+      ).toBeVisible();
+      await expect(salesPage.getByRole("navigation", { name: "Rodzaje integracji" })).toHaveCount(
+        0,
+      );
+      await expect(salesPage.getByRole("button", { name: "Dodaj bezpieczny webhook" })).toHaveCount(
+        0,
+      );
+
+      await salesPage.goto(`/panel/${organizationId}/integracje/wordpress`);
+      await expect(
+        salesPage.getByRole("heading", { name: "Nie udało się pobrać integracji" }),
+      ).toBeVisible();
+      await expect(salesPage.getByLabel("Origin strony WordPress")).toHaveCount(0);
+      await expect(
+        salesPage.getByRole("button", { name: "Wygeneruj token instalacyjny" }),
+      ).toHaveCount(0);
+    } finally {
+      await salesContext.close();
+    }
+  });
+
+  test("M9.1 integrations match the accepted segmented and bordered composition", async ({
+    page,
+  }) => {
+    const webhookArtifacts = path.join(m9IntegrationsArtifactDirectory, "webhooks");
+    const wordpressArtifacts = path.join(m9IntegrationsArtifactDirectory, "wordpress");
+    await Promise.all([
+      mkdir(webhookArtifacts, { recursive: true }),
+      mkdir(wordpressArtifacts, { recursive: true }),
+    ]);
+
+    const errors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") errors.push(message.text());
+    });
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("response", (response) => {
+      if (response.status() >= 500) errors.push(`${response.status()} ${response.url()}`);
+    });
+
+    const webhookUrl = `/panel/${organizationId}/integracje/webhooki`;
+    const wordpressUrl = `/panel/${organizationId}/integracje/wordpress`;
+
+    await page.setViewportSize({ height: 953, width: 1_651 });
+    await page.goto(webhookUrl);
+    await expect(page.getByRole("heading", { level: 1, name: "Integracje" })).toBeVisible();
+    const navigation = page.getByRole("navigation", { name: "Rodzaje integracji" });
+    await expect(navigation.getByRole("link", { name: "Webhooki" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(navigation.getByRole("link", { name: "WordPress" })).not.toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(page.locator(".integrations-primary-grid")).toBeVisible();
+    await expect(page.locator(".integration-connections")).toHaveCount(2);
+    await expect(page.getByLabel("URL odbiorcy")).toHaveCSS("height", "44px");
+
+    await expect(page.getByText("https://hooks.partner.pl/kwotum/leads")).toBeVisible();
+
+    const webhookGeometry = await page.evaluate(() => {
+      const bounds = (selector: string) => {
+        const element = document.querySelector<HTMLElement>(selector);
+        if (!element) throw new Error(`Brak elementu ${selector}.`);
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return {
+          borderRadius: Number.parseFloat(style.borderRadius),
+          borderWidth: Number.parseFloat(style.borderTopWidth),
+          height: rect.height,
+          width: rect.width,
+        };
+      };
+      const navigationTrack = bounds(
+        ".panel-module-navigation--segmented .panel-module-navigation__track",
+      );
+      const navigationLinks = Array.from(
+        document.querySelectorAll<HTMLElement>(".panel-module-navigation--segmented a"),
+      ).map((link) => ({
+        background: getComputedStyle(link).backgroundColor,
+        height: link.getBoundingClientRect().height,
+        width: link.getBoundingClientRect().width,
+      }));
+      return {
+        input: bounds(".integration-url-input"),
+        navigationLinks,
+        navigationTrack,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        primary: bounds(".integrations-primary-grid"),
+        sections: Array.from(
+          document.querySelectorAll<HTMLElement>(".integration-connections"),
+        ).map((section) => ({
+          borderRadius: Number.parseFloat(getComputedStyle(section).borderRadius),
+          borderWidth: Number.parseFloat(getComputedStyle(section).borderTopWidth),
+        })),
+      };
+    });
+
+    expect(webhookGeometry.navigationTrack.width).toBeGreaterThanOrEqual(260);
+    expect(webhookGeometry.navigationTrack.width).toBeLessThanOrEqual(275);
+    expect(webhookGeometry.navigationTrack.height).toBeGreaterThanOrEqual(44);
+    expect(webhookGeometry.navigationTrack.height).toBeLessThanOrEqual(48);
+    expect(webhookGeometry.navigationLinks).toHaveLength(2);
+    expect(webhookGeometry.navigationLinks.every((link) => link.height >= 40)).toBe(true);
+    expect(webhookGeometry.primary.borderRadius).toBeGreaterThanOrEqual(11);
+    expect(webhookGeometry.primary.borderWidth).toBe(1);
+    expect(webhookGeometry.input.height).toBe(44);
+    expect(webhookGeometry.sections.every((section) => section.borderRadius >= 11)).toBe(true);
+    expect(webhookGeometry.sections.every((section) => section.borderWidth === 1)).toBe(true);
+    expect(webhookGeometry.overflow).toBeLessThanOrEqual(1);
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(webhookArtifacts, "after-connected-1651x953.png"),
+    });
+
+    await navigation.getByRole("link", { name: "WordPress" }).click();
+    await page.waitForURL(wordpressUrl);
+    await expect(page.getByRole("heading", { level: 1, name: "Integracje" })).toBeVisible();
+    const wordpressNavigation = page.getByRole("navigation", { name: "Rodzaje integracji" });
+    await expect(wordpressNavigation.getByRole("link", { name: "WordPress" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(page.getByLabel("Origin strony WordPress")).toHaveCSS("height", "44px");
+    await expect(page.getByText("https://demo.wyceno.local", { exact: true })).toBeVisible();
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(wordpressArtifacts, "after-connected-1651x953.png"),
+    });
+
+    const responsiveMatrix: Array<Readonly<Record<string, number | string>>> = [];
+    for (const viewport of [
+      { height: 900, name: "desktop-1440x900", width: 1_440 },
+      { height: 1_024, name: "tablet-768x1024", width: 768 },
+      { height: 844, name: "mobile-390x844", width: 390 },
+      { height: 800, name: "mobile-320x800", width: 320 },
+    ]) {
+      await page.setViewportSize(viewport);
+      for (const screen of [
+        { directory: webhookArtifacts, name: "webhooks", path: webhookUrl },
+        { directory: wordpressArtifacts, name: "wordpress", path: wordpressUrl },
+      ]) {
+        await page.goto(screen.path);
+        await expect(page.getByRole("heading", { level: 1, name: "Integracje" })).toBeVisible();
+        const geometry = await page.evaluate(() => {
+          const track = document
+            .querySelector<HTMLElement>(
+              ".panel-module-navigation--segmented .panel-module-navigation__track",
+            )
+            ?.getBoundingClientRect();
+          return {
+            overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            trackHeight: track?.height ?? 0,
+            trackWidth: track?.width ?? 0,
+          };
+        });
+        expect(geometry.overflow, `${screen.name} ${viewport.name} overflow`).toBeLessThanOrEqual(
+          1,
+        );
+        expect(geometry.trackHeight).toBeGreaterThanOrEqual(44);
+        responsiveMatrix.push({
+          height: viewport.height,
+          name: `${screen.name}-${viewport.name}`,
+          ...geometry,
+          width: viewport.width,
+        });
+        if (viewport.width === 1_440 || viewport.width === 390) {
+          await page.screenshot({
+            animations: "disabled",
+            fullPage: true,
+            path: path.join(screen.directory, `${viewport.name}.png`),
+          });
+        }
+        if (viewport.width === 390) {
+          const accessibility = await new AxeBuilder({ page })
+            .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+            .analyze();
+          expect(accessibility.violations, `${screen.name} mobile accessibility`).toEqual([]);
+        }
+      }
+    }
+
+    await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
+    await page.setViewportSize({ height: 800, width: 320 });
+    await page.goto(webhookUrl);
+    const activeIntegration = page
+      .getByRole("navigation", { name: "Rodzaje integracji" })
+      .getByRole("link", { name: "Webhooki" });
+    await activeIntegration.focus();
+    await expect(activeIntegration).toBeFocused();
+    const forcedColorsOutline = await activeIntegration.evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).outlineWidth),
+    );
+    expect(forcedColorsOutline).toBeGreaterThanOrEqual(2);
+    await page.screenshot({
+      animations: "disabled",
+      fullPage: true,
+      path: path.join(webhookArtifacts, "forced-colors-320x800.png"),
+    });
+    await page.emulateMedia({ forcedColors: "none", reducedMotion: "reduce" });
+
+    await writeFile(
+      path.join(m9IntegrationsArtifactDirectory, "measurements.json"),
+      `${JSON.stringify(
+        {
+          forcedColorsOutline,
+          reference: {
+            height: 953,
+            sha256: "d864f27cdb08a1b0c5110b04da97935863d42c8f7534359de6fccb2a4c479cc3",
+            width: 1_651,
+          },
+          responsiveMatrix,
+          state: "connected",
+          webhookGeometry,
+        },
+        null,
+        2,
+      )}\n`,
+    );
     expect(errors).toEqual([]);
   });
 

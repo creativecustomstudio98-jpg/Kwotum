@@ -12,8 +12,10 @@ export default function WebhookIntegrationLoading() {
         navigation={<IntegrationsNavigation />}
         title="Integracje"
       />
-      <div className="panel-page">
-        <Skeleton label="Sprawdzanie konfiguracji webhooków" lines={9} />
+      <div className="panel-page integrations-workspace">
+        <section className="panel-card integration-state-card">
+          <Skeleton label="Sprawdzanie konfiguracji webhooków" lines={9} />
+        </section>
       </div>
     </main>
   );

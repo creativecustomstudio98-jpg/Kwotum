@@ -10,6 +10,7 @@ const organizationId = process.env.PANEL_VISUAL_QA_ORGANIZATION_ID;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const userId = process.env.PANEL_VISUAL_QA_USER_ID;
+const seedEmptyIntegrations = process.env.PANEL_VISUAL_QA_INTEGRATIONS_EMPTY === "1";
 
 if (!databaseUrl || !organizationId || !userId) {
   throw new Error("Ustaw DATABASE_URL, PANEL_VISUAL_QA_ORGANIZATION_ID i PANEL_VISUAL_QA_USER_ID.");
@@ -287,10 +288,11 @@ if (supplementalProcessCount > 0) {
   `);
 }
 
-const wordpressCredentialHash = createHash("sha256")
-  .update(`${organizationId}:panel-visual-qa-wordpress`)
-  .digest("hex");
-query(`
+if (!seedEmptyIntegrations) {
+  const wordpressCredentialHash = createHash("sha256")
+    .update(`${organizationId}:panel-visual-qa-wordpress`)
+    .digest("hex");
+  query(`
   with inserted_connection as (
     insert into public.wordpress_connections (
       organization_id, site_origin, credential_hash, plugin_version,
@@ -326,6 +328,7 @@ query(`
     '{"source":"panel_visual_qa_seed"}'::jsonb
   from inserted_connection;
 `);
+}
 
 query(`
   with inserted_policy as (
@@ -1149,12 +1152,14 @@ if (supabaseUrl && serviceRoleKey) {
   }
 }
 
-const webhookEndpointId = stableUuid(`${organizationId}:panel-visual-qa:webhook-endpoint`);
-const webhookRequestId = stableUuid(`${organizationId}:panel-visual-qa:webhook-request`);
-const webhookDeliveredId = stableUuid(`${organizationId}:panel-visual-qa:webhook-delivered`);
-const webhookRetryId = stableUuid(`${organizationId}:panel-visual-qa:webhook-retry`);
-const webhookDeadLetterId = stableUuid(`${organizationId}:panel-visual-qa:webhook-dead-letter`);
-query(`
+let webhookEndpointId = null;
+if (!seedEmptyIntegrations) {
+  webhookEndpointId = stableUuid(`${organizationId}:panel-visual-qa:webhook-endpoint`);
+  const webhookRequestId = stableUuid(`${organizationId}:panel-visual-qa:webhook-request`);
+  const webhookDeliveredId = stableUuid(`${organizationId}:panel-visual-qa:webhook-delivered`);
+  const webhookRetryId = stableUuid(`${organizationId}:panel-visual-qa:webhook-retry`);
+  const webhookDeadLetterId = stableUuid(`${organizationId}:panel-visual-qa:webhook-dead-letter`);
+  query(`
   begin;
 
   insert into public.webhook_endpoints (
@@ -1251,6 +1256,7 @@ query(`
 
   commit;
 `);
+}
 
 console.log(
   JSON.stringify({

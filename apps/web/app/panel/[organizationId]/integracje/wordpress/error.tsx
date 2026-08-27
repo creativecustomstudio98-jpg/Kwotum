@@ -13,14 +13,15 @@ export default function WordPressIntegrationError({ reset }: Readonly<{ reset: (
         description="Połączenia zewnętrzne organizacji."
         navigation={<IntegrationsNavigation />}
         title="Integracje"
-        utilityAction={{ hrefSuffix: "/procesy", label: "Przejdź do procesów" }}
       />
-      <div className="panel-page">
-        <EmptyState
-          action={<Button onClick={reset}>Ponów</Button>}
-          description="Spróbuj ponownie. Aktywny credential nie jest ujawniany przez ten ekran."
-          title="Nie udało się pobrać integracji"
-        />
+      <div className="panel-page integrations-workspace">
+        <section className="panel-card integration-state-card">
+          <EmptyState
+            action={<Button onClick={reset}>Ponów</Button>}
+            description="Spróbuj ponownie. Aktywny credential nie jest ujawniany przez ten ekran."
+            title="Nie udało się pobrać integracji"
+          />
+        </section>
       </div>
     </main>
   );

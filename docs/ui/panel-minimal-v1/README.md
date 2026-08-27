@@ -426,6 +426,11 @@ prowadzony sekwencyjnie jako Integracje → Ustawienia → Pomoc → wejście do
 panelu. Kanoniczny podział, chronione zachowania i gate'y:
 `M9_SYSTEM_PAGES_PLAN_2026-08-27.md`.
 
+M9.1 ukończono 2026-08-28. Nowsza referencja Integracji zastępuje wcześniejszą
+interpretację wyłącznie dla przełącznika WordPress/Webhooki, obramowań
+podsekcji i wysokości pól. Raport:
+`M9_1_INTEGRATIONS_IMPLEMENTATION_2026-08-28.md`. Następny etap: M9.2.
+
 ### M10 — stany i konsolidacja
 
 **Zakres:** wspólny loading, empty, error, permission i success; usunięcie

@@ -33,6 +33,7 @@ export function WordPressTokenForm({ organizationId }: { organizationId: string 
         <FormField id="wordpress-site-origin" label="Origin strony WordPress">
           <Input
             autoComplete="url"
+            className="integration-url-input"
             id="wordpress-site-origin"
             name="siteOrigin"
             placeholder="https://firma.pl"

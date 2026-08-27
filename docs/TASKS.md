@@ -2752,7 +2752,7 @@ się przed zamknięciem poprzedniego.
 - [ ] M7: odświeżyć builder i instalację bez zmiany kontraktu domenowego.
 - [ ] M8: przenieść analitykę do nowego języka wizualnego.
 - [ ] M9: uporządkować ustawienia, integracje, onboarding i wybór organizacji.
-- [ ] M9.1: przebudować najpierw Integracje — stan, konfigurację, połączenia i
+- [x] M9.1: przebudować najpierw Integracje — stan, konfigurację, połączenia i
       historię — redukując linie bez zmiany kontraktów bezpieczeństwa.
 - [ ] M9.2: po gate M9.1 uporządkować Ustawienia według zadań, bez generycznych
       kart i bez nowych pól domeny.

@@ -12,11 +12,15 @@ import {
 export function PanelModuleNavigation({
   ariaLabel,
   items,
+  variant = "default",
 }: Readonly<{
   ariaLabel: string;
   items: ReadonlyArray<PanelContextNavigationItem>;
+  variant?: "default" | "segmented";
 }>) {
   const pathname = usePathname();
+
+  if (items.length === 0) return null;
 
   function keepFocusedDestinationVisible(event: FocusEvent<HTMLElement>) {
     if (!(event.target instanceof HTMLElement)) return;
@@ -26,7 +30,7 @@ export function PanelModuleNavigation({
   return (
     <nav
       aria-label={ariaLabel}
-      className="panel-module-navigation"
+      className={`panel-module-navigation panel-module-navigation--${variant}`}
       onFocus={keepFocusedDestinationVisible}
     >
       <div className="panel-module-navigation__track">

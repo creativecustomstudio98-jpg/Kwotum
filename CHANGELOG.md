@@ -40,6 +40,12 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- M9.1 przebudowuje WordPress i Webhooki według zaakceptowanej referencji:
+  wspólny segmentowy przełącznik, biała dwukolumnowa powierzchnia stanu i
+  konfiguracji, lokalne ramy podsekcji oraz pola URL o wysokości 44 px. Stany
+  connected/empty/loading/error, responsywność i dostępność są spójne, bez
+  migracji i bez zmiany HMAC, tokenów, tenant scope, RLS ani działających akcji.
+
 - Skorygowano nawigację wewnętrzną panelu na podstawie przeglądu produkcji:
   filtr statusów Leadów ma teraz zwartą szerokość treści, zakładki Ustawień i
   Integracji nie rysują pełnej linii przez workspace, a Pomoc używa jednego

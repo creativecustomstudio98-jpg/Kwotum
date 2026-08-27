@@ -1,0 +1,118 @@
+{
+  "forcedColorsOutline": 3,
+  "reference": {
+    "height": 953,
+    "sha256": "d864f27cdb08a1b0c5110b04da97935863d42c8f7534359de6fccb2a4c479cc3",
+    "width": 1651
+  },
+  "responsiveMatrix": [
+    {
+      "height": 900,
+      "name": "webhooks-desktop-1440x900",
+      "overflow": 0,
+      "trackHeight": 46,
+      "trackWidth": 270,
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "name": "wordpress-desktop-1440x900",
+      "overflow": 0,
+      "trackHeight": 46,
+      "trackWidth": 270,
+      "width": 1440
+    },
+    {
+      "height": 1024,
+      "name": "webhooks-tablet-768x1024",
+      "overflow": 0,
+      "trackHeight": 46,
+      "trackWidth": 270,
+      "width": 768
+    },
+    {
+      "height": 1024,
+      "name": "wordpress-tablet-768x1024",
+      "overflow": 0,
+      "trackHeight": 46,
+      "trackWidth": 270,
+      "width": 768
+    },
+    {
+      "height": 844,
+      "name": "webhooks-mobile-390x844",
+      "overflow": 0,
+      "trackHeight": 46,
+      "trackWidth": 358,
+      "width": 390
+    },
+    {
+      "height": 844,
+      "name": "wordpress-mobile-390x844",
+      "overflow": 0,
+      "trackHeight": 46,
+      "trackWidth": 358,
+      "width": 390
+    },
+    {
+      "height": 800,
+      "name": "webhooks-mobile-320x800",
+      "overflow": 0,
+      "trackHeight": 46,
+      "trackWidth": 288,
+      "width": 320
+    },
+    {
+      "height": 800,
+      "name": "wordpress-mobile-320x800",
+      "overflow": 0,
+      "trackHeight": 46,
+      "trackWidth": 288,
+      "width": 320
+    }
+  ],
+  "state": "connected",
+  "webhookGeometry": {
+    "input": {
+      "borderRadius": 9,
+      "borderWidth": 1,
+      "height": 44,
+      "width": 672.859375
+    },
+    "navigationLinks": [
+      {
+        "background": "rgba(0, 0, 0, 0)",
+        "height": 40,
+        "width": 132
+      },
+      {
+        "background": "rgb(255, 255, 255)",
+        "height": 40,
+        "width": 132
+      }
+    ],
+    "navigationTrack": {
+      "borderRadius": 999,
+      "borderWidth": 0,
+      "height": 46,
+      "width": 270
+    },
+    "overflow": 0,
+    "primary": {
+      "borderRadius": 12,
+      "borderWidth": 1,
+      "height": 237.6875,
+      "width": 1347
+    },
+    "sections": [
+      {
+        "borderRadius": 12,
+        "borderWidth": 1
+      },
+      {
+        "borderRadius": 12,
+        "borderWidth": 1
+      }
+    ]
+  }
+}

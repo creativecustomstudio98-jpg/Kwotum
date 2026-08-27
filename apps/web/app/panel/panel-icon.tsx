@@ -18,6 +18,8 @@ export type PanelIconName =
   | "file"
   | "folder"
   | "help"
+  | "history"
+  | "inbox"
   | "info"
   | "integration"
   | "leads"
@@ -38,7 +40,8 @@ export type PanelIconName =
   | "templates"
   | "undo"
   | "user"
-  | "warning";
+  | "warning"
+  | "webhook";
 
 export function PanelIcon({
   name,
@@ -95,6 +98,18 @@ export function PanelIcon({
       <>
         <circle cx="12" cy="12" r="9" />
         <path d="M9.5 9a2.7 2.7 0 1 1 4.8 1.7c-.9.8-2.3 1.3-2.3 2.8M12 17h.01" />
+      </>
+    ),
+    history: (
+      <>
+        <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+        <path d="M3 3v5h5M12 7v5l3 2" />
+      </>
+    ),
+    inbox: (
+      <>
+        <path d="M4 5h16l2 9v5H2v-5l2-9Z" />
+        <path d="M2 14h5l2 3h6l2-3h5" />
       </>
     ),
     info: (
@@ -203,6 +218,14 @@ export function PanelIcon({
       <>
         <path d="M12 3 2.8 19a1.3 1.3 0 0 0 1.1 2h16.2a1.3 1.3 0 0 0 1.1-2L12 3Z" />
         <path d="M12 9v4M12 17h.01" />
+      </>
+    ),
+    webhook: (
+      <>
+        <circle cx="12" cy="5" r="2" />
+        <circle cx="5.5" cy="17" r="2" />
+        <circle cx="18.5" cy="17" r="2" />
+        <path d="M10.6 6.5 6.8 14.8M13.4 6.5l3.8 8.3M7.5 17h9" />
       </>
     ),
   };

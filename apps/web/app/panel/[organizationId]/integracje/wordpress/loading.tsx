@@ -11,10 +11,11 @@ export default function WordPressIntegrationLoading() {
         description="Połączenia zewnętrzne organizacji."
         navigation={<IntegrationsNavigation />}
         title="Integracje"
-        utilityAction={{ hrefSuffix: "/procesy", label: "Przejdź do procesów" }}
       />
-      <div className="panel-page">
-        <Skeleton label="Sprawdzanie połączeń WordPress" lines={7} />
+      <div className="panel-page integrations-workspace">
+        <section className="panel-card integration-state-card">
+          <Skeleton label="Sprawdzanie połączeń WordPress" lines={7} />
+        </section>
       </div>
     </main>
   );
