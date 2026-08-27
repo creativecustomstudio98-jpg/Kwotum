@@ -139,7 +139,12 @@ hostowane nadal przekazują konfigurację przez zmienne procesu. Ustaw
 `DEPLOYMENT_ENV=production` na docelowym środowisku — build odrzuci wtedy
 brakujący, nie-HTTPS lub loopbackowy `APP_URL`.
 Build kopiuje statyczne zasoby do artefaktu standalone przez
-`apps/web/scripts/prepare-standalone.mjs`. Wcześniej
+`apps/web/scripts/prepare-standalone.mjs`. Po każdym buildzie
+`apps/web/scripts/verify-runtime-artifact.mjs` sprawdza, czy upload zdjęć ma
+w trace natywny binding `sharp` i właściwe `libvips` dla platformy runnera,
+uruchamia realne przetworzenie obrazu z artefaktu standalone oraz potwierdza,
+że strony edytora i ustawień nie ładują tej natywnej zależności. Brak któregokolwiek
+elementu zatrzymuje build przed wdrożeniem. Wcześniej
 `apps/web/scripts/copy-widget.mjs` kopiuje moduły `@wyceno/widget` i arkusz z
 `packages/ui` do `/widget/v1/` oraz egzekwuje budżet 90 KiB gzip.
 

@@ -4,7 +4,7 @@ import { Button, FieldMessage, FormField, Input, Select } from "@wyceno/ui";
 import Image from "next/image";
 import { useActionState, useMemo, useState, type CSSProperties } from "react";
 
-import type { FlowMediaAsset } from "../../../../lib/flows/media";
+import type { FlowMediaAsset } from "../../../../lib/flows/media-assets";
 import { updateBrandingAction, type OrganizationSettingsActionState } from "./actions";
 
 const initialState = { error: null, success: null } satisfies OrganizationSettingsActionState;

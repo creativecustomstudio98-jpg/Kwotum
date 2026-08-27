@@ -6,6 +6,14 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Fixed
 
+- Odseparowano natywny `sharp` od tras panelu używających wyłącznie biblioteki
+  mediów i dodano predeployment gate artefaktu. Build potwierdza obecność
+  bindingu oraz `libvips` dla platformy runnera, wykonuje rzeczywistą konwersję
+  WebP z paczki standalone i odrzuca regresję, w której edytor lub ustawienia
+  ładują `sharp` podczas zwykłego odczytu.
+- Usunięto zdublowany scenariusz phone-first z testu pipeline'u leadów. Drugi
+  identyczny blok tworzył dodatkowego leada i fałszywie czerwienił pełny gate
+  PostgreSQL/RLS mimo poprawnej izolacji tenantów i logiki submitu.
 - Wspólny switch UI ma jawnie zablokowaną minimalną i maksymalną geometrię
   42 × 24 px, dzięki czemu ogólne style formularzy nie mogą go rozciągnąć.
 - Dashboard liczy operacyjne KPI i 30-dniowe przekroje po stronie bazy bez

@@ -1,7 +1,7 @@
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
-import { maximumFlowMediaInputBytes, normalizeFlowMedia } from "./media";
+import { maximumFlowMediaInputBytes, normalizeFlowMedia } from "./media-upload";
 
 const cleanScan = async () => ({ status: "clean" as const });
 

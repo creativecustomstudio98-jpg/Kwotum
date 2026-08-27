@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { parseDeploymentEnv } from "@wyceno/config/env";
+import { resolve } from "node:path";
 
 parseDeploymentEnv({
   APP_URL: process.env.APP_URL ?? "http://localhost:3000",
@@ -67,6 +68,13 @@ const nextConfig: NextConfig = {
     ];
   },
   output: "standalone",
+  outputFileTracingIncludes: {
+    "/api/v1/organizations/\\[organizationId\\]/flow-assets": [
+      "../../node_modules/.pnpm/@img+sharp-*/node_modules/@img/sharp-*/**/*",
+      "../../node_modules/.pnpm/@img+sharp-libvips-*/node_modules/@img/sharp-libvips-*/**/*",
+    ],
+  },
+  outputFileTracingRoot: resolve(import.meta.dirname, "../.."),
   poweredByHeader: false,
   reactStrictMode: true,
   transpilePackages: ["@wyceno/database", "@wyceno/ui", "@wyceno/validation", "@wyceno/widget"],

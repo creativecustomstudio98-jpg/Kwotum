@@ -9,7 +9,7 @@
     "dev": "next dev",
     "e2e:panel": "node scripts/run-panel-e2e.mjs",
     "lint": "eslint . --max-warnings=0",
-    "postbuild": "node scripts/prepare-standalone.mjs",
+    "postbuild": "node scripts/prepare-standalone.mjs && node scripts/verify-runtime-artifact.mjs",
     "start": "node --env-file-if-exists=.env.local .next/standalone/apps/web/server.js",
     "test": "vitest run",
     "typecheck": "next typegen && tsc --noEmit"

@@ -3380,3 +3380,36 @@ linku.
 **Gate:** wszystkie pozycje `RELEASE_CHECKLIST.md` mają dowód, ownera, datę
 i approval; nazwa i domeny są zatwierdzone, restore i rollback przećwiczone,
 a gotowość operacyjna została potwierdzona na immutable release candidate.
+
+### Incydent produkcyjny 2026-08-27 — drift aplikacja/baza
+
+**Stan:** diagnoza ukończona, dostęp do Vercela i Supabase potwierdzony, trwała
+poprawka pakowania `sharp` przechodzi lokalny test artefaktu. Produkcyjna
+aplikacja używa kontraktu PX2–PX6 i dashboard RPC, natomiast baza kończy
+historię na `20260811000300`. Dry-run wskazuje dokładnie sześć oczekujących
+migracji `20260825000100`–`20260826000100`. Wdrożenie bazy pozostaje
+zablokowane do czasu utworzenia i sprawdzenia punktu odtworzenia.
+
+- [x] Sprawdzić publiczne health/readiness, marketing i runtime smoke.
+- [x] Porównać produkcyjny schemat i historię migracji z repozytorium.
+- [x] Powiązać brakujące tabele, kolumny i RPC z błędami panelu oraz widgetu.
+- [x] Usunąć zdublowany scenariusz phone-first bez zmiany logiki produktu.
+- [x] Przejść format, lint, typecheck, unit, build i pełny PostgreSQL/RLS.
+- [x] Przećwiczyć lokalny upgrade z bazowego schematu produkcji przez wszystkie
+      sześć migracji; wszystkie zastosowały się bez błędu i utworzyły wymagane
+      obiekty.
+- [x] Zweryfikować w Vercelu bieżący deployment oraz zgodny ze schematem
+      artefakt rollbacku `FkegdvQ9fFfJyJsR9oUQiSg944Vs` (`20bed40`). Rollback
+      przygotowano, ale anulowano zgodnie z decyzją o naprawie bieżącej wersji.
+- [x] Usunąć top-level import `sharp` z tras panelu i rozdzielić odczyt
+      biblioteki mediów od ścieżki uploadu.
+- [x] Dodać zawężone `outputFileTracingIncludes` dla natywnych pakietów
+      `sharp`/`libvips` oraz gate wykonujący realną konwersję z artefaktu
+      standalone. Edytor i ustawienia mają w trace zero plików `sharp`.
+- [!] Migracja produkcyjna: Supabase zgłasza brak backupu fizycznego i wyłączony
+  PITR; brak także stagingowego restore drill wymaganego przez checklistę.
+- [ ] Wdrożyć poprawkę artefaktu na Linux/Vercel i potwierdzić brak błędów
+      `ERR_DLOPEN_FAILED` na edytorze, ustawieniach oraz uploadzie obrazu.
+- [ ] Utworzyć i zweryfikować punkt odtworzenia, przeprowadzić rehearsal na
+      stagingu, następnie zastosować sześć migracji w kolejności i wykonać
+      uwierzytelniony smoke panelu oraz syntetyczną pełną ścieżkę widgetu.

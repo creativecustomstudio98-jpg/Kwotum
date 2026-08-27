@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 import { requireTenantContext } from "../../../../lib/auth/tenant-context";
 import { getOrganizationSettings } from "../../../../lib/organizations/service";
-import { listFlowMediaAssets } from "../../../../lib/flows/media";
+import { listFlowMediaAssets } from "../../../../lib/flows/media-assets";
 import { PanelPageHeader } from "../../panel-page-header";
 import { SettingsNavigation } from "../settings-navigation";
 import { OrganizationForm } from "./organization-form";

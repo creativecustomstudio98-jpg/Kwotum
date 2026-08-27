@@ -2,12 +2,12 @@ import { AuthorizationError } from "@wyceno/database";
 import { z } from "zod";
 
 import { requireTenantContext } from "../../../../../../lib/auth/tenant-context";
+import { listFlowMediaAssets } from "../../../../../../lib/flows/media-assets";
 import {
   createFlowMediaAsset,
   flowMediaAccept,
-  listFlowMediaAssets,
   maximumFlowMediaInputBytes,
-} from "../../../../../../lib/flows/media";
+} from "../../../../../../lib/flows/media-upload";
 
 export const runtime = "nodejs";
 

@@ -62,7 +62,7 @@ import {
   type FlowEditorIssue,
 } from "../../../../../lib/flows/editor-validation";
 import { LatestTaskQueue } from "../../../../../lib/flows/latest-task-queue";
-import type { FlowMediaAsset } from "../../../../../lib/flows/media";
+import type { FlowMediaAsset } from "../../../../../lib/flows/media-assets";
 import { PanelIcon } from "../../../panel-icon";
 import {
   type FlowActionState,

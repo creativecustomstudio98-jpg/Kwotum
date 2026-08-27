@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { requireTenantContext } from "../../../../../lib/auth/tenant-context";
-import { listFlowMediaAssets } from "../../../../../lib/flows/media";
+import { listFlowMediaAssets } from "../../../../../lib/flows/media-assets";
 import { getFlowDraft } from "../../../../../lib/flows/service";
 import { FlowBuilder } from "./flow-builder";
 
