@@ -6,6 +6,10 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Fixed
 
+- Produkcyjny build Turborepo wykonuje teraz lint i typecheck jako własne,
+  blokujące zależności. Zastępuje to zdublowane natywne kontrole Vercela,
+  których odseparowany runner nie potrafił zainstalować zależności monorepo;
+  błędny lint albo typ nadal zatrzymuje wdrożenie przed utworzeniem artefaktu.
 - Usunięto drift produkcyjnego schematu: po szyfrowanym logicznym backupie,
   odtworzeniu zakresu aplikacyjnego i rehearsal na danych produkcyjnych
   wdrożono migracje PX2–PX6 oraz dashboardu do `20260826000100`. Produkcyjne

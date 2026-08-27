@@ -2753,7 +2753,8 @@ się przed zamknięciem poprzedniego.
 - [ ] M8: przenieść analitykę do nowego języka wizualnego.
 - [ ] M9: uporządkować ustawienia, integracje, onboarding i wybór organizacji.
 - [x] M9.1: przebudować najpierw Integracje — stan, konfigurację, połączenia i
-      historię — redukując linie bez zmiany kontraktów bezpieczeństwa.
+      historię — redukując linie bez zmiany kontraktów bezpieczeństwa; build
+      produkcyjny blokuje artefakt na lint i typecheck bez osobnych runnerów.
 - [ ] M9.2: po gate M9.1 uporządkować Ustawienia według zadań, bez generycznych
       kart i bez nowych pól domeny.
 - [ ] M9.3: po gate M9.2 uprościć Pomoc na białym canvasie, zachowując role,

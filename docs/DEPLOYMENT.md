@@ -47,6 +47,11 @@ schedulerem zewnętrznym przed końcem triala. Procedura:
 
 Install z frozen lockfile → lint → typecheck → unit/integration → build → security checks → artefakt immutable → migracja expand → deploy → smoke test → obserwacja → contract/cleanup w późniejszym release.
 
+`turbo run build` ma bezpośrednie zależności od `lint` i `typecheck`. Dotyczy to
+również builda Vercela, dlatego artefakt nie może powstać po pominięciu żadnej
+z tych dwóch bramek. Nie należy dublować ich natywnymi Deployment Checks,
+które uruchamiają osobną instalację zależności poza głównym buildem monorepo.
+
 ## Migracje
 
 Każda ma forward plan, kompatybilność z poprzednią wersją aplikacji, backup/restore point i udokumentowany rollback. Destrukcyjne zmiany stosują expand/contract. Wdrożonego pliku migracji nie edytujemy.

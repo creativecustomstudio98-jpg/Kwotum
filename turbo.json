@@ -21,7 +21,7 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "typecheck"],
+      "dependsOn": ["^build", "lint", "typecheck"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "clean": {

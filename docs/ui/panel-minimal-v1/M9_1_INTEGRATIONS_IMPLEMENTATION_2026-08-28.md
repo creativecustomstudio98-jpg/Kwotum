@@ -71,6 +71,12 @@ Wyniki końcowe:
 - cztery celowane przebiegi E2E — PASS, każdy z cleanupem 0;
 - `pnpm security:secrets` — PASS.
 
+Przed promocją produkcyjną usunięto również zastany błąd infrastruktury:
+natywne kontrole Lint/TypeCheck Vercela uruchamiały drugi, odseparowany install
+i kończyły się przed wykonaniem skryptów. Lint oraz typecheck są teraz
+blokującymi zależnościami `turbo run build`, więc przechodzą w tym samym,
+działającym środowisku instalacji co artefakt produkcyjny.
+
 `pnpm security:scan` zatrzymuje się na zastanym suppression ESLint w
 `szablony/template-library.tsx`. Plik nie jest częścią M9.1; sekret scan oraz
 wszystkie bramki zmienionego zakresu przechodzą.
