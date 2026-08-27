@@ -66,11 +66,11 @@
 .marketing-header__cta {
   min-height: 2.65rem;
   padding: 0.65rem 0.9rem;
-  border: 1px solid var(--wy-color-brand);
-  border-radius: var(--wy-radius-md);
+  border: 1px solid var(--wy-color-action-border);
+  border-radius: var(--wy-radius-action);
   display: inline-flex;
   align-items: center;
-  background: var(--wy-color-brand);
+  background: var(--wy-color-action);
   color: white;
   font-size: var(--wy-type-sm);
   font-weight: var(--wy-font-weight-semibold);
@@ -78,7 +78,7 @@
 }
 
 .marketing-header__cta:hover {
-  background: var(--wy-color-brand-hover);
+  background: var(--wy-color-action-hover);
 }
 
 .marketing-menu-button,
@@ -101,20 +101,20 @@
 .marketing-button {
   min-height: 2.85rem;
   padding: 0.72rem 1rem;
-  border: 1px solid var(--wy-color-brand);
-  border-radius: var(--wy-radius-md);
+  border: 1px solid var(--wy-color-action-border);
+  border-radius: var(--wy-radius-action);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  background: var(--wy-color-brand);
+  background: var(--wy-color-action);
   color: white;
   font-weight: var(--wy-font-weight-semibold);
   text-decoration: none;
 }
 
 .marketing-button:hover {
-  background: var(--wy-color-brand-hover);
+  background: var(--wy-color-action-hover);
 }
 
 .marketing-button--secondary {
@@ -11325,5 +11325,43 @@
     border: 1px solid CanvasText;
     background: Canvas;
     color: CanvasText;
+  }
+}
+
+/* Kwotum action system — one branded geometry for primary marketing actions. */
+.marketing-header--home .marketing-header__cta,
+.marketing-header--subpage .marketing-header__cta,
+.marketing-main .marketing-button {
+  border-radius: var(--wy-radius-action);
+}
+
+.marketing-header--home .marketing-header__cta,
+.marketing-header--subpage .marketing-header__cta,
+.marketing-main
+  .marketing-button:not(.marketing-button--secondary):not(.marketing-button--light):not(
+    .marketing-button--outline-light
+  ) {
+  border-color: var(--wy-color-action-border);
+  background: var(--wy-color-action);
+  box-shadow: inset 0 1px rgb(255 255 255 / 18%);
+}
+
+.marketing-header--home .marketing-header__cta:hover,
+.marketing-header--subpage .marketing-header__cta:hover,
+.marketing-main
+  .marketing-button:not(.marketing-button--secondary):not(.marketing-button--light):not(
+    .marketing-button--outline-light
+  ):hover {
+  background: var(--wy-color-action-hover);
+}
+
+@media (forced-colors: active) {
+  .marketing-header--home .marketing-header__cta,
+  .marketing-header--subpage .marketing-header__cta,
+  .marketing-main .marketing-button {
+    border-color: ButtonText;
+    background: ButtonFace;
+    box-shadow: none;
+    color: ButtonText;
   }
 }

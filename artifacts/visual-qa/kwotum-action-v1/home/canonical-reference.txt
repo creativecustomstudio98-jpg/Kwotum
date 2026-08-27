@@ -1,0 +1,7 @@
+Tekstowa decyzja właściciela z 2026-08-27: główny przycisk ma być bardziej
+zaokrąglony, zaprojektowany dla Kwotum, używać lepiej dopasowanego koloru i
+wyraźnie odróżniać się od zwykłych kontrolek.
+
+Kontekst wizualny: aktywny Landing desktop V7 i jego rzeczywisty pierwszy fold.
+Viewporty kontrolne: 1440 × 900 oraz 390 × 844.
+Kontrakt: docs/ui/KWOTUM_ACTION_SYSTEM_2026-08-27.md.

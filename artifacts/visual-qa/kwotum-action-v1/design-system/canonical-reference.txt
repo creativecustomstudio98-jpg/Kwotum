@@ -1,0 +1,3 @@
+Wspólny komponent Button/LinkButton z packages/ui. Kontrola potwierdza, że
+panel otrzymuje ten sam action token i promień co marketing, bez lokalnego
+nadpisania ekranu. Viewport: 1440 × 900.

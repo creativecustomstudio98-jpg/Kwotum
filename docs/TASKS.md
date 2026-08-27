@@ -3435,3 +3435,27 @@ Storage object bytes nie są częścią logicznego `db dump`.
       tabele, kolumny i dashboard RPC oraz health/readiness bez nowych 500/503.
 - [ ] Wykonać uwierzytelniony smoke panelu oraz syntetyczną pełną ścieżkę
       widgetu; nie jest to zastępowane przez testy tras bez sesji.
+
+### Korekta UI-A1 2026-08-27 — wyróżniająca główna akcja Kwotum
+
+**Stan:** IMPLEMENTED LOCALLY, RELEASE OPEN. Wspólny system przycisków otrzymał
+osobne tokeny akcji: szmaragd `#0B684A`, hover `#07543C`, granicę `#075139` i
+promień 14 px. Zmiana obejmuje panel, publiczny header, wspólne CTA marketingu
+oraz aktywne hero pięciu głównych tras; nie rozszerza geometrii na pola, karty,
+statusy, ikony, destrukcyjne akcje ani tenantowy widget. Test tokenów potwierdza
+WCAG AA, a rzeczywisty landing i `/design-system` potwierdzają finalną kaskadę,
+44–64 px wysokości oraz 0 px overflow na desktopie i mobile. Analiza, rollback
+i dowody: `docs/ui/KWOTUM_ACTION_SYSTEM_2026-08-27.md` oraz
+`artifacts/visual-qa/kwotum-action-v1/`.
+
+- [x] Porównać aktywne style panelu i marketingu oraz wskazać nadpisania CSS.
+- [x] Wybrać osobny kolor akcji z kontrastem co najmniej 4,5:1.
+- [x] Dodać `action`, `action-hover`, `action-border` i `radius-action` w
+      `packages/ui` bez zmiany tokenów pól i kart.
+- [x] Podłączyć wspólny komponent, header, wspólne CTA i aktywne hero.
+- [x] Zachować hover, focus, forced colors, reduced motion i cele dotykowe.
+- [x] Wykonać porównanie 1440 × 900, mobile 390 × 844 i showcase komponentu.
+- [x] Przejść pełny format, lint, typecheck, unit i build; RLS, WordPress i
+      secret scan także są zielone. Globalny SAST pozostaje czerwony przez
+      wcześniejszą supresję ESLint poza zakresem tej korekty.
+- [ ] Wdrożyć immutable release i wykonać produkcyjny smoke CTA.

@@ -32,9 +32,12 @@ ozdobne badge’e i miniaturowe dashboardy nie są neutralnym defaultem.
 | text-muted     | `#626B66` | metadata i informacje trzeciego poziomu                      |
 | border         | `#C9D0CB` | hairlines i podział treści                                   |
 | border-strong  | `#69726D` | granice interaktywnych kontrolek                             |
-| brand          | `#143D2F` | główne CTA, aktywny stan i rail                              |
-| brand-hover    | `#0F3025` | hover głównego CTA                                           |
+| brand          | `#143D2F` | aktywny stan, rail i spokojne akcenty marki                  |
+| brand-hover    | `#0F3025` | hover tekstowych i nawigacyjnych akcentów marki              |
 | brand-soft     | `#DCE9E1` | zaznaczenie i nowy element procesu                           |
+| action         | `#0B684A` | główna akcja panelu i marketingu                             |
+| action-hover   | `#07543C` | hover głównej akcji                                          |
+| action-border  | `#075139` | precyzyjna granica głównej akcji                             |
 | success        | `#2F6A4F` | potwierdzony sukces lub zakończony stan                      |
 | success-soft   | `#E3F0E8` | powierzchnia statusu sukcesu                                 |
 | danger         | `#8A2F35` | błąd, destrukcyjna akcja i spam                              |
@@ -44,8 +47,9 @@ ozdobne badge’e i miniaturowe dashboardy nie są neutralnym defaultem.
 
 Jasna zieleń nie służy do tekstu na bieli. Jest wyróżnikiem, zaznaczeniem i
 powierzchnią z tekstem `brand`. `Success` jest osobną rolą semantyczną i nie
-zastępuje koloru marki. Główne CTA używa `brand` z białym tekstem. Pary tekstów,
-CTA, komunikatów i mocnej granicy kontrolek mają automatyczny test WCAG.
+zastępuje koloru marki. Główne CTA używa osobnej roli `action` z białym
+tekstem; nie zmienia to koloru nawigacji, statusu ani pól. Pary tekstów, CTA,
+komunikatów i mocnej granicy kontrolek mają automatyczny test WCAG.
 Zieleń nie oznacza wyniku finansowego ani „eko”. Lokalne kolory są zabronione.
 
 W CSS używamy nazw `--wy-color-*`; prefiks jest stabilnym identyfikatorem
@@ -57,7 +61,8 @@ pozostają wyłącznie aliasami kompatybilności. Nowy kod używa ról semantycz
 - spacing: 0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128 px;
 - type: 12, 14, 16, 18, 20, 24, 32, 40, 52, 64 px;
 - wagi: wyłącznie 400, 500, 600 i 700; bez arbitralnych 650/680/750/850;
-- radius: `sm` 4 px, `md` 8 px, `lg` 12 px; pigułka wyłącznie dla statusu;
+- radius: `sm` 4 px, `md` 8 px, `lg` 12 px i `action` 14 px; pigułka wyłącznie
+  dla statusu;
 - motion: 120 ms reakcje, 180 ms standard, 240 ms panele, bez dekoracyjnych springów;
 - body minimum 16 px, line-height 1.55–1.68 i tabular numerals w danych;
 - główne cele dotykowe 40–44 px, minimum WCAG 24×24 CSS px.

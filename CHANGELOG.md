@@ -40,6 +40,10 @@ Wszystkie istotne zmiany projektu będą dokumentowane w tym pliku.
 
 ### Changed
 
+- Główne akcje panelu i marketingu korzystają z osobnych tokenów Kwotum:
+  szmaragdu `#0B684A`, ciemniejszego hoveru, precyzyjnej granicy i promienia
+  14 px. Pola, karty, statusy, ikony, destrukcyjne akcje i tenantowy widget
+  zachowują dotychczasową geometrię oraz role kolorystyczne.
 - M5 przebudowuje listy Leadów, Procesów i Szablonów na płaskie powierzchnie
   operacyjne bez dekoracyjnych kart, mediów i podwójnych teł. Leady oraz
   procesy otrzymały tenantową paginację serwerową i stabilne sortowanie,

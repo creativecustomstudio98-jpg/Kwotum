@@ -88,7 +88,7 @@
   min-height: 3.65rem;
   padding: 0.85rem 1.65rem;
   border: 1px solid transparent;
-  border-radius: 0.68rem;
+  border-radius: var(--wy-radius-action);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -99,14 +99,14 @@
 }
 
 .primaryAction {
-  border-color: var(--wy-marketing-brand);
-  background: var(--wy-marketing-brand);
+  border-color: var(--wy-color-action-border);
+  background: var(--wy-color-action);
   color: white;
-  box-shadow: 0 0.85rem 1.8rem rgb(7 131 59 / 15%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 18%);
 }
 
 .primaryAction:hover {
-  background: var(--wy-marketing-brand-hover);
+  background: var(--wy-color-action-hover);
 }
 
 .secondaryAction {

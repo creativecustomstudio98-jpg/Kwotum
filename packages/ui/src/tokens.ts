@@ -10,6 +10,9 @@ export const colorTokens = {
   brand: "#143D2F",
   brandHover: "#0F3025",
   brandSoft: "#DCE9E1",
+  action: "#0B684A",
+  actionHover: "#07543C",
+  actionBorder: "#075139",
   success: "#2F6A4F",
   successSoft: "#E3F0E8",
   danger: "#8A2F35",
@@ -44,6 +47,9 @@ export const marketingColorTokens = {
   brand: "#06753A",
   brandHover: "#056E32",
   brandSoft: "#E7F5EC",
+  action: "#0B684A",
+  actionHover: "#07543C",
+  actionBorder: "#075139",
   success: "#15964A",
 } as const;
 
@@ -58,6 +64,9 @@ export const panelColorTokens = {
   brand: "#003B25",
   brandHover: "#002F1E",
   brandSoft: "#EDF6F1",
+  action: "#0B684A",
+  actionHover: "#07543C",
+  actionBorder: "#075139",
   focus: "#087047",
 } as const;
 
@@ -104,6 +113,7 @@ export const radiusTokens = {
   large: "0.75rem",
   pill: "999px",
   control: "0.5rem",
+  action: "0.875rem",
   panel: "0.75rem",
 } as const;
 

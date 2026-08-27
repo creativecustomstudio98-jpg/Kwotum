@@ -11,6 +11,9 @@
   --wy-color-brand: #143d2f;
   --wy-color-brand-hover: #0f3025;
   --wy-color-brand-soft: #dce9e1;
+  --wy-color-action: #0b684a;
+  --wy-color-action-hover: #07543c;
+  --wy-color-action-border: #075139;
   --wy-color-on-brand: #ffffff;
   --wy-color-success: #2f6a4f;
   --wy-color-success-soft: #e3f0e8;
@@ -87,6 +90,7 @@
   --wy-radius-pill: 999px;
   --wy-radius-small: var(--wy-radius-sm);
   --wy-radius-control: var(--wy-radius-md);
+  --wy-radius-action: 0.875rem;
   --wy-radius-panel: var(--wy-radius-lg);
   --wy-shadow-sm: 0 1px 2px rgb(20 61 47 / 4%), 0 3px 10px rgb(20 61 47 / 4%);
   --wy-shadow-md: 0 8px 24px rgb(20 61 47 / 6%);
@@ -111,6 +115,9 @@
   --wy-color-brand: #003b25;
   --wy-color-brand-hover: #002f1e;
   --wy-color-brand-soft: #edf6f1;
+  --wy-color-action: #0b684a;
+  --wy-color-action-hover: #07543c;
+  --wy-color-action-border: #075139;
   --wy-color-on-brand: #ffffff;
   --wy-color-success: #087047;
   --wy-color-success-soft: #e9f7ef;
@@ -158,6 +165,9 @@
   --wy-marketing-brand: #06753a;
   --wy-marketing-brand-hover: #056e32;
   --wy-marketing-brand-soft: #e7f5ec;
+  --wy-color-action: #0b684a;
+  --wy-color-action-hover: #07543c;
+  --wy-color-action-border: #075139;
   --wy-marketing-success: #15964a;
 }
 
@@ -400,6 +410,7 @@ a {
 
 .wy-button {
   padding: 0.7rem var(--wy-space-4);
+  border-radius: var(--wy-radius-action);
 }
 
 .wy-button--small {
@@ -409,12 +420,14 @@ a {
 }
 
 .wy-button--primary {
-  background: var(--wy-color-brand);
+  border-color: var(--wy-color-action-border);
+  background: var(--wy-color-action);
+  box-shadow: inset 0 1px rgb(255 255 255 / 18%);
   color: white;
 }
 
 .wy-button--primary:hover {
-  background: var(--wy-color-brand-hover);
+  background: var(--wy-color-action-hover);
 }
 
 .wy-button--secondary {
@@ -1412,6 +1425,10 @@ a {
 }
 
 @media (forced-colors: active) {
+  .wy-button {
+    box-shadow: none;
+  }
+
   .wy-status-dot,
   .wy-switch__control,
   .wy-switch__control::after,

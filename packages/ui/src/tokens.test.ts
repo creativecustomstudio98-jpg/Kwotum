@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import { contrastRatio, relativeLuminance } from "./contrast";
-import { colorTokens, marketingColorTokens, panelColorTokens, panelSidebarTokens } from "./tokens";
+import {
+  colorTokens,
+  marketingColorTokens,
+  panelColorTokens,
+  panelSidebarTokens,
+  radiusTokens,
+} from "./tokens";
 
 describe("tokeny kolorystyczne", () => {
   it.each([
@@ -11,6 +17,8 @@ describe("tokeny kolorystyczne", () => {
     ["tekst wyciszony / powierzchnia", colorTokens.textMuted, colorTokens.surface],
     ["tekst wyciszony / powierzchnia drugorzędna", colorTokens.textMuted, colorTokens.surfaceMuted],
     ["biały / marka", colorTokens.surface, colorTokens.brand],
+    ["biały / główna akcja", colorTokens.surface, colorTokens.action],
+    ["biały / hover głównej akcji", colorTokens.surface, colorTokens.actionHover],
     ["tekst marki / miękka marka", colorTokens.brand, colorTokens.brandSoft],
     ["sukces / powierzchnia", colorTokens.success, colorTokens.surface],
     ["sukces / miękki sukces", colorTokens.success, colorTokens.successSoft],
@@ -49,6 +57,16 @@ describe("tokeny kolorystyczne", () => {
       marketingColorTokens.surface,
     ],
     ["biały / CTA marketingowe", marketingColorTokens.surface, marketingColorTokens.brand],
+    [
+      "biały / główna akcja marketingowa",
+      marketingColorTokens.surface,
+      marketingColorTokens.action,
+    ],
+    [
+      "biały / hover głównej akcji marketingowej",
+      marketingColorTokens.surface,
+      marketingColorTokens.actionHover,
+    ],
     ["zieleń / miękka powierzchnia", marketingColorTokens.brand, marketingColorTokens.brandSoft],
   ])("%s spełnia WCAG AA", (_name, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
@@ -71,6 +89,8 @@ describe("tokeny kolorystyczne", () => {
     ["label sidebara / hover", panelSidebarTokens.label, panelSidebarTokens.hover],
     ["tekst subtelny sidebara / hover", panelSidebarTokens.textSubtle, panelSidebarTokens.hover],
     ["focus panelu / powierzchnia", panelColorTokens.focus, panelColorTokens.surface],
+    ["biały / główna akcja panelu", panelColorTokens.surface, panelColorTokens.action],
+    ["biały / hover głównej akcji panelu", panelColorTokens.surface, panelColorTokens.actionHover],
   ])("%s spełnia WCAG AA", (_name, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
   });
@@ -89,5 +109,10 @@ describe("tokeny kolorystyczne", () => {
     expect(
       contrastRatio(panelColorTokens.borderStrong, panelColorTokens.surface),
     ).toBeGreaterThanOrEqual(3);
+  });
+
+  it("oddziela bardziej zaokrąglony przycisk akcji od geometrii pól", () => {
+    expect(radiusTokens.action).toBe("0.875rem");
+    expect(radiusTokens.action).not.toBe(radiusTokens.control);
   });
 });

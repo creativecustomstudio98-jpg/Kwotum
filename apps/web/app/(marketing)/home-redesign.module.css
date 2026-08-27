@@ -115,7 +115,7 @@
   min-height: 3.25rem;
   padding: 0.8rem 1rem;
   border: 1px solid transparent;
-  border-radius: 0.65rem;
+  border-radius: var(--wy-radius-action);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -126,13 +126,14 @@
 }
 
 .primaryAction {
-  background: var(--home-green);
+  border-color: var(--wy-color-action-border);
+  background: var(--wy-color-action);
   color: white;
-  box-shadow: 0 0.65rem 1.5rem rgb(15 75 54 / 16%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 18%);
 }
 
 .primaryAction:hover {
-  background: var(--home-green-dark);
+  background: var(--wy-color-action-hover);
 }
 
 .secondaryAction {
@@ -1526,7 +1527,7 @@
 .industryList a:focus-visible,
 .agencyNote a:focus-visible,
 .decisionDocument a:focus-visible {
-  outline: 3px solid #8bc6a7;
+  outline: 3px solid var(--wy-color-action);
   outline-offset: 3px;
 }
 
@@ -2233,20 +2234,20 @@
 .secondaryAction {
   min-height: 4rem;
   padding: 0.9rem 2.4rem;
-  border-radius: 0.68rem;
+  border-radius: var(--wy-radius-action);
   font-size: 1.05rem;
   font-weight: 650;
 }
 
 .primaryAction {
   min-width: 11.6rem;
-  border-color: var(--wy-marketing-brand);
-  background: var(--wy-marketing-brand);
-  box-shadow: 0 0.85rem 1.8rem rgb(7 131 59 / 15%);
+  border-color: var(--wy-color-action-border);
+  background: var(--wy-color-action);
+  box-shadow: inset 0 1px rgb(255 255 255 / 18%);
 }
 
 .primaryAction:hover {
-  background: var(--wy-marketing-brand-hover);
+  background: var(--wy-color-action-hover);
 }
 
 .secondaryAction {

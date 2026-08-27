@@ -1,7 +1,7 @@
 # Manifest aktywnych referencji UI Kwotum
 
 **Status:** kanoniczny  
-**Ostatnia aktualizacja:** 2026-08-26
+**Ostatnia aktualizacja:** 2026-08-27
 
 Ten plik zawiera wyłącznie referencje, które nadal sterują przyszłą pracą.
 Historyczne obrazy panelu i ich pakiety źródłowe zostały usunięte po decyzji
@@ -20,6 +20,21 @@ kierunku bez nowej decyzji.
 Referencja wizualna nie dodaje funkcji, danych, ról ani uprawnień. Nazwy,
 liczby i osoby na obrazie są przykładową treścią, dopóki wymagania produktu nie
 stanowią inaczej.
+
+## Główna akcja Kwotum — korekta tekstowa 2026-08-27
+
+Najnowsza decyzja właściciela nadpisuje wcześniejszy promień i kolor wyłącznie
+dla głównych przycisków akcji. Panel i marketing używają szmaragdu Kwotum
+`#0B684A`, hover `#07543C`, granicy `#075139` oraz promienia 14 px. Jest to
+zaokrąglony prostokąt, nie pełna pigułka. Pola, karty, statusy, ikonowe
+kontrolki, destrukcyjne akcje i tenantowy branding widgetu pozostają poza
+zakresem tej korekty.
+
+Korekta jest code-native i nie otrzymuje sztucznego pixel-perfect wyniku.
+Porównanie rzeczywistego pierwszego folda w 1440 × 900 i 390 × 844 oraz wspólnego
+komponentu w `/design-system` znajduje się w
+`artifacts/visual-qa/kwotum-action-v1/`. Kontrakt i analiza są zapisane w
+`docs/ui/KWOTUM_ACTION_SYSTEM_2026-08-27.md`.
 
 ## Panel administracyjny — Minimal V1
 
